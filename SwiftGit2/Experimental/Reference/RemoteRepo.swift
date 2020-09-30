@@ -29,8 +29,10 @@ public class RemoteRepo : InstanceProtocol {
 	
 	//TODO:LAME HACK
 	public var URL: String {
-		"ssh://" + String(validatingUTF8: git_remote_url(pointer))!
-		.replacingOccurrences(of: ":", with: "/")
-		
+		//"ssh://" + String(validatingUTF8: git_remote_url(pointer))!
+		//.replacingOccurrences(of: ":", with: "/")
+		"ssh://git@github.com:ukushu/TextProgressBar.git"
 	}
+	
+	
 }

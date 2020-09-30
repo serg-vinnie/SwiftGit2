@@ -16,14 +16,14 @@ private class Wrapper<T> {
 	}
 }
 
-public enum Credentials {
+public enum CredentialsOLD {
 	case `default`
 	case sshAgent
 	case plaintext(username: String, password: String)
 	case sshMemory(username: String, publicKey: String, privateKey: String, passphrase: String)
 
-	internal static func fromPointer(_ pointer: UnsafeMutableRawPointer) -> Credentials {
-		return Unmanaged<Wrapper<Credentials>>.fromOpaque(UnsafeRawPointer(pointer)).takeRetainedValue().value
+	internal static func fromPointer(_ pointer: UnsafeMutableRawPointer) -> CredentialsOLD {
+		return Unmanaged<Wrapper<CredentialsOLD>>.fromOpaque(UnsafeRawPointer(pointer)).takeRetainedValue().value
 	}
 
 	internal func toPointer() -> UnsafeMutableRawPointer {
@@ -34,7 +34,7 @@ public enum Credentials {
 /// Handle the request of credentials, passing through to a wrapped block after converting the arguments.
 /// Converts the result to the correct error code required by libgit2 (0 = success, 1 = rejected setting creds,
 /// -1 = error)
-internal func credentialsCallback(
+internal func credentialsCallbackOLD(
 	cred: UnsafeMutablePointer<UnsafeMutablePointer<git_cred>?>?,
 	url: UnsafePointer<CChar>?,
 	username: UnsafePointer<CChar>?,
@@ -46,7 +46,7 @@ internal func credentialsCallback(
 	// Find username_from_url
 	let name = username.map(String.init(cString:))
 
-	switch Credentials.fromPointer(payload!) {
+	switch CredentialsOLD.fromPointer(payload!) {
 	case .default:
 		result = git_cred_default_new(cred)
 	case .sshAgent:

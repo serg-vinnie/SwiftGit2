@@ -53,7 +53,7 @@ private func checkoutOptions(strategy: CheckoutStrategy,
 	return options
 }
 
-private func fetchOptions(credentials: Credentials) -> git_fetch_options {
+private func fetchOptions(credentials: CredentialsOLD) -> git_fetch_options {
 	let pointer = UnsafeMutablePointer<git_fetch_options>.allocate(capacity: 1)
 	git_fetch_init_options(pointer, UInt32(GIT_FETCH_OPTIONS_VERSION))
 
@@ -62,12 +62,12 @@ private func fetchOptions(credentials: Credentials) -> git_fetch_options {
 	pointer.deallocate()
 
 	options.callbacks.payload = credentials.toPointer()
-	options.callbacks.credentials = credentialsCallback
+	options.callbacks.credentials = credentialsCallbackOLD
 
 	return options
 }
 
-private func pushOptions(credentials: Credentials) -> git_push_options {
+private func pushOptions(credentials: CredentialsOLD) -> git_push_options {
 	let pointer = UnsafeMutablePointer<git_push_options>.allocate(capacity: 1)
 	git_push_init_options(pointer, UInt32(GIT_PUSH_OPTIONS_VERSION))
 	
@@ -76,7 +76,7 @@ private func pushOptions(credentials: Credentials) -> git_push_options {
 	pointer.deallocate()
 	
 	options.callbacks.payload = credentials.toPointer()
-	options.callbacks.credentials = credentialsCallback
+	options.callbacks.credentials = credentialsCallbackOLD
 	
 	return options
 }
@@ -162,7 +162,7 @@ public final class RepositoryOLD {
 	///
 	/// Returns a `Result` with a `Repository` or an error.
 	public class func clone(from remoteURL: URL, to localURL: URL, localClone: Bool = false, bare: Bool = false,
-	                        credentials: Credentials = .default, checkoutStrategy: CheckoutStrategy = .Safe,
+	                        credentials: CredentialsOLD = .default, checkoutStrategy: CheckoutStrategy = .Safe,
 	                        checkoutProgress: CheckoutProgressBlock? = nil) -> Result<RepositoryOLD, NSError> {
 		var options = cloneOptions(
 			bare: bare,
@@ -428,7 +428,7 @@ public final class RepositoryOLD {
 	}
 	
 	/// Push local branch changes to remote branch
-	public func push(branch: BranchOLD, to remote: Remote_OLD, credentials: Credentials = .default) -> Result<(), NSError> {
+	public func push(branch: BranchOLD, to remote: Remote_OLD, credentials: CredentialsOLD = .default) -> Result<(), NSError> {
 		return remoteLookup(named: remote.name) { remote in
 			remote.flatMap { pointer in
 				var opts = pushOptions(credentials: credentials)

@@ -193,7 +193,7 @@ public extension Repository {
 	///
 	/// Returns a `Result` with a `Repository` or an error.
 	static func clone(from remoteURL: URL, to localURL: URL, isLocalClone: Bool = false, bare: Bool = false,
-							credentials: Credentials = .default, checkoutStrategy: CheckoutStrategy = .Safe,
+							credentials: CredentialsOLD = .default, checkoutStrategy: CheckoutStrategy = .Safe,
 							checkoutProgress: CheckoutProgressBlock? = nil) -> Result<Repository, NSError> {
 			var options = cloneOptions(
 				bare: bare,
@@ -246,7 +246,7 @@ extension Array {
 	}
 }
 
-fileprivate func fetchOptions(credentials: Credentials) -> git_fetch_options {
+fileprivate func fetchOptions(credentials: CredentialsOLD) -> git_fetch_options {
 	let pointer = UnsafeMutablePointer<git_fetch_options>.allocate(capacity: 1)
 	git_fetch_init_options(pointer, UInt32(GIT_FETCH_OPTIONS_VERSION))
 
@@ -255,7 +255,7 @@ fileprivate func fetchOptions(credentials: Credentials) -> git_fetch_options {
 	pointer.deallocate()
 
 	options.callbacks.payload = credentials.toPointer()
-	options.callbacks.credentials = credentialsCallback
+	options.callbacks.credentials = credentialsCallbackOLD
 
 	return options
 }
@@ -286,7 +286,7 @@ fileprivate func cloneOptions(bare: Bool = false, localClone: Bool = false, fetc
 	return options
 }
 
-fileprivate func pushOptions(credentials: Credentials) -> git_push_options {
+fileprivate func pushOptions(credentials: CredentialsOLD) -> git_push_options {
 	let pointer = UnsafeMutablePointer<git_push_options>.allocate(capacity: 1)
 	git_push_init_options(pointer, UInt32(GIT_PUSH_OPTIONS_VERSION))
 	
@@ -295,7 +295,7 @@ fileprivate func pushOptions(credentials: Credentials) -> git_push_options {
 	pointer.deallocate()
 	
 	options.callbacks.payload = credentials.toPointer()
-	options.callbacks.credentials = credentialsCallback
+	options.callbacks.credentials = credentialsCallbackOLD
 	
 	return options
 }
