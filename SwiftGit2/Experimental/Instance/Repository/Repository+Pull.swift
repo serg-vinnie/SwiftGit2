@@ -52,10 +52,9 @@ public extension Repository {
 
             let ourOID = ourLocal.targetOID
             let theirOID = ourLocal.upstream().flatMap { $0.targetOID }
-            let baseOID = combine(ourOID, theirOID).flatMap { self.mergeBase(one: $0, two: $1) }
+            //let baseOID = combine(ourOID, theirOID).flatMap { self.mergeBase(one: $0, two: $1) }
 
-            let message = combine(theirReference, baseOID)
-                .map { their, base in "Three Way MERGE \(their.nameAsReference) -> \(ourLocal.nameAsReference) with BASE \(base)" }
+            let message = theirReference.map { their in "Three Way MERGE \(their.nameAsReference) -> \(ourLocal.nameAsReference)" }
 
             let ourCommit = ourOID.flatMap { self.commit(oid: $0) }
             let theirCommit = theirOID.flatMap { self.commit(oid: $0) }
@@ -65,15 +64,18 @@ public extension Repository {
 
             let branchName = ourLocal.nameAsReference
 
-            return [ourOID, theirOID, baseOID]
-                .flatMap { $0.tree(self) }
-                .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2]) } // -> Index
+            //return [ourOID, theirOID, baseOID]
+            //    .flatMap { $0.tree(self) }
+            //    .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2]) } // -> Index
+            return combine(ourCommit, theirCommit)
+                .flatMap { self.merge(our: $0, their: $1) }
                 .if(\.hasConflicts,
-                    then: { idx in
-                        self.checkout(index: idx, strategy: .UseTheirs)
-                            .flatMap { _ in .success(.threeWayConflict(idx)) }
+                    then: { idx in self.index()
+                        .flatMap { $0.clear() }
+                        .flatMap { self.checkout(index: idx, strategy: .UseTheirs) }
+                        .flatMap { _ in .success(.threeWayConflict(idx)) }
                     },
-
+                    
                     else: { index in
                         combine(message, parents)
                             .flatMap { index.commit(into: self, signature: signature, message: $0, parents: $1) }
