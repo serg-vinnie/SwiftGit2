@@ -1,43 +1,16 @@
-//
-//  Index+Iterator.swift
-//  SwiftGit2-OSX
-//
-//  Created by loki on 03.06.2021.
-//  Copyright © 2021 GitHub, Inc. All rights reserved.
-//
-
 import Foundation
 import Clibgit2
 import Essentials
 
-extension Result {
-    var maybeSuccess: Success? {
-        switch self {
-        case let .success(s):
-            return s
-        default:
-            return nil
-        }
-    }
-    
-    var maybeFailure: Failure? {
-        switch self {
-        case let .failure(error):
-            return error
-        default:
-            return nil
-        }
-    }
-}
+// Pointer example
+//
+// var our = UnsafeMutablePointer<UnsafePointer<git_index_entry>?>.allocate(capacity: 1)
+// var their : UnsafePointer<git_index_entry>?
+// git_index_conflict_next(our, &their, our, self.pointer)
 
-protocol ResultIterator {
-    associatedtype Success
-    
-    func next() -> Result<Success, Error> 
-}
 
 internal extension Index {
-    final class ConflictIterator: InstanceProtocol {
+    final class ConflictIterator: InstanceProtocol, ResultIterator {
         public var pointer: OpaquePointer
         
         public required init(_ pointer: OpaquePointer) {
@@ -58,38 +31,9 @@ internal extension Index {
             }
             return .failure(NSError(gitError: result, pointOfFailure: "git_index_conflict_next"))
         }
-        
-        func all() -> Result<[Conflict],Error> {
-            var c = [Conflict]()
-            
-            var result = next()
-            
-            while c.insert(next: result) { //producer.update(element: element, completion: result.completion) {
-              result = next()
-            }
-            
-            if let error = result.maybeFailure {
-                return .failure(error)
-            }
-            
-            return .success(c)
-        }
     }
-}
-
-extension Array where Element == SwiftGit2.Index.Conflict {
-    mutating func insert(next: Result<Element?, Error>) -> Bool {
-        switch next {
-        case let .success(item):
-            if let item = item {
-                self.append(item)
-                return true
-            }
-            return false
-        default:
-            return false
-        }
-    }
+    
+    // ResultIterator.all() -> Result<[Success], Error>
 }
 
 public extension Index {
@@ -103,13 +47,3 @@ public extension Index {
         var ancestor: git_index_entry { return _ancestor!.pointee }
     }
 }
-
-
-// Pointer example
-//
-// var our = UnsafeMutablePointer<UnsafePointer<git_index_entry>?>.allocate(capacity: 1)
-// var their : UnsafePointer<git_index_entry>?
-// git_index_conflict_next(our, &their, our, self.pointer)
-
-
-// 4 essentials
