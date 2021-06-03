@@ -45,6 +45,18 @@ public extension Index {
         }
         return .success(entries)
     }
+    
+    func conflicts() { //}-> Result<[Index.Entry], Error> {
+        var iterator: OpaquePointer?
+
+        git_index_conflict_iterator_new(&iterator, self.pointer)
+    }
+    
+    private func conflictIterator() -> Result<ConflictIterator, Error> {
+        return git_instance(of: ConflictIterator.self, "git_index_conflict_iterator_new"){ iterator in
+            git_index_conflict_iterator_new(&iterator, self.pointer)
+        }
+    }
 
     func add(paths: [String]) -> Result<Void, Error> {
         return paths.with_git_strarray { strarray in
