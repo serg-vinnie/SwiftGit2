@@ -47,3 +47,31 @@ public extension Index {
         var ancestor: git_index_entry { return _ancestor!.pointee }
     }
 }
+
+extension Index : CustomDebugStringConvertible, CustomStringConvertible {
+    public var description: String {
+        debugDescription
+    }
+    
+    public var debugDescription: String {
+        if let conflicts = try? conflicts().get() {
+            return "\(conflicts)"
+        }
+        return "WTF"
+    }
+}
+
+extension Index.Conflict : CustomDebugStringConvertible, CustomStringConvertible {
+    public var description: String {
+        debugDescription
+    }
+    
+    public var debugDescription: String {
+        if let path = _their?.pointee.path {
+            return String(cString: path)
+        }
+        return "WTF"
+    }
+    
+    
+}

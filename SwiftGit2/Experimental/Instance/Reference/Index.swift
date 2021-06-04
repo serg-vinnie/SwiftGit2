@@ -46,10 +46,8 @@ public extension Index {
         return .success(entries)
     }
     
-    func conflicts() { //}-> Result<[Index.Entry], Error> {
-        var iterator: OpaquePointer?
-
-        git_index_conflict_iterator_new(&iterator, self.pointer)
+    func conflicts() -> Result<[Conflict], Error> {
+        conflictIterator().flatMap { $0.all() }
     }
     
     private func conflictIterator() -> Result<ConflictIterator, Error> {

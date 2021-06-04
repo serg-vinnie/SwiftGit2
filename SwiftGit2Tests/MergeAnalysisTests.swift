@@ -72,7 +72,9 @@ class MergeAnalysisTests: XCTestCase {
 
         XCTAssert(merge == .normal)
 
-        repo1.pull(.HEAD, signature: GitTest.signature)
+        let idx = repo1.pull(.HEAD, signature: GitTest.signature)
             .assertBlock("pull has conflict") { $0.hasConflict }
+        
+        print(idx!)
     }
 }
