@@ -32,6 +32,8 @@ public struct StatusEntry {
     public let status: Status
     public let headToIndex: Diff.Delta?
     public let indexToWorkDir: Diff.Delta?
+    
+    private(set) var headToWorkdir: Diff.Delta? = nil
 
     public init(from statusEntry: git_status_entry) {
         status = Status(rawValue: statusEntry.status.rawValue)
@@ -47,6 +49,33 @@ public struct StatusEntry {
         } else {
             indexToWorkDir = nil
         }
+    }
+    
+    public init(from: StatusEntry, repo: Repository){
+        self.status = from.status
+        self.headToIndex = from.headToIndex
+        self.indexToWorkDir = from.indexToWorkDir
+        self.headToWorkdir = try? headToWorkdir(repo: repo).get()
+    }
+    
+    private func headToWorkdir(repo: Repository) -> Result<Diff.Delta?, Error> {
+        let newFile = headToIndex?.newFile ?? indexToWorkDir?.newFile
+        
+        return repo.headCommit()
+            .flatMap{ $0.tree() }
+            .flatMap { tree -> Result<Diff.Delta?, Error> in
+                let options: DiffOptions = DiffOptions()
+                var diff: OpaquePointer?
+                
+                let result = git_diff_tree_to_workdir(&diff, repo.pointer, tree.pointer, &options.diff_options)
+
+                guard result == GIT_OK.rawValue else {
+                    return Result.failure(NSError(gitError: result, pointOfFailure: "git_diff_tree_to_workdir"))
+                }
+
+                return Diff(diff!).asDeltas()
+                    .map{ $0.filter{ $0.newFile?.path == newFile?.path }.first }
+            }
     }
 }
 
