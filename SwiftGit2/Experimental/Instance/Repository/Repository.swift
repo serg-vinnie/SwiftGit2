@@ -170,17 +170,19 @@ public extension Repository {
 // index
 public extension Repository {
     ///Unstage files by relative path
-    func reset(relPaths: [String]) -> Result<Void, Error> {
+    func reset(relPaths: [String]) -> R<Void> {
         return HEAD()
-            .flatMap { $0.targetOID }
-            .flatMap { self.commit(oid: $0) }
-            .flatMap { commit in
-                git_try("git_reset_default") {
-                    relPaths.with_git_strarray { strarray in
-                        git_reset_default(self.pointer, commit.pointer, &strarray)
-                    }
-                }
+            | { $0.targetOID }
+            | { self.commit(oid: $0) }
+            | { resetDefault(commit: $0, paths: relPaths) }
+    }
+    
+    func resetDefault(commit: Commit, paths: [String]) -> R<Void> {
+        git_try("git_reset_default") {
+            paths.with_git_strarray { strarray in
+                git_reset_default(self.pointer, commit.pointer, &strarray)
             }
+        }
     }
     
     ///Stage files by relative path
@@ -190,7 +192,7 @@ public extension Repository {
     
     func remove(relPaths: [String]) -> R<()> {
          index()
-            .flatMap { $0.remove(relPaths: relPaths) }
+            .flatMap { $0.remove(paths: relPaths) }
     }
 }
 
@@ -246,37 +248,20 @@ extension RepositoryError: LocalizedError {
 public extension Repository {
     /// stageAllFiles
     func addAllFiles() -> Result<(),Error> {
-        let statOpt = StatusOptions()
-        
-        return combine(self.directoryURL, self.status(options: statOpt))
-            .map { repoUrl, status in
-                status
-                    .compactMap{ $0.indexToWorkDir }
-                    .map{ $0.getFileAbsPathUsing(repoPath: repoUrl.path) }
-            }
-            .flatMap { paths -> Result<(),Error> in
-                self.index()
-                    .flatMap {
-                        $0.add(paths: paths)
-                    }
-            }
-            
+        let entries = self.status() | { $0.compactMap { $0.indexToWorkDir }}
+
+        return combine(entries, directoryURL)
+            | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
+            | { paths in self.index()   | { $0.add(paths: paths) } }
     }
 
     /// unstageAllFiles
     func resetAllFiles() -> Result<(),Error>  {
-        let statOpt = StatusOptions()
+        let entries = self.status() | { $0.compactMap { $0.indexToWorkDir }}
 
-        return combine(self.directoryURL, self.status(options: statOpt))
-            .map { repoUrl, status in
-                status
-                    .compactMap{ $0.headToIndex }
-                    .map{ $0.getFileAbsPathUsing(repoPath: repoUrl.path) }
-            }
-            .flatMap {
-                self.reset(relPaths: $0)
-            }
-            .flatMap{ _ in .success(()) }
+        return combine(entries, directoryURL)
+            | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
+            | { paths in self.index()   | { _ in self.reset(relPaths: paths) } }
     }
 }
 
