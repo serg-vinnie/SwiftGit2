@@ -42,20 +42,6 @@ extension Repository: CustomDebugStringConvertible {
 
 // Remotes
 public extension Repository {
-    //TEST
-    func blobCreateFromDisk(path: String) -> R<Blob> {
-        let repo = self
-        
-        var oid = git_oid()
-        
-        return _result({ OID(oid) }, pointOfFailure: "git_blob_create_from_disk") {
-            path.withCString{ path1 in
-                Clibgit2.git_blob_create_from_disk(&oid, self.pointer, path1)
-            }
-        }
-        .flatMap{ repo.blob(oid: $0) }
-    }
-    
     var childrenURLs : R<[URL]> {
         let url = self.directoryURL
         let paths = submodules().map { $0.map { $0.path } }
@@ -294,7 +280,7 @@ public extension Repository {
     /// stageAllFiles
     func addAllFiles() -> Result<(),Error> {
         let entries = self.status()
-                .map{ $0.compactMap{ $0.unStagedDeltas } }
+                .map{ $0.compactMap{ $0.stagedDeltas } }
 
         return combine(entries, directoryURL)
             | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
@@ -303,7 +289,7 @@ public extension Repository {
 
     /// unstageAllFiles
     func resetAllFiles() -> Result<(),Error> {
-        let entries = self.status() | { $0.compactMap { $0.stagedDeltas }}
+        let entries = self.status() | { $0.compactMap { $0.unStagedDeltas }}
 
         return combine(entries, directoryURL)
             | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
