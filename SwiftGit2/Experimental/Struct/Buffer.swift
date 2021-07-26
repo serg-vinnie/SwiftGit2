@@ -17,6 +17,7 @@ public final class Buffer {
         self.buf = buf
     }
     
+    // need to return nullable
     public init(data: UnsafeRawPointer?, size: Int) {
         var buf = git_buf()
         

@@ -118,14 +118,7 @@ extension StatusIteratorNew: RandomAccessCollection {
             unStagedPatch = .success(nil)
         }
         
-        //let changes = try? getChanged(position: position).flatMap{ $0.asDeltas() }.get()
-        //let changesDelta = changes?.first
-        
         let changesDelta = try? getChanged(position: position).get()
-        
-        // Path spec works perfectly!
-        // print(iterator[position].relPath)
-        // print( (changesDelta?.newFile?.path ?? changesDelta?.oldFile?.path)! )
         
         return StatusEntryNew(iterator[position], stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
     }
