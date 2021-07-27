@@ -1,4 +1,6 @@
 //
+
+
 //  Repository+Status.swift
 //  SwiftGit2-OSX
 //
@@ -116,7 +118,27 @@ extension StatusIteratorNew: RandomAccessCollection {
             unStagedPatch = .success(nil)
         }
         
-        return StatusEntryNew(iterator[position], stagedPatch: stagedPatch, unStagedPatch: unStagedPatch)
+        let changesDelta = try? getChanged(position: position).get()
+        
+        //let isBinary = anyFile(at: position)?.getSameFileWithBlob(from: repo).blob?.isBinary
+        
+        return StatusEntryNew(iterator[position], stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
+    }
+    
+    private func getChanged(position: Int) -> R<[Diff.Delta]?> {
+        let relPath = iterator[position].relPath
+        
+        let repo = self.repo
+        
+        let file = anyFile(at: position)!
+        
+        guard let blobHead = file.getSameFileWithBlob(from: repo).blob else { return .success(nil)}
+        
+        return repo.blobCreateFromWorkdirAsBlob(relPath: relPath)
+            .flatMap { workdirBlob in
+                repo.diffBlobs(old: blobHead, new: workdirBlob)
+            }
+            .map{ delta -> [Diff.Delta]? in delta }
     }
     
     public var startIndex: Int { 0 }
@@ -131,10 +153,12 @@ private struct StatusEntryNew: UiStatusEntryX {
     private var stagedPatch_: Result<Patch?, Error>
     private var unStagedPatch_: Result<Patch?, Error>
     
-    init(_ entry: StatusEntry, stagedPatch: Result<Patch?, Error>, unStagedPatch: Result<Patch?, Error>) {
+    init(_ entry: StatusEntry, stagedPatch: Result<Patch?, Error>, unStagedPatch: Result<Patch?, Error>, changesDeltas: [Diff.Delta]?) {
         self.entry = entry
         self.stagedPatch_ = stagedPatch
         self.unStagedPatch_ = unStagedPatch
+        self.changesDeltas = changesDeltas?.first
+        //self.isBinary = isBinary
     }
     
     public var oldFileRelPath: String? { entry.headToIndex?.oldFile?.path ?? entry.indexToWorkDir?.oldFile?.path }
@@ -145,41 +169,45 @@ private struct StatusEntryNew: UiStatusEntryX {
     
     public var unstagedPatch: Result<Patch?, Error> { unStagedPatch_ }
     
-    var stagedDeltas: Diff.Delta? { entry.indexToWorkDir }
+    var unStagedDeltas: Diff.Delta? { entry.indexToWorkDir }
     
-    var unStagedDeltas: Diff.Delta? { entry.headToIndex }
+    var stagedDeltas: Diff.Delta? { entry.headToIndex }
     
-    public var stageState: StageState {
-        if entry.headToIndex != nil && entry.indexToWorkDir != nil {
-            return .mixed
-        }
-        
-        if let _ = entry.headToIndex {
-            return .staged
-        }
-        
-        if let _ = entry.indexToWorkDir {
-            return .unstaged
-        }
-        
-        assert(false)
+    var changesDeltas: Diff.Delta?
+    
+    var isBinary: Bool?
+    
+    var stageState: StageState {
+    if entry.headToIndex != nil && entry.indexToWorkDir != nil {
         return .mixed
     }
+    
+    if let _ = entry.headToIndex {
+        return .staged
+    }
+    
+    if let _ = entry.indexToWorkDir {
+        return .unstaged
+    }
+    
+    assert(false)
+    return .mixed
+}
     
     var status: StatusEntry.Status { entry.status }
     
     func statusFull() -> [Diff.Delta.Status] {
-        if let status = stagedDeltas?.status,
-           unStagedDeltas == nil {
+        if let status = unStagedDeltas?.status,
+           stagedDeltas == nil {
                 return [status]
         }
-        if let status = unStagedDeltas?.status,
-            stagedDeltas == nil {
+        if let status = stagedDeltas?.status,
+            unStagedDeltas == nil {
                 return [status]
         }
         
-        guard let workDir = stagedDeltas?.status else { return [.unmodified] }
-        guard let index = unStagedDeltas?.status else { return [.unmodified] }
+        guard let workDir = unStagedDeltas?.status else { return [.unmodified] }
+        guard let index = stagedDeltas?.status else { return [.unmodified] }
         
         if workDir == index {
             return [workDir]
@@ -187,6 +215,7 @@ private struct StatusEntryNew: UiStatusEntryX {
         
         return [workDir, index]
     }
+    
 }
 
 
@@ -200,8 +229,12 @@ public protocol UiStatusEntryX {
     var stagedPatch: Result<Patch?, Error> { get }
     var unstagedPatch: Result<Patch?, Error> { get }
     
-    var stagedDeltas: Diff.Delta? { get }
+    ///indexToWorkDir
     var unStagedDeltas: Diff.Delta? { get }
+    
+    ///headToIndex
+    var stagedDeltas: Diff.Delta? { get }
+    var changesDeltas: Diff.Delta? { get }
     
     var oldFileRelPath: String? { get }
     var newFileRelPath: String? { get }
@@ -209,10 +242,32 @@ public protocol UiStatusEntryX {
     var status: StatusEntry.Status { get }
     
     func statusFull() -> [Diff.Delta.Status]
+    
+    //var isBinary: Bool? { get }
 }
 
 public enum StageState {
     case mixed
     case staged
     case unstaged
+}
+
+
+///////////////////////////////////
+/// HELPERS
+//////////////////////////////////
+extension StatusIteratorNew{
+    func anyFile(at position: Int) -> Diff.File? {
+        iterator[position].headToIndex?.oldFile ??
+            iterator[position].indexToWorkDir?.oldFile ??
+            iterator[position].headToIndex?.newFile ??
+            iterator[position].indexToWorkDir?.newFile
+    }
+}
+
+fileprivate extension StatusEntry{
+    var relPath: String {
+        self.headToIndex?.newFile?.path     ?? self.indexToWorkDir?.newFile?.path ??
+            self.headToIndex?.oldFile?.path ?? self.indexToWorkDir?.oldFile?.path ?? ""
+    }
 }
