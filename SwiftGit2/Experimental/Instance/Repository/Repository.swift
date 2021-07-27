@@ -14,7 +14,7 @@ public class Repository: InstanceProtocol {
 
     public var directoryURL: Result<URL, Error> {
         if let pathPointer = git_repository_workdir(pointer) {
-            return .success(URL(fileURLWithPath: String(cString: pathPointer), isDirectory: true))
+            return String(cString: pathPointer).asURL
         }
 
         return .failure(RepositoryError.FailedToGetRepoUrl as Error)
