@@ -120,6 +120,8 @@ extension StatusIteratorNew: RandomAccessCollection {
         
         let changesDelta = try? getChanged(position: position).get()
         
+        //let isBinary = anyFile(at: position)?.getSameFileWithBlob(from: repo).blob?.isBinary
+        
         return StatusEntryNew(iterator[position], stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
     }
     
@@ -128,9 +130,9 @@ extension StatusIteratorNew: RandomAccessCollection {
         
         let repo = self.repo
         
-        let file = iterator[position].headToIndex?.oldFile ?? iterator[position].indexToWorkDir?.oldFile
+        let file = anyFile(at: position)!
         
-        guard let blobHead = file?.getSameFileWithBlob(from: repo).blob else { return .success(nil)}
+        guard let blobHead = file.getSameFileWithBlob(from: repo).blob else { return .success(nil)}
         
         return repo.blobCreateFromWorkdirAsBlob(relPath: relPath)
             .flatMap { workdirBlob in
@@ -156,6 +158,7 @@ private struct StatusEntryNew: UiStatusEntryX {
         self.stagedPatch_ = stagedPatch
         self.unStagedPatch_ = unStagedPatch
         self.changesDeltas = changesDeltas?.first
+        //self.isBinary = isBinary
     }
     
     public var oldFileRelPath: String? { entry.headToIndex?.oldFile?.path ?? entry.indexToWorkDir?.oldFile?.path }
@@ -172,22 +175,24 @@ private struct StatusEntryNew: UiStatusEntryX {
     
     var changesDeltas: Diff.Delta?
     
-    public var stageState: StageState {
-        if entry.headToIndex != nil && entry.indexToWorkDir != nil {
-            return .mixed
-        }
-        
-        if let _ = entry.headToIndex {
-            return .staged
-        }
-        
-        if let _ = entry.indexToWorkDir {
-            return .unstaged
-        }
-        
-        assert(false)
+    var isBinary: Bool?
+    
+    var stageState: StageState {
+    if entry.headToIndex != nil && entry.indexToWorkDir != nil {
         return .mixed
     }
+    
+    if let _ = entry.headToIndex {
+        return .staged
+    }
+    
+    if let _ = entry.indexToWorkDir {
+        return .unstaged
+    }
+    
+    assert(false)
+    return .mixed
+}
     
     var status: StatusEntry.Status { entry.status }
     
@@ -210,6 +215,7 @@ private struct StatusEntryNew: UiStatusEntryX {
         
         return [workDir, index]
     }
+    
 }
 
 
@@ -236,12 +242,27 @@ public protocol UiStatusEntryX {
     var status: StatusEntry.Status { get }
     
     func statusFull() -> [Diff.Delta.Status]
+    
+    //var isBinary: Bool? { get }
 }
 
 public enum StageState {
     case mixed
     case staged
     case unstaged
+}
+
+
+///////////////////////////////////
+/// HELPERS
+//////////////////////////////////
+extension StatusIteratorNew{
+    func anyFile(at position: Int) -> Diff.File? {
+        iterator[position].headToIndex?.oldFile ??
+            iterator[position].indexToWorkDir?.oldFile ??
+            iterator[position].headToIndex?.newFile ??
+            iterator[position].indexToWorkDir?.newFile
+    }
 }
 
 fileprivate extension StatusEntry{
