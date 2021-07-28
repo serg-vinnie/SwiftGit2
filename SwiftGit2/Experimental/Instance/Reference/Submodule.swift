@@ -190,7 +190,9 @@ public extension Submodule {
         let initBeforeUpdateInt: Int32 = `init` ? 1 : 0
 
         return _result({ () }, pointOfFailure: "git_submodule_update") {
-            git_submodule_update(self.pointer, initBeforeUpdateInt, &options.options)
+            options.with_git_submodule_update_options { opt in
+                git_submodule_update(self.pointer, initBeforeUpdateInt, &opt)
+            }
         }
     }
 
