@@ -14,7 +14,7 @@ public class Repository: InstanceProtocol {
 
     public var directoryURL: Result<URL, Error> {
         if let pathPointer = git_repository_workdir(pointer) {
-            return String(cString: pathPointer).asURL
+            return .success( String(cString: pathPointer).asURL() ) 
         }
 
         return .failure(RepositoryError.FailedToGetRepoUrl as Error)
@@ -300,5 +300,17 @@ public extension Repository {
 fileprivate extension Diff.Delta {
     func getFileAbsPathUsing(repoPath: String) -> String {
         return "\(repoPath)/" + ( (self.newFile?.path ?? self.oldFile?.path) ?? "" )
+    }
+}
+
+
+
+/////////////////
+///HELPERS
+///////////////////
+
+public extension String {
+    func asURL() -> URL {
+        return URL(fileURLWithPath: self)
     }
 }
