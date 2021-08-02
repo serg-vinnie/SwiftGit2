@@ -57,8 +57,8 @@ class MergeAnalysisTests: XCTestCase {
 
     func testThreeWayConflict() throws {
         // fileA
-        repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY **SUCCESSFUL** MERGE test")
-            .assertFailure()
+        repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
+                   .assertFailure("t_push_commit")
 
         // Same fileA
         repo1.t_commit(file: .fileA, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
