@@ -57,22 +57,69 @@ class MergeAnalysisTests: XCTestCase {
 
     func testThreeWayConflict() throws {
         // fileA
-        repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
+        let commit = repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
                    .assertFailure("t_push_commit")
-
+        
         // Same fileA
         repo1.t_commit(file: .fileA, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
             .assertFailure()
-
+        
         repo1.fetch(.HEAD)
             .assertFailure()
-
+        
         let merge = repo1.mergeAnalysis(.HEAD)
             .assertNotEqual(to: [.fastForward])
-
+        
+        // MERGE_HEAD creation
+        OidRevFile( repo: repo1, type: .MergeHead)?
+            .setOid(from: commit)
+            .save()
+        
         XCTAssert(merge == .normal)
-
+        
         repo1.pull(.HEAD, signature: GitTest.signature)
             .assertBlock("pull has conflict") { $0.hasConflict }
+    }
+    
+    func testMerge() throws {
+        // fileA
+        let commitToMerge = repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
+                   .assertFailure("t_push_commit")
+        
+        // Same fileA
+        repo1.t_commit(file: .fileA, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
+            .assertFailure()
+        
+        repo1.fetch(.HEAD)
+            .assertFailure()
+        
+        let merge = repo1.mergeAnalysis(.HEAD)
+            .assertNotEqual(to: [.fastForward])
+        
+        // MERGE_HEAD creation
+        OidRevFile( repo: repo1, type: .MergeHead)?
+            .setOid(from: commitToMerge)
+            .save()
+        
+        // MERGE_MSG creation
+        RevFile(repo: repo1, type: .MergeMsg)?
+            .set(content: "UKS RULEZZ")
+            .save()
+        
+        XCTAssert(merge == .normal)
+        
+        repo1.pull(.HEAD, signature: GitTest.signature)
+            .assertBlock("pull has conflict") { $0.hasConflict }
+        
+        XCTAssert( commitToMerge != nil )
+        
+        let parents = combine(repo1.headCommit(), .success(commitToMerge!) )
+                    .map { [$0, $1] }
+        
+        parents
+            .flatMap {
+                repo1.merge(our: $0[0], their: $0[1] )
+            }
+            .assertFailure()
     }
 }

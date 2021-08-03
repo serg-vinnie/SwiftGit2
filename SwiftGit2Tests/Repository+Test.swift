@@ -10,9 +10,9 @@ extension Repository {
             .flatMap { Repository.create(at: $0) }
     }
 
-    func t_push_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Void, Error> {
+    func t_push_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {
         t_commit(file: file, with: content, msg: msg)
-            .flatMap { _ in self.push(.HEAD) }
+            .flatMap { commit in self.push(.HEAD).map{ commit } }
     }
 
     func t_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {
