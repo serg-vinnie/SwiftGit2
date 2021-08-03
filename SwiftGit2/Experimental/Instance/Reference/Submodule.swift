@@ -185,13 +185,14 @@ public extension Submodule {
     /// This will clone a missing submodule and checkout the subrepository to the commit specified in the index of the containing repository.
     /// If the submodule repository doesn't contain the target commit (e.g. because fetchRecurseSubmodules isn't set),
     /// then the submodule is fetched using the fetch options supplied in options.
-    func update(options: SubmoduleUpdateOptions,
-                initBeforeUpdate: Bool = false) -> Result<Void, Error>
+    func update(options: SubmoduleUpdateOptions, `init`: Bool = false) -> R<Void>
     {
-        let initBeforeUpdateInt: Int32 = initBeforeUpdate ? 1 : 0
+        let initBeforeUpdateInt: Int32 = `init` ? 1 : 0
 
         return _result({ () }, pointOfFailure: "git_submodule_update") {
-            git_submodule_update(self.pointer, initBeforeUpdateInt, &options.options)
+            options.with_git_submodule_update_options { opt in
+                git_submodule_update(self.pointer, initBeforeUpdateInt, &opt)
+            }
         }
     }
 
@@ -217,12 +218,10 @@ public extension Submodule {
     }
 
     // TODO: Test Me. Especially "overwrite"
-    func initSub(overwrite: Bool = false) -> Result<Void, Error> {
-        let overwriteInt: Int32 = overwrite ? 1 : 0
-
-        return _result({ () }, pointOfFailure: "git_submodule_init") {
-            git_submodule_init(self.pointer, overwriteInt)
-        }
+    func `init`(overwrite: Bool) -> R<Submodule> {
+        git_try("git_submodule_init") {
+            git_submodule_init(self.pointer, overwrite ? 1 : 0)
+        } | { self }
     }
 }
 
