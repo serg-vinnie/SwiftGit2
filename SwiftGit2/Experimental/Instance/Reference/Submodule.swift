@@ -7,6 +7,7 @@
 //
 
 import Clibgit2
+import Essentials
 
 public class Submodule: InstanceProtocol {
     public let pointer: OpaquePointer
@@ -147,15 +148,13 @@ public extension Duo where T1 == Submodule, T2 == Repository {
 }
 
 public extension Submodule {
-    //	func clone() -> Result<Repository, NSError> {
-    //		print("Submodule_Clone \(self.path)")
-//
-    //		let pointer = UnsafeMutablePointer<OpaquePointer?>.allocate(capacity: 1)
-//
-    //		return _result( {Repository(pointer.pointee!)}, pointOfFailure:"git_submodule_clone" ) {
-    //			git_submodule_clone(pointer, self.pointer, nil);
-    //		}
-    //	}
+    func clone(options: SubmoduleUpdateOptions) -> R<Repository> {
+        git_instance(of: Repository.self, "git_submodule_clone") { pointer in
+            options.with_git_submodule_update_options { options in
+                git_submodule_clone(&pointer, self.pointer, &options)
+            }
+        }
+    }
 
     func fetchRecurseValueGet() -> Bool {
         // "result == 1"
@@ -186,13 +185,14 @@ public extension Submodule {
     /// This will clone a missing submodule and checkout the subrepository to the commit specified in the index of the containing repository.
     /// If the submodule repository doesn't contain the target commit (e.g. because fetchRecurseSubmodules isn't set),
     /// then the submodule is fetched using the fetch options supplied in options.
-    func update(options: SubmoduleUpdateOptions,
-                initBeforeUpdate: Bool = false) -> Result<Void, Error>
+    func update(options: SubmoduleUpdateOptions, `init`: Bool = false) -> R<Void>
     {
-        let initBeforeUpdateInt: Int32 = initBeforeUpdate ? 1 : 0
+        let initBeforeUpdateInt: Int32 = `init` ? 1 : 0
 
         return _result({ () }, pointOfFailure: "git_submodule_update") {
-            git_submodule_update(self.pointer, initBeforeUpdateInt, &options.options)
+            options.with_git_submodule_update_options { opt in
+                git_submodule_update(self.pointer, initBeforeUpdateInt, &opt)
+            }
         }
     }
 
@@ -218,12 +218,10 @@ public extension Submodule {
     }
 
     // TODO: Test Me. Especially "overwrite"
-    func initSub(overwrite: Bool = false) -> Result<Void, Error> {
-        let overwriteInt: Int32 = overwrite ? 1 : 0
-
-        return _result({ () }, pointOfFailure: "git_submodule_init") {
-            git_submodule_init(self.pointer, overwriteInt)
-        }
+    func `init`(overwrite: Bool) -> R<Submodule> {
+        git_try("git_submodule_init") {
+            git_submodule_init(self.pointer, overwrite ? 1 : 0)
+        } | { self }
     }
 }
 

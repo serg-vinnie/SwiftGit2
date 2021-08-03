@@ -57,20 +57,14 @@ public extension Index {
     }
 
     func add(paths: [String]) -> Result<Void, Error> {
-        return paths.with_git_strarray { strarray in
-            _result((), pointOfFailure: "git_index_add_all") {
-                git_index_add_all(pointer, &strarray, 0, nil, nil)
-            }
-            .flatMap { self.write() }
+        paths.with_git_strarray { strarray in
+            git_try("git_index_add_all") { git_index_add_all(pointer, &strarray, 0, nil, nil) } | { self.write() }
         }
     }
 
-    func remove(path: String) -> Result<Void, Error> {
-        return [path].with_git_strarray { strarray in
-            _result((), pointOfFailure: "git_index_add_all") {
-                git_index_remove_all(pointer, &strarray, nil, nil)
-            }
-            .flatMap { self.write() }
+    func remove(paths: [String]) -> Result<Void, Error> {
+        paths.with_git_strarray { strarray in
+            git_try("git_index_remove_all") { git_index_remove_all(pointer, &strarray, nil, nil) } | { self.write() }
         }
     }
 

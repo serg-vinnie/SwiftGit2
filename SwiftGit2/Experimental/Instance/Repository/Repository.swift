@@ -14,7 +14,7 @@ public class Repository: InstanceProtocol {
 
     public var directoryURL: Result<URL, Error> {
         if let pathPointer = git_repository_workdir(pointer) {
-            return .success(URL(fileURLWithPath: String(cString: pathPointer), isDirectory: true))
+            return .success( String(cString: pathPointer).asURL() ) 
         }
 
         return .failure(RepositoryError.FailedToGetRepoUrl as Error)
@@ -42,6 +42,12 @@ extension Repository: CustomDebugStringConvertible {
 
 // Remotes
 public extension Repository {
+    var childrenURLs : R<[URL]> {
+        let url = self.directoryURL
+        let paths = submodules().map { $0.map { $0.path } }
+        return combine(url, paths).map { url, paths in paths.map { url.appendingPathComponent($0) } }
+    }
+
     func getRemoteFirst() -> Result<Remote, Error> {
         return getRemotesNames()
             .flatMap { arr -> Result<Remote, Error> in
@@ -66,19 +72,32 @@ public extension Repository {
     }
 }
 
-public enum BranchBase {
+public enum BranchBase { 
     case head
     case commit(Commit)
     case branch(Branch)
 }
 
 public extension Repository {
+    func createReference(name: String, oid: OID, force: Bool, reflog: String)-> R<Reference> {
+        var oid = oid.oid
+
+        return git_instance(of: Reference.self, "git_reference_create") { pointer in
+            git_reference_create(&pointer, self.pointer, name, &oid, force ? 1 : 0, reflog)
+        }
+    }
+    
     func createBranch(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
         switch base {
         case .head: return headCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
         case let .commit(c): return createBranch(from: c, name: name, checkout: checkout)
         case let .branch(b): return Duo(b, self).commit().flatMap { c in createBranch(from: c, name: name, checkout: checkout) }
         }
+    }
+    
+    func branchLookup(name: String) -> R<Branch>{
+        reference(name: name)
+            .flatMap{ $0.asBranch() }
     }
 
     func headCommit() -> Result<Commit, Error> {
@@ -130,6 +149,13 @@ public extension Repository {
 }
 
 public extension Repository {
+    class func exists(at url: URL) -> Bool {
+        if case .success(_) = at(url: url) {
+            return true
+        }
+        return false
+    }
+    
     class func at(url: URL, fixDetachedHead: Bool = true) -> Result<Repository, Error> {
         var pointer: OpaquePointer?
 
@@ -156,17 +182,48 @@ public extension Repository {
 
 // index
 public extension Repository {
-    func reset(paths: [String]) -> Result<Void, Error> {
+    ///Unstage files by relative path
+    func resetDefault(paths: [String]) -> R<Void> {
         return HEAD()
-            .flatMap { $0.targetOID }
-            .flatMap { self.commit(oid: $0) }
-            .flatMap { commit in
-                git_try("git_reset_default") {
-                    paths.with_git_strarray { strarray in
-                        git_reset_default(self.pointer, commit.pointer, &strarray)
+            | { $0.targetOID }
+            | { self.commit(oid: $0) }
+            | { resetDefault(commit: $0, paths: paths) }
+    }
+    
+    func resetDefault(commit: Commit, paths: [String]) -> R<Void> {
+        git_try("git_reset_default") {
+            paths.with_git_strarray { strarray in
+                git_reset_default(self.pointer, commit.pointer, &strarray)
+            }
+        }
+    }
+    
+    func resetHard(paths: [String] = []) -> R<Void> {
+        BranchTarget.HEAD.with(self).commitInstance | { self.resetHard(commit: $0, paths: paths) }
+    }
+    
+    func resetHard(commit: Commit, paths: [String], options: CheckoutOptions = CheckoutOptions()) -> R<Void> {
+        git_try("git_reset") {
+            options.with_git_checkout_options { options in
+                paths.with_git_strarray { strarray in
+                    if strarray.count > 0 {
+                        options.paths = strarray
                     }
+                    
+                    return git_reset(self.pointer, commit.pointer, GIT_RESET_HARD, &options)
                 }
             }
+        }
+    }
+    
+    ///Stage files by relative path
+    func add(relPaths: [String]) -> R<()> {
+        index().flatMap { $0.add(paths: relPaths) }
+    }
+    
+    func remove(relPaths: [String]) -> R<()> {
+         index()
+            .flatMap { $0.remove(paths: relPaths) }
     }
 }
 
@@ -213,5 +270,47 @@ extension RepositoryError: LocalizedError {
         case .FailedToGetRepoUrl:
             return "FailedToGetRepoUrl. Url is nil?"
         }
+    }
+}
+
+///////////////////////////////////////////
+/// STAGE and unstage all files
+///////////////////////////////////////////
+public extension Repository {
+    /// stageAllFiles
+    func addAllFiles() -> Result<(),Error> {
+        let entries = self.status()
+                .map{ $0.compactMap{ $0.stagedDeltas } }
+
+        return combine(entries, directoryURL)
+            | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
+            | { paths in self.index()   | { $0.add(paths: paths) } }
+    }
+
+    /// unstageAllFiles
+    func resetAllFiles() -> Result<(),Error> {
+        let entries = self.status() | { $0.compactMap { $0.unStagedDeltas }}
+
+        return combine(entries, directoryURL)
+            | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
+            | { paths in self.index()   | { _ in self.resetDefault(paths: paths) } }
+    }
+}
+
+fileprivate extension Diff.Delta {
+    func getFileAbsPathUsing(repoPath: String) -> String {
+        return "\(repoPath)/" + ( (self.newFile?.path ?? self.oldFile?.path) ?? "" )
+    }
+}
+
+
+
+/////////////////
+///HELPERS
+///////////////////
+
+public extension String {
+    func asURL() -> URL {
+        return URL(fileURLWithPath: self)
     }
 }

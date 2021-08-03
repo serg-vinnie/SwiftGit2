@@ -10,6 +10,8 @@ import Essentials
 @testable import SwiftGit2
 import XCTest
 
+
+
 class RepositoryRemoteTests: XCTestCase {
     override func setUpWithError() throws {}
     override func tearDownWithError() throws {}
@@ -41,6 +43,12 @@ class RepositoryRemoteTests: XCTestCase {
         repo.getRemoteFirst()
             .flatMap { $0.connect(direction: .push, auth: .credentials(.default)) } // should fail
             .assertSuccess("retmote.connect .push")
+        
+        let creds = [GitTest.credentials_01, GitTest.credentials_bullshit] // last will be tried first
+        
+        repo.getRemoteFirst()
+            .flatMap { $0.connect(direction: .push, possibleCreds: creds) }
+            .assertFailure("retmote.connect .push") // should succeed
     }
 
     func testPush() {
@@ -54,12 +62,12 @@ class RepositoryRemoteTests: XCTestCase {
 
         repo.detachHEAD().assertFailure("detachHEAD")
 
-        repo.push()
+        repo.push(.HEAD)
             .assertSuccess("push")
 
         repo.detachedHeadFix().assertFailure("detachedHeadFix")
 
-        repo.push()
+        repo.push(.HEAD)
             .assertFailure("push")
     }
 
@@ -74,7 +82,7 @@ class RepositoryRemoteTests: XCTestCase {
             .assertFailure("t_commit")
 
         // push should FAIL
-        repo.push()
+        repo.push(.HEAD)
             .assertSuccess("push")
     }
 
@@ -90,7 +98,31 @@ class RepositoryRemoteTests: XCTestCase {
             .assertFailure("t_commit")
 
         // push should FAIL
-        repo.push()
+        repo.push(.HEAD)
             .assertSuccess("push")
+    }
+    
+    func testUpstreamExists() {
+        let info = PublicTestRepo()
+
+        guard let repo = Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .auto)))
+            .assertFailure("clone") else { fatalError() }
+        
+        repo.upstreamExistsFor(.HEAD)
+            .assertFailure("upstreamExistsFor")
+        
+        repo.createBranch(from: .head, name: "newBranch", checkout: true)
+            .flatMap { repo.upstreamExistsFor(.branch($0)) }
+            .assertEqual(to: false, "upstreamExistsFor newBranch")
+        
+        repo.t_commit(msg: "testcommit")
+            .assertFailure()
+        
+        repo.pendingCommitsCount(.branchShortName("newBranch"))
+            .assertEqual(to: .push(1), ".pendingCommitsCount(.branchShortName(newBranch))")
+        
+//        repo.pendingCommits(.branchShortName("newBranch"), .push)
+//            .assertFailure("repo.pendingCommits(.branch($0), .push)")
+        
     }
 }

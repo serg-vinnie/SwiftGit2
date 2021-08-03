@@ -78,6 +78,8 @@ public extension Diff {
         public let path: String
         public let size: UInt64
         public let flags: Flags
+        
+        /// is null by default
         public var blob: Blob?
 
         public init(_ diffFile: git_diff_file) {
@@ -86,6 +88,17 @@ public extension Diff {
             self.path = path.map(String.init(cString:))!
             size = diffFile.size
             flags = Flags(rawValue: diffFile.flags)
+        }
+        
+        public var isBinary: Bool? { blob?.isBinary }
+        
+        /// return new instance of file with initialized blob
+        func getSameFileWithBlob(from repo: Repository) -> File {
+            var file: File? = self
+            
+            repo.loadBlobFor(file: &file)
+            
+            return file!
         }
     }
 

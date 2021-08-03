@@ -7,6 +7,7 @@
 //
 
 import Clibgit2
+import Essentials
 
 // SetHEAD and Checkout
 public extension Repository {
@@ -22,8 +23,15 @@ public extension Repository {
     }
 
     func checkout(commit: Commit, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
-        checkout(commit.oid, strategy: strategy, progress: progress)
+        checkout(commit.oid, strategy: strategy, progress: progress) | { _ in () }
     }
+    
+    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> Result<Repository, Error> {
+        setHEAD_detached(oid)
+            | { checkoutHead(strategy: strategy, progress: progress) }
+            | { self }
+    }
+
 }
 
 internal extension Repository {
@@ -47,11 +55,6 @@ internal extension Repository {
         }
     }
 
-    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
-        setHEAD_detached(oid)
-            .flatMap { checkoutHead(strategy: strategy, progress: progress) }
-    }
-
     func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> Result<Reference, Error> {
         setHEAD(reference)
             .flatMap { checkoutHead(strategy: strategy, progress: progress) }
@@ -66,4 +69,26 @@ internal extension Repository {
             }
         }
     }
+}
+
+
+////////////////////////////
+//HELPERS
+////////////////////////////
+fileprivate class FS {
+    static func delete(_ path : String, silent: Bool = true) {
+        if !silent {
+            print("FS: going to delete file: \(path)")
+        }
+        let fileManager = FileManager.default
+        do {
+            try fileManager.removeItem(atPath: path)
+        } catch let error {
+            if !silent {
+                print("FS: cant delete \(path)")
+                print(error)
+            }
+        }
+    }
+
 }

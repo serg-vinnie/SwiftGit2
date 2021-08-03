@@ -17,8 +17,8 @@ public enum PullResult {
     case threeWayConflict(Index)
 }
 
-public extension Repository {
-    func pull(_ target: FetchTarget, options: FetchOptions = FetchOptions(auth: .auto), signature: Signature) -> Result<PullResult, Error> {
+public extension Repository {    
+    func pull(_ target: BranchTarget, options: FetchOptions = FetchOptions(auth: .auto), signature: Signature) -> Result<PullResult, Error> {
         return combine(fetch(target, options: options), mergeAnalysis(target))
             .flatMap { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, signature: signature) }
     }
@@ -70,7 +70,7 @@ public extension Repository {
                 .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2]) } // -> Index
                 .if(\.hasConflicts,
                     then: { idx in
-                        self.checkout(index: idx, strategy: .UseTheirs)
+                        self.checkout(index: idx, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
                             .flatMap { _ in .success(.threeWayConflict(idx)) }
                     },
 
@@ -120,13 +120,3 @@ extension PullResult: Equatable {
         }
     }
 }
-
-// public static func == (lhs: DetachedHeadFix, rhs: DetachedHeadFix) -> Bool {
-//    switch (lhs, rhs) {
-//    case (.fixed, .fixed): return true
-//    case (.notNecessary, .notNecessary): return true
-//    case let (.ambiguous(a_l), .ambiguous(a_r)):
-//        return a_l == a_r
-//    default: return false
-//    }
-// }

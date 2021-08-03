@@ -8,6 +8,7 @@
 
 import Clibgit2
 import Foundation
+import Essentials
 
 public class Remote: InstanceProtocol {
     public let pointer: OpaquePointer
@@ -23,12 +24,22 @@ public class Remote: InstanceProtocol {
 
 public extension Remote {
     /// The name of the remote repo
-    var name: String { String(validatingUTF8: git_remote_name(pointer))! }
-    var url: String { String(validatingUTF8: git_remote_url(pointer))! }
+    var name        : String    { String(validatingUTF8: git_remote_name(pointer))! }
+    var url         : String    { String(validatingUTF8: git_remote_url(pointer))! }
+    var connected   : Bool      { git_remote_connected(pointer) == 1 }
+    
+    // tries different credentials sequentially: last item will be tried first
+    // returns first working Credentials instance
+    func connect(direction: Direction, possibleCreds: [Credentials]) -> R<(String, Credentials)> {
+        var creds = possibleCreds
+        let closure = { () -> Credentials in
+            return creds.popLast() ?? Credentials.none
+        }
+        
+        return connect(direction: direction, auth: .match { _, _ in closure() } )
+    }
 
-    var connected: Bool { git_remote_connected(pointer) == 1 }
-
-    func connect(direction: Direction, auth: Auth) -> Result<Remote, Error> {
+    func connect(direction: Direction, auth: Auth) -> R<(String, Credentials)> {
         let callbacks = RemoteCallbacks(auth: auth)
         let proxyOptions = ProxyOptions()
 
@@ -38,7 +49,7 @@ public extension Remote {
                     git_remote_connect(pointer, git_direction(UInt32(direction.rawValue)), &cb, &options, nil)
                 }
             }
-        }.map { self }
+        }.map { (self.url, callbacks.recentCredentials) }
     }
 }
 
@@ -54,7 +65,7 @@ extension Remote: CustomDebugStringConvertible {
 }
 
 public extension Repository {
-    func rename(remote: String, to newName: String) -> Result<[String], Error> {
+    func rename(remote: String, to newName: String) -> R<[String]> {
         var problems = git_strarray()
         defer {
             git_strarray_free(&problems)
