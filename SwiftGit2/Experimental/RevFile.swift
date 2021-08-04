@@ -38,7 +38,7 @@ class OidRevFile {
             let url = gitDir.appendingPathComponent("MERGE_HEAD")
             guard exist(url) else { return }
             
-            let f = FFile(r: url)
+            let f = File(r: url)
             
             content = f.readln()
             break
@@ -58,7 +58,7 @@ class OidRevFile {
         switch type {
         case .MergeHead:
             if let content = content{
-                let f = FFile(w: gitDir.appendingPathComponent("MERGE_HEAD").path )
+                let f = File(w: gitDir.appendingPathComponent("MERGE_HEAD").path )
                 f.write(content)
             }
             
@@ -102,7 +102,7 @@ class RevFile {
             let url = gitDir.appendingPathComponent("MERGE_MSG")
             guard exist(url) else { return }
             
-            let f = FFile(r: url)
+            let f = File(r: url)
             
             var content = ""
             
@@ -166,7 +166,7 @@ class RevFile {
             fallthrough
         case .MergeMsg:
             if let content = content{
-                let f = FFile(w: gitDir.appendingPathComponent("MERGE_MSG").path )
+                let f = File(w: gitDir.appendingPathComponent("MERGE_MSG").path )
                 f.write(content)
             }
             
