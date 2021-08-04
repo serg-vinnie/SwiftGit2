@@ -101,10 +101,7 @@ class MergeAnalysisTests: XCTestCase {
             .setOid(from: commitToMerge)
             .save()
         
-        // MERGE_MSG creation
-        RevFile(repo: repo1, type: .MergeMsg)?
-            .set(content: "UKS RULEZZ")
-            .save()
+        
         
         XCTAssert(merge == .normal)
         
@@ -119,6 +116,14 @@ class MergeAnalysisTests: XCTestCase {
         parents
             .flatMap {
                 repo1.merge(our: $0[0], their: $0[1] )
+            }
+            .onSuccess { index -> () in
+                // MERGE_MSG creation
+                RevFile(repo: repo1, type: .MergeMsg)?
+                    .generateMergeMsg(from: index)
+                    .save()
+                
+                return ()
             }
             .assertFailure()
     }

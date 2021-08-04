@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Essentials
 
 class OidRevFile {
     private var content: String?
@@ -112,9 +113,22 @@ class RevFile {
         }
     }
     
-    public func set(content: String) -> RevFile {
-        self.content = content
+//    public func set(content: String) -> RevFile {
+//        self.content = content
+//        return self
+//    }
+    
+    func generateMergeMsg(from index: Index ) -> RevFile{
+        let msg = try? index
+            .conflicts()
+            .map { $0.map{ $0.description } }
+            .map { $0.joined(separator: "\r\n# - ") }
+            .map{ "CONFLICTS: \r\n# - " }
+            .get()
+        
+        self.content = msg
         return self
+        
     }
     
     func save() {
