@@ -35,12 +35,12 @@ class OidRevFile {
     private func getContent(type: OidRevFileType) {
         switch type {
         case .MergeHead:
-            let url = gitDir.appendingPathComponent("MERGE_HEAD")
-            guard exist(url) else { return }
+            let file = FileUks(url: gitDir.appendingPathComponent("MERGE_HEAD"))
             
-            let f = File(r: url)
+            guard file.exists() else { return }
             
-            content = f.readln()
+            content = file.getContent()
+            
             break
             
         default:
@@ -58,8 +58,8 @@ class OidRevFile {
         switch type {
         case .MergeHead:
             if let content = content{
-                let f = File(w: gitDir.appendingPathComponent("MERGE_HEAD").path )
-                f.write(content)
+                try? FileUks(url: gitDir.appendingPathComponent("MERGE_HEAD"))
+                    .setContent(content)
             }
             
         default:
@@ -99,18 +99,11 @@ class RevFile {
         case .PullMsg:
             fallthrough
         case .MergeMsg:
-            let url = gitDir.appendingPathComponent("MERGE_MSG")
-            guard exist(url) else { return }
+            let file = FileUks(url: gitDir.appendingPathComponent("MERGE_MSG"))
             
-            let f = File(r: url)
+            guard file.exists() else { return }
             
-            var content = ""
-            
-            while let str = f.readln() {
-                content += "\(str)\r\n"
-            }
-            
-            self.content = content
+            content = file.getContent()
             break
             
         default:
@@ -165,9 +158,9 @@ class RevFile {
         case .PullMsg:
             fallthrough
         case .MergeMsg:
-            if let content = content{
-                let f = File(w: gitDir.appendingPathComponent("MERGE_MSG").path )
-                f.write(content)
+            if let content = content {
+                try? FileUks(url: gitDir.appendingPathComponent("MERGE_MSG") )
+                    .setContent(content)
             }
             
         default:
