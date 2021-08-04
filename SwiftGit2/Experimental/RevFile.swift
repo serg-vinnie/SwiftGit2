@@ -118,20 +118,40 @@ class RevFile {
 //        return self
 //    }
     
-    func generateMergeMsg(from index: Index ) -> RevFile{
-        let msg = try? index
-            .conflicts()
-            .map { $0.map{ $0.description } }
-            .map { $0.joined(separator: "\r\n# - ") }
-            .map{ "CONFLICTS: \r\n# - " }
-            .get()
+    func generateMergeMsg(from index: Index, commit: Commit) -> RevFile {
+        let msgHeader = "Merge commit '\(commit.oid.shortOid)'"
         
-        self.content = msg
-        return self
-        
+        return generateMergeMsgBase(from: index, msgHeader: msgHeader )
     }
     
-    func save() {
+    private func generateMergeMsg(from index: Index, branchName: String) -> RevFile {
+        let msgHeader = "Merge branch '\(branchName)'"
+        
+        return generateMergeMsgBase(from: index, msgHeader: msgHeader )
+    }
+    
+    private func generateMergeMsgBase(from index: Index, msgHeader: String) -> RevFile {
+        let separator = "\n * "
+        
+        let msgDescription = try? index
+            .conflicts()
+            .map { $0.map{ $0.description } }
+            .map { files -> String in
+                files.joined(separator: separator) }
+            .map{ "Conflicts:\(separator)\($0)" }
+            .get()
+        
+        if let msgDescription = msgDescription {
+            self.content = "\(msgHeader)\n\n\(msgDescription)\n"
+        }
+        else {
+            self.content = "\(msgHeader)"
+        }
+        
+        return self
+    }
+    
+    func save()  -> RevFile {
         switch type {
         case .MergeMsg:
             if let content = content{
@@ -142,6 +162,8 @@ class RevFile {
         default:
             break
         }
+        
+        return self
     }
 }
 

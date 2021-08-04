@@ -81,7 +81,7 @@ class MergeAnalysisTests: XCTestCase {
             .assertBlock("pull has conflict") { $0.hasConflict }
     }
     
-    func testMerge() throws {
+    func testMergeMessageGeneration() throws {
         // fileA
         let commitToMerge = repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
                    .assertFailure("t_push_commit")
@@ -101,8 +101,6 @@ class MergeAnalysisTests: XCTestCase {
             .setOid(from: commitToMerge)
             .save()
         
-        
-        
         XCTAssert(merge == .normal)
         
         repo1.pull(.HEAD, signature: GitTest.signature)
@@ -119,9 +117,12 @@ class MergeAnalysisTests: XCTestCase {
             }
             .onSuccess { index -> () in
                 // MERGE_MSG creation
-                RevFile(repo: repo1, type: .MergeMsg)?
-                    .generateMergeMsg(from: index)
+                let msgContent = RevFile(repo: repo1, type: .MergeMsg)?
+                    .generateMergeMsg(from: index, commit: commitToMerge!)
                     .save()
+                    .content
+                
+                XCTAssert(msgContent!.contains("Conflicts"))
                 
                 return ()
             }
