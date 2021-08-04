@@ -63,8 +63,11 @@ class OidRevFile {
             }
             
         default:
+            print("Did you forgot to add something into save() method?")
             break
         }
+        
+        print("OidRevFile saved")
     }
 }
 
@@ -93,6 +96,8 @@ class RevFile {
     
     private func getContent(type: RevFileType) {
         switch type {
+        case .PullMsg:
+            fallthrough
         case .MergeMsg:
             let url = gitDir.appendingPathComponent("MERGE_MSG")
             guard exist(url) else { return }
@@ -117,6 +122,10 @@ class RevFile {
 //        self.content = content
 //        return self
 //    }
+    
+    func generatePullMsg(from index: Index) -> RevFile {
+        return generateMergeMsgBase(from: index, msgHeader: "PULL conflicts resolve")
+    }
     
     func generateMergeMsg(from index: Index, commit: Commit) -> RevFile {
         let msgHeader = "Merge commit '\(commit.oid.shortOid)'"
@@ -153,6 +162,8 @@ class RevFile {
     
     func save()  -> RevFile {
         switch type {
+        case .PullMsg:
+            fallthrough
         case .MergeMsg:
             if let content = content{
                 let f = FFile(w: gitDir.appendingPathComponent("MERGE_MSG").path )
@@ -160,18 +171,24 @@ class RevFile {
             }
             
         default:
+            print("Did you forgot to add something into save() method?")
             break
         }
+        
+        print("RevFile saved")
         
         return self
     }
 }
 
 enum RevFileType {
-    case MergeMsg
-    case SquashMsg //SQUASH_MSG
+    case MergeMsg // MERGE_MSG
+    case SquashMsg // SQUASH_MSG
     case CommitEditMsg // COMMIT_EDITMSG
     //case MergeMode // MERGE_MODE
+    
+    //CUSTOMS
+    case PullMsg // MERGE_MSG
 }
     
 enum OidRevFileType {

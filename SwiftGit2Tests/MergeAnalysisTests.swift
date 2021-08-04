@@ -57,7 +57,7 @@ class MergeAnalysisTests: XCTestCase {
 
     func testThreeWayConflict() throws {
         // fileA
-        let commit = repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
+        repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
                    .assertFailure("t_push_commit")
         
         // Same fileA
@@ -69,11 +69,6 @@ class MergeAnalysisTests: XCTestCase {
         
         let merge = repo1.mergeAnalysis(.HEAD)
             .assertNotEqual(to: [.fastForward])
-        
-        // MERGE_HEAD creation
-        OidRevFile( repo: repo1, type: .MergeHead)?
-            .setOid(from: commit)
-            .save()
         
         XCTAssert(merge == .normal)
         
