@@ -66,7 +66,12 @@ public extension Repository {
                 return .failure(WTF("can't get RemotesNames"))
             }
     }
-
+    
+    func getAllRemotesCount() -> Result<Int, Error>{
+        getRemotesNames()
+            .map{ $0.count }
+    }
+    
     func getAllRemotes() -> Result<[Remote], Error> {
         return getRemotesNames()
             .flatMap { $0.flatMap { self.remoteRepo(named: $0) } }
