@@ -53,6 +53,18 @@ public extension Remote {
     }
 }
 
+
+public extension Remote {
+    var urlForBrowser: String {
+        if url.hasPrefix("git@") {
+            return "https://" + url.replace(of: "git@", to: "").replace(of: ":", to: "/")
+        }
+        
+        return url
+    }
+}
+
+
 public enum Direction: Int32 {
     case fetch = 0 // GIT_DIRECTION_FETCH
     case push = 1 // GIT_DIRECTION_PUSH
