@@ -11,21 +11,30 @@ import Essentials
 
 public class Repository: InstanceProtocol {
     public var pointer: OpaquePointer
-
-    public var directoryURL: Result<URL, Error> {
-        if let pathPointer = git_repository_workdir(pointer) {
-            return .success( String(cString: pathPointer).asURL() ) 
-        }
-
-        return .failure(RepositoryError.FailedToGetRepoUrl as Error)
-    }
-
+    
     public required init(_ pointer: OpaquePointer) {
         self.pointer = pointer
     }
-
+    
     deinit {
         git_repository_free(pointer)
+    }
+}
+
+extension Repository {
+    public var directoryURL: Result<URL, Error> {
+        if let pathPointer = git_repository_workdir(pointer) {
+            return .success( String(cString: pathPointer).asURL() )
+        }
+        
+        return .failure(RepositoryError.FailedToGetRepoUrl as Error)
+    }
+    
+    public var gitDirUrl: Result<URL, Error> {
+        if let pathPointer = git_repository_commondir(pointer) {
+            return .success( String(cString: pathPointer).asURL() )
+        }
+        return .failure(RepositoryError.FailedToGetRepoUrl as Error)
     }
 }
 

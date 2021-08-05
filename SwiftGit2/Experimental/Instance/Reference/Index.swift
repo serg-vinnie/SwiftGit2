@@ -46,6 +46,16 @@ public extension Index {
         return .success(entries)
     }
     
+    func conflicts() -> Result<[Conflict], Error> {
+        conflictIterator().flatMap { $0.all() }
+    }
+    
+    private func conflictIterator() -> Result<ConflictIterator, Error> {
+        return git_instance(of: ConflictIterator.self, "git_index_conflict_iterator_new"){ iterator in
+            git_index_conflict_iterator_new(&iterator, self.pointer)
+        }
+    }
+
     func add(paths: [String]) -> Result<Void, Error> {
         paths.with_git_strarray { strarray in
             git_try("git_index_add_all") { git_index_add_all(pointer, &strarray, 0, nil, nil) } | { self.write() }

@@ -23,6 +23,10 @@ public extension Object {
     }
 }
 
+extension OID {
+    var shortOid: String { "\( self.description.suffix(8) )" }
+}
+
 public extension Repository {
     func commit(oid: OID) -> Result<Commit, Error> {
         return instanciate(oid)

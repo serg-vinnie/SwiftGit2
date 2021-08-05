@@ -59,19 +59,19 @@ class MergeAnalysisTests: XCTestCase {
         // fileA
         repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
                    .assertFailure("t_push_commit")
-
+        
         // Same fileA
         repo1.t_commit(file: .fileA, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
             .assertFailure()
-
+        
         repo1.fetch(.HEAD)
             .assertFailure()
-
+        
         let merge = repo1.mergeAnalysis(.HEAD)
             .assertNotEqual(to: [.fastForward])
-
+        
         XCTAssert(merge == .normal)
-
+        
         repo1.pull(.HEAD, signature: GitTest.signature)
             .assertBlock("pull has conflict") { $0.hasConflict }
     }
