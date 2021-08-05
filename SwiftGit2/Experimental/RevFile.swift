@@ -35,7 +35,7 @@ class OidRevFile {
     private func getContent(type: OidRevFileType) {
         switch type {
         case .MergeHead:
-            let file = FileUks(url: gitDir.appendingPathComponent("MERGE_HEAD"))
+            let file = File(url: gitDir.appendingPathComponent("MERGE_HEAD"))
             
             guard file.exists() else { return }
             
@@ -58,7 +58,7 @@ class OidRevFile {
         switch type {
         case .MergeHead:
             if let content = content{
-                try? FileUks(url: gitDir.appendingPathComponent("MERGE_HEAD"))
+                try? File(url: gitDir.appendingPathComponent("MERGE_HEAD"))
                     .setContent(content)
             }
             
@@ -99,7 +99,7 @@ class RevFile {
         case .PullMsg:
             fallthrough
         case .MergeMsg:
-            let file = FileUks(url: gitDir.appendingPathComponent("MERGE_MSG"))
+            let file = File(url: gitDir.appendingPathComponent("MERGE_MSG"))
             
             guard file.exists() else { return }
             
@@ -159,7 +159,7 @@ class RevFile {
             fallthrough
         case .MergeMsg:
             if let content = content {
-                try? FileUks(url: gitDir.appendingPathComponent("MERGE_MSG") )
+                try? File(url: gitDir.appendingPathComponent("MERGE_MSG") )
                     .setContent(content)
             }
             
