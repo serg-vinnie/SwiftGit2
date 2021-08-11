@@ -48,10 +48,12 @@ public extension Repository {
             }
     }
     
-    func mergeIntoHEAD(their: Branch, signature: Signature) -> Result<MergeResult, Error> {
+    func mergeIntoHEAD(their theirName: String, signature: Signature) -> Result<MergeResult, Error> {
         let our = HEAD()  | { $0.asBranch() }
-        return combine(mergeAnalysis(branch: their), our)
-            | { self.mergeAndCommit(anal: $0, our: $1, their: their, signature: signature) }
+        let their = self.branchLookup(name: theirName)
+        let anal = their | { mergeAnalysis(branch: $0) }
+        return combine(anal, our, their)
+            | { self.mergeAndCommit(anal: $0, our: $1, their: $2, signature: signature) }
     }
     
     func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature) -> Result<MergeResult, Error> {
