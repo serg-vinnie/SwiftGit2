@@ -47,6 +47,15 @@ public extension Repository {
                     .commit(message: "TAO_MERGE", signature: signature)
             }
     }
+    
+    func mergeAndCommit(our: Branch, their: Branch, signature: Signature) -> Result<Commit, Error> {
+        let ourCommit = our.targetOID | { self.commit(oid: $0) }
+        let theirCommit = their.targetOID | { self.commit(oid: $0) }
+        
+        return combine(ourCommit, theirCommit)
+            | { merge(our: $0, their: $1) }
+            | { index in index.with(self).commit(message: "TAO_MERGE", signature: signature) }
+    }
 
     func mergeAnalysis(_ target: BranchTarget) -> Result<MergeAnalysis, Error> {
         return target.branch(in: self)

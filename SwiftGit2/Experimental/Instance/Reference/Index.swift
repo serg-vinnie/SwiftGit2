@@ -9,7 +9,7 @@
 import Clibgit2
 import Essentials
 
-public final class Index: InstanceProtocol {
+public final class Index: InstanceProtocol, DuoUser {
     public var pointer: OpaquePointer
 
     public required init(_ pointer: OpaquePointer) {
