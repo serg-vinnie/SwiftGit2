@@ -52,9 +52,13 @@ public extension Repository {
         let ourCommit = our.targetOID | { self.commit(oid: $0) }
         let theirCommit = their.targetOID | { self.commit(oid: $0) }
         
+        let ourName = our.nameAsBranch ?? "?"
+        let theirName = their.nameAsBranch ?? "?"
+        let message = "merge OUR: \(ourName), THEIR: \(theirName)"
+        
         return combine(ourCommit, theirCommit)
             | { merge(our: $0, their: $1) }
-            | { index in index.with(self).commit(message: "TAO_MERGE", signature: signature) }
+            | { index in index.with(self).commit(message: message, signature: signature) }
     }
 
     func mergeAnalysis(_ target: BranchTarget) -> Result<MergeAnalysis, Error> {
