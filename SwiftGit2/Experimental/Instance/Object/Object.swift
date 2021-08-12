@@ -12,19 +12,22 @@ public protocol Object: InstanceProtocol {}
 
 public extension Object {
     var oid: OID { OID(git_object_id(pointer).pointee) }
-
-    var oidShort: Result<String, Error> {
-        var buf = git_buf(ptr: nil, asize: 0, size: 0)
-
-        return _result({ Buffer(buf: buf) }, pointOfFailure: "git_object_short_id") {
-            git_object_short_id(&buf, self.pointer)
-        }
-        .flatMap { $0.asString() }
-    }
+    
+// Native realisation return 7 symbols instead of 8, better do not use it
+//    var oidShort: Result<String, Error> {
+//        var buf = git_buf(ptr: nil, asize: 0, size: 0)
+//
+//        return _result({ Buffer(buf: buf) }, pointOfFailure: "git_object_short_id") {
+//            git_object_short_id(&buf, self.pointer)
+//        }
+//        .flatMap { $0.asString() }
+//    }
+//
+    var oidShort: String { self.oid.oidShort }
 }
 
-extension OID {
-    var shortOid: String { "\( self.description.suffix(8) )" }
+public extension OID {
+    var oidShort: String { "\( self.description.suffix(8) )" }
 }
 
 public extension Repository {

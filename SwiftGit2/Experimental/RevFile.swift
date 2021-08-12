@@ -103,7 +103,7 @@ public class RevFile {
     }
     
     func generateMergeMsg(from index: Index, commit: Commit) -> RevFile {
-        let msgHeader = "Merge commit '\(commit.oid.shortOid)'"
+        let msgHeader = "Merge commit '\(commit.oidShort)'"
         
         return generateMergeMsgBase(from: index, msgHeader: msgHeader )
     }
