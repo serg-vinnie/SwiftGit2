@@ -30,10 +30,18 @@ public extension Submodule {
     var url: String { String(cString: git_submodule_url(pointer)) }
 
     /// Get the OID for the submodule in the current working directory.
-    var Oid: OID { OID(git_submodule_wd_id(pointer).pointee) }
+    var Oid: OID? {
+        guard let submod = git_submodule_wd_id(pointer) else { return nil }
+        
+        return OID(submod.pointee)
+    }
 
     /// Get the OID for the submodule in the current HEAD tree.
-    var headOID: OID { OID(git_submodule_head_id(pointer).pointee) }
+    var headOID: OID? {
+        guard let submod = git_submodule_head_id(pointer) else { return nil }
+        
+        return OID(submod.pointee)
+    }
 
     /// Open the repository for a submodule.
     /// WILL WORK ONLY IF SUBMODULE IS CHECKED OUT INTO WORKING DIRECTORY
