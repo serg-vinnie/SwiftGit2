@@ -23,13 +23,13 @@ class MergeAnalysisTests: XCTestCase {
         repo2.t_push_commit(file: .fileA, with: .random, msg: "for FAST FORWARD MERGE Test")
             .assertFailure()
 
-        repo1.mergeAnalysis(.HEAD)
+        repo1.mergeAnalysisUpstream(.HEAD)
             .assertEqual(to: .upToDate)
 
         repo1.fetch(.HEAD)
             .assertFailure()
 
-        repo1.mergeAnalysis(.HEAD)
+        repo1.mergeAnalysisUpstream(.HEAD)
             .assertEqual(to: [.fastForward, .normal])
 
         repo1.pull(.HEAD, signature: GitTest.signature)
@@ -46,7 +46,7 @@ class MergeAnalysisTests: XCTestCase {
         repo1.fetch(.HEAD)
             .assertFailure()
 
-        let merge = repo1.mergeAnalysis(.HEAD)
+        let merge = repo1.mergeAnalysisUpstream(.HEAD)
             .assertNotEqual(to: [.fastForward], "merge analysis")
 
         XCTAssert(merge == .normal)
@@ -67,7 +67,7 @@ class MergeAnalysisTests: XCTestCase {
         repo1.fetch(.HEAD)
             .assertFailure()
         
-        let merge = repo1.mergeAnalysis(.HEAD)
+        let merge = repo1.mergeAnalysisUpstream(.HEAD)
             .assertNotEqual(to: [.fastForward])
         
         XCTAssert(merge == .normal)

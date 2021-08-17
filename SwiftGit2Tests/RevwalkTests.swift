@@ -46,7 +46,7 @@ class RevwalkTests: XCTestCase {
         repo2.fetch(.HEAD)
             .assertFailure()
         
-        repo2.mergeAnalysis(.HEAD)
+        repo2.mergeAnalysisUpstream(.HEAD)
             .assertEqual(to: [.fastForward, .normal])
         
         repo2.pendingCommits(.HEAD, .fetch)
