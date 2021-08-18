@@ -48,6 +48,9 @@ public extension Repository {
         }
     }
 
+    
+    
+    
     func checkoutHead(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [] ) -> Result<Void, Error> {
         return git_try("git_checkout_head") {
             CheckoutOptions(strategy: strategy, pathspec: pathspec, progress: progress)
