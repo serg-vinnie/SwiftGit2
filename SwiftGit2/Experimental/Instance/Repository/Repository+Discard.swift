@@ -47,8 +47,7 @@ public extension Repository {
         }
     }
 }
-        
-        
+
 //        return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
 //            .map { FS. }
 //    }
