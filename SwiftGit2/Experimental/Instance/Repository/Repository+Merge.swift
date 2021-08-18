@@ -84,7 +84,7 @@ public extension Repository {
             let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
             
             let message = baseOID
-                | { base in "Three Way MERGE \(their.nameAsReference) -> \(our.nameAsReference) with BASE \(base)" }
+                | { base in "MERGE [\(their.nameAsReference)] with [\(our.nameAsReference)] using BASE \(base)" }
             
             let ourTree   = ourOID   | { self.commit(oid: $0) } | { $0.tree() }
             let theirTree = theirOID | { self.commit(oid: $0) } | { $0.tree() }

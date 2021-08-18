@@ -57,7 +57,7 @@ public extension Repository {
             let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
             
             let message = combine(theirReference, baseOID)
-                | { their, base in "Three Way MERGE \(their.nameAsReference) -> \(ourLocal.nameAsReference) with BASE \(base)" }
+                | { their, base in "MERGE [\(their.nameAsReference)] with [\(ourLocal.nameAsReference)] using BASE \(base)" }
             
             let ourCommit   = ourOID   | { self.commit(oid: $0) }
             let theirCommit = theirOID | { self.commit(oid: $0) }
