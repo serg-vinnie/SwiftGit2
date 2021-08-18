@@ -48,10 +48,6 @@ public extension Repository {
     }
 }
 
-//        return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
-//            .map { FS. }
-//    }
-    
 //    func discard(entry: UiStatusEntryX) -> R<Void> {
 //        switch entry.status {
 //        case .current: return .success(())
