@@ -23,8 +23,35 @@ public extension Repository {
     func discard(entry: UiStatusEntryX) -> R<Void> {
         guard let path = entry.newFileRelPath ?? entry.oldFileRelPath else { return .failure(WTF("Failed to get path for discard file changes"))  }
         
-        return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
+        if entry.stageState == .mixed {
+            let _ = try? self.add( relPaths: [path] ).get()
+        }
+        
+        switch entry.status {
+        case .current: return .success(())
+        case .ignored: return .failure(WTF("Repository.discard doesn't support ignored status"))
+        case .conflicted: return .failure(WTF("Repository.discard doesn't support conflicted status"))
+        
+        case .workTreeNew:
+            return entry.with(self).indexToWorkDirNewFileURL | { $0.rm() }
+        
+        case .indexNew, .indexDeleted, .indexModified, .indexTypeChange, .indexRenamed,
+             .workTreeDeleted, .workTreeModified, .workTreeUnreadable, .workTreeTypeChange, .workTreeRenamed:
+             
+            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
+            
+        default:
+            assert(false)
+            
+            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
+        }
     }
+}
+        
+        
+//        return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
+//            .map { FS. }
+//    }
     
 //    func discard(entry: UiStatusEntryX) -> R<Void> {
 //        switch entry.status {
@@ -68,7 +95,7 @@ public extension Repository {
 //
 //        return .success(())
 //    }
-}
+//}
 
 public extension UiStatusEntryX {
     func with(_ repo: Repository) -> Duo<UiStatusEntryX, Repository> {
