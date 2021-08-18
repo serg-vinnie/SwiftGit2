@@ -54,7 +54,7 @@ class MergeAnalysisTests: XCTestCase {
         repo1.pull(.HEAD, signature: GitTest.signature)
             .assertEqual(to: .threeWaySuccess)
     }
-
+    
     func testThreeWayConflict() throws {
         // fileA
         repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")

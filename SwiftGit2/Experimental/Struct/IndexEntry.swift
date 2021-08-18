@@ -19,41 +19,40 @@ public extension Index {
             nanoseconds = time.nanoseconds
         }
     }
-
+    
     struct Entry {
+        public var dev: UInt32 { wrappedEntry.dev }
+        public var ino: UInt32 { wrappedEntry.ino }
+        public var mode: UInt32 { wrappedEntry.mode }
+        public var uid: UInt32 { wrappedEntry.uid }
+        public var gid: UInt32 { wrappedEntry.gid }
+        public var fileSize: UInt32 { wrappedEntry.file_size }
+        
         public let ctime: Time
         public let mtime: Time
-        public let dev: UInt32
-        public let ino: UInt32
-        public let mode: UInt32
-        public let uid: UInt32
-        public let gid: UInt32
-        public let fileSize: UInt32
         public let oid: OID
-
+        
         public let flags: Flags
         public let flagsExtended: FlagsExtended
-
+        
         public let path: String
-
+        
         public let stage: Int32
-
+        
+        public var wrappedEntry: git_index_entry
+        
         init(entry: git_index_entry) {
+            wrappedEntry = entry
+            
             ctime = Time(entry.ctime)
             mtime = Time(entry.mtime)
-            dev = entry.dev
-            ino = entry.ino
-            mode = entry.mode
-            uid = entry.uid
-            gid = entry.gid
-            fileSize = entry.file_size
             oid = OID(entry.id)
-
+            
             flags = Flags(rawValue: UInt32(entry.flags))
             flagsExtended = FlagsExtended(rawValue: UInt32(entry.flags_extended))
-
+            
             path = String(cString: entry.path)
-
+            
             var mutableEntry = entry
             stage = git_index_entry_stage(&mutableEntry)
         }

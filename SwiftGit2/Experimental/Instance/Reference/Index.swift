@@ -24,7 +24,7 @@ public final class Index: InstanceProtocol {
 public extension Repository {
     func index() -> Result<Index, Error> {
         var pointer: OpaquePointer?
-
+        
         return _result({ Index(pointer!) }, pointOfFailure: "git_repository_index") {
             git_repository_index(&pointer, self.pointer)
         }
@@ -55,16 +55,35 @@ public extension Index {
             git_index_conflict_iterator_new(&iterator, self.pointer)
         }
     }
-
-    func add(paths: [String]) -> Result<Void, Error> {
+    
+    func add(_ entry: Index.Entry) -> R<()> {
+        var entry1 = entry.wrappedEntry
+        
+        return _result((), pointOfFailure: "git_index_clear") {
+            git_index_add(self.pointer, &entry1 )
+        }
+    }
+    
+    func add(paths: [String]) -> R<()> {
         paths.with_git_strarray { strarray in
             git_try("git_index_add_all") { git_index_add_all(pointer, &strarray, 0, nil, nil) } | { self.write() }
         }
     }
-
+    
     func remove(paths: [String]) -> Result<Void, Error> {
         paths.with_git_strarray { strarray in
             git_try("git_index_remove_all") { git_index_remove_all(pointer, &strarray, nil, nil) } | { self.write() }
+        }
+    }
+    
+    func removeConflict(relPath: String) -> R<()> {
+        return _result({ () }, pointOfFailure: "git_index_conflict_remove") {
+            relPath.withCString { path in
+                git_index_conflict_remove(self.pointer, path);
+            }
+        }
+        .flatMap {
+            self.write()
         }
     }
 
@@ -95,10 +114,10 @@ public extension Index {
 public extension Duo where T1 == Index, T2 == Repository {
     func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         let (index, repo) = value
-
+        
         return index.writeTree()
             .flatMap { treeOID in
-
+                
                 repo.headCommit()
                     // If commit exist
                     .flatMap { commit in

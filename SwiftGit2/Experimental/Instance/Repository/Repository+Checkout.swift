@@ -34,7 +34,7 @@ public extension Repository {
 
 }
 
-internal extension Repository {
+public extension Repository {
     func setHEAD_detached(_ oid: OID) -> Result<Void, Error> {
         var oid = oid.oid
         return _result((), pointOfFailure: "git_repository_set_head_detached") {
@@ -63,6 +63,15 @@ internal extension Repository {
 
     func checkout(index: Index, strategy: CheckoutStrategy) -> Result<Void, Error> {
         let options = CheckoutOptions(strategy: strategy)
+        return git_try("git_checkout_index") {
+            options.with_git_checkout_options { opt in
+                git_checkout_index(self.pointer, index.pointer, &opt)
+            }
+        }
+    }
+    
+    func checkout(index: Index, strategy: CheckoutStrategy, relPaths: [String]) -> Result<Void, Error> {
+        let options = CheckoutOptions(strategy: strategy, relPaths: relPaths )
         return git_try("git_checkout_index") {
             options.with_git_checkout_options { opt in
                 git_checkout_index(self.pointer, index.pointer, &opt)
