@@ -47,7 +47,7 @@ public extension Repository {
             return git_repository_set_head(self.pointer, reference.nameAsReference)
         }
     }
-
+    
     func checkoutHead(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [] ) -> Result<Void, Error> {
         return git_try("git_checkout_head") {
             CheckoutOptions(strategy: strategy, pathspec: pathspec, progress: progress)
@@ -80,7 +80,6 @@ public extension Repository {
         }
     }
 }
-
 
 ////////////////////////////
 //HELPERS

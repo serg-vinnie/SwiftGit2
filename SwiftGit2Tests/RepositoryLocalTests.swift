@@ -63,7 +63,7 @@ class RepositoryLocalTests: XCTestCase {
         guard let fixResultDetached = repo.detachedHeadFix().assertFailure("detached HEAD fix") else { fatalError() }
         XCTAssert(fixResultDetached == .fixed)
 
-        repo.createBranchOLD(from: .head, name: "branch1", checkout: false)
+        repo.createBranch(from: .HEAD, name: "branch1", checkout: false)
             .assertFailure("create branch1")
 
         repo.detachHEAD()
