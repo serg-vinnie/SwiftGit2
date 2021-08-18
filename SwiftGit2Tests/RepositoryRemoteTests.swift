@@ -111,7 +111,7 @@ class RepositoryRemoteTests: XCTestCase {
         repo.upstreamExistsFor(.HEAD)
             .assertFailure("upstreamExistsFor")
         
-        repo.createBranch(from: .head, name: "newBranch", checkout: true)
+        repo.createBranchOLD(from: .head, name: "newBranch", checkout: true)
             .flatMap { repo.upstreamExistsFor(.branch($0)) }
             .assertEqual(to: false, "upstreamExistsFor newBranch")
         

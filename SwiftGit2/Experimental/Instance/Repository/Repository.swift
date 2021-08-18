@@ -101,12 +101,19 @@ public extension Repository {
         }
     }
     
-    func createBranch(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
+    @available(*, deprecated, message: "use createBranch(from target) instead")
+    func createBranchOLD(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
+
         switch base {
         case .head: return headCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
         case let .commit(c): return createBranch(from: c, name: name, checkout: checkout)
         case let .branch(b): return Duo(b, self).commit().flatMap { c in createBranch(from: c, name: name, checkout: checkout) }
         }
+    }
+    
+    func createBranch(from target: BranchTarget, name: String, checkout: Bool) -> Result<Reference, Error> {
+        target.with(self).commitInstance
+            | { self.createBranch(from: $0, name: name, checkout: checkout)}
     }
     
     func branchLookup(name: String) -> R<Branch>{

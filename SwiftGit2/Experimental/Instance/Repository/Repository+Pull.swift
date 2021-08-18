@@ -10,7 +10,7 @@ import Clibgit2
 import Essentials
 import Foundation
 
-public enum PullResult {
+public enum MergeResult {
     case upToDate
     case fastForward
     case threeWaySuccess
@@ -18,12 +18,12 @@ public enum PullResult {
 }
 
 public extension Repository {    
-    func pull(_ target: BranchTarget, options: FetchOptions = FetchOptions(auth: .auto), signature: Signature) -> Result<PullResult, Error> {
-        return combine(fetch(target, options: options), mergeAnalysis(target))
-            .flatMap { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, signature: signature) }
+    func pull(_ target: BranchTarget, options: FetchOptions = FetchOptions(auth: .auto), signature: Signature) -> Result<MergeResult, Error> {
+        return combine(fetch(target, options: options), mergeAnalysisUpstream(target))
+            | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, signature: signature) }
     }
 
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, signature: Signature) -> Result<PullResult, Error> {
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, signature: Signature) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         let repo = self
@@ -42,28 +42,27 @@ public extension Repository {
             let message = theirReference.map { their in "Fast Forward MERGE \(their.nameAsReference) -> \(ourLocal.nameAsReference)" }
             
             return combine(targetOID, message)
-                .flatMap { oid, message in ourLocal.set(target: oid, message: message) }
-                .flatMap { $0.asBranch() }
-                .flatMap { self.checkout(branch: $0, strategy: .Force) }
-                .map { _ in .fastForward }
+                | { oid, message in ourLocal.set(target: oid, message: message) }
+                | { $0.asBranch() }
+                | { self.checkout(branch: $0, strategy: .Force) }
+                | { _ in .fastForward }
             
         } else if anal.contains(.normal) {
             /////////////////////////////////
             // THREE-WAY MERGE
             /////////////////////////////////
             
-            let ourOID = ourLocal.targetOID
-            let theirOID = ourLocal.upstream().flatMap { $0.targetOID }
-            let baseOID = combine(ourOID, theirOID).flatMap { self.mergeBase(one: $0, two: $1) }
+            let ourOID   = ourLocal.targetOID
+            let theirOID = ourLocal.upstream()       | { $0.targetOID }
+            let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
             
             let message = combine(theirReference, baseOID)
-                .map { their, base in "Three Way MERGE \(their.nameAsReference) -> \(ourLocal.nameAsReference) with BASE \(base)" }
+                | { their, base in "Three Way MERGE \(their.nameAsReference) -> \(ourLocal.nameAsReference) with BASE \(base)" }
             
-            let ourCommit = ourOID.flatMap { self.commit(oid: $0) }
-            let theirCommit = theirOID.flatMap { self.commit(oid: $0) }
+            let ourCommit   = ourOID   | { self.commit(oid: $0) }
+            let theirCommit = theirOID | { self.commit(oid: $0) }
             
-            let parents = combine(ourCommit, theirCommit)
-                .map { [$0, $1] }
+            let parents = combine(ourCommit, theirCommit) | { [$0, $1] }
             
             let branchName = ourLocal.nameAsReference
             
@@ -83,17 +82,16 @@ public extension Repository {
                                 OidRevFile( repo: repo, type: .MergeHead)?
                                     .setOid(from: $0[1] )
                                     .save()
-                            }
-                            .flatMap{ _ in
+                            } | { _ in
                                 repo.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
-                                    .flatMap { _ in .success(.threeWayConflict(index)) }
+                                    | { _ in .success(.threeWayConflict(index)) }
                             }
                     },
                     else: { index in
                         combine(message, parents)
-                            .flatMap { index.commit(into: self, signature: signature, message: $0, parents: $1) }
-                            .flatMap { _ in self.checkout(branch: branchName, strategy: .Force) }
-                            .map { _ in .threeWaySuccess }
+                            | { index.commit(into: self, signature: signature, message: $0, parents: $1) }
+                            | { _ in self.checkout(branch: branchName, strategy: .Force) }
+                            | { _ in .threeWaySuccess }
                     })
         }
 
@@ -103,20 +101,19 @@ public extension Repository {
 
 private extension Result where Success == OID, Failure == Error {
     func tree(_ repo: Repository) -> Result<Tree, Error> {
-        flatMap { repo.commit(oid: $0) }
-            .flatMap { $0.tree() }
+        self | { repo.commit(oid: $0) } | { $0.tree() }
     }
 }
 
 internal extension Index {
     func commit(into repo: Repository, signature: Signature, message: String, parents: [Commit]) -> Result<Void, Error> {
         writeTree(to: repo)
-            .flatMap { tree in repo.commitCreate(signature: signature, message: message, tree: tree, parents: parents) }
-            .map { _ in () }
+            | { tree in repo.commitCreate(signature: signature, message: message, tree: tree, parents: parents) }
+            | { _ in () }
     }
 }
 
-extension PullResult: Equatable {
+extension MergeResult: Equatable {
     var hasConflict: Bool {
         if case .threeWayConflict = self {
             return true
@@ -125,7 +122,7 @@ extension PullResult: Equatable {
         }
     }
 
-    public static func == (lhs: PullResult, rhs: PullResult) -> Bool {
+    public static func == (lhs: MergeResult, rhs: MergeResult) -> Bool {
         switch (lhs, rhs) {
         case (.upToDate, .upToDate): return true
         case (.fastForward, .fastForward): return true

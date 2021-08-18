@@ -47,14 +47,99 @@ public extension Repository {
                     .commit(message: "TAO_MERGE", signature: signature)
             }
     }
+    
+    func mergeIntoHEAD(their theirName: String, signature: Signature) -> Result<MergeResult, Error> {
+        let our = HEAD()  | { $0.asBranch() }
+        let their = self.branchLookup(name: theirName)
+        let anal = their | { mergeAnalysis(branch: $0) }
+        return combine(anal, our, their)
+            | { self.mergeAndCommit(anal: $0, our: $1, their: $2, signature: signature) }
+    }
+    
+    func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature) -> Result<MergeResult, Error> {
+        guard !anal.contains(.upToDate) else { return .success(.upToDate) }
+        
+        if anal.contains(.fastForward) || anal.contains(.unborn) {
+            /////////////////////////////////////
+            // FAST-FORWARD MERGE
+            /////////////////////////////////////
+            
+            let targetOID = their.targetOID
+            
+            let message = "Fast Forward MERGE \(their.nameAsReference) -> \(our.nameAsReference)"
 
-    func mergeAnalysis(_ target: BranchTarget) -> Result<MergeAnalysis, Error> {
+            return targetOID
+                | { oid in our.set(target: oid, message: message) }
+                | { $0.asBranch() }
+                | { self.checkout(branch: $0, strategy: .Force) }
+                | { _ in .fastForward }
+            
+        } else if anal.contains(.normal) {
+            /////////////////////////////////
+            // THREE-WAY MERGE
+            /////////////////////////////////
+            
+            let ourOID   = our.targetOID
+            let theirOID = their.targetOID
+            let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
+            
+            let message = baseOID
+                | { base in "Three Way MERGE \(their.nameAsReference) -> \(our.nameAsReference) with BASE \(base)" }
+            
+            let ourTree   = ourOID   | { self.commit(oid: $0) } | { $0.tree() }
+            let theirTree = theirOID | { self.commit(oid: $0) } | { $0.tree() }
+            let baseTree  = baseOID  | { self.commit(oid: $0) } | { $0.tree() }
+            
+            let ourCommit   = ourOID   | { self.commit(oid: $0) }
+            let theirCommit = theirOID | { self.commit(oid: $0) }
+            let parents     = combine(ourCommit, theirCommit) | { [$0, $1] }
+            
+            let branchName = our.nameAsReference
+            
+            return combine(ourTree, theirTree, baseTree)
+                .flatMap { self.merge(our: $0, their: $1, ancestor: $2) } // -> Index
+                .if(\.hasConflicts,
+                    then: { index in
+                        parents
+                            .map {
+                                // MERGE_HEAD creation
+                                let _ = RevFile( repo: self, type: .PullMsg)?
+                                    .generatePullMsg(from: index)
+                                    .save()
+                                
+                                // MERGE_HEAD creation
+                                OidRevFile( repo: self, type: .MergeHead)?
+                                    .setOid(from: $0[1] )
+                                    .save()
+                            } | { _ in
+                                self.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
+                                    | { _ in .success(.threeWayConflict(index)) }
+                            }
+                    },
+                    else: { index in
+                        combine(message, parents)
+                            | { index.commit(into: self, signature: signature, message: $0, parents: $1) }
+                            | { _ in self.checkout(branch: branchName, strategy: .Force) }
+                            | { _ in .threeWaySuccess }
+                    })
+            
+        }
+            
+        return .failure(WTF("pull: unexpected MergeAnalysis value: \(anal.rawValue)"))
+    }
+
+    func mergeAnalysisUpstream(_ target: BranchTarget) -> Result<MergeAnalysis, Error> {
         return target.branch(in: self)
             | { $0.upstream() }
             | { $0.targetOID }
             | { self.annotatedCommit(oid: $0) }
             | { self.mergeAnalysis(their_head: $0) }
-        
+    }
+    
+    func mergeAnalysis(branch: Branch) -> Result<MergeAnalysis, Error> {
+        return branch.targetOID
+            | { self.annotatedCommit(oid: $0) }
+            | { self.mergeAnalysis(their_head: $0) }
     }
 
     // Analyzes the given branch(es) and determines the opportunities for merging them into the HEAD of the repository.
