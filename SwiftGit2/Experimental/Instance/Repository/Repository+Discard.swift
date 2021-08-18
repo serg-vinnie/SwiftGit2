@@ -21,7 +21,9 @@ public extension Repository {
     }
     
     func discard(entry: UiStatusEntryX) -> R<Void> {
-        return .success(())
+        guard let path = entry.newFileRelPath ?? entry.oldFileRelPath else { return .failure(WTF("Failed to get path for discard file changes"))  }
+        
+        return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
     }
     
 //    func discard(entry: UiStatusEntryX) -> R<Void> {
