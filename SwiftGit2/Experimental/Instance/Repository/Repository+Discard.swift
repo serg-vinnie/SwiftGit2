@@ -23,9 +23,8 @@ public extension Repository {
     func discard(entry: UiStatusEntryX) -> R<Void> {
         guard let path = entry.newFileRelPath ?? entry.oldFileRelPath else { return .failure(WTF("Failed to get path for discard file changes"))  }
         
-        if entry.stageState == .mixed {
-            let _ = try? self.add( relPaths: [path] ).get()
-        }
+        // Stage file if mixed
+        if entry.stageState == .mixed { let _ = try? self.add( relPaths: [path] ).get() }
         
         switch entry.status {
         case .current: return .success(())
@@ -45,7 +44,7 @@ public extension Repository {
         case .workTreeRenamed:
             return entry.with(self).indexToWorkDirNewFileURL
                 | { $0.rm() }
-                | {entry.headToIndexOLDFilePath }
+                | { entry.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
             
         case .indexNew, .indexDeleted, .indexModified, .indexTypeChange,
