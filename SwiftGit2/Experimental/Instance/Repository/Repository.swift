@@ -254,7 +254,7 @@ public extension Repository {
         var pointer: OpaquePointer?
 
         return _result({ Remote(pointer!) }, pointOfFailure: "git_remote_create") {
-            "tempName".withCString { tempName in
+            "origin".withCString { tempName in
                 str.withCString { url in
                     git_remote_create(&pointer, self.pointer, tempName, url)
                 }
