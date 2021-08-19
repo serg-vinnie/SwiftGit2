@@ -35,10 +35,23 @@ public extension Repository {
         case .workTreeNew:
             return entry.with(self).indexToWorkDirNewFileURL | { $0.rm() }
         
-        case .indexNew, .indexDeleted, .indexModified, .indexTypeChange, .indexRenamed,
-             .workTreeDeleted, .workTreeModified, .workTreeUnreadable, .workTreeTypeChange, .workTreeRenamed:
+        case .indexRenamed:
+            return combine(self.index(), entry.headToIndexNEWFilePath)
+                | { index, path in index.remove(paths: [path]) }
+                | { entry.with(self).headToIndexNewFileURL } | { $0.rm() }
+                | { entry.headToIndexOLDFilePath }
+                | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
+            
+        case .workTreeRenamed:
+            return entry.with(self).indexToWorkDirNewFileURL
+                | { $0.rm() }
+                | {entry.headToIndexOLDFilePath }
+                | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
+            
+        case .indexNew, .indexDeleted, .indexModified, .indexTypeChange,
+             .workTreeDeleted, .workTreeModified, .workTreeUnreadable, .workTreeTypeChange:
              
-            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
+            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path] )
             
         default:
             assert(false)
