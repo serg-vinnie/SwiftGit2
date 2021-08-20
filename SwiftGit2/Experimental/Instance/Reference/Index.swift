@@ -118,7 +118,7 @@ public extension Duo where T1 == Index, T2 == Repository {
         return index.writeTree()
             .flatMap { treeOID in
                 
-                repo.headCommit()
+                repo.getHeadCommit()
                     // If commit exist
                     .flatMap { commit in
                         repo.commit(tree: OID(treeOID), parents: [commit], message: message, signature: signature)
