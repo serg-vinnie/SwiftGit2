@@ -38,12 +38,12 @@ public extension Repository {
 
                 case .oneCommit: // Logic for 1 commit in history
                     let repo = self
-                    return self.getHeadCommit().flatMap { $0.tree() }
+                    return self.headCommit().flatMap { $0.tree() }
                         .flatMap { repo.diffTreeToTree(oldTree: $0, newTree: nil) }
                         .map { [$0] }
 
                 case .manyCommits: // Logic for 2 and more commits in history
-                    return set.with(set[Repository.self].getHeadCommit()) // assigns set[Commit.self] to refer HEAD commit
+                    return set.with(set[Repository.self].headCommit()) // assigns set[Commit.self] to refer HEAD commit
                         .flatMap { $0.with($0[Commit.self].tree()) } // assigns set[Tree.self] to refer Tree of HEAD commit
                         .flatMap { $0.with($0[Commit.self] // assigns set[[Tree].self] to refer parent trees of HEAD commit
                                 .parents()
@@ -56,7 +56,7 @@ public extension Repository {
     }
 
     fileprivate func checkHistorySituation() -> Result<HistorySituation, Error> {
-        if let headCommit = try? self.getHeadCommit().get() {
+        if let headCommit = try? self.headCommit().get() {
             return headCommit.parents()
                 .map { $0.count == 0 ? HistorySituation.oneCommit : .manyCommits }
         }

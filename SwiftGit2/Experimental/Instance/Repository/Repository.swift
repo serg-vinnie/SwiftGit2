@@ -105,7 +105,7 @@ public extension Repository {
     func createBranchOLD(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
         
         switch base {
-        case .head: return getHeadCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
+        case .head: return headCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
         case let .commit(c): return createBranch(from: c, name: name, checkout: checkout)
         case let .branch(b): return Duo(b, self).commit().flatMap { c in createBranch(from: c, name: name, checkout: checkout) }
         }
@@ -316,7 +316,7 @@ fileprivate extension Diff.Delta {
 }
 
 public extension Repository {
-    func getHeadCommit() -> Result<Commit, Error> {
+    func headCommit() -> Result<Commit, Error> {
         var oid = git_oid()
         
         return _result({ oid }, pointOfFailure: "git_reference_name_to_id") {
@@ -325,12 +325,12 @@ public extension Repository {
         .flatMap { instanciate(OID($0)) }
     }
     
-    func getHeadBranch() -> R<Branch>{
+    func headBranch() -> R<Branch>{
         return self.HEAD()
             .flatMap { $0.asBranch() }
     }
     
-    func getHeadName() -> R<String> {
+    func headName() -> R<String> {
         if repoIsBare || headIsUnborn {
             return .success("master")
         }
