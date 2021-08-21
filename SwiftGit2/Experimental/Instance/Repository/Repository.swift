@@ -103,7 +103,7 @@ public extension Repository {
     
     @available(*, deprecated, message: "use createBranch(from target) instead")
     func createBranchOLD(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
-
+        
         switch base {
         case .head: return headCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
         case let .commit(c): return createBranch(from: c, name: name, checkout: checkout)
@@ -119,15 +119,6 @@ public extension Repository {
     func branchLookup(name: String) -> R<Branch>{
         reference(name: name)
             .flatMap{ $0.asBranch() }
-    }
-
-    func headCommit() -> Result<Commit, Error> {
-        var oid = git_oid()
-
-        return _result({ oid }, pointOfFailure: "git_reference_name_to_id") {
-            git_reference_name_to_id(&oid, self.pointer, "HEAD")
-        }
-        .flatMap { instanciate(OID($0)) }
     }
 
     internal func createBranch(from commit: Commit, name: String, checkout: Bool, force: Bool = false) -> Result<Reference, Error> {
@@ -321,6 +312,37 @@ public extension Repository {
 fileprivate extension Diff.Delta {
     func getFileAbsPathUsing(repoPath: String) -> String {
         return "\(repoPath)/" + ( (self.newFile?.path ?? self.oldFile?.path) ?? "" )
+    }
+}
+
+public extension Repository {
+    func headCommit() -> Result<Commit, Error> {
+        var oid = git_oid()
+        
+        return _result({ oid }, pointOfFailure: "git_reference_name_to_id") {
+            git_reference_name_to_id(&oid, self.pointer, "HEAD")
+        }
+        .flatMap { instanciate(OID($0)) }
+    }
+    
+    func headBranch() -> R<Branch>{
+        return self.HEAD()
+            .flatMap { $0.asBranch() }
+    }
+    
+    func headName() -> R<String> {
+        if repoIsBare || headIsUnborn {
+            return .success("master")
+        }
+        
+        if headIsDetached {
+            return HEAD()
+                .flatMap{ $0.targetOID }
+                .map { "\($0.description)".substring(to: 8) }
+        }
+        
+        return HEAD()
+            .map { $0.nameAsReference.replace(of: "refs/heads/", to: "") }
     }
 }
 
