@@ -101,7 +101,8 @@ public extension Repository {
         }
     }
     
-    @available(*, deprecated, message: "use createBranch(from target) instead")
+    @available(*, deprecated, message: "use createBranch(from target) instead. But this method works with detached head")
+    // Works with detached head
     func createBranchOLD(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
         
         switch base {
@@ -111,6 +112,7 @@ public extension Repository {
         }
     }
     
+    ///TODO: Does not work with detached head!!!!!
     func createBranch(from target: BranchTarget, name: String, checkout: Bool) -> Result<Reference, Error> {
         target.with(self).commitInstance
             | { self.createBranch(from: $0, name: name, checkout: checkout)}

@@ -9,8 +9,7 @@ public enum BranchTarget : DuoUser {
     
     func branch(in repo: Repository) -> R<Branch> {
         switch self {
-        case .HEAD: return repo.HEAD()
-                    .flatMap { $0.asBranch() }
+        case .HEAD: return repo.headBranch()
         case let .branch(branch): return .success(branch)
             
         case let .branchShortName(name):
