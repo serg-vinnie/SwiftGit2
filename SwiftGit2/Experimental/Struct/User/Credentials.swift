@@ -17,12 +17,12 @@ public enum Credentials {
     case ssh(publicKey: String, privateKey: String, passphrase: String)
 }
 
-extension Credentials {
+public extension Credentials {
+    static var sshDir : URL { URL.userHome.appendingPathComponent(".ssh") }
+    static var publicKey : URL { sshDir.appendingPathComponent("id_rsa.pub") }
+    static var privateKey : URL { sshDir.appendingPathComponent("id_rsa") }
+    
     static var sshDefault: Credentials {
-        let sshDir = URL.userHome.appendingPathComponent(".ssh")
-        let publicKey = sshDir.appendingPathComponent("id_rsa.pub")
-        let privateKey = sshDir.appendingPathComponent("id_rsa")
-
         guard publicKey.exists else { return .none }
         guard privateKey.exists else { return .none }
 
