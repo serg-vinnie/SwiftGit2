@@ -39,7 +39,7 @@ public extension Repository {
             let targetOID = theirReference
                 .flatMap { $0.targetOID }
             
-            let message = theirReference.map { their in "Fast Forward MERGE \(their.nameAsReference) -> \(ourLocal.nameAsReference)" }
+            let message = theirReference.map { their in "Fast Forward MERGE \(their.nameAsReferenceCleaned) -> \(ourLocal.nameAsReferenceCleaned)" }
             
             return combine(targetOID, message)
                 | { oid, message in ourLocal.set(target: oid, message: message) }
@@ -57,7 +57,7 @@ public extension Repository {
             let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
             
             let message = combine(theirReference, baseOID)
-                | { their, base in "MERGE [\(their.nameAsReference)] with [\(ourLocal.nameAsReference)] using BASE \(base)" }
+                | { their, base in "MERGE [\(their.nameAsReferenceCleaned)] & [\(ourLocal.nameAsReferenceCleaned)] | BASE: \(base)" }
             
             let ourCommit   = ourOID   | { self.commit(oid: $0) }
             let theirCommit = theirOID | { self.commit(oid: $0) }

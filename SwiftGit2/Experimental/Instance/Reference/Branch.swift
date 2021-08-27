@@ -21,6 +21,7 @@ public enum BranchLocation {
 public protocol Branch: InstanceProtocol {
     var nameAsBranch: String? { get }
     var nameAsReference: String { get }
+    var nameAsReferenceCleaned: String { get }
     var isBranch: Bool { get }
     var isRemote: Bool { get }
 

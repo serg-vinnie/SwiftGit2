@@ -84,7 +84,7 @@ public extension Repository {
             let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
             
             let message = baseOID
-                | { base in "MERGE [\(their.nameAsReference)] with [\(our.nameAsReference)] using BASE \(base)" }
+                | { base in "MERGE [\(their.nameAsReferenceCleaned)] & [\(our.nameAsReferenceCleaned)] | BASE: \(base)" }
             
             let ourTree   = ourOID   | { self.commit(oid: $0) } | { $0.tree() }
             let theirTree = theirOID | { self.commit(oid: $0) } | { $0.tree() }
@@ -201,3 +201,4 @@ public struct MergePreference: OptionSet {
     public static let noFastForward = MergeAnalysis(rawValue: GIT_MERGE_PREFERENCE_NO_FASTFORWARD.rawValue) // There is a merge.ff=false configuration setting, suggesting that the user does not want to allow a fast-forward merge.
     public static let fastForwardOnly = MergeAnalysis(rawValue: GIT_MERGE_PREFERENCE_FASTFORWARD_ONLY.rawValue) // There is a merge.ff=only configuration setting, suggesting that the user only wants fast-forward merges.
 }
+

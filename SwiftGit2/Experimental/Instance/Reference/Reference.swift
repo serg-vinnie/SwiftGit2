@@ -23,6 +23,8 @@ public class Reference: Branch { // Branch: InstanceProtocol
 
 public extension Reference {
     var nameAsReference: String { String(validatingUTF8: git_reference_name(pointer)) ?? "" }
+    
+    var nameAsReferenceCleaned: String{ nameAsReference.fixNameAsReference() }
 
     var isDirect: Bool { git_reference_type(pointer) == GIT_REFERENCE_DIRECT }
     var isSymbolic: Bool { git_reference_type(pointer) == GIT_REFERENCE_SYMBOLIC }
@@ -82,5 +84,16 @@ public extension Repository {
         return _result({ Reference(pointer!) }, pointOfFailure: "git_reference_lookup") {
             git_reference_lookup(&pointer, self.pointer, name)
         }
+    }
+}
+
+
+/////////////////////////
+/// HELPERS
+/////////////////////////
+
+fileprivate extension String {
+    func fixNameAsReference() -> String {
+        self.split(separator: "/").dropFirst(2).joined(separator:"/")
     }
 }
