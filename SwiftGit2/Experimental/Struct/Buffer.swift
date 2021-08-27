@@ -21,7 +21,7 @@ public final class Buffer {
     public init(data: UnsafeRawPointer?, size: Int) {
         var buf = git_buf()
         
-        let a = git_buf_set(&buf, data, size)
+        let _ = git_buf_set(&buf, data, size)
         
         self.buf = buf
     }
