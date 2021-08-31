@@ -62,7 +62,7 @@ public extension Repository {
     }
 
     func getRemoteFirst() -> Result<Remote, Error> {
-        return getRemotesNames()
+        return remoteList()
             .flatMap { arr -> Result<Remote, Error> in
                 if let first = arr.first {
                     return self.remoteRepo(named: first)
@@ -72,21 +72,21 @@ public extension Repository {
     }
     
     func getAllRemotesCount() -> Result<Int, Error>{
-        getRemotesNames()
+        remoteList()
             .map{ $0.count }
     }
     
     func getAllRemotes() -> Result<[Remote], Error> {
-        return getRemotesNames()
+        return remoteList()
             .flatMap { $0.flatMap { self.remoteRepo(named: $0) } }
     }
 
-    private func getRemotesNames() -> Result<[String], Error> {
+    func remoteList() -> Result<[String], Error> {
         var strarray = git_strarray()
 
-        return _result({ strarray.map { $0 } }, pointOfFailure: "git_remote_list") {
+        return git_try("git_remote_list") {
             git_remote_list(&strarray, self.pointer)
-        }
+        } | { strarray.map { $0 } }
     }
 }
 
