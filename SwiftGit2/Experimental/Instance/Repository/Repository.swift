@@ -22,9 +22,7 @@ public class Repository: InstanceProtocol {
 }
 
 extension Repository {
-    public func remote(of target: BranchTarget) -> R<Remote> {
-        target.with(self).remote()
-    }
+    public func remote(of target: BranchTarget) -> R<Remote> { target.with(self).remote }
     
     public var directoryURL: Result<URL, Error> {
         if let pathPointer = git_repository_workdir(pointer) {
@@ -62,7 +60,7 @@ public extension Repository {
     }
 
     func getRemoteFirst() -> Result<Remote, Error> {
-        return remoteList()
+        return remoteNameList()
             .flatMap { arr -> Result<Remote, Error> in
                 if let first = arr.first {
                     return self.remoteRepo(named: first)
@@ -72,16 +70,16 @@ public extension Repository {
     }
     
     func getAllRemotesCount() -> Result<Int, Error>{
-        remoteList()
+        remoteNameList()
             .map{ $0.count }
     }
     
-    func getAllRemotes() -> Result<[Remote], Error> {
-        return remoteList()
+    func remoteList() -> Result<[Remote], Error> {
+        return remoteNameList()
             .flatMap { $0.flatMap { self.remoteRepo(named: $0) } }
     }
 
-    func remoteList() -> Result<[String], Error> {
+    func remoteNameList() -> Result<[String], Error> {
         var strarray = git_strarray()
 
         return git_try("git_remote_list") {
