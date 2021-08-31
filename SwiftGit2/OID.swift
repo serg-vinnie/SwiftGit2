@@ -74,10 +74,3 @@ extension OID: Hashable {
         return git_oid_cmp(&left, &right) == 0
     }
 }
-
-public extension Duo where T1 == OID, T2 == Repository {
-    func commit() -> Result<Commit, Error> {
-        let (oid, repo) = value
-        return repo.instanciate(oid)
-    }
-}

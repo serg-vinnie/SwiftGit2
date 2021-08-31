@@ -12,9 +12,7 @@ import Essentials
 public extension Repository {
     func push(_ target: BranchTarget, options: PushOptions = PushOptions()) -> Result<Void, Error> {
         let branch = target.with(self).branchInstance
-
-        let remote = branch
-            .flatMap { Duo($0, self).remote() }
+        let remote = target.with(self).remote()
 
         return combine(remote, branch)
             .flatMap { $0.push(branchName: $1.nameAsReference, options: options) }

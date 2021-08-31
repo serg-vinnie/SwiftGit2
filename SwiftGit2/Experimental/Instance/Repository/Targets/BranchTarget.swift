@@ -19,6 +19,16 @@ public enum BranchTarget : DuoUser {
 }
 
 public extension Duo where T1 == BranchTarget, T2 == Repository {
+    var repo : Repository { value.1 }
+    //var target : RemoteTarget { value.0 }
+    
     var branchInstance: R<Branch> { value.0.branch(in: value.1) }
-    var commitInstance: R<Commit> { branchInstance | { $0.targetOID } | { value.1.commit(oid: $0) }}
+    var commit: R<Commit> { branchInstance | { $0.targetOID } | { value.1.commit(oid: $0) } }
+    
+    func remote() -> Result<Remote, Error> {
+        //let (branch, repo) = value
+        return branchInstance
+            | { repo.remoteName(branch: $0.nameAsReference) }
+            | { remoteName in repo.remoteRepo(named: remoteName) }
+    }
 }
