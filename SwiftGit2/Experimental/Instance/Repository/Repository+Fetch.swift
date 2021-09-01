@@ -27,7 +27,7 @@ public extension Remote {
     }
 }
 
-internal extension Repository {
+public extension Repository {
     func upstreamExistsFor(_ target: BranchTarget) -> R<Bool> {
         return target.branch(in: self)
             .flatMap { $0.upstream() }
