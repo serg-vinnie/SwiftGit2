@@ -22,6 +22,8 @@ public class Repository: InstanceProtocol {
 }
 
 extension Repository {
+    public func remote(of target: BranchTarget) -> R<Remote> { target.with(self).remote }
+    
     public var directoryURL: Result<URL, Error> {
         if let pathPointer = git_repository_workdir(pointer) {
             return .success( String(cString: pathPointer).asURL() )
@@ -58,7 +60,7 @@ public extension Repository {
     }
 
     func getRemoteFirst() -> Result<Remote, Error> {
-        return getRemotesNames()
+        return remoteNameList()
             .flatMap { arr -> Result<Remote, Error> in
                 if let first = arr.first {
                     return self.remoteRepo(named: first)
@@ -68,21 +70,21 @@ public extension Repository {
     }
     
     func getAllRemotesCount() -> Result<Int, Error>{
-        getRemotesNames()
+        remoteNameList()
             .map{ $0.count }
     }
     
-    func getAllRemotes() -> Result<[Remote], Error> {
-        return getRemotesNames()
+    func remoteList() -> Result<[Remote], Error> {
+        return remoteNameList()
             .flatMap { $0.flatMap { self.remoteRepo(named: $0) } }
     }
 
-    private func getRemotesNames() -> Result<[String], Error> {
+    func remoteNameList() -> Result<[String], Error> {
         var strarray = git_strarray()
 
-        return _result({ strarray.map { $0 } }, pointOfFailure: "git_remote_list") {
+        return git_try("git_remote_list") {
             git_remote_list(&strarray, self.pointer)
-        }
+        } | { strarray.map { $0 } }
     }
 }
 
@@ -108,13 +110,13 @@ public extension Repository {
         switch base {
         case .head: return headCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
         case let .commit(c): return createBranch(from: c, name: name, checkout: checkout)
-        case let .branch(b): return Duo(b, self).commit().flatMap { c in createBranch(from: c, name: name, checkout: checkout) }
+        case let .branch(b): return BranchTarget.branch(b).with(self).commit | { c in createBranch(from: c, name: name, checkout: checkout) }
         }
     }
     
     ///TODO: Does not work with detached head!!!!!
     func createBranch(from target: BranchTarget, name: String, checkout: Bool) -> Result<Reference, Error> {
-        target.with(self).commitInstance
+        target.with(self).commit
             | { self.createBranch(from: $0, name: name, checkout: checkout)}
     }
     
@@ -213,7 +215,7 @@ public extension Repository {
     }
     
     func resetHard(paths: [String] = []) -> R<Void> {
-        BranchTarget.HEAD.with(self).commitInstance | { self.resetHard(commit: $0, paths: paths) }
+        BranchTarget.HEAD.with(self).commit | { self.resetHard(commit: $0, paths: paths) }
     }
     
     func resetHard(commit: Commit, paths: [String], options: CheckoutOptions = CheckoutOptions()) -> R<Void> {

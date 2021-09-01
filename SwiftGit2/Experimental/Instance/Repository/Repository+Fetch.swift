@@ -12,11 +12,8 @@ import Essentials
 
 public extension Repository {
     func fetch(_ target: BranchTarget, options: FetchOptions = FetchOptions()) -> Result<Branch, Error> {
-        let branch = target.branch(in: self)
-        return branch
-            .flatMap { Duo($0, self).remote() }
-            .flatMap { $0.fetch(options: options) }
-            .flatMap { branch }
+        let duo = target.with(self)
+        return duo.remote | { $0.fetch(options: options) } | { duo.branchInstance }
     }
 }
 

@@ -12,17 +12,13 @@ import Essentials
 public extension Repository {
     func push(_ target: BranchTarget, options: PushOptions = PushOptions()) -> Result<Void, Error> {
         let branch = target.with(self).branchInstance
+        let remote = target.with(self).remote
 
-        let remote = branch
-            .flatMap { Duo($0, self).remote() }
-
-        return combine(remote, branch)
-            .flatMap { $0.push(branchName: $1.nameAsReference, options: options) }
+        return combine(remote, branch) | { $0.push(branchName: $1.nameAsReference, options: options) }
     }
 
     func push(remoteName: String, branchName: String, options: PushOptions) -> Result<Void, Error> {
-        remote(name: remoteName)
-            .flatMap { $0.push(branchName: branchName, options: options) }
+        remote(name: remoteName) | { $0.push(branchName: branchName, options: options) }
     }
 }
 
