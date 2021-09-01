@@ -22,7 +22,7 @@ public class OidRevFile {
     
     private var gitDir: URL
     
-    init? ( repo: Repository, type: OidRevFileType ) {
+    public init? ( repo: Repository, type: OidRevFileType ) {
         guard let gitDir = (try? repo.gitDirUrl.get() )?.absoluteURL else { return nil }
         
         self.type = type
@@ -68,6 +68,13 @@ public class OidRevFile {
         }
         
         print("OidRevFile saved")
+    }
+    
+    public func delete() -> OidRevFile {
+        File(url: gitDir.appendingPathComponent( self.type.asFileName() ) )
+            .delete()
+        
+        return self
     }
 }
 
@@ -178,14 +185,33 @@ public enum RevFileType: String {
     }
 }
     
-enum OidRevFileType {
-    case FetchHead
+public enum OidRevFileType {
+//    case FetchHead
     case OrigHead
     case MergeHead
-    case CherryPickHead //CHERRY_PICK_HEAD
-    case BisectHead //BISECT_HEAD
-    case RevertHead //REVERT_HEAD
-    case RejectNonFfHead //REJECT_NON_FF_HEAD
+    case CherryPickHead
+    case BisectHead
+    case RevertHead
+    case RejectNonFfHead
+    
+    func asFileName() -> String {
+        switch self {
+//        case .FetchHead:
+//            return ""
+        case .OrigHead:
+            return "ORIG_HEAD"
+        case .MergeHead:
+            return "MERGE_HEAD"
+        case .CherryPickHead:
+            return "CHERRY_PICK_HEAD"
+        case .BisectHead:
+            return "BISECT_HEAD"
+        case .RevertHead:
+            return "REVERT_HEAD"
+        case .RejectNonFfHead:
+            return "REJECT_NON_FF_HEAD"
+        }
+    }
 }
 
 
