@@ -7,6 +7,7 @@
 //
 
 import Clibgit2
+import Essentials
 
 public enum Credentials {
     case none // always fail
@@ -27,6 +28,16 @@ public extension Credentials {
         guard privateKey.exists else { return .none }
 
         return .ssh(publicKey: publicKey.path, privateKey: privateKey.path, passphrase: "")
+    }
+    
+    static var sshAll: R<[Credentials]> {
+        let files = URL.userHome.appendingPathComponent(".ssh").files
+        let pubs  = files | { $0.filter { $0.hasSuffix(".pub") } }
+        let maybePrivates = pubs | { $0.map { $0.replace(of: ".pub", to: "") } } | { Set($0) }
+        
+        return combine(files, maybePrivates)
+            | { files, privs in files.filter { privs.contains($0) } }
+            | { $0.map { .ssh(publicKey: $0 + ".pub", privateKey: $0, passphrase: "") } }
     }
 
     func isSsh() -> Bool {
@@ -50,12 +61,12 @@ extension Credentials : CustomStringConvertible {
             return "Credentials.default"
         case .sshAgent:
             return "Credentials.sshAgent"
-        case .plaintext(username: let username, password: let password):
+        case let .plaintext(username, password):
             return "Credentials.plaintext(username: \(username), password: \(password.asPassword))"
         case .sshMemory(username: let username, publicKey: _, privateKey: _, passphrase: _):
             return "Credentials.sshMemory(username: \(username) ...)"
-        case .ssh(publicKey: let publicKey, privateKey: _, passphrase: _):
-            return "Credentials.ssh(publicKey: \(publicKey) ...)"
+        case let .ssh(publicKey, privateKey, passphrase):
+            return "Credentials.ssh(publicKey: \(publicKey), privateKey: \(privateKey), passphrase: \(passphrase.asPassword)"
         }
     }
 }
