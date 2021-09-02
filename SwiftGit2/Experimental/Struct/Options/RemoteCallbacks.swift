@@ -14,7 +14,6 @@ public typealias AuthCB = (_ url: String?, _ username: String?) -> (Credentials)
 
 public enum Auth {
     case match(AuthCB)
-    case auto
     case credentials(Credentials)
 }
 
@@ -24,7 +23,7 @@ public class RemoteCallbacks: GitPayload {
     private var remote_callbacks = git_remote_callbacks()
     public var transferProgress: TransferProgressCB?
 
-    public init(auth: Auth = .auto) {
+    public init(auth: Auth) {
         self.auth = auth
 
         let result = git_remote_init_callbacks(&remote_callbacks, UInt32(GIT_REMOTE_CALLBACKS_VERSION))
@@ -109,13 +108,17 @@ private func transferCallback(stats: UnsafePointer<git_indexer_progress>?, paylo
 }
 
 public extension Auth {
+    static func list( possibleCreds: [Credentials]) -> Auth {
+        var creds = possibleCreds
+        let closure = { () -> Credentials in
+            return creds.popLast() ?? Credentials.none
+        }
+        
+        return Auth.match { _, _ in closure() }
+    }
+    
     func credentials(url: String?, name: String?) -> Credentials {
         switch self {
-        case .auto:
-            if url?.starts(with: "http") ?? false {
-                return .default
-            }
-            return Credentials.sshDefault
         case let .match(callback):
             return callback(url, name)
         case let .credentials(c):

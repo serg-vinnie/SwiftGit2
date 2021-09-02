@@ -20,18 +20,9 @@ public enum Credentials {
 
 public extension Credentials {
     static var sshDir : URL { URL.userHome.appendingPathComponent(".ssh") }
-    static var publicKey : URL { sshDir.appendingPathComponent("id_rsa.pub") }
-    static var privateKey : URL { sshDir.appendingPathComponent("id_rsa") }
-    
-    static var sshDefault: Credentials {
-        guard publicKey.exists else { return .none }
-        guard privateKey.exists else { return .none }
-
-        return .ssh(publicKey: publicKey.path, privateKey: privateKey.path, passphrase: "")
-    }
     
     static var sshAll: R<[Credentials]> {
-        let files = URL.userHome.appendingPathComponent(".ssh").files
+        let files = sshDir.files
         let pubs  = files | { $0.filter { $0.hasSuffix(".pub") } }
         let maybePrivates = pubs | { $0.map { $0.replace(of: ".pub", to: "") } } | { Set($0) }
         

@@ -10,7 +10,7 @@ import Clibgit2
 import Essentials
 
 public extension Repository {
-    func push(_ target: BranchTarget, options: PushOptions = PushOptions()) -> Result<Void, Error> {
+    func push(_ target: BranchTarget, options: PushOptions) -> Result<Void, Error> {
         let branch = target.with(self).branchInstance
         let remote = target.with(self).remote
 
@@ -38,7 +38,7 @@ extension Remote {
 
 public extension Duo where T1 == Branch, T2 == Remote {
     /// Push local branch changes to remote branch
-    func push(auth: Auth = .auto) -> Result<Void, Error> {
+    func push(auth: Auth) -> Result<Void, Error> {
         let (branch, remote) = value
         return remote.push(branchName: branch.nameAsReference, options: PushOptions(auth: auth))
     }

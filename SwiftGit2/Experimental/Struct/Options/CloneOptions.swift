@@ -13,7 +13,7 @@ public class CloneOptions {
         get { return clone_options.bare == 1 }
     }
 
-    public init(fetch: FetchOptions = FetchOptions(), checkout: CheckoutOptions = CheckoutOptions()) {
+    public init(fetch: FetchOptions, checkout: CheckoutOptions = CheckoutOptions()) {
         self.fetch = fetch
         self.checkout = checkout
 

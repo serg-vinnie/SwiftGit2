@@ -260,7 +260,7 @@ public extension Repository {
 
 // STATIC funcs
 public extension Repository {
-    static func clone(from remoteURL: URL, to localURL: URL, options: CloneOptions = CloneOptions()) -> Result<Repository, Error> {
+    static func clone(from remoteURL: URL, to localURL: URL, options: CloneOptions) -> Result<Repository, Error> {
         var pointer: OpaquePointer?
         let remoteURLString = (remoteURL as NSURL).isFileReferenceURL() ? remoteURL.path : remoteURL.absoluteString
 

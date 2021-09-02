@@ -18,7 +18,7 @@ public enum MergeResult {
 }
 
 public extension Repository {    
-    func pull(_ target: BranchTarget, options: FetchOptions = FetchOptions(auth: .auto), signature: Signature) -> Result<MergeResult, Error> {
+    func pull(_ target: BranchTarget, options: FetchOptions, signature: Signature) -> Result<MergeResult, Error> {
         return combine(fetch(target, options: options), mergeAnalysisUpstream(target))
             | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, signature: signature) }
     }
