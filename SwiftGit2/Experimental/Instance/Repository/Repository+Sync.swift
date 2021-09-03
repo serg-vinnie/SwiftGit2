@@ -15,6 +15,7 @@ public extension Repository {
     }
     
     func sync(_ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, fetchOptions: FetchOptions = FetchOptions(auth: .auto), pushOptions: PushOptions = PushOptions(), signature: Signature) -> R<PullPushResult> {
+        
         return upstreamExistsFor(.HEAD)
             .if(\.self, then: { _ in
                 
@@ -26,7 +27,7 @@ public extension Repository {
                     | { .success }
             })
     }
-
+    
     func pullAndPush(_ target: BranchTarget, fetchOptions: FetchOptions, pushOptions: PushOptions, signature: Signature) -> R<PullPushResult> {
         switch pull(target, options: fetchOptions, signature: signature) {
         case let .success(result):
@@ -41,6 +42,4 @@ public extension Repository {
             return .failure(error)
         }
     }
-
 }
-
