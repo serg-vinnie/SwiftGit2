@@ -12,10 +12,12 @@ import Essentials
 public class OidRevFile {
     private var content: String?
     
-    public var contentAsOid: OID? {
-        guard let content = content else { return nil }
+    public var contentAsOids: [OID] {
+        guard let oidStrs = content?.split(separator: "\n") else { return [] }
         
-        return OID(string: content)
+        return oidStrs
+                .map{ OID(string: "\($0)" ) }
+                .compactMap{ $0 }
     }
     
     private(set) var type: OidRevFileType
