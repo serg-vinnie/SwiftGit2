@@ -112,7 +112,7 @@ public extension Index {
 }
 
 public extension Duo where T1 == Index, T2 == Repository {
-    func commit(message: String, signature: Signature, secondParent: Commit? = nil ) -> Result<Commit, Error> {
+    func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         let (index, repo) = value
         
         return index.writeTree()
@@ -121,12 +121,7 @@ public extension Duo where T1 == Index, T2 == Repository {
                 repo.headCommit()
                     // If commit exist
                     .flatMap { commit in
-                        let parents: [Commit]
-                        
-                        if let secondParent = secondParent { parents = [commit, secondParent] }
-                            else { parents = [commit] }
-                        
-                        return repo.commit(tree: OID(treeOID), parents: parents, message: message, signature: signature)
+                        repo.commit(tree: OID(treeOID), parents: [commit], message: message, signature: signature)
                     }
                     // if there are no parents: initial commit
                     .flatMapError { _ in

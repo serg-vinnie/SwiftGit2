@@ -22,7 +22,7 @@ public class OidRevFile {
     
     private var gitDir: URL
     
-    public init? ( repo: Repository, type: OidRevFileType ) {
+    init? ( repo: Repository, type: OidRevFileType ) {
         guard let gitDir = (try? repo.gitDirUrl.get() )?.absoluteURL else { return nil }
         
         self.type = type
@@ -178,7 +178,7 @@ public enum RevFileType: String {
     }
 }
     
-public enum OidRevFileType {
+enum OidRevFileType {
     case FetchHead
     case OrigHead
     case MergeHead
