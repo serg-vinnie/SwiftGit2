@@ -18,10 +18,10 @@ class RevwalkTests: XCTestCase {
     override func setUpWithError() throws {
         let info = PublicTestRepo()
 
-        repo1 = Repository.clone(from: info.urlSsh, to: info.localPath)
+        repo1 = Repository.clone(from: info.urlSsh, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
             .assertFailure("clone 1")
 
-        repo2 = Repository.clone(from: info.urlSsh, to: info.localPath2)
+        repo2 = Repository.clone(from: info.urlSsh, to: info.localPath2, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
             .assertFailure("clone 2")
     }
     
@@ -40,10 +40,10 @@ class RevwalkTests: XCTestCase {
             .map { $0.count }
             .assertEqual(to: 1, "repo1.pendingCommits(.HEAD, .push)")
                 
-        repo1.push(.HEAD)
+        repo1.push(.HEAD, options: PushOptions(auth: .credentials(.sshDefault)))
             .assertFailure("push")
         
-        repo2.fetch(.HEAD)
+        repo2.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
             .assertFailure()
         
         repo2.mergeAnalysisUpstream(.HEAD)

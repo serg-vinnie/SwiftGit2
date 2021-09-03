@@ -10,10 +10,10 @@ class MergeAnalysisTests: XCTestCase {
     override func setUpWithError() throws {
         let info = PublicTestRepo()
 
-        repo1 = Repository.clone(from: info.urlSsh, to: info.localPath)
+        repo1 = Repository.clone(from: info.urlSsh, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
             .assertFailure("clone 1")
 
-        repo2 = Repository.clone(from: info.urlSsh, to: info.localPath2)
+        repo2 = Repository.clone(from: info.urlSsh, to: info.localPath2, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
             .assertFailure("clone 2")
     }
 
@@ -26,13 +26,13 @@ class MergeAnalysisTests: XCTestCase {
         repo1.mergeAnalysisUpstream(.HEAD)
             .assertEqual(to: .upToDate)
 
-        repo1.fetch(.HEAD)
+        repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
             .assertFailure()
 
         repo1.mergeAnalysisUpstream(.HEAD)
             .assertEqual(to: [.fastForward, .normal])
 
-        repo1.pull(.HEAD, signature: GitTest.signature)
+        repo1.pull(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)), signature: GitTest.signature)
             .assertEqual(to: .fastForward, "pull fast forward merge")
     }
 
@@ -43,7 +43,7 @@ class MergeAnalysisTests: XCTestCase {
         repo1.t_commit(file: .fileB, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
             .assertFailure()
 
-        repo1.fetch(.HEAD)
+        repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
             .assertFailure()
 
         let merge = repo1.mergeAnalysisUpstream(.HEAD)
@@ -51,7 +51,7 @@ class MergeAnalysisTests: XCTestCase {
 
         XCTAssert(merge == .normal)
 
-        repo1.pull(.HEAD, signature: GitTest.signature)
+        repo1.pull(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)), signature: GitTest.signature)
             .assertEqual(to: .threeWaySuccess)
     }
     
@@ -64,7 +64,7 @@ class MergeAnalysisTests: XCTestCase {
         repo1.t_commit(file: .fileA, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
             .assertFailure()
         
-        repo1.fetch(.HEAD)
+        repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
             .assertFailure()
         
         let merge = repo1.mergeAnalysisUpstream(.HEAD)
@@ -72,7 +72,7 @@ class MergeAnalysisTests: XCTestCase {
         
         XCTAssert(merge == .normal)
         
-        repo1.pull(.HEAD, signature: GitTest.signature)
+        repo1.pull(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)), signature: GitTest.signature)
             .assertBlock("pull has conflict") { $0.hasConflict }
     }
 }
