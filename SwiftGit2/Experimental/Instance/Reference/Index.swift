@@ -112,14 +112,8 @@ public extension Index {
 }
 
 public extension Duo where T1 == Index, T2 == Repository {
-    /// Use Repo.Commit instead!
-    func commit(message: String, signature: Signature) -> Result<Commit, Error> {
+    func commit(message: String, signature: Signature, secondParent: Commit? = nil ) -> Result<Commit, Error> {
         let (index, repo) = value
-        
-        var secondParent: Commit?
-        if let secondParentOid = OidRevFile( repo: repo, type: .MergeHead )?.contentAsOid {
-            secondParent = repo.commit(oid: secondParentOid).maybeSuccess
-        }
         
         return index.writeTree()
             .flatMap { treeOID in
@@ -138,12 +132,6 @@ public extension Duo where T1 == Index, T2 == Repository {
                     .flatMapError { _ in
                         repo.commit(tree: OID(treeOID), parents: [], message: message, signature: signature)
                     }
-            }
-            // RevFiles cleanup
-            .onSuccess { _ in
-                let _ = RevFile( repo: repo, type: .CommitDescr)?.delete()
-                let _ = RevFile( repo: repo, type: .MergeMsg)?.delete()
-                let _ = OidRevFile( repo: repo, type: .MergeHead )?.delete()
             }
     }
 }
