@@ -117,7 +117,7 @@ public extension Duo where T1 == Index, T2 == Repository {
         let (index, repo) = value
         
         var secondParent: Commit?
-        if let secondParentOid = OidRevFile( repo: repo, type: .MergeHead )?.contentAsOids.first {
+        if let secondParentOid = OidRevFile( repo: repo, type: .MergeHead )?.contentAsOid {
             secondParent = repo.commit(oid: secondParentOid).maybeSuccess
         }
         
