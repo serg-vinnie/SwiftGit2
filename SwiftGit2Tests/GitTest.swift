@@ -104,7 +104,8 @@ extension String {
     }
 
     func print(failure: Error) {
-        Swift.print("\(self) FAILED with: \(failure.localizedDescription)")
+        let nsError = failure as NSError
+        Swift.print("\(self) FAILED with(code:\(nsError.code): \(failure.localizedDescription)")
     }
 
     func write(to file: URL) -> Result<Void, Error> {
