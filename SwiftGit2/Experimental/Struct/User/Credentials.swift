@@ -32,13 +32,18 @@ public extension Credentials {
     }
     
     static var sshAll: R<[Credentials]> {
+        let c1 = Credentials.ssh(publicKey: "/Users/loki/.ssh/id_rsa.pub", privateKey: "/Users/loki/.ssh/id_rsa", passphrase: "")
+        let c2 = Credentials.ssh(publicKey: "/Users/loki/.ssh/bla.pub", privateKey: "/Users/loki/.ssh/bla", passphrase: "")
+        return .success([c2, c1])
+        
+        let path = sshDir.path + "/"
         let files = sshDir.files
         let pubs  = files | { $0.filter { $0.hasSuffix(".pub") } }
         let maybePrivates = pubs | { $0.map { $0.replace(of: ".pub", to: "") } } | { Set($0) }
         
         return combine(files, maybePrivates)
             | { files, privs in files.filter { privs.contains($0) } }
-            | { $0.map { .ssh(publicKey: $0 + ".pub", privateKey: $0, passphrase: "") } }
+            | { $0.map { .ssh(publicKey: path + $0 + ".pub", privateKey: path + $0, passphrase: "") } }
     }
 
     func isSsh() -> Bool {
