@@ -148,10 +148,8 @@ public class RevFile {
     }
     
     public func save()  -> RevFile {
-        if let content = content {
-            try? File(url: gitDir.appendingPathComponent( self.type.asFileName() ) )
-                .setContent(content)
-        }
+        try? File(url: gitDir.appendingPathComponent( self.type.asFileName() ) )
+            .setContent(content ?? "")
         
         return self
     }

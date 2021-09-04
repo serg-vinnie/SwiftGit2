@@ -214,10 +214,12 @@ public extension Repository {
         }
     }
     
+    @available(*, deprecated, message: "use reset() instead")
     func resetHard(paths: [String] = []) -> R<Void> {
         BranchTarget.HEAD.with(self).commit | { self.resetHard(commit: $0, paths: paths) }
     }
     
+    @available(*, deprecated, message: "use reset() instead")
     func resetHard(commit: Commit, paths: [String], options: CheckoutOptions = CheckoutOptions()) -> R<Void> {
         git_try("git_reset") {
             options.with_git_checkout_options { options in
@@ -227,6 +229,24 @@ public extension Repository {
                     }
                     
                     return git_reset(self.pointer, commit.pointer, GIT_RESET_HARD, &options)
+                }
+            }
+        }
+    }
+    
+    func reset(_ resetType: ResetType, paths: [String] = []) -> R<Void> {
+        BranchTarget.HEAD.with(self).commit | { self.reset(resetType, commit: $0, paths: paths) }
+    }
+    
+    func reset(_ resetType: ResetType = .Hard, commit: Commit, paths: [String], options: CheckoutOptions = CheckoutOptions()) -> R<Void> {
+        git_try("git_reset") {
+            options.with_git_checkout_options { options in
+                paths.with_git_strarray { strarray in
+                    if strarray.count > 0 {
+                        options.paths = strarray
+                    }
+                    
+                    return git_reset(self.pointer, commit.pointer, resetType.asGitResetType(), &options)
                 }
             }
         }
@@ -359,5 +379,22 @@ public extension Repository {
 public extension String {
     func asURL() -> URL {
         return URL(fileURLWithPath: self)
+    }
+}
+
+public enum ResetType {
+    case Soft
+    case Mixed
+    case Hard
+    
+    func asGitResetType() -> git_reset_t {
+        switch self {
+        case .Soft:
+            return GIT_RESET_SOFT
+        case .Mixed:
+            return GIT_RESET_MIXED
+        case .Hard:
+            return GIT_RESET_HARD
+        }
     }
 }
