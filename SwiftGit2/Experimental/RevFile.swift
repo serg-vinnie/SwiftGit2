@@ -165,7 +165,7 @@ public enum RevFileType: String {
     case MergeMsg
     case SquashMsg
     case CommitEditMsg
-    //case MergeMode // MERGE_MODE
+    case MergeMode
     
     //CUSTOMS
     case PullMsg // MERGE_MSG
@@ -177,6 +177,8 @@ public enum RevFileType: String {
             fallthrough
         case .MergeMsg:
             return "MERGE_MSG"
+        case .MergeMode:
+            return "MERGE_MODE"
         case .SquashMsg:
             return "SQUASH_MSG"
         case .CommitEditMsg:

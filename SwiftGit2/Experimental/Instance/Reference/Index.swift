@@ -147,6 +147,7 @@ public extension Duo where T1 == Index, T2 == Repository {
             .onSuccess { _ in
                 let _ = RevFile( repo: repo, type: .CommitDescr)?.delete()
                 let _ = RevFile( repo: repo, type: .MergeMsg)?.delete()
+                let _ = RevFile( repo: repo, type: .MergeMode)?.delete()
                 let _ = OidRevFile( repo: repo, type: .MergeHead )?.delete()
             }
     }

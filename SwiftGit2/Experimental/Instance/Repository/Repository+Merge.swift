@@ -107,6 +107,10 @@ public extension Repository {
                                     .generatePullMsg(from: index)
                                     .save()
                                 
+                                // MERGE_MODE creation
+                                let _ = RevFile(repo: self, type: .MergeMode )?
+                                    .save()
+                                
                                 // MERGE_HEAD creation
                                 OidRevFile( repo: self, type: .MergeHead)?
                                     .setOid(from: $0[1] )
