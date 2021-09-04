@@ -78,6 +78,10 @@ public class OidRevFile {
         
         return self
     }
+    
+    public func exist() -> Bool {
+        File(url: gitDir.appendingPathComponent(type.asFileName())).exists()
+    }
 }
 
 public class RevFile {
@@ -100,7 +104,6 @@ public class RevFile {
         self.gitDir = gitDir
         self.content = File(url: gitDir.appendingPathComponent(type.asFileName())).getContent()
     }
-    
     
     public func set(content: String) -> RevFile {
         self.content = content
@@ -159,7 +162,12 @@ public class RevFile {
         
         return self
     }
+    
+    public func exist() -> Bool {
+        File(url: gitDir.appendingPathComponent(type.asFileName())).exists()
+    }
 }
+
 
 public enum RevFileType: String {
     case MergeMsg
@@ -222,4 +230,16 @@ public enum OidRevFileType {
 fileprivate func exist(_ url: URL) -> Bool {
     let fileManager = FileManager.default
     return fileManager.fileExists(atPath: url.path)
+}
+
+public extension Optional where Wrapped == OidRevFile {
+    func exist() -> Bool {
+        self?.exist() ?? false
+    }
+}
+
+public extension Optional where Wrapped == RevFile {
+    func exist() -> Bool {
+        self?.exist() ?? false
+    }
 }
