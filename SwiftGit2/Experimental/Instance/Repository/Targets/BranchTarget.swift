@@ -28,4 +28,5 @@ public extension Duo where T1 == BranchTarget, T2 == Repository {
     var remote : R<Remote> { remoteName | { remoteName in repo.remoteRepo(named: remoteName) } }
     
     var remoteName : R<String> { branchInstance | { repo.remoteName(branch: $0.nameAsReference) } }
+    //var remoteName : R<String> { branchInstance | { $0.upstreamName() } | { repo.remoteName(upstream: $0) } }
 }

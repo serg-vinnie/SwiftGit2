@@ -125,4 +125,9 @@ class RepositoryRemoteTests: XCTestCase {
 //            .assertFailure("repo.pendingCommits(.branch($0), .push)")
         
     }
+    
+    func testSshAll() {
+        Credentials.sshAll
+            .assertFailure("clone")
+    }
 }
