@@ -12,7 +12,7 @@ import Essentials
 
 public extension Repository {
     func discardAll(url: URL) -> R<Void> {
-        return resetHard()
+        return reset(.Hard)
             | { self.status(options: StatusOptions(flags: [.includeUntracked], show: .workdirOnly)) }
             | { $0.map { $0 } | { $0.indexToWorkDirNEWFilePath } }
             | { $0 | { url.appendingPathComponent($0) } }
