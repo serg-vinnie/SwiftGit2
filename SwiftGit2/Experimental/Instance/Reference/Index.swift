@@ -129,8 +129,12 @@ public extension Duo where T1 == Index, T2 == Repository {
                     .flatMap { commit in
                         let parents: [Commit]
                         
-                        if let secondParent = secondParent { parents = [commit, secondParent] }
-                            else { parents = [commit] }
+                        if let secondParent = secondParent{
+                            parents = [commit, secondParent]
+                        }
+                        else {
+                            parents = [commit]
+                        }
                         
                         return repo.commit(tree: OID(treeOID), parents: parents, message: message, signature: signature)
                     }
