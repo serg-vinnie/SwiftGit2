@@ -76,11 +76,20 @@ public extension Index {
         }
     }
     
-    func removeConflict(relPath: String) -> R<()> {
+    func conflictRemove(relPath: String) -> R<()> {
         return _result({ () }, pointOfFailure: "git_index_conflict_remove") {
             relPath.withCString { path in
                 git_index_conflict_remove(self.pointer, path);
             }
+        }
+        .flatMap {
+            self.write()
+        }
+    }
+    
+    func conflictRemoveAll() -> R<()> {
+        return _result({ () }, pointOfFailure: "git_index_conflict_cleanup") {
+            git_index_conflict_cleanup(self.pointer);
         }
         .flatMap {
             self.write()

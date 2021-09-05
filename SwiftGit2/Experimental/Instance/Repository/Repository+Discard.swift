@@ -11,13 +11,17 @@ import Clibgit2
 import Essentials
 
 public extension Repository {
-    func discardAll(url: URL) -> R<Void> {
-        return reset(.Hard)
-            | { self.status(options: StatusOptions(flags: [.includeUntracked], show: .workdirOnly)) }
-            | { $0.map { $0 } | { $0.indexToWorkDirNEWFilePath } }
-            | { $0 | { url.appendingPathComponent($0) } }
-            | { $0.flatMapCatch { $0.rm() } }
-            | { _ in () }
+    func discardAll() -> R<()> {
+        return directoryURL
+            .flatMap { url -> R<()> in
+                
+                return reset(.Hard)
+                    | { self.status(options: StatusOptions(flags: [.includeUntracked], show: .workdirOnly)) }
+                    | { $0.map { $0 } | { $0.indexToWorkDirNEWFilePath } }
+                    | { $0 | { url.appendingPathComponent($0) } }
+                    | { $0.flatMapCatch { $0.rm() } }
+                    | { _ in () }
+            }
     }
     
     func discard(entry: UiStatusEntryX) -> R<Void> {
