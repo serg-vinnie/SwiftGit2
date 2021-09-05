@@ -76,11 +76,20 @@ public extension Index {
         }
     }
     
-    func removeConflict(relPath: String) -> R<()> {
+    func conflictRemove(relPath: String) -> R<()> {
         return _result({ () }, pointOfFailure: "git_index_conflict_remove") {
             relPath.withCString { path in
                 git_index_conflict_remove(self.pointer, path);
             }
+        }
+        .flatMap {
+            self.write()
+        }
+    }
+    
+    func conflictRemoveAll() -> R<()> {
+        return _result({ () }, pointOfFailure: "git_index_conflict_cleanup") {
+            git_index_conflict_cleanup(self.pointer);
         }
         .flatMap {
             self.write()
@@ -112,8 +121,14 @@ public extension Index {
 }
 
 public extension Duo where T1 == Index, T2 == Repository {
+    /// Use Repo.Commit instead!
     func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         let (index, repo) = value
+        
+        var secondParent: Commit?
+        if let secondParentOid = OidRevFile( repo: repo, type: .MergeHead )?.contentAsOids.first {
+            secondParent = repo.commit(oid: secondParentOid).maybeSuccess
+        }
         
         return index.writeTree()
             .flatMap { treeOID in
@@ -121,12 +136,26 @@ public extension Duo where T1 == Index, T2 == Repository {
                 repo.headCommit()
                     // If commit exist
                     .flatMap { commit in
-                        repo.commit(tree: OID(treeOID), parents: [commit], message: message, signature: signature)
+                        let parents: [Commit]
+                        
+                        if let secondParent = secondParent{
+                            parents = [commit, secondParent]
+                        }
+                        else {
+                            parents = [commit]
+                        }
+                        
+                        return repo.commit(tree: OID(treeOID), parents: parents, message: message, signature: signature)
                     }
                     // if there are no parents: initial commit
                     .flatMapError { _ in
                         repo.commit(tree: OID(treeOID), parents: [], message: message, signature: signature)
                     }
+            }
+            // RevFiles cleanup
+            .flatMap { commit in
+                repo.stateClean()
+                    .map { _ in commit}
             }
     }
 }
