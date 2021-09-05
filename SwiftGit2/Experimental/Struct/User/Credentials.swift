@@ -16,6 +16,8 @@ public enum Credentials {
     case plaintext(username: String, password: String)
     case sshMemory(username: String, publicKey: String, privateKey: String, passphrase: String)
     case ssh(publicKey: String, privateKey: String, passphrase: String)
+    
+    public var isNone : Bool { if case .none = self { return true } else { return false } }
 }
 
 public extension Credentials {
@@ -32,9 +34,9 @@ public extension Credentials {
     }
     
     static var sshAll: R<[Credentials]> {
-        let c1 = Credentials.ssh(publicKey: "/Users/loki/.ssh/id_rsa.pub", privateKey: "/Users/loki/.ssh/id_rsa", passphrase: "")
-        let c2 = Credentials.ssh(publicKey: "/Users/loki/.ssh/bla.pub", privateKey: "/Users/loki/.ssh/bla", passphrase: "")
-        return .success([c2, c1])
+//        let c1 = Credentials.ssh(publicKey: "/Users/loki/.ssh/id_rsa.pub", privateKey: "/Users/loki/.ssh/id_rsa", passphrase: "")
+//        let c2 = Credentials.ssh(publicKey: "/Users/loki/.ssh/bla.pub", privateKey: "/Users/loki/.ssh/bla", passphrase: "")
+//        return .success([c2, c1])
         
         let path = sshDir.path + "/"
         let files = sshDir.files
