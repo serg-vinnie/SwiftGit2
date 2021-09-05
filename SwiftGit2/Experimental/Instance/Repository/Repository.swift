@@ -351,6 +351,21 @@ public extension Repository {
 }
 
 
+public extension Repository {
+    var State: RepoState {
+        let state: Int32 = git_repository_state(self.pointer)
+        
+        return git_repository_state_t(UInt32(state))
+            .asRepoState()
+    }
+    
+    func stateClean() -> R<()> {
+        return _result({}, pointOfFailure: "git_repository_state_cleanup") {
+            git_repository_state_cleanup(self.pointer)
+        }
+    }
+}
+
 
 /////////////////
 ///HELPERS
@@ -375,6 +390,83 @@ public enum ResetType {
             return GIT_RESET_MIXED
         case .Hard:
             return GIT_RESET_HARD
+        }
+    }
+}
+
+public enum RepoState {
+    case None,
+         Merge,
+         Revert,
+         RevertSequence,
+         CherryPick,
+         CherryPickSequence,
+         Bisect,
+         Rebase,
+         RebaseInteractive,
+         Rebase_Merge,
+         ApplyMailbox,
+         ApplyMailboxOrRebase
+    
+    func asGitT() -> git_repository_state_t {
+        switch self {
+        case .None:
+            return GIT_REPOSITORY_STATE_NONE
+        case .Merge:
+            return GIT_REPOSITORY_STATE_MERGE
+        case .Revert:
+            return GIT_REPOSITORY_STATE_REVERT
+        case .RevertSequence:
+            return GIT_REPOSITORY_STATE_REVERT_SEQUENCE
+        case .CherryPick:
+            return GIT_REPOSITORY_STATE_CHERRYPICK
+        case .CherryPickSequence:
+            return GIT_REPOSITORY_STATE_CHERRYPICK_SEQUENCE
+        case .Bisect:
+            return GIT_REPOSITORY_STATE_BISECT
+        case .Rebase:
+            return GIT_REPOSITORY_STATE_REBASE
+        case .RebaseInteractive:
+            return GIT_REPOSITORY_STATE_REBASE_INTERACTIVE
+        case .Rebase_Merge:
+            return GIT_REPOSITORY_STATE_REBASE_MERGE
+        case .ApplyMailbox:
+            return GIT_REPOSITORY_STATE_APPLY_MAILBOX
+        case .ApplyMailboxOrRebase:
+            return GIT_REPOSITORY_STATE_APPLY_MAILBOX_OR_REBASE
+        }
+    }
+}
+
+public extension git_repository_state_t {
+    func asRepoState() -> RepoState{
+        switch self {
+        case GIT_REPOSITORY_STATE_NONE:
+            return .None
+        case GIT_REPOSITORY_STATE_MERGE:
+            return .Merge
+        case GIT_REPOSITORY_STATE_REVERT:
+            return .Revert
+        case GIT_REPOSITORY_STATE_REVERT_SEQUENCE:
+            return .RevertSequence
+        case GIT_REPOSITORY_STATE_CHERRYPICK:
+            return .CherryPick
+        case GIT_REPOSITORY_STATE_CHERRYPICK_SEQUENCE:
+            return .CherryPickSequence
+        case GIT_REPOSITORY_STATE_BISECT:
+            return .Bisect
+        case GIT_REPOSITORY_STATE_REBASE:
+            return .Rebase
+        case GIT_REPOSITORY_STATE_REBASE_INTERACTIVE:
+            return .RebaseInteractive
+        case GIT_REPOSITORY_STATE_REBASE_MERGE:
+            return .Rebase_Merge
+        case GIT_REPOSITORY_STATE_APPLY_MAILBOX:
+            return .ApplyMailbox
+        case GIT_REPOSITORY_STATE_APPLY_MAILBOX_OR_REBASE:
+            return .ApplyMailboxOrRebase
+        default:
+            return .None
         }
     }
 }
