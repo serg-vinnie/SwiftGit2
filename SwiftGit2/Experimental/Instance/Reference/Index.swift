@@ -88,8 +88,8 @@ public extension Index {
     }
     
     func conflictRemoveAll() -> R<()> {
-        return _result({ () }, pointOfFailure: "git_index_conflict_cleanup") {
-            git_index_conflict_cleanup(self.pointer);
+        return git_try("git_index_conflict_cleanup") {
+            git_index_conflict_cleanup(self.pointer)
         }
         .flatMap {
             self.write()
@@ -125,25 +125,19 @@ public extension Duo where T1 == Index, T2 == Repository {
     func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         let (index, repo) = value
         
-        var secondParent: Commit?
-        if let secondParentOid = OidRevFile( repo: repo, type: .MergeHead )?.contentAsOids.first {
-            secondParent = repo.commit(oid: secondParentOid).maybeSuccess
-        }
+        let otherParents = OidRevFile( repo: repo, type: .MergeHead )?
+            .contentAsOids
+            .map { repo.commit(oid: $0) }
+            .compactMap{ $0 }
+            .flatMap{ $0 }
+            .maybeSuccess ?? []
         
         return index.writeTree()
             .flatMap { treeOID in
-                
                 repo.headCommit()
                     // If commit exist
                     .flatMap { commit in
-                        let parents: [Commit]
-                        
-                        if let secondParent = secondParent{
-                            parents = [commit, secondParent]
-                        }
-                        else {
-                            parents = [commit]
-                        }
+                        let parents: [Commit] = [commit].appending(contentsOf: otherParents)
                         
                         return repo.commit(tree: OID(treeOID), parents: parents, message: message, signature: signature)
                     }
