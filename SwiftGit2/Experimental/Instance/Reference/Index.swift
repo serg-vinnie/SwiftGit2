@@ -125,15 +125,14 @@ public extension Duo where T1 == Index, T2 == Repository {
     func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         let (index, repo) = value
         
-        let otherParents = OidRevFile( repo: repo, type: .MergeHead )?
+        let otherParentsR = OidRevFile( repo: repo, type: .MergeHead )?
             .contentAsOids
-            .map { repo.commit(oid: $0) }
-            .compactMap{ $0 }
-            .flatMap{ $0 }
-            .maybeSuccess ?? []
+            .flatMap { repo.commit(oid: $0) } ?? .success([])
         
-        return index.writeTree()
-            .flatMap { treeOID in
+        let treeOidR = index.writeTree()
+        
+        return combine(treeOidR, otherParentsR)
+            .flatMap { treeOID, otherParents in
                 repo.headCommit()
                     // If commit exist
                     .flatMap { commit in
