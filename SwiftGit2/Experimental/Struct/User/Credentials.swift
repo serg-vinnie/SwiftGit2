@@ -77,6 +77,23 @@ extension Credentials : CustomStringConvertible {
             return "Credentials.ssh(publicKey: \(publicKey), privateKey: \(privateKey), passphrase: \(passphrase.asPassword)"
         }
     }
+    
+    public var descriptionShort: String {
+        switch self {
+        case .none:
+            return "none"
+        case .default:
+            return "anonymous"
+        case .sshAgent:
+            return "sshAgent"
+        case let .plaintext(username, password):
+            return "name: \(username), password: \(password.asPassword))"
+        case .sshMemory(username: let username, publicKey: _, privateKey: _, passphrase: _):
+            return "sshMemory name: \(username) ...)"
+        case let .ssh(publicKey, privateKey, _):
+            return "publicKey: \(publicKey)\nprivateKey: \(privateKey)"
+        }
+    }
 }
 
 private extension String {
