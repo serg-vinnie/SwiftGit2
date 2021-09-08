@@ -12,10 +12,12 @@ import Essentials
 public class OidRevFile {
     private var content: String?
     
-    public var contentAsOid: OID? {
-        guard let content = content else { return nil }
+    public var contentAsOids: [OID] {
+        guard let oidStrs = content?.split(separator: "\n") else { return [] }
         
-        return OID(string: content)
+        return oidStrs
+                .map{ OID(string: "\($0)" ) }
+                .compactMap{ $0 }
     }
     
     private(set) var type: OidRevFileType
@@ -76,6 +78,10 @@ public class OidRevFile {
         
         return self
     }
+    
+    public func exist() -> Bool {
+        File(url: gitDir.appendingPathComponent(type.asFileName())).exists()
+    }
 }
 
 public class RevFile {
@@ -98,7 +104,6 @@ public class RevFile {
         self.gitDir = gitDir
         self.content = File(url: gitDir.appendingPathComponent(type.asFileName())).getContent()
     }
-    
     
     public func set(content: String) -> RevFile {
         self.content = content
@@ -143,10 +148,8 @@ public class RevFile {
     }
     
     public func save()  -> RevFile {
-        if let content = content {
-            try? File(url: gitDir.appendingPathComponent( self.type.asFileName() ) )
-                .setContent(content)
-        }
+        try? File(url: gitDir.appendingPathComponent( self.type.asFileName() ) )
+            .setContent(content ?? "")
         
         return self
     }
@@ -157,13 +160,18 @@ public class RevFile {
         
         return self
     }
+    
+    public func exist() -> Bool {
+        File(url: gitDir.appendingPathComponent(type.asFileName())).exists()
+    }
 }
+
 
 public enum RevFileType: String {
     case MergeMsg
     case SquashMsg
     case CommitEditMsg
-    //case MergeMode // MERGE_MODE
+    case MergeMode
     
     //CUSTOMS
     case PullMsg // MERGE_MSG
@@ -175,6 +183,8 @@ public enum RevFileType: String {
             fallthrough
         case .MergeMsg:
             return "MERGE_MSG"
+        case .MergeMode:
+            return "MERGE_MODE"
         case .SquashMsg:
             return "SQUASH_MSG"
         case .CommitEditMsg:
@@ -219,3 +229,33 @@ fileprivate func exist(_ url: URL) -> Bool {
     let fileManager = FileManager.default
     return fileManager.fileExists(atPath: url.path)
 }
+
+public extension Optional where Wrapped == OidRevFile {
+    func exist() -> Bool {
+        self?.exist() ?? false
+    }
+}
+
+public extension Optional where Wrapped == RevFile {
+    func exist() -> Bool {
+        self?.exist() ?? false
+    }
+}
+
+//FETCH_HEAD - зберігає в собі запис з іменем бранча з останнього виклику git fetch. (вводиться вручну при виклику git_remote_fetch в параметр reflog_message )
+//ORIG_HEAD - створюється командами які різко змінюють HEAD на інший. Він створюється для того що б можна було відкотити назад дію якщо щось піде не так.
+//MERGE_HEAD - записується коміт який ти намагаєшся підмерджити в твій хеад. Наприклад 851e89d0445bfc885fb16d9cf090bd1276fc787e
+//MERGE_MODE - ?
+//MERGE_MSG - повідомлення що видається як дескріпшн мерджа (лонг меседж). Лібгітом не створюється автоматично. Гітом створюється через якийсь відповідний хук - https://git-scm.com/docs/githooks
+//CHERRY_PICK_HEAD - записує запис з іменем бранча останнього виклику git cherry-pick. Наприклад 851e89d0445bfc885fb16d9cf090bd1276fc787e
+//SQUASH_MSG - ?
+//BISECT_HEAD - ?
+//REVERT_HEAD - ?
+//REJECT_NON_FF_HEAD - ?
+//(повного такого єдиного списку не існує в документації. Тож треба по крихтам вичіпляти з різних кутків документації)
+//
+//(краще файли зберігати в UTF-8)
+//Всього в лібгіті лише 2 команди мають можливість створювати рефлог файл подібний з ручним вказуванням меседжа -git_remote_fetch та
+//git_remote_update_tips
+//
+//Можливо може бути корисною інформація про хуки до цієї теми - але тавер використовує явно не їх. Бо всі хуки що тавер генерить по-факту являються семплами і не виконуються на практиці.

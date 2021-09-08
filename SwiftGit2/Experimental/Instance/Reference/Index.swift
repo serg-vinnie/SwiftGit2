@@ -76,11 +76,20 @@ public extension Index {
         }
     }
     
-    func removeConflict(relPath: String) -> R<()> {
+    func conflictRemove(relPath: String) -> R<()> {
         return _result({ () }, pointOfFailure: "git_index_conflict_remove") {
             relPath.withCString { path in
                 git_index_conflict_remove(self.pointer, path);
             }
+        }
+        .flatMap {
+            self.write()
+        }
+    }
+    
+    func conflictRemoveAll() -> R<()> {
+        return git_try("git_index_conflict_cleanup") {
+            git_index_conflict_cleanup(self.pointer)
         }
         .flatMap {
             self.write()
@@ -112,19 +121,22 @@ public extension Index {
 }
 
 public extension Duo where T1 == Index, T2 == Repository {
-    func commit(message: String, signature: Signature, secondParent: Commit? = nil ) -> Result<Commit, Error> {
+    /// Use Repo.Commit instead!
+    func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         let (index, repo) = value
         
-        return index.writeTree()
-            .flatMap { treeOID in
-                
+        let otherParentsR = OidRevFile( repo: repo, type: .MergeHead )?
+            .contentAsOids
+            .flatMap { repo.commit(oid: $0) } ?? .success([])
+        
+        let treeOidR = index.writeTree()
+        
+        return combine(treeOidR, otherParentsR)
+            .flatMap { treeOID, otherParents in
                 repo.headCommit()
                     // If commit exist
                     .flatMap { commit in
-                        let parents: [Commit]
-                        
-                        if let secondParent = secondParent { parents = [commit, secondParent] }
-                            else { parents = [commit] }
+                        let parents: [Commit] = [commit].appending(contentsOf: otherParents)
                         
                         return repo.commit(tree: OID(treeOID), parents: parents, message: message, signature: signature)
                     }
@@ -132,6 +144,11 @@ public extension Duo where T1 == Index, T2 == Repository {
                     .flatMapError { _ in
                         repo.commit(tree: OID(treeOID), parents: [], message: message, signature: signature)
                     }
+            }
+            // RevFiles cleanup
+            .flatMap { commit in
+                repo.stateClean()
+                    .map { _ in commit}
             }
     }
 }
