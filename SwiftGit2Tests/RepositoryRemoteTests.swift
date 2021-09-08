@@ -19,21 +19,21 @@ class RepositoryRemoteTests: XCTestCase {
     func testHttpsAnonymouseClone() {
         let info = PublicTestRepo()
 
-        Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .auto)))
+        Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.default))))
             .assertFailure("clone")
     }
 
     func testSSHDefaultClone() {
         let info = PublicTestRepo()
 
-        Repository.clone(from: info.urlSsh, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .auto)))
+        Repository.clone(from: info.urlSsh, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
             .assertFailure("clone")
     }
 
     func testRemoteConnect() {
         let info = PublicTestRepo()
 
-        guard let repo = Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .auto)))
+        guard let repo = Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.default))))
             .assertFailure("clone") else { fatalError() }
 
         repo.getRemoteFirst()
@@ -54,7 +54,7 @@ class RepositoryRemoteTests: XCTestCase {
     func testPush() {
         let info = PublicTestRepo()
 
-        guard let repo = Repository.clone(from: info.urlSsh, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .auto)))
+        guard let repo = Repository.clone(from: info.urlSsh, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
             .assertFailure("clone") else { fatalError() }
 
         repo.t_commit(file: .fileA, with: .random, msg: "fileA random content")
@@ -62,12 +62,12 @@ class RepositoryRemoteTests: XCTestCase {
 
         repo.detachHEAD().assertFailure("detachHEAD")
 
-        repo.push(.HEAD)
+        repo.push(.HEAD, options: PushOptions(auth: .credentials(.sshDefault)))
             .assertSuccess("push")
 
         repo.detachedHeadFix().assertFailure("detachedHeadFix")
 
-        repo.push(.HEAD)
+        repo.push(.HEAD, options: PushOptions(auth: .credentials(.sshDefault)))
             .assertFailure("push")
     }
 
@@ -75,14 +75,14 @@ class RepositoryRemoteTests: XCTestCase {
         let info = PublicTestRepo()
 
         // use HTTPS anonymous access
-        guard let repo = Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .auto)))
+        guard let repo = Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.default))))
             .assertFailure("clone") else { fatalError() }
 
         repo.t_commit(file: .fileA, with: .random, msg: "fileA random content")
             .assertFailure("t_commit")
 
         // push should FAIL
-        repo.push(.HEAD)
+        repo.push(.HEAD, options: PushOptions(auth: .credentials(.default)))
             .assertSuccess("push")
     }
 
@@ -98,14 +98,14 @@ class RepositoryRemoteTests: XCTestCase {
             .assertFailure("t_commit")
 
         // push should FAIL
-        repo.push(.HEAD)
+        repo.push(.HEAD, options: PushOptions(auth: .credentials(.default)))
             .assertSuccess("push")
     }
     
     func testUpstreamExists() {
         let info = PublicTestRepo()
 
-        guard let repo = Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .auto)))
+        guard let repo = Repository.clone(from: info.urlHttps, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.default))))
             .assertFailure("clone") else { fatalError() }
         
         repo.upstreamExistsFor(.HEAD)

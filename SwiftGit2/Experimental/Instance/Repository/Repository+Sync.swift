@@ -9,13 +9,12 @@ public enum PullPushResult {
 
 public extension Repository {
     
-    func sync(msg: String, fetchOptions: FetchOptions = FetchOptions(auth: .auto), pushOptions: PushOptions = PushOptions(), signature: Signature) -> R<PullPushResult> {
+    func sync(msg: String, fetchOptions: FetchOptions, pushOptions: PushOptions, signature: Signature) -> R<PullPushResult> {
         commit(message: msg, signature: signature)
             .flatMap { _ in sync(.firstRemote, .HEAD, fetchOptions: fetchOptions, pushOptions: pushOptions, signature: signature)}
     }
     
-    func sync(_ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, fetchOptions: FetchOptions = FetchOptions(auth: .auto), pushOptions: PushOptions = PushOptions(), signature: Signature) -> R<PullPushResult> {
-        
+    func sync(_ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, fetchOptions: FetchOptions, pushOptions: PushOptions, signature: Signature) -> R<PullPushResult> {
         return upstreamExistsFor(.HEAD)
             .if(\.self, then: { _ in
                 

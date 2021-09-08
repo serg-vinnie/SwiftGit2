@@ -16,12 +16,15 @@ public enum Credentials {
     case plaintext(username: String, password: String)
     case sshMemory(username: String, publicKey: String, privateKey: String, passphrase: String)
     case ssh(publicKey: String, privateKey: String, passphrase: String)
+    
+    public var isNone : Bool { if case .none = self { return true } else { return false } }
 }
 
 public extension Credentials {
     static var sshDir : URL { URL.userHome.appendingPathComponent(".ssh") }
-    static var publicKey : URL { sshDir.appendingPathComponent("id_rsa.pub") }
-    static var privateKey : URL { sshDir.appendingPathComponent("id_rsa") }
+    
+    private static var publicKey : URL { sshDir.appendingPathComponent("id_rsa.pub") }
+    private static var privateKey : URL { sshDir.appendingPathComponent("id_rsa") }
     
     static var sshDefault: Credentials {
         guard publicKey.exists else { return .none }
@@ -31,13 +34,18 @@ public extension Credentials {
     }
     
     static var sshAll: R<[Credentials]> {
-        let files = URL.userHome.appendingPathComponent(".ssh").files
+//        let c1 = Credentials.ssh(publicKey: "/Users/loki/.ssh/id_rsa.pub", privateKey: "/Users/loki/.ssh/id_rsa", passphrase: "")
+//        let c2 = Credentials.ssh(publicKey: "/Users/loki/.ssh/bla.pub", privateKey: "/Users/loki/.ssh/bla", passphrase: "")
+//        return .success([c2, c1])
+        
+        let path = sshDir.path + "/"
+        let files = sshDir.files
         let pubs  = files | { $0.filter { $0.hasSuffix(".pub") } }
         let maybePrivates = pubs | { $0.map { $0.replace(of: ".pub", to: "") } } | { Set($0) }
         
         return combine(files, maybePrivates)
             | { files, privs in files.filter { privs.contains($0) } }
-            | { $0.map { .ssh(publicKey: $0 + ".pub", privateKey: $0, passphrase: "") } }
+            | { $0.map { .ssh(publicKey: path + $0 + ".pub", privateKey: path + $0, passphrase: "") } }
     }
 
     func isSsh() -> Bool {
@@ -67,6 +75,23 @@ extension Credentials : CustomStringConvertible {
             return "Credentials.sshMemory(username: \(username) ...)"
         case let .ssh(publicKey, privateKey, passphrase):
             return "Credentials.ssh(publicKey: \(publicKey), privateKey: \(privateKey), passphrase: \(passphrase.asPassword)"
+        }
+    }
+    
+    public var descriptionShort: String {
+        switch self {
+        case .none:
+            return "none"
+        case .default:
+            return "anonymous"
+        case .sshAgent:
+            return "sshAgent"
+        case let .plaintext(username, password):
+            return "name: \(username), password: \(password.asPassword))"
+        case .sshMemory(username: let username, publicKey: _, privateKey: _, passphrase: _):
+            return "sshMemory name: \(username) ...)"
+        case let .ssh(publicKey, privateKey, _):
+            return "publicKey: \(publicKey)\nprivateKey: \(privateKey)"
         }
     }
 }

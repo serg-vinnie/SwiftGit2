@@ -240,13 +240,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1DA3413E26B9668B0097E488 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
 		1DB0F84F24EFFD7B00637B9B /* Repository */ = {
 			isa = PBXGroup;
 			children = (
@@ -454,7 +447,6 @@
 		E64A9DB124D78BF8005B643E /* Experimental */ = {
 			isa = PBXGroup;
 			children = (
-				1DA3413E26B9668B0097E488 /* Helpers */,
 				E69D5D102573B21400AEBA28 /* Instance */,
 				E6AB53AF2575311600364E5F /* Struct */,
 				1D496A4125372FA800789177 /* git_strarray.swift */,

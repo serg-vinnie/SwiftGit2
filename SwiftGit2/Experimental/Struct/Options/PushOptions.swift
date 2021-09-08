@@ -20,7 +20,7 @@ public class PushOptions {
         assert(result == GIT_OK.rawValue)
     }
 
-    public convenience init(auth: Auth = .auto) {
+    public convenience init(auth: Auth) {
         self.init(callbacks: RemoteCallbacks(auth: auth))
     }
 }
