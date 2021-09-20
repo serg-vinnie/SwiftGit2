@@ -21,8 +21,8 @@ public extension Repository {
         }.map { OID(out) }
     }
 
-    func merge(our: Tree, their: Tree, ancestor: Tree) -> Result<Index, Error> {
-        var options = MergeOptions()
+    func merge(our: Tree, their: Tree, ancestor: Tree, options: MergeOptions) -> Result<Index, Error> {
+        var options = options
         var indexPointer: OpaquePointer?
 
         return git_try("git_merge_trees") {
@@ -48,15 +48,15 @@ public extension Repository {
             }
     }
     
-    func mergeIntoHEAD(their theirName: String, signature: Signature) -> Result<MergeResult, Error> {
+    func mergeIntoHEAD(their theirName: String, signature: Signature, options: MergeOptions) -> Result<MergeResult, Error> {
         let our = HEAD()  | { $0.asBranch() }
         let their = self.branchLookup(name: theirName)
         let anal = their | { mergeAnalysis(branch: $0) }
         return combine(anal, our, their)
-            | { self.mergeAndCommit(anal: $0, our: $1, their: $2, signature: signature) }
+            | { self.mergeAndCommit(anal: $0, our: $1, their: $2, signature: signature, options: options) }
     }
     
-    func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature) -> Result<MergeResult, Error> {
+    func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         if anal.contains(.fastForward) || anal.contains(.unborn) {
@@ -97,7 +97,7 @@ public extension Repository {
             let branchName = our.nameAsReference
             
             return combine(ourTree, theirTree, baseTree)
-                .flatMap { self.merge(our: $0, their: $1, ancestor: $2) } // -> Index
+                .flatMap { self.merge(our: $0, their: $1, ancestor: $2,options: options) } // -> Index
                 .if(\.hasConflicts,
                     then: { index in
                         parents

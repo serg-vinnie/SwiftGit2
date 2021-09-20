@@ -9,7 +9,7 @@
 import Clibgit2
 import Foundation
 
-struct MergeOptions {
+public struct MergeOptions {
     var merge_options = git_merge_options()
 
     public init(mergeFlags: git_merge_flag_t? = nil, fileFlags: git_merge_file_flag_t? = nil, renameTheshold: Int = 50) {

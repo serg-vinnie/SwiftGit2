@@ -7,34 +7,43 @@ public enum PullPushResult {
     case success
 }
 
+public struct SyncOptions {
+    public let pull: PullOptions
+    public let push: PushOptions
+    public init(pull: PullOptions, push: PushOptions) {
+        self.pull = pull
+        self.push = push
+    }
+}
+
 public extension Repository {
     
-    func sync(msg: String, fetchOptions: FetchOptions, pushOptions: PushOptions, signature: Signature) -> R<PullPushResult> {
-        commit(message: msg, signature: signature)
-            .flatMap { _ in sync(.firstRemote, .HEAD, fetchOptions: fetchOptions, pushOptions: pushOptions, signature: signature)}
+    func sync(msg: String, options: SyncOptions) -> R<PullPushResult> {
+        commit(message: msg, signature: options.pull.signature)
+            .flatMap { _ in sync(.firstRemote, .HEAD, options: options)}
     }
     
-    func sync(_ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, fetchOptions: FetchOptions, pushOptions: PushOptions, signature: Signature) -> R<PullPushResult> {
+    func sync(_ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, options: SyncOptions) -> R<PullPushResult> {
         return upstreamExistsFor(.HEAD)
             .if(\.self, then: { _ in
                 
-                pullAndPush(.HEAD, fetchOptions: fetchOptions, pushOptions: pushOptions, signature: signature)
+                pullAndPush(.HEAD, options: options)
             }, else: { _ in
                 
                 remoteTarget.with(self).createUpstream(for: branchTarget, force: true)
-                    | { _ in push(branchTarget, options: pushOptions) }
+                    | { _ in push(branchTarget, options: options.push) }
                     | { .success }
             })
     }
     
-    func pullAndPush(_ target: BranchTarget, fetchOptions: FetchOptions, pushOptions: PushOptions, signature: Signature) -> R<PullPushResult> {
-        switch pull(target, options: fetchOptions, signature: signature) {
+    func pullAndPush(_ target: BranchTarget, options: SyncOptions) -> R<PullPushResult> {
+        switch pull(target, options: options.pull) {
         case let .success(result):
             switch result {
             case let .threeWayConflict(index):
                 return .success(.conflict(index))
             default:
-                return push(target, options: pushOptions)
+                return push(target, options: options.push)
                     .map { .success }
             }
         case let .failure(error):
