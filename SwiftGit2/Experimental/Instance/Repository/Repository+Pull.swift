@@ -18,12 +18,12 @@ public enum MergeResult {
 }
 
 public extension Repository {    
-    func pull(_ target: BranchTarget, options: FetchOptions, signature: Signature) -> Result<MergeResult, Error> {
+    func pull(_ target: BranchTarget, options: FetchOptions, signature: Signature, checkoutProgress: CheckoutProgressBlock? = nil) -> Result<MergeResult, Error> {
         return combine(fetch(target, options: options), mergeAnalysisUpstream(target))
-            | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, signature: signature) }
+            | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, signature: signature, progress: checkoutProgress) }
     }
 
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, signature: Signature) -> Result<MergeResult, Error> {
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, signature: Signature, progress: CheckoutProgressBlock? = nil) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         let repo = self
@@ -44,7 +44,7 @@ public extension Repository {
             return combine(targetOID, message)
                 | { oid, message in ourLocal.set(target: oid, message: message) }
                 | { $0.asBranch() }
-                | { self.checkout(branch: $0, strategy: .Force) }
+                | { self.checkout(branch: $0, strategy: .Force, progress: progress) }
                 | { _ in .fastForward }
             
         } else if anal.contains(.normal) {
@@ -87,14 +87,14 @@ public extension Repository {
                                     .setOid(from: $0[1] )
                                     .save()
                             } | { _ in
-                                repo.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
+                                repo.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3], progress: progress)
                                     | { _ in .success(.threeWayConflict(index)) }
                             }
                     },
                     else: { index in
                         combine(message, parents)
                             | { index.commit(into: self, signature: signature, message: $0, parents: $1) }
-                            | { _ in self.checkout(branch: branchName, strategy: .Force) }
+                            | { _ in self.checkout(branch: branchName, strategy: .Force, progress: progress) }
                             | { _ in .threeWaySuccess }
                     })
         }

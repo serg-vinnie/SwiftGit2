@@ -61,8 +61,9 @@ public extension Repository {
             .map { reference }
     }
 
-    func checkout(index: Index, strategy: CheckoutStrategy) -> Result<Void, Error> {
-        let options = CheckoutOptions(strategy: strategy)
+    func checkout(index: Index, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
+        let options = CheckoutOptions(strategy: strategy, progress: progress)
+        
         return git_try("git_checkout_index") {
             options.with_git_checkout_options { opt in
                 git_checkout_index(self.pointer, index.pointer, &opt)
@@ -70,8 +71,8 @@ public extension Repository {
         }
     }
     
-    func checkout(index: Index, strategy: CheckoutStrategy, relPaths: [String]) -> Result<Void, Error> {
-        let options = CheckoutOptions(strategy: strategy,pathspec: relPaths )
+    func checkout(index: Index, strategy: CheckoutStrategy, relPaths: [String], progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
+        let options = CheckoutOptions(strategy: strategy,pathspec: relPaths, progress: progress )
         
         return git_try("git_checkout_index") {
             options.with_git_checkout_options { opt in
