@@ -109,7 +109,8 @@ private func transferCallback(stats: UnsafePointer<git_indexer_progress>?, paylo
 
 public extension Auth {
     static func list( possibleCreds: [Credentials]) -> Auth {
-        var creds = possibleCreds
+        var creds = Array(possibleCreds.reversed())
+        
         let closure = { () -> Credentials in
             return creds.popLast() ?? Credentials.none
         }
