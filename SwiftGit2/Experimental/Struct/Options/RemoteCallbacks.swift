@@ -15,19 +15,39 @@ public typealias AuthCB = (_ url: String?, _ username: String?) -> (Credentials)
 public enum Auth {
     case match(AuthCB)
     case credentials(Credentials)
+    case list([Credentials])
 }
 
 public class RemoteCallbacks: GitPayload {
-    let auth: Auth
+    var list = [Credentials]()
+    var callback : AuthCB?
+    
     var recentCredentials = Credentials.default
     private var remote_callbacks = git_remote_callbacks()
     public var transferProgress: TransferProgressCB?
 
     public init(auth: Auth) {
-        self.auth = auth
+        switch auth {
+        case .match(let callback):
+            self.callback = callback
+        case .credentials(let cred):
+            self.list = [cred]
+        case .list(let list):
+            self.list = Array(list.reversed()) // reversed to use popLast
+        }
 
         let result = git_remote_init_callbacks(&remote_callbacks, UInt32(GIT_REMOTE_CALLBACKS_VERSION))
         assert(result == GIT_OK.rawValue)
+    }
+    
+    func next(url: String?, username: String?) -> Credentials {
+        if let cred = list.popLast() {
+            return cred
+        } else if let cb = callback {
+            return cb(url, username)
+        }
+        
+        return .none
     }
 
     #if DEBUG
@@ -70,7 +90,7 @@ private func credentialsCallback(
     let result: Int32
     
     let _payload = RemoteCallbacks.unretained(pointer: payload)
-    _payload.recentCredentials = _payload.auth.credentials(url: url, name: name)
+    _payload.recentCredentials = _payload.next(url: url, username: name)
 
     switch _payload.recentCredentials {
     case .none:
@@ -105,25 +125,4 @@ private func transferCallback(stats: UnsafePointer<git_indexer_progress>?, paylo
     }
 
     return 0
-}
-
-public extension Auth {
-    static func list( possibleCreds: [Credentials]) -> Auth {
-        var creds = Array(possibleCreds.reversed())
-        
-        let closure = { () -> Credentials in
-            return creds.popLast() ?? Credentials.none
-        }
-        
-        return Auth.match { _, _ in closure() }
-    }
-    
-    func credentials(url: String?, name: String?) -> Credentials {
-        switch self {
-        case let .match(callback):
-            return callback(url, name)
-        case let .credentials(c):
-            return c
-        }
-    }
 }

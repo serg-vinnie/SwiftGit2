@@ -17,13 +17,25 @@ public enum MergeResult {
     case threeWayConflict(Index)
 }
 
+public struct PullOptions {
+    public var signature : Signature
+    public var fetch : FetchOptions
+    public var checkoutProgress: CheckoutProgressBlock?    = nil
+    public var mergeOptions : MergeOptions                 = MergeOptions()
+    
+    public init(signature: Signature, fetch: FetchOptions) {
+        self.signature = signature
+        self.fetch     = fetch
+    }
+}
+
 public extension Repository {    
-    func pull(_ target: BranchTarget, options: FetchOptions, signature: Signature, checkoutProgress: CheckoutProgressBlock? = nil) -> Result<MergeResult, Error> {
-        return combine(fetch(target, options: options), mergeAnalysisUpstream(target))
-            | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, signature: signature, progress: checkoutProgress) }
+    func pull(_ target: BranchTarget, options: PullOptions) -> Result<MergeResult, Error> {
+        return combine(fetch(target, options: options.fetch), mergeAnalysisUpstream(target))
+            | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options) }
     }
 
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, signature: Signature, progress: CheckoutProgressBlock? = nil) -> Result<MergeResult, Error> {
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         let repo = self
@@ -44,7 +56,7 @@ public extension Repository {
             return combine(targetOID, message)
                 | { oid, message in ourLocal.set(target: oid, message: message) }
                 | { $0.asBranch() }
-                | { self.checkout(branch: $0, strategy: .Force, progress: progress) }
+                | { self.checkout(branch: $0, strategy: .Force, progress: options.checkoutProgress) }
                 | { _ in .fastForward }
             
         } else if anal.contains(.normal) {
@@ -68,7 +80,7 @@ public extension Repository {
             
             return [ourOID, theirOID, baseOID]
                 .flatMap { $0.tree(self) }
-                .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2]) } // -> Index
+                .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options.mergeOptions) } // -> Index
                 .if(\.hasConflicts,
                     then: { index in
                         parents
@@ -87,14 +99,14 @@ public extension Repository {
                                     .setOid(from: $0[1] )
                                     .save()
                             } | { _ in
-                                repo.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3], progress: progress)
+                                repo.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3], progress: options.checkoutProgress)
                                     | { _ in .success(.threeWayConflict(index)) }
                             }
                     },
                     else: { index in
                         combine(message, parents)
-                            | { index.commit(into: self, signature: signature, message: $0, parents: $1) }
-                            | { _ in self.checkout(branch: branchName, strategy: .Force, progress: progress) }
+                            | { index.commit(into: self, signature: options.signature, message: $0, parents: $1) }
+                            | { _ in self.checkout(branch: branchName, strategy: .Force, progress: options.checkoutProgress) }
                             | { _ in .threeWaySuccess }
                     })
         }

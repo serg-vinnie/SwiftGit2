@@ -32,7 +32,9 @@ class MergeAnalysisTests: XCTestCase {
         repo1.mergeAnalysisUpstream(.HEAD)
             .assertEqual(to: [.fastForward, .normal])
 
-        repo1.pull(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)), signature: GitTest.signature)
+        let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.sshDefault)))
+        
+        repo1.pull(.HEAD, options: options)
             .assertEqual(to: .fastForward, "pull fast forward merge")
     }
 
@@ -51,7 +53,9 @@ class MergeAnalysisTests: XCTestCase {
 
         XCTAssert(merge == .normal)
 
-        repo1.pull(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)), signature: GitTest.signature)
+        let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.sshDefault)))
+        
+        repo1.pull(.HEAD, options: options)
             .assertEqual(to: .threeWaySuccess)
     }
     
@@ -72,7 +76,9 @@ class MergeAnalysisTests: XCTestCase {
         
         XCTAssert(merge == .normal)
         
-        repo1.pull(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)), signature: GitTest.signature)
+        let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.sshDefault)))
+        
+        repo1.pull(.HEAD, options: options)
             .assertBlock("pull has conflict") { $0.hasConflict }
     }
 }
