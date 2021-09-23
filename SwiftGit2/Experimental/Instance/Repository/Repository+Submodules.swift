@@ -9,22 +9,27 @@
 import Clibgit2
 
 public extension Repository {
-    func submodules() -> Result<[Submodule], Error> {
+    func submoduleName() -> Result<[String], Error> {
         var submodulePairs = SubmoduleCallbacks()
 
-        return _result({ submodulePairs.submodulesNames }, pointOfFailure: "git_submodule_foreach") {
+        return git_try("git_submodule_foreach") {
             git_submodule_foreach(self.pointer, submodulePairs.submodule_cb, &submodulePairs)
-        }
-        .flatMap { names in names.flatMap { self.submoduleLookup(named: $0) } }
+        }.map { submodulePairs.submodulesNames }
+    }
+    
+    func submodules() -> Result<[Submodule], Error> {
+        submoduleName().flatMap { names in names.flatMap { self.submoduleLookup(named: $0) } }
     }
 
     func submoduleLookup(named name: String) -> Result<Submodule, Error> {
-        var subModPointer: OpaquePointer?
-
-        return _result({ Submodule(subModPointer!) }, pointOfFailure: "git_submodule_lookup") {
-            name.withCString { submoduleName in
-                git_submodule_lookup(&subModPointer, self.pointer, submoduleName)
-            }
+        git_instance(of: Submodule.self, "git_submodule_lookup"){ p in
+            git_submodule_lookup(&p, self.pointer, name)
+        }
+        .onSuccess {
+            print("did find submodule: \($0.path)")
+        }
+        .onFailure {
+            print("failed to find submoduel: \(name), \($0.localizedDescription)")
         }
     }
 }
@@ -39,7 +44,9 @@ class SubmoduleCallbacks {
 
         guard let name = name,
               let nameStr = String(utf8String: name)
-        else { return -1 }
+        else {
+            return -1
+        }
 
         self_.submodulesNames.append(nameStr)
 
