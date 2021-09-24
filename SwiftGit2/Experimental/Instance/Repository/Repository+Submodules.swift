@@ -25,12 +25,6 @@ public extension Repository {
         git_instance(of: Submodule.self, "git_submodule_lookup"){ p in
             git_submodule_lookup(&p, self.pointer, name)
         }
-        .onSuccess {
-            print("did find submodule: \($0.path)")
-        }
-        .onFailure {
-            print("failed to find submoduel: \(name), \($0.localizedDescription)")
-        }
     }
 }
 
