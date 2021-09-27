@@ -172,6 +172,12 @@ public extension Repository {
         return false
     }
     
+    class func at(path: String) -> Result<Repository, Error> {
+        git_instance(of: Repository.self, "git_repository_open") { p in
+            git_repository_open(&p, path)
+        }
+    }
+    
     class func at(url: URL, fixDetachedHead: Bool = true) -> Result<Repository, Error> {
         var pointer: OpaquePointer?
 
@@ -366,6 +372,23 @@ public extension Repository {
     }
 }
 
+public extension Repository {
+    // WTF two ignore checks
+
+    func isIgnored(path: String) -> R<Bool> {
+        var ignored : Int32 = 0
+        return git_try("git_ignore_path_is_ignored") {
+            git_ignore_path_is_ignored(&ignored, self.pointer, path)
+        }.map { ignored == 1 }
+    }
+    
+    func statusShouldIgnore(path: String) -> R<Bool> {
+        var ignored : Int32 = 0
+        return git_try("git_status_should_ignore") {
+            git_status_should_ignore(&ignored, self.pointer, path)
+        }.map { ignored == 1 }
+    }
+}
 
 /////////////////
 ///HELPERS
