@@ -190,7 +190,7 @@ public enum RevFileType: String {
         case .CommitEditMsg:
             return "COMMIT_EDITMSG"
         case .CommitDescr:
-            return "ZZ_TAO_CUSTOM_COMMIT_DESCR_MSG"
+            return "COMMIT_DESCRIPTION_TAO_GIT"
         }
     }
 }
