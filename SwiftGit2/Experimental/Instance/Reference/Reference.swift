@@ -47,7 +47,7 @@ public extension Reference {
         }
         return nil
     }
-
+    
     var targetOID: Result<OID, Error> {
         if isSymbolic {
             var resolved: OpaquePointer?
