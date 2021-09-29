@@ -256,20 +256,20 @@ public struct SubmoduleStatusFlags: OptionSet {
 
     public let rawValue: UInt32
 
-    public static let InHead = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_HEAD.rawValue)
-    public static let InIndex = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_INDEX.rawValue)
-    public static let InConfig = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_CONFIG.rawValue)
-    public static let InWd = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_WD.rawValue)
-    public static let IndexAdded = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_INDEX_ADDED.rawValue)
-    public static let IndexDeleted = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_INDEX_DELETED.rawValue)
-    public static let IndexModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_INDEX_MODIFIED.rawValue)
-    public static let WdUninitialized = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_UNINITIALIZED.rawValue)
-    public static let WdAdded = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_ADDED.rawValue)
-    public static let WdDeleted = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_DELETED.rawValue)
-    public static let WdModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_MODIFIED.rawValue)
-    public static let WdIndexModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_INDEX_MODIFIED.rawValue)
-    public static let WdWdModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_WD_MODIFIED.rawValue)
-    public static let WdUntracked = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_UNTRACKED.rawValue)
+    public static let inHead = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_HEAD.rawValue)
+    public static let inIndex = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_INDEX.rawValue)
+    public static let inConfig = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_CONFIG.rawValue)
+    public static let inWd = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_IN_WD.rawValue)
+    public static let indexAdded = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_INDEX_ADDED.rawValue)
+    public static let indexDeleted = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_INDEX_DELETED.rawValue)
+    public static let indexModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_INDEX_MODIFIED.rawValue)
+    public static let wdUninitialized = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_UNINITIALIZED.rawValue)
+    public static let wdAdded = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_ADDED.rawValue)
+    public static let wdDeleted = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_DELETED.rawValue)
+    public static let wdModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_MODIFIED.rawValue)
+    public static let wdIndexModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_INDEX_MODIFIED.rawValue)
+    public static let wdWdModified = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_WD_MODIFIED.rawValue)
+    public static let wdUntracked = SubmoduleStatusFlags(rawValue: GIT_SUBMODULE_STATUS_WD_UNTRACKED.rawValue)
 }
 
 /*
