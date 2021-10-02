@@ -25,7 +25,7 @@ private func withArrayOfCStrings<T>(
 ) -> T {
     var cStrings = args.map { strdup($0) }
     defer {
-        cStrings.forEach { free($0) }
+        cStrings.forEach { if let str = $0 { free(str) } }
     }
     return body(&cStrings)
 }
