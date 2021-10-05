@@ -111,7 +111,7 @@ public class RevFile {
     }
     
     func generatePullMsg(from index: Index) -> RevFile {
-        return generateMergeMsgBase(from: index, msgHeader: "PULL conflicts resolve")
+        return generateMergeMsgBase(from: index, msgHeader: "MERGE conflicts resolve")
     }
     
     func generateMergeMsg(from index: Index, commit: Commit) -> RevFile {
