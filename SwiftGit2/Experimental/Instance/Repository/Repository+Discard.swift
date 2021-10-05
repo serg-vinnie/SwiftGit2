@@ -16,7 +16,7 @@ public extension Repository {
             .flatMap { url -> R<()> in
                 
                 return reset(.Hard)
-                    | { self.status(options: StatusOptions(flags: [.includeUntracked], show: .workdirOnly)) }
+                    | { self.statusConflictSafe(options: StatusOptions(flags: [.includeUntracked], show: .workdirOnly)) }
                     | { $0.map { $0 } | { $0.indexToWorkDirNEWFilePath } }
                     | { $0 | { url.appendingPathComponent($0) } }
                     | { $0.flatMapCatch { $0.rm() } }

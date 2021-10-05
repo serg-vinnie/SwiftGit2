@@ -57,6 +57,20 @@ public extension Repository {
         git_repository_is_bare(pointer) == 1 ? true : false
     }
 
+    
+    func statusConflictSafe(options: StatusOptions = StatusOptions()) -> Result<StatusIteratorNew, Error> {
+        var newFlags = options.flags
+        newFlags.remove(.includeUntracked)
+        let conflictOptions = StatusOptions(flags: newFlags, show: options.show, pathspec: options.pathspec)
+        
+        return index()
+            .flatMap {
+                $0.hasConflicts
+                ? status(options: conflictOptions)
+                : status(options: options)
+            }
+    }
+    
     func status(options: StatusOptions = StatusOptions()) -> Result<StatusIteratorNew, Error> {
         var pointer: OpaquePointer?
 
