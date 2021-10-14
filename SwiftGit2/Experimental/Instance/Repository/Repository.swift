@@ -206,6 +206,11 @@ public extension Repository {
 public extension Repository {
     ///Unstage files by relative path
     func resetDefault(paths: [String]) -> R<Void> {
+        if self.headIsUnborn {
+            return index()
+                .flatMap{ $0.remove(paths: paths) }
+        }
+        
         return HEAD()
             | { $0.targetOID }
             | { self.commit(oid: $0) }
