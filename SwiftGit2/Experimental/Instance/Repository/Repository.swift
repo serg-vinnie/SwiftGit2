@@ -172,6 +172,13 @@ public extension Repository {
         return false
     }
     
+    class func exists(at path: String) -> Bool {
+        if case .success(_) = at(path: path) {
+            return true
+        }
+        return false
+    }
+    
     class func at(path: String) -> Result<Repository, Error> {
         git_instance(of: Repository.self, "git_repository_open") { p in
             git_repository_open(&p, path)
