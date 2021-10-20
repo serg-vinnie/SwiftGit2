@@ -26,6 +26,9 @@ public extension Submodule {
     /// Get the path to the submodule. RELATIVE! Almost allways the same as "name" parameter
     var path: String { String(cString: git_submodule_path(pointer)) }
 
+    var pathAbs : R<String> {
+        self.repo() | { $0.directoryURL | { $0.path } }
+    }
     /// Url to remote repo (https or ssh)
     var url: String { String(cString: git_submodule_url(pointer)) }
 
