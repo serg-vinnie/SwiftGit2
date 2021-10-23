@@ -7,8 +7,15 @@
 //
 
 import Clibgit2
+import Essentials
 
 public extension Repository {
+    var childrenURLs : R<[URL]> {
+        let url = self.directoryURL
+        let paths = submodules().map { $0.map { $0.path } }
+        return combine(url, paths).map { url, paths in paths.map { url.appendingPathComponent($0) } }
+    }
+    
     func submoduleName() -> Result<[String], Error> {
         var submodulePairs = SubmoduleCallbacks()
 
