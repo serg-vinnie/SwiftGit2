@@ -28,7 +28,7 @@ public final class StatusIterator {
 extension StatusIterator: RandomAccessCollection {
     public typealias Element = StatusEntry
     public typealias Index = Int
-    public typealias SubSequence = StatusIterator
+    //public typealias SubSequence = StatusIterator
     public typealias Indices = DefaultIndices<StatusIterator>
 
     public subscript(position: Int) -> StatusEntry {
@@ -109,7 +109,7 @@ public final class StatusIteratorNew {
 extension StatusIteratorNew: RandomAccessCollection {
     public typealias Element = UiStatusEntryX
     public typealias Index = Int
-    public typealias SubSequence = StatusIteratorNew
+    //public typealias SubSequence = StatusIteratorNew
     public typealias Indices = DefaultIndices<StatusIteratorNew>
     
     public subscript(position: Int) -> UiStatusEntryX {
