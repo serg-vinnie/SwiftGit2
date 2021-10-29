@@ -24,13 +24,15 @@ public class Repository: InstanceProtocol {
 extension Repository {
     public func remote(of target: BranchTarget) -> R<Remote> { target.with(self).remote }
     
-    public var directoryURL: Result<URL, Error> {
+    public var directoryPath: Result<String, Error> {
         if let pathPointer = git_repository_workdir(pointer) {
-            return .success( String(cString: pathPointer).asURL() )
+            return .success( String(cString: pathPointer) )
         }
         
         return .failure(RepositoryError.FailedToGetRepoUrl as Error)
     }
+    
+    public var directoryURL: Result<URL, Error> { directoryPath | { $0.asURL() } }
     
     public var gitDirUrl: Result<URL, Error> {
         if let pathPointer = git_repository_commondir(pointer) {
