@@ -9,6 +9,7 @@
 import Foundation
 import Clibgit2
 import Essentials
+import AppCore
 
 public extension Repository {
     func discardAll() -> R<()> {
@@ -19,9 +20,23 @@ public extension Repository {
                     | { self.statusConflictSafe(options: StatusOptions(flags: [.includeUntracked], show: .workdirOnly)) }
                     | { $0.map { $0 } | { $0.indexToWorkDirNEWFilePath } }
                     | { $0 | { url.appendingPathComponent($0) } }
-                    | { $0.flatMapCatch { $0.rm() } }
+                    | { $0.flatMapCatch { url -> R<()> in
+                        //if is not submodule - remove it from disk
+                        if !url.isDirectory {
+                            return url.rm()
+                        }
+                        
+                        return .success( () )
+                    } }
                     | { _ in () }
             }
+    }
+    
+    func discard(entries: [UiStatusEntryX]) -> R<()> {
+        entries
+            .map{ discard(entry: $0) }
+            .flatMap{ $0 }
+            .flatMap{ _ in return .success(()) }
     }
     
     func discard(entry: UiStatusEntryX) -> R<Void> {
