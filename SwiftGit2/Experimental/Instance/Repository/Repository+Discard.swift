@@ -9,7 +9,6 @@
 import Foundation
 import Clibgit2
 import Essentials
-import AppCore
 
 public extension Repository {
     func discardAll() -> R<()> {
