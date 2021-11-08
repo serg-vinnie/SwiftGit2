@@ -208,16 +208,16 @@ public extension Repository {
 // index
 public extension Repository {
     ///Unstage files by relative path
-    func resetDefault(paths: [String]) -> R<Void> {
+    func resetDefault(pathPatterns: [String] = []) -> R<Void> {
         if self.headIsUnborn {
             return index()
-                .flatMap{ $0.remove(paths: paths) }
+                .flatMap{ $0.removeAll(pathPatterns: pathPatterns) }
         }
         
         return HEAD()
             | { $0.targetOID }
             | { self.commit(oid: $0) }
-            | { resetDefault(commit: $0, paths: paths) }
+            | { resetDefault(commit: $0, paths: pathPatterns) }
     }
     
     func resetDefault(commit: Commit, paths: [String]) -> R<Void> {
@@ -248,12 +248,12 @@ public extension Repository {
     
     ///Stage files by relative path
     func add(relPaths: [String]) -> R<()> {
-        index().flatMap { $0.add(paths: relPaths) }
+        index().flatMap { $0.addAll(pathPatterns: relPaths) }
     }
     
     func remove(relPaths: [String]) -> R<()> {
          index()
-            .flatMap { $0.remove(paths: relPaths) }
+            .flatMap { $0.removeAll(pathPatterns: relPaths) }
     }
 }
 
@@ -314,7 +314,7 @@ public extension Repository {
 
         return combine(entries, directoryURL)
             | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
-            | { paths in self.index()   | { $0.add(paths: paths) } }
+            | { paths in self.index()   | { $0.addAll(pathPatterns: paths) } }
     }
 
     /// unstageAllFiles
@@ -323,7 +323,7 @@ public extension Repository {
 
         return combine(entries, directoryURL)
             | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
-            | { paths in self.index()   | { _ in self.resetDefault(paths: paths) } }
+            | { paths in self.index()   | { _ in self.resetDefault(pathPatterns: paths) } }
     }
 }
 
