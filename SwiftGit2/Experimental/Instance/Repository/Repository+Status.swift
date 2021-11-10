@@ -106,6 +106,57 @@ public final class StatusIteratorNew {
     }
 }
 
+extension StatusEntry {
+    func asStatusEntryX(repo: Repository, idx: Int) -> UiStatusEntryX {
+        let entry = self
+        
+        var stagedPatch: R<Patch?>
+        var unStagedPatch: R<Patch?>
+        
+        if let hti = entry.headToIndex {
+            stagedPatch = repo.patchFrom(delta: hti)
+                .map{ patch -> Patch? in patch }
+        } else {
+            stagedPatch = .success(nil)
+        }
+        
+        if let itw =  entry.indexToWorkDir {
+            unStagedPatch = repo.patchFrom(delta: itw)
+                .map{ patch -> Patch? in patch }
+        } else {
+            unStagedPatch = .success(nil)
+        }
+        
+        let changesDelta = try? getChanged(repo: repo).get()
+        
+        //let isBinary = anyFile(at: position)?.getSameFileWithBlob(from: repo).blob?.isBinary
+        
+        return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
+    }
+    
+    fileprivate func getChanged(repo: Repository) -> R<[Diff.Delta]?> {
+        let relPath = self.relPath
+        
+        let file = anyFilePath()!
+        
+        guard let blobHead = file.getSameFileWithBlob(from: repo).blob else { return .success(nil)}
+        
+        return repo.blobCreateFromWorkdirAsBlob(relPath: relPath)
+            .flatMap { workdirBlob in
+                repo.diffBlobs(old: blobHead, new: workdirBlob)
+            }
+            .map{ delta -> [Diff.Delta]? in delta }
+    }
+    
+    fileprivate func anyFilePath() -> Diff.File? {
+        self.headToIndex?.oldFile ??
+        self.indexToWorkDir?.oldFile ??
+        self.headToIndex?.newFile ??
+        self.indexToWorkDir?.newFile
+    }
+}
+
+
 extension StatusIteratorNew: RandomAccessCollection {
     public typealias Element = UiStatusEntryX
     public typealias Index = Int
