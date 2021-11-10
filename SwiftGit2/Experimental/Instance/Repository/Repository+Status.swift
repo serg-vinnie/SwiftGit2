@@ -107,7 +107,7 @@ public final class StatusIteratorNew {
 }
 
 extension StatusEntry {
-    func asStatusEntryX(repo: Repository, idx: Int) -> UiStatusEntryX {
+    func asStatusEntryX(repo: Repository) -> UiStatusEntryX {
         let entry = self
         
         var stagedPatch: R<Patch?>
