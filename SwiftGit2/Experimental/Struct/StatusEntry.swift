@@ -67,6 +67,24 @@ public extension StatusEntry {
     }
 }
 
+public extension StatusEntry {
+    var headToIndexNEWFilePath : R<String> {
+        self.headToIndex.asNonOptional("headToIndex_newFilePath") | { $0.newFilePath }
+    }
+    
+    var headToIndexOLDFilePath : R<String> {
+        self.headToIndex.asNonOptional("headToIndex_oldFilePath") | { $0.oldFilePath }
+    }
+    
+    var indexToWorkDirNEWFilePath : R<String> {
+        self.indexToWorkDir.asNonOptional("indexToWorkDir_newFilePath") | { $0.newFilePath }
+    }
+    
+    var indexToWorkDirOLDFilePath : R<String> {
+        self.indexToWorkDir.asNonOptional("indexToWorkDir_oldFilePath") | { $0.oldFilePath }
+    }
+}
+
 public extension UiStatusEntryX {
     var headToIndexNEWFilePath : R<String> {
         stagedDeltas.asNonOptional("headToIndex") | { $0.newFilePath }
@@ -83,7 +101,6 @@ public extension UiStatusEntryX {
     var indexToWorkDirOLDFilePath : R<String> {
         unStagedDeltas.asNonOptional("indexToWorkDir") | { $0.newFilePath }
     }
-
 }
 
 public extension Duo where T1 == UiStatusEntryX, T2 == Repository {

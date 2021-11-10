@@ -309,21 +309,12 @@ extension RepositoryError: LocalizedError {
 public extension Repository {
     /// stageAllFiles
     func addAllFiles() -> Result<(),Error> {
-        let entries = self.statusConflictSafe()
-                .map{ $0.compactMap{ $0.stagedDeltas } }
-
-        return combine(entries, directoryURL)
-            | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
-            | { paths in self.index()   | { $0.addAll(pathPatterns: paths) } }
+        return self.index() | { $0.addAll(pathPatterns: []) }
     }
 
     /// unstageAllFiles
     func resetAllFiles() -> Result<(),Error> {
-        let entries = self.statusConflictSafe() | { $0.compactMap { $0.unStagedDeltas }}
-
-        return combine(entries, directoryURL)
-            | { entries, url in entries | { $0.getFileAbsPathUsing(repoPath: url.path) } }
-            | { paths in self.index()   | { _ in self.resetDefault(pathPatterns: paths) } }
+        return self.index() | { _ in self.resetDefault(pathPatterns: []) }
     }
 }
 

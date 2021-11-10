@@ -31,36 +31,41 @@ public extension Repository {
             }
     }
     
-    func discard(entries: [UiStatusEntryX]) -> R<()> {
+    func discard(entries: [StatusEntry]) -> R<()> {
         entries
             .map{ discard(entry: $0) }
             .flatMap{ $0 }
             .flatMap{ _ in return .success(()) }
     }
     
-    func discard(entry: UiStatusEntryX) -> R<Void> {
+    func discard(entry: StatusEntry) -> R<Void> {
+        /// ĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀ
+        /// TODO: REVRITE ME! HORRIBLE HACK HERE!!!!!
+        /// ĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀ
+        let entryOLD = entry.asStatusEntryX(repo: self)
+        
         guard let path = entry.newFileRelPath ?? entry.oldFileRelPath else { return .failure(WTF("Failed to get path for discard file changes"))  }
         
         // Stage file if mixed
-        if entry.stageState == .mixed { let _ = try? self.add( relPaths: [path] ).get() }
+        if entryOLD.stageState == .mixed { let _ = try? self.add( relPaths: [path] ).get() }
         
-        switch entry.status {
+        switch entryOLD.status {
         case .current: return .success(())
         case .ignored: return .failure(WTF("Repository.discard doesn't support ignored status"))
         case .conflicted: return .failure(WTF("Repository.discard doesn't support conflicted status"))
         
         case .workTreeNew:
-            return entry.with(self).indexToWorkDirNewFileURL | { $0.rm() }
+            return entryOLD.with(self).indexToWorkDirNewFileURL | { $0.rm() }
         
         case .indexRenamed:
-            return combine(self.index(), entry.headToIndexNEWFilePath)
+            return combine(self.index(), entryOLD.headToIndexNEWFilePath)
                 | { index, path in index.removeAll(pathPatterns: [path]) }
-                | { entry.with(self).headToIndexNewFileURL } | { $0.rm() }
-                | { entry.headToIndexOLDFilePath }
+                | { entryOLD.with(self).headToIndexNewFileURL } | { $0.rm() }
+                | { entryOLD.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
             
         case .workTreeRenamed:
-            return entry.with(self).indexToWorkDirNewFileURL
+            return entryOLD.with(self).indexToWorkDirNewFileURL
                 | { $0.rm() }
                 | { entry.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }

@@ -58,7 +58,7 @@ public extension Repository {
     }
 
     
-    func statusConflictSafe(options: StatusOptions = StatusOptions()) -> Result<StatusIteratorNew, Error> {
+    func statusConflictSafe(options: StatusOptions = StatusOptions()) -> Result<StatusIterator, Error> {
         var newFlags = options.flags
         newFlags.remove(.includeUntracked)
         let conflictOptions = StatusOptions(flags: newFlags, show: options.show, pathspec: options.pathspec)
@@ -71,13 +71,11 @@ public extension Repository {
             }
     }
     
-    func status(options: StatusOptions = StatusOptions()) -> Result<StatusIteratorNew, Error> {
+    func status(options: StatusOptions = StatusOptions()) -> Result<StatusIterator, Error> {
         var pointer: OpaquePointer?
 
         if repoIsBare {
-            let si = StatusIterator(nil)
-            
-            return .success( StatusIteratorNew(iterator: si, repo: self)  )
+            return .success( StatusIterator(nil) )
         }
 
         return options.with_git_status_options { options in
@@ -85,7 +83,7 @@ public extension Repository {
                 git_status_list_new(&pointer, self.pointer, &options)
             }
         }
-        .map{ StatusIteratorNew(iterator: $0, repo: self )}
+        //.map{ StatusIteratorNew(iterator: $0, repo: self )}
     }
 }
 
@@ -106,7 +104,7 @@ public final class StatusIteratorNew {
     }
 }
 
-extension StatusEntry {
+public extension StatusEntry {
     func asStatusEntryX(repo: Repository) -> UiStatusEntryX {
         let entry = self
         
@@ -156,61 +154,10 @@ extension StatusEntry {
     }
 }
 
-
-extension StatusIteratorNew: RandomAccessCollection {
-    public typealias Element = UiStatusEntryX
-    public typealias Index = Int
-    //public typealias SubSequence = StatusIteratorNew
-    public typealias Indices = DefaultIndices<StatusIteratorNew>
+public extension StatusEntry {
+    var oldFileRelPath: String? { self.headToIndex?.oldFile?.path ?? self.indexToWorkDir?.oldFile?.path }
     
-    public subscript(position: Int) -> UiStatusEntryX {
-        let entry = iterator[position]
-        
-        var stagedPatch: R<Patch?>
-        var unStagedPatch: R<Patch?>
-        
-        if let hti = entry.headToIndex {
-            stagedPatch = repo.patchFrom(delta: hti)
-                .map{ patch -> Patch? in patch }
-        } else {
-            stagedPatch = .success(nil)
-        }
-        
-        if let itw =  entry.indexToWorkDir {
-            unStagedPatch = repo.patchFrom(delta: itw)
-                .map{ patch -> Patch? in patch }
-        } else {
-            unStagedPatch = .success(nil)
-        }
-        
-        let changesDelta = try? getChanged(position: position).get()
-        
-        //let isBinary = anyFile(at: position)?.getSameFileWithBlob(from: repo).blob?.isBinary
-        
-        return StatusEntryNew(iterator[position], stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
-    }
-    
-    private func getChanged(position: Int) -> R<[Diff.Delta]?> {
-        let relPath = iterator[position].relPath
-        
-        let repo = self.repo
-        
-        let file = anyFile(at: position)!
-        
-        guard let blobHead = file.getSameFileWithBlob(from: repo).blob else { return .success(nil)}
-        
-        return repo.blobCreateFromWorkdirAsBlob(relPath: relPath)
-            .flatMap { workdirBlob in
-                repo.diffBlobs(old: blobHead, new: workdirBlob)
-            }
-            .map{ delta -> [Diff.Delta]? in delta }
-    }
-    
-    public var startIndex: Int { 0 }
-    public var endIndex: Int { iterator.endIndex }
-    
-    public func index(before i: Int) -> Int { return i - 1 }
-    public func index(after i: Int) -> Int { return i + 1 }
+    var newFileRelPath: String? { self.headToIndex?.newFile?.path ?? self.indexToWorkDir?.newFile?.path }
 }
 
 private struct StatusEntryNew: UiStatusEntryX {
@@ -280,8 +227,34 @@ private struct StatusEntryNew: UiStatusEntryX {
         
         return [workDir, index]
     }
-    
 }
+
+public extension StatusEntry {
+    var unStagedDeltas: Diff.Delta? { self.indexToWorkDir }
+    
+    var stagedDeltas: Diff.Delta? { self.headToIndex }
+    
+    func statusFull() -> [Diff.Delta.Status] {
+        if let status = unStagedDeltas?.status,
+           stagedDeltas == nil {
+                return [status]
+        }
+        if let status = stagedDeltas?.status,
+            unStagedDeltas == nil {
+                return [status]
+        }
+        
+        guard let workDir = unStagedDeltas?.status else { return [.unmodified] }
+        guard let index = stagedDeltas?.status else { return [.unmodified] }
+        
+        if workDir == index {
+            return [workDir]
+        }
+        
+        return [workDir, index]
+    }
+}
+
 
 
 
@@ -321,15 +294,6 @@ public enum StageState {
 ///////////////////////////////////
 /// HELPERS
 //////////////////////////////////
-extension StatusIteratorNew{
-    func anyFile(at position: Int) -> Diff.File? {
-        iterator[position].headToIndex?.oldFile ??
-            iterator[position].indexToWorkDir?.oldFile ??
-            iterator[position].headToIndex?.newFile ??
-            iterator[position].indexToWorkDir?.newFile
-    }
-}
-
 fileprivate extension StatusEntry{
     var relPath: String {
         self.headToIndex?.newFile?.path     ?? self.indexToWorkDir?.newFile?.path ??
