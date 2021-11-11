@@ -64,13 +64,13 @@ public extension Index {
         }
     }
     
-    func addAll(pathPatterns: [String] = []) -> R<()> {
+    func addAll(pathPatterns: [String] = ["*"]) -> R<()> {
         pathPatterns.with_git_strarray { strarray in
             git_try("git_index_add_all") { git_index_add_all(pointer, &strarray, 0, nil, nil) } | { self.write() }
         }
     }
     
-    func removeAll(pathPatterns: [String] = []) -> Result<Void, Error> {
+    func removeAll(pathPatterns: [String] = ["*"]) -> Result<Void, Error> {
         pathPatterns.with_git_strarray { strarray in
             git_try("git_index_remove_all") { git_index_remove_all(pointer, &strarray, nil, nil) } | { self.write() }
         }

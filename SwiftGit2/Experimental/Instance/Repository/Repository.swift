@@ -208,7 +208,7 @@ public extension Repository {
 // index
 public extension Repository {
     ///Unstage files by relative path
-    func resetDefault(pathPatterns: [String] = []) -> R<Void> {
+    func resetDefault(pathPatterns: [String] = ["*"]) -> R<Void> {
         if self.headIsUnborn {
             return index()
                 .flatMap{ $0.removeAll(pathPatterns: pathPatterns) }
