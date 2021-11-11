@@ -42,30 +42,30 @@ public extension Repository {
         /// ĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀ
         /// TODO: REVRITE ME! HORRIBLE HACK HERE!!!!!
         /// ĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀ
-        let entryOLD = entry.asStatusEntryX(repo: self)
+        let entryX = entry.asStatusEntryX(repo: self)
         
         guard let path = entry.newFileRelPath ?? entry.oldFileRelPath else { return .failure(WTF("Failed to get path for discard file changes"))  }
         
         // Stage file if mixed
-        if entryOLD.stageState == .mixed { let _ = try? self.add( relPaths: [path] ).get() }
+        if entryX.stageState == .mixed { let _ = try? self.add( relPaths: [path] ).get() }
         
-        switch entryOLD.status {
+        switch entry.status {
         case .current: return .success(())
         case .ignored: return .failure(WTF("Repository.discard doesn't support ignored status"))
         case .conflicted: return .failure(WTF("Repository.discard doesn't support conflicted status"))
         
         case .workTreeNew:
-            return entryOLD.with(self).indexToWorkDirNewFileURL | { $0.rm() }
+            return entryX.with(self).indexToWorkDirNewFileURL | { $0.rm() }
         
         case .indexRenamed:
-            return combine(self.index(), entryOLD.headToIndexNEWFilePath)
+            return combine(self.index(), entryX.headToIndexNEWFilePath)
                 | { index, path in index.removeAll(pathPatterns: [path]) }
-                | { entryOLD.with(self).headToIndexNewFileURL } | { $0.rm() }
-                | { entryOLD.headToIndexOLDFilePath }
+                | { entryX.with(self).headToIndexNewFileURL } | { $0.rm() }
+                | { entryX.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
             
         case .workTreeRenamed:
-            return entryOLD.with(self).indexToWorkDirNewFileURL
+            return entryX.with(self).indexToWorkDirNewFileURL
                 | { $0.rm() }
                 | { entry.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
