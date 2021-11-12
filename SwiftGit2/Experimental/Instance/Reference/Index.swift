@@ -64,6 +64,12 @@ public extension Index {
         }
     }
     
+    func addBy(path: String) -> R<()> {
+        git_try("git_index_add_bypath") {
+            git_index_add_bypath(self.pointer, path)
+        }
+    }
+    
     func addAll(pathPatterns: [String] = ["*"]) -> R<()> {
         pathPatterns.with_git_strarray { strarray in
             git_try("git_index_add_all") { git_index_add_all(pointer, &strarray, 0, nil, nil) } | { self.write() }
