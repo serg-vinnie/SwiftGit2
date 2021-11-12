@@ -158,6 +158,15 @@ public extension StatusEntry {
     var oldFileRelPath: String? { self.headToIndex?.oldFile?.path ?? self.indexToWorkDir?.oldFile?.path }
     
     var newFileRelPath: String? { self.headToIndex?.newFile?.path ?? self.indexToWorkDir?.newFile?.path }
+    
+    /// headToIndex old + new | indexToWorkDir old + new
+    var allPaths: [String?] {
+        [self.headToIndex?.oldFile?.path,
+         self.indexToWorkDir?.oldFile?.path,
+         self.headToIndex?.newFile?.path,
+         self.indexToWorkDir?.newFile?.path
+        ]
+    }
 }
 
 private struct StatusEntryNew: UiStatusEntryX {
