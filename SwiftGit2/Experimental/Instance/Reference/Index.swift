@@ -59,27 +59,32 @@ public extension Index {
     func add(_ entry: Index.Entry) -> R<()> {
         var entry1 = entry.wrappedEntry
         
-        return _result((), pointOfFailure: "git_index_clear") {
+        return _result((), pointOfFailure: "git_index_add") {
             git_index_add(self.pointer, &entry1 )
-        }
+        } | { self.write() }
     }
     
-    func addBy(path: String) -> R<()> {
-        git_try("git_index_add_bypath") {
-            git_index_add_bypath(self.pointer, path)
-        }
+    func addBy(relPath: String) -> R<()> {
+        return git_try("git_index_add_bypath") {
+            relPath.withCString { path in
+                git_index_add_bypath(self.pointer, path)
+            }
+        } | { self.write() }
     }
     
     func addAll(pathPatterns: [String] = ["*"]) -> R<()> {
-        pathPatterns.with_git_strarray { strarray in
-            git_try("git_index_add_all") { git_index_add_all(pointer, &strarray, 0, nil, nil) } | { self.write() }
-        }
+        git_try("git_index_add_all") {
+            pathPatterns.with_git_strarray { strarray in
+                git_index_add_all(pointer, &strarray, 0, nil, nil)
+            }
+        } | { self.write() }
     }
     
     func removeAll(pathPatterns: [String] = ["*"]) -> Result<Void, Error> {
-        pathPatterns.with_git_strarray { strarray in
-            git_try("git_index_remove_all") { git_index_remove_all(pointer, &strarray, nil, nil) } | { self.write() }
-        }
+        git_try("git_index_remove_all") {
+            pathPatterns.with_git_strarray { strarray in
+                git_index_remove_all(pointer, &strarray, nil, nil) }
+        } | { self.write() }
     }
     
     func conflictRemove(relPath: String) -> R<()> {
