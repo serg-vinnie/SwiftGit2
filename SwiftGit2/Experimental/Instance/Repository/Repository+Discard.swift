@@ -47,7 +47,7 @@ public extension Repository {
         guard let path = entry.newFileRelPath ?? entry.oldFileRelPath else { return .failure(WTF("Failed to get path for discard file changes"))  }
         
         // Stage file if mixed
-        if entryX.stageState == .mixed { let _ = try? self.add( relPaths: [path] ).get() }
+        if entryX.stageState == .mixed { let _ = try? self.addBy( path: path ).get() }
         
         switch entry.status {
         case .current: return .success(())
