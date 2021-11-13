@@ -39,15 +39,7 @@ public extension Repository {
     }
     
     func discard(entry: StatusEntry) -> R<Void> {
-        /// ĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀ
-        /// TODO: REVRITE ME! HORRIBLE HACK HERE!!!!!
-        /// ĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀĀ
-        let entryX = entry.asStatusEntryX(repo: self)
-        
-        guard let path = entry.newFileRelPath ?? entry.oldFileRelPath else { return .failure(WTF("Failed to get path for discard file changes"))  }
-        
-        // Stage file if mixed
-        if entryX.stageState == .mixed { let _ = try? self.addBy( path: path ).get() }
+        let paths = entry.allPaths.compactMap{ $0 }.distinct()
         
         switch entry.status {
         case .current: return .success(())
@@ -55,17 +47,17 @@ public extension Repository {
         case .conflicted: return .failure(WTF("Repository.discard doesn't support conflicted status"))
         
         case .workTreeNew:
-            return entryX.with(self).indexToWorkDirNewFileURL | { $0.rm() }
+            return entry.with(self).indexToWorkDirNewFileURL | { $0.rm() }
         
         case .indexRenamed:
-            return combine(self.index(), entryX.headToIndexNEWFilePath)
-                | { index, path in index.removeAll(pathPatterns: [path]) }
-                | { entryX.with(self).headToIndexNewFileURL } | { $0.rm() }
-                | { entryX.headToIndexOLDFilePath }
+            return combine(self.index(), entry.headToIndexNEWFilePath)
+                | { index, path in index.removeAll(pathPatterns: paths) }
+                | { entry.with(self).headToIndexNewFileURL } | { $0.rm() }
+                | { entry.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
             
         case .workTreeRenamed:
-            return entryX.with(self).indexToWorkDirNewFileURL
+            return entry.with(self).indexToWorkDirNewFileURL
                 | { $0.rm() }
                 | { entry.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
@@ -73,12 +65,14 @@ public extension Repository {
         case .indexNew, .indexDeleted, .indexModified, .indexTypeChange,
              .workTreeDeleted, .workTreeModified, .workTreeUnreadable, .workTreeTypeChange:
              
-            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path] )
+            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: paths )
             
         default:
-            assert(false)
+            print("discard(entry) -- HORRIBLE ERROR? Or not?")
             
-            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [path])
+            //assert(false)
+            // Stage file if mixed? Maybe some another situations?
+            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: paths)
         }
     }
 }
@@ -129,6 +123,12 @@ public extension Repository {
 
 public extension UiStatusEntryX {
     func with(_ repo: Repository) -> Duo<UiStatusEntryX, Repository> {
+        return Duo(self, repo)
+    }
+}
+
+public extension StatusEntry {
+    func with(_ repo: Repository) -> Duo<StatusEntry, Repository> {
         return Duo(self, repo)
     }
 }

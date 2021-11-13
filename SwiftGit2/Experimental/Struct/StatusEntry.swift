@@ -47,6 +47,7 @@ public extension StatusEntry {
         public init(rawValue: UInt32) {
             self.rawValue = rawValue
         }
+        
 
         public let rawValue: UInt32
 
@@ -104,6 +105,20 @@ public extension UiStatusEntryX {
 }
 
 public extension Duo where T1 == UiStatusEntryX, T2 == Repository {
+    var headToIndexNewFileURL : R<URL> {
+        let (entry, repo) = self.value
+        let path = entry.headToIndexNEWFilePath
+        return combine(repo.directoryURL, path) | { $0.appendingPathComponent($1) }
+    }
+    
+    var indexToWorkDirNewFileURL : R<URL> {
+        let (entry, repo) = self.value
+        let path = entry.indexToWorkDirNEWFilePath
+        return combine(repo.directoryURL, path) | { $0.appendingPathComponent($1) }
+    }
+}
+
+public extension Duo where T1 == StatusEntry, T2 == Repository {
     var headToIndexNewFileURL : R<URL> {
         let (entry, repo) = self.value
         let path = entry.headToIndexNEWFilePath
