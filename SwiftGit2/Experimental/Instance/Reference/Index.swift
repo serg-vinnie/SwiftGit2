@@ -92,19 +92,13 @@ public extension Index {
             relPath.withCString { path in
                 git_index_conflict_remove(self.pointer, path);
             }
-        }
-        .flatMap {
-            self.write()
-        }
+        } | { self.write() }
     }
     
     func conflictRemoveAll() -> R<()> {
         return git_try("git_index_conflict_cleanup") {
             git_index_conflict_cleanup(self.pointer)
-        }
-        .flatMap {
-            self.write()
-        }
+        } | { self.write() }
     }
 
     func clear() -> Result<Void, Error> {
