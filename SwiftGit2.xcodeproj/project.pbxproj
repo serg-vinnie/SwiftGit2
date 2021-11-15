@@ -14,6 +14,7 @@
 		1D5E1F422742A34D00498539 /* StatusEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F412742A34D00498539 /* StatusEntryTests.swift */; };
 		1D5E1F452742A7DC00498539 /* EssetialTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 1D5E1F442742A7DC00498539 /* EssetialTesting */; };
 		1D5E1F472742B31700498539 /* IEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F462742B31700498539 /* IEntry.swift */; };
+		1D5E1F492742CEF000498539 /* Repository+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F482742CEF000498539 /* Repository+Entries.swift */; };
 		1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6EFB29252BA5A1000D0BE1 /* Tree.swift */; };
 		1D764BD8252CD148008417A7 /* Submodule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D764BD7252CD148008417A7 /* Submodule.swift */; };
 		1D991AE12518FA7900335255 /* Duo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D991AE02518FA7900335255 /* Duo.swift */; };
@@ -128,6 +129,7 @@
 		1D5B38A725228C790019E593 /* Repository+Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Diff.swift"; sourceTree = "<group>"; };
 		1D5E1F412742A34D00498539 /* StatusEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryTests.swift; sourceTree = "<group>"; };
 		1D5E1F462742B31700498539 /* IEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEntry.swift; sourceTree = "<group>"; };
+		1D5E1F482742CEF000498539 /* Repository+Entries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Entries.swift"; sourceTree = "<group>"; };
 		1D6EFB29252BA5A1000D0BE1 /* Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
 		1D764BD7252CD148008417A7 /* Submodule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Submodule.swift; sourceTree = "<group>"; };
 		1D991AE02518FA7900335255 /* Duo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Duo.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				E6AF628926925BCE007D0585 /* Graph */,
 				E6D4A91F24DEACC000E8041E /* Repository.swift */,
 				E63EDF75265D255500A3D048 /* Repository+HEAD.swift */,
+				1D5E1F482742CEF000498539 /* Repository+Entries.swift */,
 				E67D157124EF24A500DA3542 /* Repository+Status.swift */,
 				E6AF628C26938457007D0585 /* Repository+Sync.swift */,
 				E63EDF7F265FF7E100A3D048 /* Repository+Push.swift */,
@@ -717,6 +720,7 @@
 				E6AF629226939D65007D0585 /* RemoteTarget.swift in Sources */,
 				E653907A23E7328200C08416 /* Diff+Delta.swift in Sources */,
 				E6D4A91E24DEAA3000E8041E /* Reference.swift in Sources */,
+				1D5E1F492742CEF000498539 /* Repository+Entries.swift in Sources */,
 				DA5914761A94579000AED74C /* Errors.swift in Sources */,
 				1D991AE3251934FF00335255 /* Remote.swift in Sources */,
 				E6332E082652D20E004990E7 /* GitPayload.swift in Sources */,
