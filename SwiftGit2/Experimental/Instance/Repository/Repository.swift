@@ -312,8 +312,10 @@ extension RepositoryError: LocalizedError {
 ///////////////////////////////////////////
 public extension Repository {
     /// stageAllFiles
-    func addAllFiles() -> Result<(),Error> {
-        return self.index() | { $0.addAll(pathPatterns: []) }
+    func addAllFiles() -> Result<Repository,Error> {
+        return self.index()
+            | { $0.addAll(pathPatterns: []) }
+            | { _ in self }
     }
 
     /// unstageAllFiles
