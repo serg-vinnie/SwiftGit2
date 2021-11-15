@@ -21,7 +21,6 @@ extension Repository {
                        .map { .commit($0) } as R<Entries>
                }
            },
-
                 else: { status in
                    .success(.status(status))
            })
