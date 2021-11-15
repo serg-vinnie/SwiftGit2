@@ -63,5 +63,41 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.deltas[0].entryFileInfo }
             .shouldSucceed()!
     }
+    
+    func test_should_return_EntyFileInfo_Commit_rename() {
+        let url = URL.randomTempDirectory().maybeSuccess!
+        
+        Repository.create(at: url)
+            .flatMap { $0.t_with_commit(file: .fileA, with: .random, msg: "....") }
+            .shouldSucceed()
+        
+        url.moveFile(at: TestFile.fileA.rawValue, to: TestFile.fileB.rawValue)
+        
+        Repository.at(url: url)
+            .flatMap { $0.addBy(path: TestFile.fileB.rawValue) }
+            .flatMap { $0.commit(message: "rename", signature: GitTest.signature) }
+            .shouldSucceed()
+        
+        let entryFileInfo = Repository.at(url: url)
+            .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
+            .flatMap { $0.deltas[0].entryFileInfo }
+            .shouldSucceed()!
+        
+        if case let .renamed(a, b) = entryFileInfo {
+            XCTAssert(a == TestFile.fileA.rawValue)
+            XCTAssert(b == TestFile.fileB.rawValue)
+        } else {
+            XCTAssert(false)
+        }
+        //if = entryFileInfo.
+    }
 
+}
+
+extension URL {
+    func moveFile(at: String, to _to: String) {
+        let from  = self.appendingPathComponent(at)
+        let to  = self.appendingPathComponent(_to)
+        try! FileManager.default.moveItem(at: from, to: to)
+    }
 }
