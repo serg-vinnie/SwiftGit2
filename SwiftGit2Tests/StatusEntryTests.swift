@@ -55,5 +55,13 @@ class StatusEntryTests: XCTestCase {
         
         XCTAssert(commitDetails.deltas[0].pathInWorkDir == TestFile.fileA.rawValue)
     }
+    
+    func test_should_return_EntyFileInfo_Commit() {
+        _ = Repository.t_randomRepo()
+            .flatMap { $0.t_with_commit(file: .fileA, with: .random, msg: "....") }
+            .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
+            .flatMap { $0.deltas[0].entryFileInfo }
+            .shouldSucceed()!
+    }
 
 }

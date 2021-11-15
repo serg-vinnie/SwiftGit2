@@ -49,7 +49,14 @@ extension Diff.Delta: IEntry {
     public var stageState: StageState { .unavailable}
     
     public var entryFileInfo: R<EntryFileInfo> {
-        return .failure(WTF(""))
+        guard let path = pathInWorkDir else { return .failure(WTF("pathInWorkDir is NIL")) }
+        
+        
+        
+        
+        
+        
+        return .success(.single(path))
     }
 }
 
