@@ -246,8 +246,8 @@ public extension Repository {
         }
     }
     
-    func addBy(path: String) -> R<()> {
-        index().flatMap { $0.addBy(relPath: path) }
+    func addBy(path: String) -> R<Repository> {
+        index() | { $0.addBy(relPath: path) } | { self }
     }
     
     ///Stage files by relative path
