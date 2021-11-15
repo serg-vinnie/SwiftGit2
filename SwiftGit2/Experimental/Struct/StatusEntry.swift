@@ -2,20 +2,20 @@
 import Clibgit2
 import Essentials
 
-extension StatusEntry: Identifiable {
-    public var id: String {
-        var finalId: String = ""
+public protocol StatusEntryInfo {
+    var pathInWd: String? { get }
+}
 
-        if let newPath = indexToWorkDir?.newFile?.path { finalId += newPath }
-
-        if let oldPath = indexToWorkDir?.oldFile?.path { finalId += oldPath }
-
-        if let newPath = headToIndex?.newFile?.path { finalId += newPath }
-
-        if let oldPath = headToIndex?.oldFile?.path { finalId += oldPath }
-
-        return finalId
-    }
+extension StatusEntry: StatusEntryInfo {
+    public var pathInWd: String? {
+        // indexToWorkDir?
+        // headToIndex?
+        // self.indexToWorkDir?.newFile
+        // self.indexToWorkDir?.oldFile
+        // self.headToIndex?.newFile
+        // self.headToIndex?.newFile
+        
+        self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path }
 }
 
 public struct StatusEntry {
