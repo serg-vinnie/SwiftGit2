@@ -37,10 +37,10 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.status() }
             .shouldSucceed()!
         
-        XCTAssert(status[0].isStaged == true)
+        XCTAssert(status[0].isStaged == false)
         
         let newStatus = Repository.at(url: url)
-            .flatMap { $0.addBy(path: entry.pathInWorkDir!) }
+            .flatMap { $0.addBy(path: status[0].pathInWorkDir!) }
             .flatMap { $0.status() }
             .shouldSucceed()!
         
