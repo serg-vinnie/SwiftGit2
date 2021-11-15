@@ -12,6 +12,7 @@
 		1D4C9B5426AD79C600ADBBDE /* Repository+Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4C9B5326AD79C600ADBBDE /* Repository+Blob.swift */; };
 		1D5B38A825228C790019E593 /* Repository+Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5B38A725228C790019E593 /* Repository+Diff.swift */; };
 		1D5E1F422742A34D00498539 /* StatusEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F412742A34D00498539 /* StatusEntryTests.swift */; };
+		1D5E1F452742A7DC00498539 /* EssetialTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 1D5E1F442742A7DC00498539 /* EssetialTesting */; };
 		1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6EFB29252BA5A1000D0BE1 /* Tree.swift */; };
 		1D764BD8252CD148008417A7 /* Submodule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D764BD7252CD148008417A7 /* Submodule.swift */; };
 		1D991AE12518FA7900335255 /* Duo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D991AE02518FA7900335255 /* Duo.swift */; };
@@ -234,6 +235,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D5E1F452742A7DC00498539 /* EssetialTesting in Frameworks */,
 				E6332DD1265167F0004990E7 /* SwiftGit2.framework in Frameworks */,
 				E6E99239268BC1BE00F8E8BD /* Essentials in Frameworks */,
 			);
@@ -592,6 +594,7 @@
 			name = SwiftGit2Tests;
 			packageProductDependencies = (
 				E6E99238268BC1BE00F8E8BD /* Essentials */,
+				1D5E1F442742A7DC00498539 /* EssetialTesting */,
 			);
 			productName = SwiftGit2Tests;
 			productReference = E6332DCC265167F0004990E7 /* SwiftGit2Tests.xctest */;
@@ -628,6 +631,7 @@
 			mainGroup = BEB31F191A0D6F7A00F525B9;
 			packageReferences = (
 				E62B73C2268092B400B7D881 /* XCRemoteSwiftPackageReference "essentials" */,
+				1D5E1F432742A7DC00498539 /* XCRemoteSwiftPackageReference "essential_tests" */,
 			);
 			productRefGroup = BEB31F241A0D6F7A00F525B9 /* Products */;
 			projectDirPath = "";
@@ -1016,6 +1020,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		1D5E1F432742A7DC00498539 /* XCRemoteSwiftPackageReference "essential_tests" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@gitlab.com:sergiy.vynnychenko/essential_tests.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		E62B73C2268092B400B7D881 /* XCRemoteSwiftPackageReference "essentials" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@gitlab.com:sergiy.vynnychenko/essentials.git";
@@ -1027,6 +1039,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1D5E1F442742A7DC00498539 /* EssetialTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1D5E1F432742A7DC00498539 /* XCRemoteSwiftPackageReference "essential_tests" */;
+			productName = EssetialTesting;
+		};
 		E62B73C3268092B400B7D881 /* Essentials */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E62B73C2268092B400B7D881 /* XCRemoteSwiftPackageReference "essentials" */;
