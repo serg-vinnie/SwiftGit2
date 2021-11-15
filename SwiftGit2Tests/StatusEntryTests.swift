@@ -8,8 +8,7 @@ class StatusEntryTests: XCTestCase {
         let repo = Repository.t_randomRepo()
         _ = repo.flatMap { $0.t_write(file: .fileA, with: .random) }
         
-        let options = StatusOptions(flags: [.includeUntracked, .renamesHeadToIndex])
-        let status = repo.flatMap { $0.status(options: options) }
+        let status = repo.flatMap { $0.status() }
             .shouldSucceed()!
         
         let entrie = status[0]
@@ -25,8 +24,7 @@ class StatusEntryTests: XCTestCase {
         let repo = Repository.t_randomRepo()
         _ = repo.flatMap { $0.t_write(file: .fileA, with: .random) }
         
-        let options = StatusOptions(flags: [.includeUntracked, .renamesHeadToIndex])
-        let status = repo.flatMap { $0.status(options: options) }
+        let status = repo.flatMap { $0.status() }
             .shouldSucceed()!
     }
 

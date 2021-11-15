@@ -17,7 +17,7 @@ public class StatusOptions {
     var show: StatusOptions.Show { StatusOptions.Show(rawValue: git_options.show.rawValue)! }
     var flags: StatusOptions.Flags { StatusOptions.Flags(rawValue: git_options.flags) }
 
-    public init(flags: StatusOptions.Flags? = nil, show: StatusOptions.Show? = nil, pathspec: [String] = []) {
+    public init(flags: StatusOptions.Flags? = [.includeUntracked, .renamesHeadToIndex], show: StatusOptions.Show? = nil, pathspec: [String] = []) {
         self.pathspec = pathspec
         let result = git_status_init_options(&git_options, UInt32(GIT_STATUS_OPTIONS_VERSION))
         assert(result == GIT_OK.rawValue)
