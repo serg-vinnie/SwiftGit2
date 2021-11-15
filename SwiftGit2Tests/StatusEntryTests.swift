@@ -8,7 +8,6 @@ class StatusEntryTests: XCTestCase {
         let repo = Repository.t_randomRepo()
         _ = repo.flatMap { $0.t_write(file: .fileA, with: .random) }
         
-        
         let options = StatusOptions(flags: [.includeUntracked, .renamesHeadToIndex])
         let status = repo.flatMap { $0.status(options: options) }
             .shouldSucceed()!
@@ -16,6 +15,11 @@ class StatusEntryTests: XCTestCase {
         let entrie = status[0]
         XCTAssert(entrie.indexToWorkDir != nil)
         XCTAssert(entrie.headToIndex == nil)
+        
+        XCTAssert(entrie.indexToWorkDir?.oldFile != nil)
+        XCTAssert(entrie.indexToWorkDir?.newFile != nil)
+        XCTAssert(entrie.indexToWorkDir?.oldFile?.path == entrie.indexToWorkDir?.newFile?.path)
+        
         
     }
 
