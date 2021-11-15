@@ -65,7 +65,7 @@ class StatusEntryTests: XCTestCase {
     }
     
     func test_should_return_EntyFileInfo_Commit_rename() {
-        let url = URL.randomTempDirectory().maybeSuccess!
+        let url = URL(fileURLWithPath: NSTemporaryDirectory().appending(UUID().uuidString), isDirectory: true)
         
         print("REPO_URL \(url.path)")
         
@@ -74,9 +74,10 @@ class StatusEntryTests: XCTestCase {
             .shouldSucceed()
         
         url.moveFile(at: TestFile.fileA.rawValue, to: TestFile.fileB.rawValue)
-        //TestFile.fileB.rawValue
+        
         Repository.at(url: url)
-            .flatMap { $0.addAllFiles() }
+            .flatMap { $0.addBy(path: TestFile.fileB.rawValue) }
+            .flatMap { $0.addBy(path: TestFile.fileA.rawValue) }
             .flatMap { $0.commit(message: "rename", signature: GitTest.signature) }
             .shouldSucceed()
         
