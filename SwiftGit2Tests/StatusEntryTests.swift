@@ -4,7 +4,7 @@ import XCTest
 import EssetialTesting
 
 class StatusEntryTests: XCTestCase {
-    func testBla() {
+    func test_bla() {
         let repo = Repository.t_randomRepo()
         _ = repo.flatMap { $0.t_write(file: .fileA, with: .random) }
         
@@ -19,8 +19,15 @@ class StatusEntryTests: XCTestCase {
         XCTAssert(entrie.indexToWorkDir?.oldFile != nil)
         XCTAssert(entrie.indexToWorkDir?.newFile != nil)
         XCTAssert(entrie.indexToWorkDir?.oldFile?.path == entrie.indexToWorkDir?.newFile?.path)
+    }
+    
+    func test_statusEntry_should_return_pathInWorkdir() {
+        let repo = Repository.t_randomRepo()
+        _ = repo.flatMap { $0.t_write(file: .fileA, with: .random) }
         
-        
+        let options = StatusOptions(flags: [.includeUntracked, .renamesHeadToIndex])
+        let status = repo.flatMap { $0.status(options: options) }
+            .shouldSucceed()!
     }
 
 }

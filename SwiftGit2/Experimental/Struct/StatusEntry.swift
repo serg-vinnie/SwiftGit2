@@ -2,22 +2,6 @@
 import Clibgit2
 import Essentials
 
-public protocol StatusEntryInfo {
-    var pathInWd: String? { get }
-}
-
-extension StatusEntry: StatusEntryInfo {
-    public var pathInWd: String? {
-        // indexToWorkDir?
-        // headToIndex?
-        // self.indexToWorkDir?.newFile
-        // self.indexToWorkDir?.oldFile
-        // self.headToIndex?.newFile
-        // self.headToIndex?.newFile
-        
-        self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path }
-}
-
 public struct StatusEntry {
     public let status: Status
     public let headToIndex: Diff.Delta?
