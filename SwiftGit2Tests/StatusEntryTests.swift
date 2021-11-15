@@ -26,7 +26,7 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.status() }
             .shouldSucceed()!
         
-        XCTAssert(status[0].pathInWorkDir == "")
+        XCTAssert(status[0].pathInWorkDir == TestFile.fileA.rawValue)
     }
     
     func test_should_stage_new_file() {
@@ -37,8 +37,7 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.status() }
             .shouldSucceed()!
         
-        let entry = status[0]
-        XCTAssert(entry.isStaged == false)
+        XCTAssert(status[0].isStaged == true)
         
         let newStatus = Repository.at(url: url)
             .flatMap { $0.addBy(path: entry.pathInWorkDir!) }

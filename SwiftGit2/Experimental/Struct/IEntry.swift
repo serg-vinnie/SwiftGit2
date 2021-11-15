@@ -7,7 +7,7 @@ public protocol IEntry {
 }
 
 extension StatusEntry: IEntry {
-    public var isStaged: Bool { false }
+    public var isStaged: Bool { self.stageState == .staged }
     
     public var pathInWorkDir: String? {
         // indexToWorkDir?
@@ -19,4 +19,29 @@ extension StatusEntry: IEntry {
         
         self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path
     }
+}
+
+
+public extension StatusEntry {
+    var stageState: StageState {
+        if self.headToIndex != nil && self.indexToWorkDir != nil {
+            return .mixed
+        }
+        
+        if let _ = self.headToIndex {
+            return .staged
+        }
+        
+        if let _ = self.indexToWorkDir {
+            return .unstaged
+        }
+        
+        return .unstaged
+    }
+}
+
+public enum StageState {
+    case mixed
+    case staged
+    case unstaged
 }

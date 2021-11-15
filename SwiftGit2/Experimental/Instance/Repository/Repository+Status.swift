@@ -293,11 +293,6 @@ public protocol UiStatusEntryX {
     //var isBinary: Bool? { get }
 }
 
-public enum StageState {
-    case mixed
-    case staged
-    case unstaged
-}
 
 
 ///////////////////////////////////
