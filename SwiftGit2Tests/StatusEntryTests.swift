@@ -37,14 +37,22 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.status() }
             .shouldSucceed()!
         
-        XCTAssert(status[0].isStaged == false)
+        XCTAssert(status[0].stageState != .staged)
         
         let newStatus = Repository.at(url: url)
             .flatMap { $0.addBy(path: status[0].pathInWorkDir!) }
             .flatMap { $0.status() }
             .shouldSucceed()!
         
-        XCTAssert(newStatus[0].isStaged == true)
+        XCTAssert(newStatus[0].stageState == .staged)
+    }
+    
+    func test_commit_file_should_return_pathInWd() {
+        let status = Repository.t_randomRepo()
+            .flatMap { $0.t_with_commit(file: .fileA, with: .random, msg: "....") }
+            ////.flatMap { $0.deltas(target: .)() }
+            .shouldSucceed()!
+  
     }
 
 }

@@ -3,12 +3,10 @@ import Foundation
 
 public protocol IEntry {
     var pathInWorkDir: String? { get }
-    var isStaged : Bool { get }
+    var stageState: StageState { get }
 }
 
 extension StatusEntry: IEntry {
-    public var isStaged: Bool { self.stageState == .staged }
-    
     public var pathInWorkDir: String? {
         // indexToWorkDir?
         // headToIndex?
@@ -19,11 +17,8 @@ extension StatusEntry: IEntry {
         
         self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path
     }
-}
 
-
-public extension StatusEntry {
-    var stageState: StageState {
+    public var stageState: StageState {
         if self.headToIndex != nil && self.indexToWorkDir != nil {
             return .mixed
         }
@@ -36,12 +31,19 @@ public extension StatusEntry {
             return .unstaged
         }
         
-        return .unstaged
+        return .unavailable
     }
+}
+
+extension Diff.Delta: IEntry {
+    public var pathInWorkDir: String? { self.newFile?.path }
+    
+    public var stageState: StageState { .unavailable}
 }
 
 public enum StageState {
     case mixed
     case staged
     case unstaged
+    case unavailable
 }

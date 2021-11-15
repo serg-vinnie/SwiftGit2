@@ -20,6 +20,10 @@ extension Repository {
             .flatMap { file in self.addBy(path: file) }
             .flatMap { _ in self.commit(message: msg, signature: GitTest.signature) }
     }
+    
+    func t_with_commit(file: TestFile, with content: TestFileContent, msg: String) -> R<Repository> {
+        t_commit(file: file, with: content, msg: msg) | { _ in self }
+    }
 
     func t_write(file: TestFile, with content: TestFileContent) -> Result<String, Error> {
         return t_with(file: file, with: content)
