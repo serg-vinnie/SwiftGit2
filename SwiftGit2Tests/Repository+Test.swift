@@ -22,10 +22,15 @@ extension Repository {
     }
 
     func t_write(file: TestFile, with content: TestFileContent) -> Result<String, Error> {
-        return directoryURL
+        return t_with(file: file, with: content)
+            .map { _ in file.rawValue }
+    }
+    
+    func t_with(file: TestFile, with content: TestFileContent) -> R<Repository> {
+        directoryURL
             .map { $0.appendingPathComponent(file.rawValue) }
             .flatMap { $0.write(content: content.get()) }
-            .map { _ in file.rawValue }
+            .map { _ in self }
     }
 }
 
