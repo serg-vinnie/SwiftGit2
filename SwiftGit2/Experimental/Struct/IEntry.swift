@@ -1,9 +1,11 @@
 
 import Foundation
+import Essentials
 
 public protocol IEntry {
     var pathInWorkDir: String? { get }
     var stageState: StageState { get }
+    var entryFileInfo: R<EntryFileInfo> { get }
 }
 
 extension StatusEntry: IEntry {
@@ -17,7 +19,7 @@ extension StatusEntry: IEntry {
         
         self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path
     }
-
+    
     public var stageState: StageState {
         if self.headToIndex != nil && self.indexToWorkDir != nil {
             return .mixed
@@ -33,12 +35,22 @@ extension StatusEntry: IEntry {
         
         return .unavailable
     }
+    
+    public var entryFileInfo: R<EntryFileInfo> {
+        
+            
+        return .failure(WTF(""))
+    }
 }
 
 extension Diff.Delta: IEntry {
     public var pathInWorkDir: String? { self.newFile?.path }
     
     public var stageState: StageState { .unavailable}
+    
+    public var entryFileInfo: R<EntryFileInfo> {
+        return .failure(WTF(""))
+    }
 }
 
 public enum StageState {
@@ -46,4 +58,9 @@ public enum StageState {
     case staged
     case unstaged
     case unavailable
+}
+
+public enum EntryFileInfo {
+    case single(String)
+    case renamed(String, String)
 }
