@@ -11,6 +11,7 @@
 		1D496A4225372FA800789177 /* git_strarray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D496A4125372FA800789177 /* git_strarray.swift */; };
 		1D4C9B5426AD79C600ADBBDE /* Repository+Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4C9B5326AD79C600ADBBDE /* Repository+Blob.swift */; };
 		1D5B38A825228C790019E593 /* Repository+Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5B38A725228C790019E593 /* Repository+Diff.swift */; };
+		1D5E1F422742A34D00498539 /* StatusEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F412742A34D00498539 /* StatusEntryTests.swift */; };
 		1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6EFB29252BA5A1000D0BE1 /* Tree.swift */; };
 		1D764BD8252CD148008417A7 /* Submodule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D764BD7252CD148008417A7 /* Submodule.swift */; };
 		1D991AE12518FA7900335255 /* Duo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D991AE02518FA7900335255 /* Duo.swift */; };
@@ -123,6 +124,7 @@
 		1D496A4125372FA800789177 /* git_strarray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = git_strarray.swift; sourceTree = "<group>"; };
 		1D4C9B5326AD79C600ADBBDE /* Repository+Blob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Blob.swift"; sourceTree = "<group>"; };
 		1D5B38A725228C790019E593 /* Repository+Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Diff.swift"; sourceTree = "<group>"; };
+		1D5E1F412742A34D00498539 /* StatusEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryTests.swift; sourceTree = "<group>"; };
 		1D6EFB29252BA5A1000D0BE1 /* Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
 		1D764BD7252CD148008417A7 /* Submodule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Submodule.swift; sourceTree = "<group>"; };
 		1D991AE02518FA7900335255 /* Duo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Duo.swift; sourceTree = "<group>"; };
@@ -425,6 +427,7 @@
 		E6332DCD265167F0004990E7 /* SwiftGit2Tests */ = {
 			isa = PBXGroup;
 			children = (
+				1D5E1F412742A34D00498539 /* StatusEntryTests.swift */,
 				E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */,
 				E68A3AD126658A9E00B0244C /* SwiftGit2-OSX.xctestplan */,
 				E63EDF73265C0A6B00A3D048 /* RepositoryLocalTests.swift */,
@@ -725,6 +728,7 @@
 				E63EDF74265C0A6B00A3D048 /* RepositoryLocalTests.swift in Sources */,
 				E63EDF6E265BC30800A3D048 /* GitTest.swift in Sources */,
 				E63EDF6C265BC0F200A3D048 /* MergeAnalysisTests.swift in Sources */,
+				1D5E1F422742A34D00498539 /* StatusEntryTests.swift in Sources */,
 				E63EDF70265BF7FD00A3D048 /* Repository+Test.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -17,7 +17,7 @@ extension Repository {
 
     func t_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {
         t_write(file: file, with: content)
-            .flatMap { file in self.index().flatMap { $0.add(paths: [file]) } }
+            .flatMap { file in self.addBy(path: file) }
             .flatMap { _ in self.commit(message: msg, signature: GitTest.signature) }
     }
 

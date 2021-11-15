@@ -31,7 +31,8 @@ class RepositoryLocalTests: XCTestCase {
         // if let status = repo.status().assertFailure("status") { XCTAssert(status.count == 1) } else { fatalError() }
 
         // repo.reset(paths: )
-        repo.index().flatMap { $0.add(paths: [README_md]) }
+        repo.addBy(path: README_md)
+        //index().flatMap { $0.add(paths: [README_md]) }
             .assertFailure("index add \(README_md)")
 
         repo.commit(message: "initial commit", signature: Signature(name: "name", email: "email@domain.com"))
