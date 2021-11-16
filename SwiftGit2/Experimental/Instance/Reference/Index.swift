@@ -77,7 +77,7 @@ public extension Index {
              pathPatterns.with_git_strarray { strarray in
                  git_index_add_all(pointer, &strarray, 0, nil, nil)
              }
-         }
+         } | { self.write() }
     }
     
     func removeBy(relPath: String) -> R<()> {
