@@ -20,7 +20,7 @@ public extension Repository {
             guard let path = entry.pathInWorkDir else { return .wtf("Staging: can't resolve entry.pathInWorkDir") }
             
             if entry.status.contains(.workTreeDeleted) {
-                return self.resetDefault(pathPatterns: [path])
+                return self.remove(relPaths: [path])
                     .map{ self }
             } else {
                 return self.addBy(path: path)

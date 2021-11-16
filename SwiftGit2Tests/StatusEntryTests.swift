@@ -40,7 +40,7 @@ class StatusEntryTests: XCTestCase {
         XCTAssert(status[0].stageState != .staged)
         
         let newStatus = Repository.at(url: url)
-            .flatMap { $0.addBy(path: status[0].pathInWorkDir!) }
+            .flatMap { $0.stage(.entry(status[0])) }
             .flatMap { $0.status() }
             .shouldSucceed()!
         
@@ -75,16 +75,20 @@ class StatusEntryTests: XCTestCase {
         
         url.moveFile(at: TestFile.fileA.rawValue, to: TestFile.fileB.rawValue)
         
+        let status = Repository.create(at: url)
+            .flatMap { $0.status() }
+            .shouldSucceed()!
+        
         Repository.at(url: url)
-            .flatMap { $0.addBy(path: TestFile.fileB.rawValue) }
-            .flatMap { $0.addBy(path: TestFile.fileA.rawValue) }
+            .flatMap { $0.stage(.entry(status[0])) }
+            .flatMap { $0.stage(.entry(status[1])) }
             .flatMap { $0.commit(message: "rename", signature: GitTest.signature) }
             .shouldSucceed()
         
         let entryFileInfo = Repository.at(url: url)
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .flatMap { $0.deltas[0].entryFileInfo }
-            .shouldSucceed()!
+            .shouldSucceed("entryFileInfo")!
         
         if case let .renamed(a, b) = entryFileInfo {
             XCTAssert(a == TestFile.fileA.rawValue)
