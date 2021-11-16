@@ -73,9 +73,17 @@ public extension Index {
     }
     
     func addAll(pathPatterns: [String] = ["*"]) -> R<()> {
-        git_try("git_index_add_all") {
-            pathPatterns.with_git_strarray { strarray in
-                git_index_add_all(pointer, &strarray, 0, nil, nil)
+         git_try("git_index_add_all") {
+             pathPatterns.with_git_strarray { strarray in
+                 git_index_add_all(pointer, &strarray, 0, nil, nil)
+             }
+         }
+    }
+    
+    func removeBy(relPath: String) -> R<()> {
+        return git_try("git_index_remove_bypath") {
+            relPath.withCString { path in
+                git_index_remove_bypath(self.pointer, path)
             }
         } | { self.write() }
     }
