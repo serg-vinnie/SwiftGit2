@@ -18,6 +18,16 @@ public extension Repository {
                 .map{ self }
         case .entry(let entry):
             guard let path = entry.pathInWorkDir else { return .wtf("Staging: can't resolve entry.pathInWorkDir") }
+        
+            let url = self.directoryURL | { $0.appendingPathComponent(path) }
+            
+            if case .success(let url) = url {
+                if url.isDirExist {
+                    return self.index()
+                        .flatMap { $0.addAll(pathPatterns: ["\(path)"]) }
+                        .map{ self }
+                }
+            }
             
             if entry.status.contains(.workTreeDeleted) {
                 return self.remove(relPaths: [path])
