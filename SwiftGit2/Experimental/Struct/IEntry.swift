@@ -3,6 +3,9 @@ import Foundation
 import Essentials
 
 public protocol IEntry {
+    // unique id for navigation
+    // stagePath
+    // status
     var pathInWorkDir: String? { get }
     var stageState: StageState { get }
     var entryFileInfo: R<EntryFileInfo> { get }
