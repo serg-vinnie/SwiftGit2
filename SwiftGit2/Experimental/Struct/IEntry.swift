@@ -41,7 +41,23 @@ extension StatusEntry: IEntry {
     }
     
     public var entryFileInfo: R<EntryFileInfo> {
-        return .failure(WTF(""))
+        let staged = self.headToIndex
+        let unStaged = self.indexToWorkDir
+        
+        let oldPath = staged?.oldFile?.path ?? unStaged?.oldFile?.path
+        let newPath = staged?.newFile?.path ?? unStaged?.newFile?.path
+        
+        if let oldPath = oldPath,
+           let newPath = newPath,
+           oldPath != newPath {
+            return .success(.renamed(oldPath, newPath))
+        } else if let newPath = newPath {
+            return .success(.single(newPath))
+        } else if let oldPath = oldPath {
+            return .success(.single(oldPath))
+        }
+        
+        return .failure(WTF("EntryFileInfo error"))
     }
     
     public var statuses: [Diff.Delta.Status] {
