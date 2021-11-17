@@ -29,7 +29,7 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.status() }
             .shouldSucceed()!
         
-        XCTAssert(status[0].pathInWorkDir == TestFile.fileA.rawValue)
+        XCTAssert(status[0].stagePath == TestFile.fileA.rawValue)
     }
     
     func test_should_stage_new_file() {
@@ -58,7 +58,7 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .shouldSucceed()!
         
-        XCTAssert(commitDetails.deltas[0].pathInWorkDir == TestFile.fileA.rawValue)
+        XCTAssert(commitDetails.deltas[0].stagePath == TestFile.fileA.rawValue)
         XCTAssert(commitDetails.deltas[0].statuses == [.added])
     }
     

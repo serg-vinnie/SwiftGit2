@@ -4,8 +4,9 @@ import Essentials
 
 public protocol IEntry {
     // unique id for navigation
-    // stagePath  pathInWorkDir
+    // pathInWorkDir
     var stagePath: String? { get }
+    //var pathInWorkDir: String? { get }
     
     
     var stageState: StageState { get }
