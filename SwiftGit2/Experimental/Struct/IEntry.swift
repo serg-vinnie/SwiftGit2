@@ -69,7 +69,7 @@ extension Diff.Delta: IEntry {
     public var pathInWorkDir: String? { self.newFile?.path }
     
     public var statuses: [Diff.Delta.Status] {
-        []
+        [self.status]
     }
     
     public var stageState: StageState { .unavailable}
