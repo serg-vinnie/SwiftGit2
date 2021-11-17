@@ -12,6 +12,9 @@ class StatusEntryTests: XCTestCase {
             .shouldSucceed()!
         
         let entrie = status[0]
+        
+        XCTAssert(entrie.statuses == [.untracked] )
+        
         XCTAssert(entrie.indexToWorkDir != nil)
         XCTAssert(entrie.headToIndex == nil)
         
@@ -37,6 +40,7 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.status() }
             .shouldSucceed()!
         
+        XCTAssert(status[0].statuses == [.untracked] )
         XCTAssert(status[0].stageState != .staged)
         
         let newStatus = Repository.at(url: url)
@@ -45,6 +49,7 @@ class StatusEntryTests: XCTestCase {
             .shouldSucceed()!
         
         XCTAssert(newStatus[0].stageState == .staged)
+        XCTAssert(newStatus[0].statuses == [.added] )
     }
     
     func test_commit_file_should_return_pathInWd() {
@@ -54,6 +59,7 @@ class StatusEntryTests: XCTestCase {
             .shouldSucceed()!
         
         XCTAssert(commitDetails.deltas[0].pathInWorkDir == TestFile.fileA.rawValue)
+        XCTAssert(commitDetails.deltas[0].statuses == [.added])
     }
     
     func test_should_return_EntyFileInfo_Commit() {
@@ -79,18 +85,22 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.status() }
             .shouldSucceed()!
         
+        XCTAssert(status[0].statuses == [.deleted])
+        XCTAssert(status[1].statuses == [.untracked])
+        
         Repository.at(url: url)
             .flatMap { $0.stage(.entry(status[0])) }
             .flatMap { $0.stage(.entry(status[1])) }
             .flatMap { $0.commit(message: "rename", signature: GitTest.signature) }
             .shouldSucceed()
         
-        let entryFileInfo = Repository.at(url: url)
+        let deltas = Repository.at(url: url)
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
-            .flatMap { $0.deltas[0].entryFileInfo }
-            .shouldSucceed("entryFileInfo")!
+            .shouldSucceed("deltas")!
         
-        if case let .renamed(a, b) = entryFileInfo {
+        XCTAssert(deltas.deltas[0].statuses == [.renamed])
+        
+        if case let .success(.renamed(a, b)) = deltas.deltas[0].entryFileInfo {
             XCTAssert(a == TestFile.fileA.rawValue)
             XCTAssert(b == TestFile.fileB.rawValue)
         } else {
