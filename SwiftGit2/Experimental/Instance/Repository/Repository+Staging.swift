@@ -17,23 +17,23 @@ public extension Repository {
                 .flatMap { $0.addAll() }
                 .map{ self }
         case .entry(let entry):
-            guard let path = entry.stagePath else { return .wtf("Staging: can't resolve entry.pathInWorkDir") }
+            guard entry.stagePath != "" else { return .wtf("Staging: can't resolve entry.stagePath") }
         
-            let url = self.directoryURL | { $0.appendingPathComponent(path) }
+            let url = self.directoryURL | { $0.appendingPathComponent(entry.stagePath) }
             
             if case .success(let url) = url {
                 if url.isDirExist {
                     return self.index()
-                        .flatMap { $0.addAll(pathPatterns: ["\(path)"]) }
+                        .flatMap { $0.addAll(pathPatterns: ["\(entry.stagePath)"]) }
                         .map{ self }
                 }
             }
             
             if entry.status.contains(.workTreeDeleted) {
-                return self.remove(relPaths: [path])
+                return self.remove(relPaths: [entry.stagePath])
                     .map{ self }
             } else {
-                return self.addBy(path: path)
+                return self.addBy(path: entry.stagePath)
             }
         }
     }
@@ -45,12 +45,10 @@ public extension Repository {
                 .map{ self }
             
         case .entry(let entry):
-            if let path = entry.stagePath {
-                return self.resetDefault(pathPatterns: [path])
-                    .map{ self }
-            }
+            guard entry.stagePath != "" else { return .wtf("Staging: can't resolve entry.stagePath") }
             
-            return .wtf("Fuck")
+            return self.resetDefault(pathPatterns: [entry.stagePath])
+                .map{ self }
         }
     }
 }

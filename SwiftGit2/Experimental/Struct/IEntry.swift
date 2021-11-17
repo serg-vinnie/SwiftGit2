@@ -4,17 +4,20 @@ import Essentials
 
 public protocol IEntry {
     // unique id for navigation
-    var stagePath: String? { get }
-    
+    var stagePath: String { get }
     
     var stageState: StageState { get }
     var entryFileInfo: R<EntryFileInfo> { get }
     
     var statuses: [Diff.Delta.Status] { get }
+    
+    var id: String { get }
 }
 
 extension StatusEntry: IEntry {
-    public var stagePath: String? {
+    public var id: String { "\(stagePath)_____\(statuses)" }
+    
+    public var stagePath: String {
         // indexToWorkDir?
         // headToIndex?
         // self.indexToWorkDir?.newFile
@@ -22,7 +25,11 @@ extension StatusEntry: IEntry {
         // self.headToIndex?.newFile
         // self.headToIndex?.newFile
         
-        self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path
+        let res = self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path ?? ""
+        
+        assert(res != "")
+        
+        return res
     }
     
     public var stageState: StageState {
@@ -67,7 +74,14 @@ extension StatusEntry: IEntry {
 }
 
 extension Diff.Delta: IEntry {
-    public var stagePath: String? { self.newFile?.path }
+    public var stagePath: String {
+        guard let path = self.newFile?.path else {
+            assert(false)
+            return ""
+        }
+        
+        return path
+    }
     
     public var statuses: [Diff.Delta.Status] {
         [self.status]
@@ -76,7 +90,7 @@ extension Diff.Delta: IEntry {
     public var stageState: StageState { .unavailable}
     
     public var entryFileInfo: R<EntryFileInfo> {
-        guard let stagePath = stagePath else { return .failure(WTF("pathInWorkDir is NIL")) }
+        guard stagePath != "" else { return .failure(WTF("stagePath is NIL")) }
         
         if stagePath != self.oldFile?.path {
             if let oldFile = self.oldFile?.path {
