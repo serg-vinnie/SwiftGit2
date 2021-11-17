@@ -3,7 +3,6 @@ import Foundation
 import Essentials
 
 public protocol IEntry {
-    // unique id for navigation
     var stagePath: String { get }
     
     var stageState: StageState { get }
@@ -18,13 +17,6 @@ extension StatusEntry: IEntry {
     public var id: String { "\(stagePath)_____\(statuses)" }
     
     public var stagePath: String {
-        // indexToWorkDir?
-        // headToIndex?
-        // self.indexToWorkDir?.newFile
-        // self.indexToWorkDir?.oldFile
-        // self.headToIndex?.newFile
-        // self.headToIndex?.newFile
-        
         let res = self.indexToWorkDir?.newFile?.path ?? self.headToIndex?.newFile?.path ?? ""
         
         assert(res != "")
