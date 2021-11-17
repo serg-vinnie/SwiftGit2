@@ -243,6 +243,7 @@ public extension StatusEntry {
     
     var stagedDeltas: Diff.Delta? { self.headToIndex }
     
+    @available(*, deprecated, message: "use .statuses instead")
     func statusFull() -> [Diff.Delta.Status] {
         if let status = unStagedDeltas?.status,
            stagedDeltas == nil {

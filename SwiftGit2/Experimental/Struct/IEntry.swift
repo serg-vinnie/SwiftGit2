@@ -5,10 +5,11 @@ import Essentials
 public protocol IEntry {
     // unique id for navigation
     // stagePath
-    // status
     var pathInWorkDir: String? { get }
     var stageState: StageState { get }
     var entryFileInfo: R<EntryFileInfo> { get }
+    
+    var statuses: [Diff.Delta.Status] { get }
 }
 
 extension StatusEntry: IEntry {
@@ -40,14 +41,36 @@ extension StatusEntry: IEntry {
     }
     
     public var entryFileInfo: R<EntryFileInfo> {
-        
-            
         return .failure(WTF(""))
+    }
+    
+    public var statuses: [Diff.Delta.Status] {
+        if let status = unStagedDeltas?.status,
+           stagedDeltas == nil {
+                return [status]
+        }
+        if let status = stagedDeltas?.status,
+            unStagedDeltas == nil {
+                return [status]
+        }
+        
+        guard let workDir = unStagedDeltas?.status else { return [.unmodified] }
+        guard let index = stagedDeltas?.status else { return [.unmodified] }
+        
+        if workDir == index {
+            return [workDir]
+        }
+        
+        return [workDir, index]
     }
 }
 
 extension Diff.Delta: IEntry {
     public var pathInWorkDir: String? { self.newFile?.path }
+    
+    public var statuses: [Diff.Delta.Status] {
+        fatalError()
+    }
     
     public var stageState: StageState { .unavailable}
     
