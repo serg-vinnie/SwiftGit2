@@ -17,7 +17,7 @@ public extension Repository {
                 .flatMap { $0.addAll() }
                 .map{ self }
         case .entry(let entry):
-            guard let path = entry.pathInWorkDir else { return .wtf("Staging: can't resolve entry.pathInWorkDir") }
+            guard let path = entry.stagePath else { return .wtf("Staging: can't resolve entry.pathInWorkDir") }
         
             let url = self.directoryURL | { $0.appendingPathComponent(path) }
             
@@ -45,7 +45,7 @@ public extension Repository {
                 .map{ self }
             
         case .entry(let entry):
-            if let path = entry.pathInWorkDir {
+            if let path = entry.stagePath {
                 return self.resetDefault(pathPatterns: [path])
                     .map{ self }
             }

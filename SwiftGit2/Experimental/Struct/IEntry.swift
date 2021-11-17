@@ -4,8 +4,10 @@ import Essentials
 
 public protocol IEntry {
     // unique id for navigation
-    // stagePath
-    var pathInWorkDir: String? { get }
+    // stagePath  pathInWorkDir
+    var stagePath: String? { get }
+    
+    
     var stageState: StageState { get }
     var entryFileInfo: R<EntryFileInfo> { get }
     
@@ -13,7 +15,7 @@ public protocol IEntry {
 }
 
 extension StatusEntry: IEntry {
-    public var pathInWorkDir: String? {
+    public var stagePath: String? {
         // indexToWorkDir?
         // headToIndex?
         // self.indexToWorkDir?.newFile
@@ -66,7 +68,7 @@ extension StatusEntry: IEntry {
 }
 
 extension Diff.Delta: IEntry {
-    public var pathInWorkDir: String? { self.newFile?.path }
+    public var stagePath: String? { self.newFile?.path }
     
     public var statuses: [Diff.Delta.Status] {
         [self.status]
@@ -75,15 +77,15 @@ extension Diff.Delta: IEntry {
     public var stageState: StageState { .unavailable}
     
     public var entryFileInfo: R<EntryFileInfo> {
-        guard let pathInWorkDir = pathInWorkDir else { return .failure(WTF("pathInWorkDir is NIL")) }
+        guard let stagePath = stagePath else { return .failure(WTF("pathInWorkDir is NIL")) }
         
-        if pathInWorkDir != self.oldFile?.path {
+        if stagePath != self.oldFile?.path {
             if let oldFile = self.oldFile?.path {
-                return .success(.renamed(oldFile, pathInWorkDir))
+                return .success(.renamed(oldFile, stagePath))
             }
         }
         
-        return .success(.single(pathInWorkDir))
+        return .success(.single(stagePath))
     }
 }
 

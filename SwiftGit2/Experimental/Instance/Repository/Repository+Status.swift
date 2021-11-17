@@ -242,27 +242,6 @@ public extension StatusEntry {
     var unStagedDeltas: Diff.Delta? { self.indexToWorkDir }
     
     var stagedDeltas: Diff.Delta? { self.headToIndex }
-    
-    @available(*, deprecated, message: "use .statuses instead")
-    func statusFull() -> [Diff.Delta.Status] {
-        if let status = unStagedDeltas?.status,
-           stagedDeltas == nil {
-                return [status]
-        }
-        if let status = stagedDeltas?.status,
-            unStagedDeltas == nil {
-                return [status]
-        }
-        
-        guard let workDir = unStagedDeltas?.status else { return [.unmodified] }
-        guard let index = stagedDeltas?.status else { return [.unmodified] }
-        
-        if workDir == index {
-            return [workDir]
-        }
-        
-        return [workDir, index]
-    }
 }
 
 
