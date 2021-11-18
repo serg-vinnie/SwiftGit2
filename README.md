@@ -70,6 +70,3 @@ We :heart: to receive pull requests! GitHub makes it easy:
 3. Send a Pull Request
 
 All contributions should match GitHub’s [Swift Style Guide](https://github.com/github/swift-style-guide).
-
-## License
-SwiftGit2 is available under the MIT license.
