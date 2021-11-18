@@ -110,6 +110,31 @@ extension Diff.Delta: IEntry {
     }
 }
 
+public extension IEntry {
+    func getFileType() -> FileType {
+        if stagePath.lowercased().hasSuffix( [// Absolutely sure supported extensions
+            ".jpeg",".jpg", ".gif", ".ai", ".pdf", ".eps",".icns",".jp2",".ico",".pbm",".pgm",
+            ".pict",".png",".ppm",".psd",".sgi",".tga",".tiff",".cr2",".dng",".heic", ".heif",
+            ".nef",".nrw",".orf",".pef",".raf",".rw2",".webp",".bmp",".dds",".exr",".hdr",".jpe",
+            ".pgm"
+            //not tested
+            //".j2k", ".jpf", ".jpm", ".jpg2", ".j2c", ".jpc", ".jpx", ".mj2",
+            //".pct", ".pic",".pnm",".qtif",".stl",".icb", ".vda",".tif"
+        ] ) {
+            return .Img
+        }
+        
+        //TODO: TEXT FILE
+        
+        return .SomeBinary
+    }
+}
+
+public enum FileType {
+    case Img
+    case SomeBinary
+}
+
 public enum StageState {
     case mixed
     case staged
@@ -120,4 +145,20 @@ public enum StageState {
 public enum EntryFileInfo {
     case single(String)
     case renamed(String, String)
+}
+
+///////////////////////////////////////////
+///HELPERS
+///////////////////////////////////////////
+
+fileprivate extension String {
+    func hasSuffix(_ suffixes:[String]) -> Bool {
+        for s in suffixes {
+            if self.hasSuffix(s) {
+                return true
+            }
+        }
+        
+        return false
+    }
 }
