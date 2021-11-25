@@ -195,12 +195,8 @@ public extension Repository {
     }
 
     class func create(at url: URL) -> Result<Repository, Error> {
-        var pointer: OpaquePointer?
-
-        return _result({ Repository(pointer!) }, pointOfFailure: "git_repository_init") {
-            url.path.withCString { path in
-                git_repository_init(&pointer, path, 0)
-            }
+        git_instance(of: Repository.self, "git_repository_init") { pointer in
+            git_repository_init(&pointer, url.path, 0)
         }
     }
 }
