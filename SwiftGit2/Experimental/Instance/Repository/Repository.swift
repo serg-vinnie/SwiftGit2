@@ -195,9 +195,13 @@ public extension Repository {
     }
 
     class func create(at url: URL) -> Result<Repository, Error> {
-        git_instance(of: Repository.self, "git_repository_init") { pointer in
+        let repo = git_instance(of: Repository.self, "git_repository_init") { pointer in
             git_repository_init(&pointer, url.path, 0)
         }
+        
+        return url.appendingPathComponent(".git/HEAD").write(content: "ref: refs/heads/main") | { _ in repo }
+        
+        //return repo
     }
 }
 
