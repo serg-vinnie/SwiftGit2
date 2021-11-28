@@ -40,45 +40,45 @@ internal extension Repository {
     }
 }
 
-internal class Revwalk : InstanceProtocol, ResultIterator {
-    typealias Success = OID
+public class Revwalk : InstanceProtocol, ResultIterator {
+    public typealias Success = OID
     
-    var pointer: OpaquePointer
+    public var pointer: OpaquePointer
     
-    required init(_ pointer: OpaquePointer) {
+    public required init(_ pointer: OpaquePointer) {
         self.pointer = pointer
     }
     
-    static func new(in repo: Repository) -> R<Revwalk> {
+    public static func new(in repo: Repository) -> R<Revwalk> {
         git_instance(of: Revwalk.self, "git_revwalk_new") { git_revwalk_new(&$0, repo.pointer) }
     }
     
-    func push(range: String) -> R<Revwalk> {
+    public func push(range: String) -> R<Revwalk> {
         git_try("git_revwalk_push_range") { git_revwalk_push_range(pointer, range) } | { self }
     }
     
-    func push(ref: String) -> R<Revwalk> {
+    public func push(ref: String) -> R<Revwalk> {
         git_try("git_revwalk_push_ref") { git_revwalk_push_ref(pointer, ref) } | { self }
     }
     
-    func hide(oid: OID) -> R<Revwalk> {
+    public func hide(oid: OID) -> R<Revwalk> {
         var oid = oid.oid
         return git_try("git_revwalk_hide") { git_revwalk_hide(pointer, &oid) } | { self }
     }
     
-    func hide(ref: String) -> R<Revwalk> {
+    public func hide(ref: String) -> R<Revwalk> {
         git_try("git_revwalk_hide") { git_revwalk_hide_ref(pointer, ref) } | { self }
     }
     
     //        git_revwalk_sorting(pointer, GIT_SORT_TOPOLOGICAL.rawValue)
     //        git_revwalk_sorting(pointer, GIT_SORT_TIME.rawValue)
     //        git_revwalk_push(pointer, &oid)
-    func sorting(_ mode: UInt32) -> R<Revwalk> {
+    public func sorting(_ mode: UInt32) -> R<Revwalk> {
         git_try("git_revwalk_sorting") { git_revwalk_sorting(pointer, mode) } | { self }
     }
     
     // calls by all() in ResultIterator
-    func next() -> Result<OID?, Error> {
+    public func next() -> Result<OID?, Error> {
         var oid = git_oid()
 
         switch git_revwalk_next(&oid, pointer) {
