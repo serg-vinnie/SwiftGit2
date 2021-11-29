@@ -10,7 +10,7 @@ import Foundation
 import Essentials
 
 extension Repository {
-   public func entries(target: CommitTarget, statusOptions: StatusOptions = StatusOptions(), findOptions: Diff.FindOptions) -> R<Entries> {
+   public func entries(target: CommitTarget, statusOptions: StatusOptions = StatusOptions(), findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<Entries> {
        return self.statusConflictSafe(options: statusOptions)
            .if(\.isEmpty,
                 then: { _ in
@@ -28,7 +28,7 @@ extension Repository {
 }
 
 public extension Repository {
-    func deltas(target: CommitTarget, findOptions: Diff.FindOptions) -> R<CommitDetails> {
+    func deltas(target: CommitTarget, findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<CommitDetails> {
         if headIsUnborn {
             return .success(CommitDetails(parents: [], deltas: [], all: [:], desc: ""))
         }
