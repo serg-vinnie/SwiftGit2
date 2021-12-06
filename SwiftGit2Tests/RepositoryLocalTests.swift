@@ -5,6 +5,14 @@ import Foundation
 import XCTest
 
 class RepositoryLocalTests: XCTestCase {
+//    func test_measureStatus() {
+//        measure {
+//            Repository.at(path: "/Users/uks/dev/taogit")
+//                .flatMap{ $0.deltas(target: .HEADorWorkDir) }
+//                .shouldSucceed()
+//        }
+//    }
+    
     func testCreateOpenRepo() throws {
         GitTest.tmpURL
             .flatMap { Repository.create(at: $0) }
