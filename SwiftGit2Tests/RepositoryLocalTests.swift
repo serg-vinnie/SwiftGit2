@@ -8,7 +8,7 @@ class RepositoryLocalTests: XCTestCase {
 //    func test_measureStatus() {
 //        measure {
 //            Repository.at(path: "/Users/uks/dev/taogit")
-//                .flatMap{ $0.deltas(target: .HEADorWorkDir) }
+//                .flatMap{ $0.commitsIn(ref: "refs/heads/master") }
 //                .shouldSucceed()
 //        }
 //    }
@@ -91,3 +91,18 @@ extension Repository {
             .flatMap { self.setHEAD_detached($0) }
     }
 }
+
+
+////HELPERS
+extension Repository {
+    func commitsIn(range: String) -> R<[Commit]> {
+        let oids = Revwalk.new(in: self) | { $0.push(range: range) } | { $0.all() }
+        return oids.flatMap { $0.flatMap { self.commit(oid: $0) } }
+    }
+
+    func commitsIn(ref: String) -> R<[Commit]> {
+        let oids = Revwalk.new(in: self) | { $0.push(ref: ref) } | { $0.all() }
+        return oids.flatMap { $0.flatMap { self.commit(oid: $0) } }
+    }
+}
+
