@@ -61,6 +61,10 @@ public class Revwalk : InstanceProtocol, ResultIterator {
         git_try("git_revwalk_push_ref") { git_revwalk_push_ref(pointer, ref) } | { self }
     }
     
+    public func pushHead() -> R<Revwalk> {
+        git_try("git_revwalk_push_head") { git_revwalk_push_head(pointer) } | { self }
+    }
+    
     public func hide(oid: OID) -> R<Revwalk> {
         var oid = oid.oid
         return git_try("git_revwalk_hide") { git_revwalk_hide(pointer, &oid) } | { self }
