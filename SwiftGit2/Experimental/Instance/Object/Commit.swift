@@ -10,15 +10,15 @@ import Clibgit2
 
 public class Commit: Object {
     public var pointer: OpaquePointer
-
+    
     public required init(_ pointer: OpaquePointer) {
         self.pointer = pointer
     }
-
+    
     deinit {
         git_commit_free(pointer)
     }
-
+    
     /// Subject
     public var summary: String { String(validatingUTF8: git_commit_summary(pointer)) ?? "" }
     /// Description
@@ -28,10 +28,10 @@ public class Commit: Object {
         }
         return ""
     }
-
+    
     /// Description + \n\n + Subject
     // public var message 	: String 	{ String(validatingUTF8: git_commit_message(pointer)) ?? "" }
-
+    
     public var author: git_signature { git_commit_author(pointer).pointee }
     public var commiter: git_signature { git_commit_committer(pointer).pointee }
     public var time: Date { Date(timeIntervalSince1970: Double(git_commit_time(pointer))) }
@@ -41,21 +41,21 @@ public extension Commit {
     func parents() -> Result<[Commit], Error> {
         var result: [Commit] = []
         let parentsCount = git_commit_parentcount(pointer)
-
+        
         for i in 0 ..< parentsCount {
             var commit: OpaquePointer?
             let gitResult = git_commit_parent(&commit, pointer, i)
-
+            
             if gitResult == GIT_OK.rawValue {
                 result.append(Commit(commit!))
             } else {
                 return Result.failure(NSError(gitError: gitResult, pointOfFailure: "git_commit_parent"))
             }
         }
-
+        
         return .success(result)
     }
-
+    
     func tree() -> Result<Tree, Error> {
         git_instance(of: Tree.self, "git_commit_tree") { pointer in
             git_commit_tree(&pointer, self.pointer)

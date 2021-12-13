@@ -80,7 +80,7 @@ public extension Diff {
         public let flags: Flags
         
         /// is null by default
-        public var blob: Blob?
+//        public var blob: Blob?
 
         public init(_ diffFile: git_diff_file) {
             oid = OID(diffFile.id)
@@ -90,16 +90,16 @@ public extension Diff {
             flags = Flags(rawValue: diffFile.flags)
         }
         
-        public var isBinary: Bool? { blob?.isBinary }
+//        public var isBinary: Bool? { blob?.isBinary }
         
         /// return new instance of file with initialized blob
-        func getSameFileWithBlob(from repo: Repository) -> File {
-            var file: File? = self
-            
-            repo.loadBlobFor(file: &file)
-            
-            return file!
-        }
+//        func getSameFileWithBlob(from repo: Repository) -> File {
+//            var file: File? = self
+//            
+//            repo.loadBlobFor(file: &file)
+//            
+//            return file!
+//        }
     }
 
     struct Hunk {

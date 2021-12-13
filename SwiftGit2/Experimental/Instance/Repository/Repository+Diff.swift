@@ -7,6 +7,7 @@
 //
 
 import Clibgit2
+import Essentials
 
 public extension Repository {
     func hunksFrom(delta: Diff.Delta, options: DiffOptions = DiffOptions()) -> Result<[Diff.Hunk], Error> {
@@ -17,22 +18,31 @@ public extension Repository {
     }
 
     func patchFrom(delta: Diff.Delta, options _: DiffOptions? = nil, reverse: Bool = false) -> Result<Patch, Error> {
-        var oldFile = delta.oldFile
-        var newFile = delta.newFile
-
-        loadBlobFor(file: &oldFile)
-        loadBlobFor(file: &newFile)
-
-        if reverse {
-            return Patch.fromFiles(old: newFile, new: oldFile)
+        let oldFile = delta.oldFile
+        let newFile = delta.newFile
+        
+        if oldFile == nil && newFile == nil {
+            return .wtf("patchFrom: oldFile == nil & newFile == nil")
         }
-        return Patch.fromFiles(old: oldFile, new: newFile)
+        
+        if oldFile == nil {
+            return newFile!.blob
+                .flatMap{ Patch.fromBlobs(old: nil, oldPath: nil, new: $0, newPath: newFile!.path) }
+        }
+        
+        if newFile == nil {
+            return oldFile!.blob
+                .flatMap{ Patch.fromBlobs(old: $0, oldPath: oldFile!.path, new: nil, newPath: nil) }
+        }
+        
+        return combine(newFile!.blob,newFile!.blob)
+                .flatMap{ Patch.fromBlobs(old: $0, oldPath: oldFile!.path, new: $1, newPath: newFile!.path) }
     }
-
+    
     func blob(oid: OID) -> Result<Blob, Error> {
         var oid = oid.oid
         var blob_pointer: OpaquePointer?
-
+        
         return _result({ Blob(blob_pointer!) }, pointOfFailure: "git_object_lookup") {
             git_object_lookup(&blob_pointer, self.pointer, &oid, GIT_OBJECT_BLOB)
         }

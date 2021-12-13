@@ -54,9 +54,15 @@ public extension Repository {
         }
     }
     
-    func loadBlobFor(file: inout Diff.File?) {
-        if let oid = file?.oid {
-            file?.blob = try? blob(oid: oid).get()
-        }
+//    func loadBlobFor(file: inout Diff.File?) {
+//        if let oid = file?.oid {
+//            file?.blob = try? blob(oid: oid).get()
+//        }
+//    }
+}
+
+extension Diff.File {
+    var blob: R<Blob> {
+        return .notImplemented("Diff.File.blob")
     }
 }

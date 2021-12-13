@@ -8,31 +8,32 @@
 
 import Clibgit2
 import Foundation
+import Essentials
 
-public class Patch {
-    let pointer: OpaquePointer
+public class Patch : InstanceProtocol {
+    public let pointer: OpaquePointer
 
-    public init(_ pointer: OpaquePointer) {
+    required public init(_ pointer: OpaquePointer) {
         self.pointer = pointer
     }
 
     deinit {
         git_patch_free(pointer)
     }
+//
+//    public static func fromFiles(old: Diff.File?, new: Diff.File?, options: DiffOptions = DiffOptions()) -> Result<Patch, Error> {
+//        var patchPointer: OpaquePointer?
+//
+//        return _result({ Patch(patchPointer!) }, pointOfFailure: "git_patch_from_blobs") {
+//            git_patch_from_blobs(&patchPointer, old?.blob?.pointer, old?.path, new?.blob?.pointer, new?.path, &options.diff_options)
+//        }
+//    }
 
-    public static func fromFiles(old: Diff.File?, new: Diff.File?, options: DiffOptions = DiffOptions()) -> Result<Patch, Error> {
-        var patchPointer: OpaquePointer?
-
-        return _result({ Patch(patchPointer!) }, pointOfFailure: "git_patch_from_blobs") {
-            git_patch_from_blobs(&patchPointer, old?.blob?.pointer, old?.path, new?.blob?.pointer, new?.path, &options.diff_options)
-        }
-    }
-
-    public static func fromBlobs(old: Blob?, new: Blob?, options: DiffOptions = DiffOptions()) -> Result<Patch, Error> {
-        var patchPointer: OpaquePointer?
-
-        return _result({ Patch(patchPointer!) }, pointOfFailure: "git_patch_from_blobs") {
-            git_patch_from_blobs(&patchPointer, old?.pointer, nil, new?.pointer, nil, &options.diff_options)
+    public static func fromBlobs(old: Blob?, oldPath: String?, new: Blob?, newPath: String?, options: DiffOptions = DiffOptions()) -> R<Patch> {
+        git_instance(of: Patch.self, "git_patch_from_blobs") { patchPointer in
+            options.with_diff_options { diff_opt in
+                git_patch_from_blobs(&patchPointer, old?.pointer, oldPath, new?.pointer, newPath, &diff_opt)
+            }
         }
     }
 }

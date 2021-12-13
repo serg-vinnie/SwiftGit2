@@ -135,14 +135,12 @@ public extension StatusEntry {
     fileprivate func getChanged(repo: Repository) -> R<[Diff.Delta]?> {
         let relPath = self.relPath
         
-        let file = anyFilePath()!
+        // we don't need to detect renames in this case
+        let headBlob = repo.deltas(target: .HEADorWorkDir, findOptions: Diff.FindOptions())
+            .flatMap { $0.deltas.blob(path: self.relPath) }
         
-        guard let blobHead = file.getSameFileWithBlob(from: repo).blob else { return .success(nil)}
-        
-        return repo.blobCreateFromWorkdirAsBlob(relPath: relPath)
-            .flatMap { workdirBlob in
-                repo.diffBlobs(old: blobHead, new: workdirBlob)
-            }
+        return combine(headBlob, repo.blobCreateFromWorkdirAsBlob(relPath: relPath))
+            .flatMap { repo.diffBlobs(old: $0, new: $1) }
             .map{ delta -> [Diff.Delta]? in delta }
     }
     
@@ -151,6 +149,16 @@ public extension StatusEntry {
         self.indexToWorkDir?.oldFile ??
         self.headToIndex?.newFile ??
         self.indexToWorkDir?.newFile
+    }
+}
+
+private extension Array where Element == Diff.Delta {
+    func blob(path: String) -> R<Blob> {
+        if let newFile = self.first(where: { $0.newFile?.path == path })?.newFile {
+            return newFile.blob
+        }
+        
+        return .wtf("can't find delta for path: \(path)")
     }
 }
 
