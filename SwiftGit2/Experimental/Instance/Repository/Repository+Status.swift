@@ -126,7 +126,6 @@ public extension StatusEntry {
             unStagedPatch = .success(nil)
         }
         
-        //let changesDelta = try? getChanged(repo: repo).get()
         switch getChanged(repo: repo) {
         case let .success(changesDelta):
             return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
@@ -134,10 +133,6 @@ public extension StatusEntry {
             AppCore.log(title: "StatusEntry", error: error)
             return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: nil)
         }
-        
-        //let isBinary = anyFile(at: position)?.getSameFileWithBlob(from: repo).blob?.isBinary
-        
-       
     }
     
     fileprivate func getChanged(repo: Repository) -> R<[Diff.Delta]?> {
@@ -148,8 +143,6 @@ public extension StatusEntry {
         if self.statuses.contains(.added) || self.statuses.contains(.untracked) {
             return .success(nil)
         }
-        
-        let relPath = self.relPath
         
         // we don't need to detect renames in this case
         let headBlob = repo.deltas(target: .HEADorWorkDir, findOptions: Diff.FindOptions())
