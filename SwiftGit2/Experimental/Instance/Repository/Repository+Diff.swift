@@ -16,7 +16,7 @@ public extension Repository {
 
         return hunksBetweenBlobs(old: old, new: new, options: options)
     }
-
+    
     func patchFrom(delta: Diff.Delta, options _: DiffOptions? = nil, reverse: Bool = false) -> Result<Patch, Error> {
         let oldFile = delta.oldFile
         let newFile = delta.newFile
@@ -26,14 +26,15 @@ public extension Repository {
         }
         
         if oldFile == nil {
-            
-            return blob(oid: newFile!.oid)
-                .flatMap{ Patch.fromBlobs(old: nil, oldPath: nil, new: $0, newPath: newFile!.path) }
+            return .wtf("oldFile == nil")
+//            return blob(oid: newFile!.oid)
+//                .flatMap{ Patch.fromBlobs(old: nil, oldPath: nil, new: $0, newPath: newFile!.path) }
         }
         
         if newFile == nil {
-            return blob(oid: oldFile!.oid)
-                .flatMap{ Patch.fromBlobs(old: $0, oldPath: oldFile!.path, new: nil, newPath: nil) }
+            return .wtf("newFile == nil")
+//            return blob(oid: oldFile!.oid)
+//                .flatMap{ Patch.fromBlobs(old: $0, oldPath: oldFile!.path, new: nil, newPath: nil) }
         }
         
         return combine( blob(oid: oldFile!.oid), blob(oid: newFile!.oid) )
