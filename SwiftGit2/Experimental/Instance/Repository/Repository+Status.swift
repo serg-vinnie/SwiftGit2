@@ -135,13 +135,13 @@ public extension StatusEntry {
         }
     }
     
-    fileprivate func getChanged(repo: Repository) -> R<[Diff.Delta]?> {
+    fileprivate func getChanged(repo: Repository) -> R<[Diff.Delta]> {
         if let _ = repo.submoduleLookup(named: self.relPath).maybeSuccess {
             return .success([])
         }
         
         if self.statuses.contains(.added) || self.statuses.contains(.untracked) {
-            return .success(nil)
+            return .success([])
         }
         
         // we don't need to detect renames in this case
@@ -151,7 +151,6 @@ public extension StatusEntry {
         
         return combine(headBlob, repo.blobCreateFromWorkdirAsBlob(relPath: relPath))
             .flatMap { repo.diffBlobs(old: $0, new: $1) }
-            .map{ delta -> [Diff.Delta]? in delta }
     }
     
     fileprivate func anyFilePath() -> Diff.File? {
