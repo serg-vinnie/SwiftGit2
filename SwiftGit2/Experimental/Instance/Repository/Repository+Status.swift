@@ -141,6 +141,14 @@ public extension StatusEntry {
     }
     
     fileprivate func getChanged(repo: Repository) -> R<[Diff.Delta]?> {
+        if let _ = repo.submoduleLookup(named: self.relPath).maybeSuccess {
+            return .success([])
+        }
+        
+        if self.statuses.contains(.added) || self.statuses.contains(.untracked) {
+            return .success(nil)
+        }
+        
         let relPath = self.relPath
         
         // we don't need to detect renames in this case
