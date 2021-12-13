@@ -53,16 +53,4 @@ public extension Repository {
             git_diff_blobs(old?.pointer, nil, new?.pointer, nil, &options.diff_options, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
         }
     }
-    
-//    func loadBlobFor(file: inout Diff.File?) {
-//        if let oid = file?.oid {
-//            file?.blob = try? blob(oid: oid).get()
-//        }
-//    }
-}
-
-extension Diff.File {
-    var blob: R<Blob> {
-        return .notImplemented("Diff.File.blob")
-    }
 }

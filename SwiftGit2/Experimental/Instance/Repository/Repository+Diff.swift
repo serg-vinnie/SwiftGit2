@@ -26,16 +26,17 @@ public extension Repository {
         }
         
         if oldFile == nil {
-            return newFile!.blob
+            
+            return blob(oid: newFile!.oid)
                 .flatMap{ Patch.fromBlobs(old: nil, oldPath: nil, new: $0, newPath: newFile!.path) }
         }
         
         if newFile == nil {
-            return oldFile!.blob
+            return blob(oid: oldFile!.oid)
                 .flatMap{ Patch.fromBlobs(old: $0, oldPath: oldFile!.path, new: nil, newPath: nil) }
         }
         
-        return combine(newFile!.blob,newFile!.blob)
+        return combine( blob(oid: oldFile!.oid), blob(oid: newFile!.oid) )
                 .flatMap{ Patch.fromBlobs(old: $0, oldPath: oldFile!.path, new: $1, newPath: newFile!.path) }
     }
     

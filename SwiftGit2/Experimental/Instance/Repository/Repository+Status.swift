@@ -10,6 +10,7 @@
 
 import Clibgit2
 import Essentials
+import AppCore
 
 public final class StatusIterator {
     public var pointer: OpaquePointer?
@@ -125,11 +126,18 @@ public extension StatusEntry {
             unStagedPatch = .success(nil)
         }
         
-        let changesDelta = try? getChanged(repo: repo).get()
+        //let changesDelta = try? getChanged(repo: repo).get()
+        switch getChanged(repo: repo) {
+        case let .success(changesDelta):
+            return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
+        case let .failure(error):
+            AppCore.log(title: "StatusEntry", error: error)
+            return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: nil)
+        }
         
         //let isBinary = anyFile(at: position)?.getSameFileWithBlob(from: repo).blob?.isBinary
         
-        return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
+       
     }
     
     fileprivate func getChanged(repo: Repository) -> R<[Diff.Delta]?> {
@@ -137,7 +145,8 @@ public extension StatusEntry {
         
         // we don't need to detect renames in this case
         let headBlob = repo.deltas(target: .HEADorWorkDir, findOptions: Diff.FindOptions())
-            .flatMap { $0.deltas.blob(path: self.relPath) }
+            .flatMap { $0.deltas.fileOid(path: self.relPath) }
+            .flatMap { repo.blob(oid: $0) }
         
         return combine(headBlob, repo.blobCreateFromWorkdirAsBlob(relPath: relPath))
             .flatMap { repo.diffBlobs(old: $0, new: $1) }
@@ -153,12 +162,12 @@ public extension StatusEntry {
 }
 
 private extension Array where Element == Diff.Delta {
-    func blob(path: String) -> R<Blob> {
+    func fileOid(path: String) -> R<OID> {
         if let newFile = self.first(where: { $0.newFile?.path == path })?.newFile {
-            return newFile.blob
+            return .success(newFile.oid)
         }
         
-        return .wtf("can't find delta for path: \(path)")
+        return .wtf("can't find fileOid for path: \(path)")
     }
 }
 
