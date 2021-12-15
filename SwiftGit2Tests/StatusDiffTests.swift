@@ -10,13 +10,18 @@ class StatusDiffTests: XCTestCase {
     
     override func setUp() {
         let dstURL = urlRoot.appendingPathComponent("dst")
-        _ = dstURL.rm()
         let srcURL = urlRoot.appendingPathComponent("src")
-        srcURL.copy(to: dstURL)
+        srcURL.copy(to: dstURL, replace: true)
             .shouldSucceed()
     }
     
     func test_should_return_content_of_Untracked_Unstaged_File() {
+        let status = Repository.at(url: urlHeadIsUnborn)
+            .flatMap { $0.status() }
+            .shouldSucceed()!
+        XCTAssert(status.count == 1)
+        XCTAssert(status[0].statuses.contains(.untracked))
+        
         
     }
     
