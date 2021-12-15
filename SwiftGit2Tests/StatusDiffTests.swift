@@ -37,6 +37,12 @@ class StatusDiffTests: XCTestCase {
         XCTAssert(status.count == 1)
         XCTAssert(status[0].statuses.contains(.added))
         
+        let hunks = Repository
+            .at(url: urlHeadIsUnborn)
+            .flatMap{ $0.hunksFrom(delta: status[0].stagedDeltas! ) }
+            .shouldSucceed()!
+        
+        XCTAssert( hunks.count == 1 )
     }
     
     func test_should_create_hooks_templates() {
