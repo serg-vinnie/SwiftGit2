@@ -26,6 +26,16 @@ class StatusDiffTests: XCTestCase {
     }
     
     func test_should_return_content_of_Untracked_Staged_File() {
+        Repository
+            .at(url: urlHeadIsUnborn)
+            .flatMap { $0.stage(.all) }
+            .shouldSucceed()
+        
+        let status = Repository.at(url: urlHeadIsUnborn)
+            .flatMap { $0.status() }
+            .shouldSucceed()!
+        XCTAssert(status.count == 1)
+        XCTAssert(status[0].statuses.contains(.added))
         
     }
     
