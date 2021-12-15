@@ -45,6 +45,79 @@ class StatusDiffTests: XCTestCase {
         
         let lines = hunks[0].lines.compactMap { $0.content}
         print(lines)
+        
+        // 2
+        // (staged + unstaged).sorted()
+        
+        // 3
+        // mixed hunks
+        
+        // ---------------------------------------------------------
+        
+        // test repos wtih mixed state:
+        // 1. normal hunks (no mixed state)
+        // 2. mixed hunks
+        
+        // --------------------------------------------------------- BASIC
+        
+        // hunk.print()
+        //
+        
+        /*
+         
+         struct StatusEntryHunks {
+            let staged : [Hunk] //dir
+            let unstaged : [Hunk] //dir
+         }
+         
+         extenstion StatusEntryHunks {
+            var all : [Hunk] {
+                
+            }
+         }
+         
+         let statusEntryHunks = repo.hunksIn(entry: status[0]) -> StatusEntryHunks
+         
+         statusEntryHunks.all.map { $0.asHTML }
+         statusEntryHunks.all.map { $0.asString }
+         
+         */
+        
+        // --------------------------------------------------------- MIXED STATE
+        
+        /*
+         
+         enum StatusEntryHunkEntry {
+            case staged(Hunk)
+            case unstaged(Hunk)
+            case mixed(Hunk,Hunk)
+         }
+         
+         extenstion StatusEntryHunks {
+            var allEntries : [StatusEntryHunkEntry] {
+                
+            }
+         }
+         
+         extension StatusEntryHunkEntry {
+            var asString : String { get }
+            var asHTML  : Strinng { get }
+            var asAttributedString : NSAttributedString { get }
+         }
+
+         extension NSAttributedString {
+            var asHTML :  String
+         }
+         
+         */
+        
+        // --------------------------------------------------------- patch per hunk
+        
+        /*
+         
+            
+         
+         */
     }
     
     func test_should_create_hooks_templates() {
