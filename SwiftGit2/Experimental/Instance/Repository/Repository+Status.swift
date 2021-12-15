@@ -10,7 +10,6 @@
 
 import Clibgit2
 import Essentials
-import AppCore
 
 public final class StatusIterator {
     public var pointer: OpaquePointer?
@@ -130,7 +129,7 @@ public extension StatusEntry {
         case let .success(changesDelta):
             return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: changesDelta)
         case let .failure(error):
-            AppCore.log(title: "StatusEntry", error: error)
+            print("StatusEntry.asStatusEntryX ERROR: \(error)")
             return StatusEntryNew(entry, stagedPatch: stagedPatch, unStagedPatch: unStagedPatch, changesDeltas: nil)
         }
     }
