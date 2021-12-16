@@ -128,7 +128,15 @@ class StatusDiffTests: XCTestCase {
          
          */
     }
-    
+    func test_should_return_Hunk_From_File() {
+        let hunk = Repository.at(url: urlHeadIsUnborn)
+            .flatMap{ $0.hunkFrom(relPath: "file.txt") }
+            .shouldSucceed("hunk")!
+        
+        print(hunk.lines.map{ $0.content} )
+        
+        XCTAssert(hunk.lines[0].content == "bla bla bla\n")
+    }
     
     func test_should_create_hooks_templates() {
         // TODO: implement me
