@@ -18,13 +18,13 @@ class StatusDiffTests: XCTestCase {
 //    func test_should_return_content_of_Untracked_Unstaged_File() {
 //        let repo = Repository.at(url: urlHeadIsUnborn)
 //            .shouldSucceed()!
-//        
+//
 //        let status = Repository.at(url: urlHeadIsUnborn)
 //            .flatMap { $0.status() }
 //            .shouldSucceed()!
 //        XCTAssert(status.count == 1)
 //        XCTAssert(status[0].statuses.contains(.untracked))
-//        
+//
 //    }
     
     func test_should_return_content_of_Untracked_Staged_File() {
@@ -59,6 +59,7 @@ class StatusDiffTests: XCTestCase {
 //        let lines = hunks[0].lines.compactMap { $0.content}
 //        print(lines)
 //
+        //+++++++++++++++++++++++++++++
         // 2
         // (staged + unstaged).sorted()
         
@@ -77,19 +78,20 @@ class StatusDiffTests: XCTestCase {
         //
         
         /*
+                             //+++++++++++++++++++++++++++++
+                             struct StatusEntryHunks {
+                                let staged : [Hunk] //dir
+                                let unstaged : [Hunk] //dir
+                             }
+                             //+++++++++++++++++++++++++++++
+                             extenstion StatusEntryHunks {
+                                var all : [Hunk] {
+                                    
+                                }
+                             }
          
-         struct StatusEntryHunks {
-            let staged : [Hunk] //dir
-            let unstaged : [Hunk] //dir
-         }
-         
-         extenstion StatusEntryHunks {
-            var all : [Hunk] {
-                
-            }
-         }
-         
-         let statusEntryHunks = repo.hunksIn(entry: status[0]) -> StatusEntryHunks
+                             //+++++++++++++++++++++++++++++
+                             let statusEntryHunks = repo.hunksIn(entry: status[0]) -> StatusEntryHunks
          
          statusEntryHunks.all.map { $0.asHTML }
          statusEntryHunks.all.map { $0.asString }
