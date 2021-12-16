@@ -24,22 +24,33 @@ class StatusDiffTests: XCTestCase {
 //    }
     
     func test_should_return_content_of_Untracked_Staged_File() {
+        var status = Repository.at(url: urlHeadIsUnborn)
+            .flatMap { $0.status() }
+            .shouldSucceed()!
+        
+        let statusEntryHunks1 = Repository
+            .at(url: urlHeadIsUnborn)
+            .flatMap{ status[0].hunks(repo: $0 ) }
+            .shouldSucceed()!
+        
+        XCTAssert( statusEntryHunks1.staged.count == 0 && statusEntryHunks1.unstaged.count == 0 )
+        
         Repository
             .at(url: urlHeadIsUnborn)
             .flatMap { $0.stage(.all) }
             .shouldSucceed()
         
-        let status = Repository.at(url: urlHeadIsUnborn)
+        status = Repository.at(url: urlHeadIsUnborn)
             .flatMap { $0.status() }
             .shouldSucceed()!
         XCTAssert(status.count == 1)
         XCTAssert(status[0].statuses.contains(.added))
         
-        let statusEntryHunks =  Repository.at(url: urlHeadIsUnborn)
+        let statusEntryHunks2 = Repository.at(url: urlHeadIsUnborn)
             .flatMap{ status[0].hunks(repo: $0 ) }
             .shouldSucceed()!
         
-        XCTAssert( statusEntryHunks.staged.count == 1 )
+        XCTAssert( statusEntryHunks2.staged.count == 1 )
         
 //        let lines = hunks[0].lines.compactMap { $0.content}
 //        print(lines)
