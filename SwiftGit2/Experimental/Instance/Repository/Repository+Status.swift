@@ -145,7 +145,7 @@ public extension StatusEntry {
         
         // we don't need to detect renames in this case
         let headBlob = repo.deltas(target: .HEADorWorkDir, findOptions: Diff.FindOptions())
-            .flatMap { $0.deltas.fileOid(path: self.relPath) }
+            .flatMap { $0.deltasWithHunks.fileOid(path: self.relPath) }
             .flatMap { repo.blob(oid: $0) }
         
         return combine(headBlob, repo.blobCreateFromWorkdirAsBlob(relPath: relPath))

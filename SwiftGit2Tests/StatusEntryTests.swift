@@ -58,15 +58,15 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .shouldSucceed()!
         
-        XCTAssert(commitDetails.deltas[0].stagePath == TestFile.fileA.rawValue)
-        XCTAssert(commitDetails.deltas[0].statuses == [.added])
+        XCTAssert(commitDetails.deltasWithHunks[0].stagePath == TestFile.fileA.rawValue)
+        XCTAssert(commitDetails.deltasWithHunks[0].statuses == [.added])
     }
     
     func test_should_return_EntyFileInfo_Commit() {
         _ = Repository.t_randomRepo()
             .flatMap { $0.t_with_commit(file: .fileA, with: .random, msg: "....") }
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
-            .flatMap { $0.deltas[0].entryFileInfo }
+            .flatMap { $0.deltasWithHunks[0].entryFileInfo }
             .shouldSucceed()!
     }
     
@@ -98,9 +98,9 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .shouldSucceed("deltas")!
         
-        XCTAssert(deltas.deltas[0].statuses == [.renamed])
+        XCTAssert(deltas.deltasWithHunks[0].statuses == [.renamed])
         
-        if case let .success(.renamed(a, b)) = deltas.deltas[0].entryFileInfo {
+        if case let .success(.renamed(a, b)) = deltas.deltasWithHunks[0].entryFileInfo {
             XCTAssert(a == TestFile.fileA.rawValue)
             XCTAssert(b == TestFile.fileB.rawValue)
         } else {
