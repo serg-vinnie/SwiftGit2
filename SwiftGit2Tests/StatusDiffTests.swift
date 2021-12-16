@@ -16,11 +16,15 @@ class StatusDiffTests: XCTestCase {
     }
     
 //    func test_should_return_content_of_Untracked_Unstaged_File() {
+//        let repo = Repository.at(url: urlHeadIsUnborn)
+//            .shouldSucceed()!
+//        
 //        let status = Repository.at(url: urlHeadIsUnborn)
 //            .flatMap { $0.status() }
 //            .shouldSucceed()!
 //        XCTAssert(status.count == 1)
 //        XCTAssert(status[0].statuses.contains(.untracked))
+//        
 //    }
     
     func test_should_return_content_of_Untracked_Staged_File() {
@@ -33,7 +37,7 @@ class StatusDiffTests: XCTestCase {
             .flatMap{ status[0].hunks(repo: $0 ) }
             .shouldSucceed()!
         
-        XCTAssert( statusEntryHunks1.staged.count == 0 && statusEntryHunks1.unstaged.count == 0 )
+        XCTAssert( statusEntryHunks1.staged.count == 0 && statusEntryHunks1.unstaged.count == 1 )
         
         Repository
             .at(url: urlHeadIsUnborn)
@@ -128,6 +132,7 @@ class StatusDiffTests: XCTestCase {
          
          */
     }
+    
     func test_should_return_Hunk_From_File() {
         let hunk = Repository.at(url: urlHeadIsUnborn)
             .flatMap{ $0.hunkFrom(relPath: "file.txt") }
@@ -141,6 +146,4 @@ class StatusDiffTests: XCTestCase {
     func test_should_create_hooks_templates() {
         // TODO: implement me
     }
-
-    
 }

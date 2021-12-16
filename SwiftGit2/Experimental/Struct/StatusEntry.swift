@@ -72,6 +72,11 @@ public extension StatusEntry {
 
 public extension StatusEntry {
     func hunks(repo: Repository) -> R<StatusEntryHunks> {
+        if self.statuses.contains(.untracked) {
+            return repo.hunkFrom(relPath: self.stagePath)
+                .map { StatusEntryHunks(staged: [], unstaged: [$0]) }
+        }
+        
         let stagedHunks : R<[Diff.Hunk]>
         
         if let staged = self.stagedDeltas {
