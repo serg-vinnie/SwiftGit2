@@ -50,3 +50,15 @@ public extension Repository {
         }
     }
 }
+
+public extension Repository {
+    func hunkFrom(path: String) -> R<Diff.Hunk> {
+        let repo = self
+        
+        return repo.blobCreateFromDisk(path: path )
+            .flatMap { repo.blob(oid: $0) }
+            .flatMap { repo.diffBlobs(old: nil, new: $0) }
+            .flatMap { $0.first.asNonOptional }
+            .flatMap { $0.hunks.first.asNonOptional }
+    }
+}

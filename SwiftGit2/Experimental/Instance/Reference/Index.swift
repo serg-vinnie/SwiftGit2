@@ -15,6 +15,12 @@ public final class Index: InstanceProtocol, DuoUser {
     public required init(_ pointer: OpaquePointer) {
         self.pointer = pointer
     }
+    
+    public static func new() -> R<Index> {
+        git_instance(of: Index.self, "git_index_new") { pointer in
+            git_index_new( &pointer )
+        }
+    }
 
     deinit {
         git_index_free(pointer)
