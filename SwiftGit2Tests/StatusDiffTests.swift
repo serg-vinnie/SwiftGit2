@@ -15,15 +15,13 @@ class StatusDiffTests: XCTestCase {
             .shouldSucceed()
     }
     
-    func test_should_return_content_of_Untracked_Unstaged_File() {
-        let status = Repository.at(url: urlHeadIsUnborn)
-            .flatMap { $0.status() }
-            .shouldSucceed()!
-        XCTAssert(status.count == 1)
-        XCTAssert(status[0].statuses.contains(.untracked))
-        
-        
-    }
+//    func test_should_return_content_of_Untracked_Unstaged_File() {
+//        let status = Repository.at(url: urlHeadIsUnborn)
+//            .flatMap { $0.status() }
+//            .shouldSucceed()!
+//        XCTAssert(status.count == 1)
+//        XCTAssert(status[0].statuses.contains(.untracked))
+//    }
     
     func test_should_return_content_of_Untracked_Staged_File() {
         Repository
@@ -37,15 +35,15 @@ class StatusDiffTests: XCTestCase {
         XCTAssert(status.count == 1)
         XCTAssert(status[0].statuses.contains(.added))
         
-        let hunks = Repository.at(url: urlHeadIsUnborn)
-            .flatMap{ $0.hunksFrom(delta: status[0].stagedDeltas! ) }
+        let statusEntryHunks =  Repository.at(url: urlHeadIsUnborn)
+            .flatMap{ status[0].hunks(repo: $0 ) }
             .shouldSucceed()!
         
-        XCTAssert( hunks.count == 1 )
+        XCTAssert( statusEntryHunks.staged.count == 1 )
         
-        let lines = hunks[0].lines.compactMap { $0.content}
-        print(lines)
-        
+//        let lines = hunks[0].lines.compactMap { $0.content}
+//        print(lines)
+//
         // 2
         // (staged + unstaged).sorted()
         
@@ -104,7 +102,7 @@ class StatusDiffTests: XCTestCase {
             var asHTML  : Strinng { get }
             var asAttributedString : NSAttributedString { get }
          }
-
+         
          extension NSAttributedString {
             var asHTML :  String
          }
@@ -119,6 +117,7 @@ class StatusDiffTests: XCTestCase {
          
          */
     }
+    
     
     func test_should_create_hooks_templates() {
         // TODO: implement me
