@@ -103,6 +103,7 @@ class StatusDiffTests: XCTestCase {
         /*
          
          enum StatusEntryHunkEntry {
+            case commit(Hunk)
             case staged(Hunk)
             case unstaged(Hunk)
             case mixed(Hunk,Hunk)
