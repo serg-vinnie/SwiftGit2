@@ -141,7 +141,7 @@ class StatusDiffTests: XCTestCase {
             .flatMap{ $0.hunkFrom(relPath: "file.txt") }
             .shouldSucceed("hunk")!
         
-        print(hunk.lines.map{ $0.content} )
+        print(hunk)
         
         XCTAssert(hunk.lines[0].content == "bla bla bla\n")
     }
