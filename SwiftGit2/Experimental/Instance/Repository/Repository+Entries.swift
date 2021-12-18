@@ -94,6 +94,8 @@ public struct CommitDetails {
     public let all             : [OID:[Diff.Delta]]
     public let desc            : String
     
+    public static var emtpy : CommitDetails { CommitDetails(parents: [], deltasWithHunks: [], all: [:], desc: "")  }
+    
     public func with(parent: Int) -> CommitDetails {
         guard parents.count > 0 else { return self }
         guard parent < parents.count else {
