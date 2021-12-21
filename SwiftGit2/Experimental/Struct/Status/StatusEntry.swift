@@ -70,31 +70,6 @@ public extension StatusEntry {
     }
 }
 
-public struct StatusEntryHunks {
-    let staged : [Diff.Hunk] //dir
-    let unstaged : [Diff.Hunk] //dir
-}
-
-extension StatusEntryHunks {
-    var all : [Diff.Hunk] {
-        staged.appending(contentsOf: unstaged)
-            .sorted{ $0.newStart < $1.newStart }
-   }
-}
-
-extension Diff.Hunk : CustomStringConvertible {
-    public var description: String {
-        lines.map{ $0.content }.compactMap{ $0 }.joined()
-    }
-    
-    func print() {
-        Swift.print(self)
-    }
-}
-
-
-
-
 public extension Duo where T1 == StatusEntry, T2 == Repository {
     var headToIndexNewFileURL : R<URL> {
         let (entry, repo) = self.value
