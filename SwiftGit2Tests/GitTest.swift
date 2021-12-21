@@ -102,12 +102,12 @@ extension String {
     func print<T>(success: T) {
         Swift.print("\(self) SUCCEEDED with: \(success)")
     }
-
+    
     func print(failure: Error) {
         let nsError = failure as NSError
         Swift.print("\(self) FAILED with(code:\(nsError.code): \(failure.localizedDescription)")
     }
-
+    
     func write(to file: URL) -> Result<Void, Error> {
         do {
             try write(toFile: file.path, atomically: true, encoding: .utf8)

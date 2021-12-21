@@ -399,16 +399,6 @@ public extension Repository {
 ///HELPERS
 ///////////////////
 
-public extension String {
-    func asURL() -> URL {
-        return URL(fileURLWithPath: self)
-    }
-    
-    func asBrowserUrl() -> URL? {
-        return URL(string: self)
-    }
-}
-
 public enum ResetType {
     case Soft
     case Mixed

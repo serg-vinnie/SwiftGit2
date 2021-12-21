@@ -146,19 +146,3 @@ public enum EntryFileInfo {
     case single(String)
     case renamed(String, String)
 }
-
-///////////////////////////////////////////
-///HELPERS
-///////////////////////////////////////////
-
-fileprivate extension String {
-    func hasSuffix(_ suffixes:[String]) -> Bool {
-        for s in suffixes {
-            if self.hasSuffix(s) {
-                return true
-            }
-        }
-        
-        return false
-    }
-}
