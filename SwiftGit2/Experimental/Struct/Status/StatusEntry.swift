@@ -93,37 +93,7 @@ extension Diff.Hunk : CustomStringConvertible {
 }
 
 
-public extension UiStatusEntryX {
-    var headToIndexNEWFilePath : R<String> {
-        stagedDeltas.asNonOptional("headToIndex") | { $0.newFilePath }
-    }
-    
-    var headToIndexOLDFilePath : R<String> {
-        stagedDeltas.asNonOptional("headToIndex") | { $0.oldFilePath }
-    }
-    
-    var indexToWorkDirNEWFilePath : R<String> {
-        unStagedDeltas.asNonOptional("indexToWorkDir") | { $0.newFilePath }
-    }
-    
-    var indexToWorkDirOLDFilePath : R<String> {
-        unStagedDeltas.asNonOptional("indexToWorkDir") | { $0.newFilePath }
-    }
-}
 
-public extension Duo where T1 == UiStatusEntryX, T2 == Repository {
-    var headToIndexNewFileURL : R<URL> {
-        let (entry, repo) = self.value
-        let path = entry.headToIndexNEWFilePath
-        return combine(repo.directoryURL, path) | { $0.appendingPathComponent($1) }
-    }
-    
-    var indexToWorkDirNewFileURL : R<URL> {
-        let (entry, repo) = self.value
-        let path = entry.indexToWorkDirNEWFilePath
-        return combine(repo.directoryURL, path) | { $0.appendingPathComponent($1) }
-    }
-}
 
 public extension Duo where T1 == StatusEntry, T2 == Repository {
     var headToIndexNewFileURL : R<URL> {
