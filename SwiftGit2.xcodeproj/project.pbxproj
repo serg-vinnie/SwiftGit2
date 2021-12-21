@@ -279,6 +279,8 @@
 		1DEC290F27722E81007C32FF /* Status */ = {
 			isa = PBXGroup;
 			children = (
+				1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */,
+				E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */,
 			);
 			path = Status;
 			sourceTree = "<group>";
@@ -502,8 +504,6 @@
 		E6AB53AF2575311600364E5F /* Struct */ = {
 			isa = PBXGroup;
 			children = (
-				1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */,
-				E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */,
 				1DEC290F27722E81007C32FF /* Status */,
 				E68A3ACD2665346800B0244C /* User */,
 				E623A3122634881B00484E11 /* Options */,
