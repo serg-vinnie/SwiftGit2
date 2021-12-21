@@ -4,13 +4,12 @@
 //
 //  Created by UKS on 21.12.2021.
 //  Copyright © 2021 GitHub, Inc. All rights reserved.
-//
 
 import Foundation
 import Clibgit2
 
 public struct StatusEntryHunks {
-    let staged : [Diff.Hunk] //dir
+    let staged   : [Diff.Hunk] //dir
     let unstaged : [Diff.Hunk] //dir
 }
 
