@@ -16,18 +16,18 @@ public extension Repository {
         return combine(url, paths).map { url, paths in paths.map { url.appendingPathComponent($0) } }
     }
     
-    func submoduleName() -> Result<[String], Error> {
-        var submodulePairs = SubmoduleCallbacks()
-
+    func submodulesNames() -> Result<[String], Error> {
+        var submoduleCb = SubmoduleCallbacks()
+        
         return git_try("git_submodule_foreach") {
-            git_submodule_foreach(self.pointer, submodulePairs.submodule_cb, &submodulePairs)
-        }.map { submodulePairs.submodulesNames }
+            git_submodule_foreach(self.pointer, submoduleCb.submodule_cb, &submoduleCb)
+        }.map { submoduleCb.names }
     }
     
     func submodules() -> Result<[Submodule], Error> {
-        submoduleName().flatMap { names in names.flatMap { self.submoduleLookup(named: $0) } }
+        submodulesNames().flatMap { names in names.flatMap { self.submoduleLookup(named: $0) } }
     }
-
+    
     func submoduleLookup(named name: String) -> Result<Submodule, Error> {
         git_instance(of: Submodule.self, "git_submodule_lookup"){ p in
             git_submodule_lookup(&p, self.pointer, name)
@@ -36,21 +36,21 @@ public extension Repository {
 }
 
 class SubmoduleCallbacks {
-    var submodulesNames = [String]()
-
+    var names = [String]()
+    
     let submodule_cb: git_submodule_cb = { _, name, payload in
         let self_ = payload.unsafelyUnwrapped
             .bindMemory(to: SubmoduleCallbacks.self, capacity: 1)
             .pointee
-
+        
         guard let name = name,
               let nameStr = String(utf8String: name)
         else {
             return -1
         }
-
-        self_.submodulesNames.append(nameStr)
-
+        
+        self_.names.append(nameStr)
+        
         return 0
     }
 }
