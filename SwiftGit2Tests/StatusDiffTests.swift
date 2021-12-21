@@ -34,7 +34,7 @@ class StatusDiffTests: XCTestCase {
         
         let statusEntryHunks1 = Repository
             .at(url: urlHeadIsUnborn)
-            .flatMap{ status[0].hunks(repo: $0 ) }
+            .flatMap{ status[0].with($0).hunks }
             .shouldSucceed()!
         
         XCTAssert( statusEntryHunks1.staged.count == 0 && statusEntryHunks1.unstaged.count == 1 )
@@ -51,7 +51,7 @@ class StatusDiffTests: XCTestCase {
         XCTAssert(status[0].statuses.contains(.added))
         
         let statusEntryHunks2 = Repository.at(url: urlHeadIsUnborn)
-            .flatMap{ status[0].hunks(repo: $0 ) }
+            .flatMap{ status[0].with($0).hunks }
             .shouldSucceed()!
         
         XCTAssert( statusEntryHunks2.staged.count == 1 )
