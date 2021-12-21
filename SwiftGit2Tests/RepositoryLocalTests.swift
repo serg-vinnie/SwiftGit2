@@ -80,7 +80,7 @@ class RepositoryLocalTests: XCTestCase {
 
         guard let fixResultAmbigues = repo.detachedHeadFix().assertFailure("detached HEAD fix") else { fatalError() }
 
-        XCTAssert(fixResultAmbigues == .ambiguous(branches: ["refs/heads/branch1", "refs/heads/master"]))
+        XCTAssert(fixResultAmbigues == .ambiguous(branches: ["refs/heads/branch1", "refs/heads/main"]))
     }
 }
 
