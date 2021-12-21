@@ -276,6 +276,13 @@
 			path = Repository;
 			sourceTree = "<group>";
 		};
+		1DEC290F27722E81007C32FF /* Status */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Status;
+			sourceTree = "<group>";
+		};
 		621E66D41C72965C00A0F352 /* Mac */ = {
 			isa = PBXGroup;
 			children = (
@@ -495,10 +502,11 @@
 		E6AB53AF2575311600364E5F /* Struct */ = {
 			isa = PBXGroup;
 			children = (
+				1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */,
+				E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */,
+				1DEC290F27722E81007C32FF /* Status */,
 				E68A3ACD2665346800B0244C /* User */,
 				E623A3122634881B00484E11 /* Options */,
-				E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */,
-				1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */,
 				AA89482E23F1671A0074288B /* Buffer.swift */,
 				E6332D06264EA35D004990E7 /* IndexEntry.swift */,
 				E6332E072652D20E004990E7 /* GitPayload.swift */,
