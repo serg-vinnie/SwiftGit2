@@ -9,8 +9,8 @@ import Foundation
 import Clibgit2
 
 public struct StatusEntryHunks {
-    let staged   : [Diff.Hunk] //dir
-    let unstaged : [Diff.Hunk] //dir
+    public let staged   : [Diff.Hunk] //dir
+    public let unstaged : [Diff.Hunk] //dir
 }
 
 extension StatusEntryHunks {
