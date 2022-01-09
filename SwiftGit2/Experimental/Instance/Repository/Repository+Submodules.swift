@@ -16,7 +16,11 @@ public extension Repository {
         return combine(url, paths).map { url, paths in paths.map { url.appendingPathComponent($0) } }
     }
     
-    func submodulesNames() -> Result<[String], Error> {
+    var hasSubmodules : R<Bool> {
+        submodulesNames().map { $0.count > 0 }
+    }
+    
+    func submodulesNames() -> R<[String]> {
         var submoduleCb = SubmoduleCallbacks()
         
         return git_try("git_submodule_foreach") {
@@ -24,11 +28,11 @@ public extension Repository {
         }.map { submoduleCb.names }
     }
     
-    func submodules() -> Result<[Submodule], Error> {
+    func submodules() -> R<[Submodule]> {
         submodulesNames().flatMap { names in names.flatMap { self.submoduleLookup(named: $0) } }
     }
     
-    func submoduleLookup(named name: String) -> Result<Submodule, Error> {
+    func submoduleLookup(named name: String) -> R<Submodule> {
         git_instance(of: Submodule.self, "git_submodule_lookup"){ p in
             git_submodule_lookup(&p, self.pointer, name)
         }
