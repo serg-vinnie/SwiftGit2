@@ -46,8 +46,10 @@ public struct OID {
         oid = pointer.pointee
         pointer.deallocate()
     }
+}
 
-
+public extension OID {
+    var oidShort: String { "\( self.description.suffix(8) )" }
 }
 
 extension OID: CustomStringConvertible {
