@@ -74,10 +74,10 @@ public extension Repository {
         return remoteNameList()
             .flatMap { $0.flatMap { self.remoteRepo(named: $0) } }
     }
-
+    
     func remoteNameList() -> Result<[String], Error> {
         var strarray = git_strarray()
-
+        
         return git_try("git_remote_list") {
             git_remote_list(&strarray, self.pointer)
         } | { strarray.map { $0 } }
@@ -93,67 +93,69 @@ public enum BranchBase {
 public extension Repository {
     func createReference(name: String, oid: OID, force: Bool, reflog: String)-> R<Reference> {
         var oid = oid.oid
-
+        
         return git_instance(of: Reference.self, "git_reference_create") { pointer in
             git_reference_create(&pointer, self.pointer, name, &oid, force ? 1 : 0, reflog)
         }
     }
     
-    @available(*, deprecated, message: "use createBranch(from target) instead. But this method works with detached head")
-    // Works with detached head
-    func createBranchOLD(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
-        
-        switch base {
-        case .head: return headCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
-        case let .commit(c): return createBranch(from: c, name: name, checkout: checkout)
-        case let .branch(b): return BranchTarget.branch(b).with(self).commit | { c in createBranch(from: c, name: name, checkout: checkout) }
-        }
-    }
+//    @available(*, deprecated, message: "use createBranch(from target) instead. But this method works with detached head")
+//    // Works with detached head
+//    func createBranchOLD(from base: BranchBase, name: String, checkout: Bool) -> Result<Reference, Error> {
+//        
+//        switch base {
+//        case .head: return headCommit().flatMap { createBranch(from: $0, name: name, checkout: checkout) }
+//        case let .commit(c): return createBranch(from: c, name: name, checkout: checkout)
+//        case let .branch(b): return BranchTarget.branch(b).with(self).commit | { c in createBranch(from: c, name: name, checkout: checkout) }
+//        }
+//    }
     
-    ///TODO: Does not work with detached head!!!!!
     func createBranch(from target: BranchTarget, name: String, checkout: Bool) -> Result<Reference, Error> {
-        target.with(self).commit
-            | { self.createBranch(from: $0, name: name, checkout: checkout)}
+        let repo = self
+        
+        return target.oid(in: self)
+            .flatMap { repo.commit(oid: $0) }
+            .flatMap { commit in repo.createBranch(from: commit, name: name, checkout: checkout) }
     }
     
     func branchLookup(name: String) -> R<Branch>{
         reference(name: name)
             .flatMap{ $0.asBranch() }
     }
-
+    
     internal func createBranch(from commit: Commit, name: String, checkout: Bool, force: Bool = false) -> Result<Reference, Error> {
         var pointer: OpaquePointer?
-
+        
         return git_try("git_branch_create") {
             git_branch_create(&pointer, self.pointer, name, commit.pointer, force ? 0 : 1)
         }
         .map { Reference(pointer!) }
-        .if(checkout,
-            then: { self.checkout(reference: $0, strategy: .Safe) })
+        .if ( checkout,
+              then: { self.checkout(reference: $0, strategy: .Safe) })
     }
-
+    
     func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         return index()
             .flatMap { index in Duo(index, self).commit(message: message, signature: signature) }
     }
-
+    
     func remoteRepo(named name: String) -> Result<Remote, Error> {
         return remoteLookup(named: name) { $0.map { Remote($0) } }
     }
-
+    
     func remoteLookup<A>(named name: String, _ callback: (Result<OpaquePointer, Error>) -> A) -> A {
         var pointer: OpaquePointer?
-
+        
         let result = _result((), pointOfFailure: "git_remote_lookup") {
             git_remote_lookup(&pointer, self.pointer, name)
         }.map { pointer! }
-
+        
         return callback(result)
     }
-
+    
     func remote(name: String) -> Result<Remote, Error> {
         var pointer: OpaquePointer?
-
+        
         return git_try("git_remote_lookup") {
             git_remote_lookup(&pointer, self.pointer, name)
         }.map { Remote(pointer!) }
@@ -183,7 +185,7 @@ public extension Repository {
     
     class func at(url: URL, fixDetachedHead: Bool = true) -> Result<Repository, Error> {
         var pointer: OpaquePointer?
-
+        
         return git_try("git_repository_open") {
             url.withUnsafeFileSystemRepresentation {
                 git_repository_open(&pointer, $0)
@@ -193,7 +195,7 @@ public extension Repository {
         .if(fixDetachedHead,
             then: { repo in repo.detachedHeadFix().map { _ in repo } })
     }
-
+    
     class func create(at url: URL) -> Result<Repository, Error> {
         let repo = git_instance(of: Repository.self, "git_repository_init") { pointer in
             git_repository_init(&pointer, url.path, 0)
@@ -215,9 +217,9 @@ public extension Repository {
         }
         
         return HEAD()
-            | { $0.targetOID }
-            | { self.commit(oid: $0) }
-            | { resetDefault(commit: $0, paths: pathPatterns) }
+        | { $0.targetOID }
+        | { self.commit(oid: $0) }
+        | { resetDefault(commit: $0, paths: pathPatterns) }
     }
     
     func resetDefault(commit: Commit, paths: [String]) -> R<Void> {
@@ -256,7 +258,7 @@ public extension Repository {
     }
     
     func remove(relPaths: [String]) -> R<()> {
-         index()
+        index()
             .flatMap { $0.removeAll(pathPatterns: relPaths) }
     }
 }
@@ -265,7 +267,7 @@ public extension Repository {
 public extension Repository {
     func createRemote(str: String) -> Result<Remote, Error> {
         var pointer: OpaquePointer?
-
+        
         return _result({ Remote(pointer!) }, pointOfFailure: "git_remote_create") {
             "origin".withCString { tempName in
                 str.withCString { url in
@@ -281,7 +283,7 @@ public extension Repository {
     static func clone(from remoteURL: URL, to localURL: URL, options: CloneOptions) -> Result<Repository, Error> {
         var pointer: OpaquePointer?
         let remoteURLString = (remoteURL as NSURL).isFileReferenceURL() ? remoteURL.path : remoteURL.absoluteString
-
+        
         return git_try("git_clone") {
             options.with_git_clone_options { clone_options in
                 localURL.withUnsafeFileSystemRepresentation { git_clone(&pointer, remoteURLString, $0, &clone_options) }
@@ -314,10 +316,10 @@ public extension Repository {
     /// stageAllFiles
     func addAllFiles() -> Result<Repository,Error> {
         return self.index()
-            | { $0.addAll(pathPatterns: []) }
-            | { _ in self }
+        | { $0.addAll(pathPatterns: []) }
+        | { _ in self }
     }
-
+    
     /// unstageAllFiles
     func resetAllFiles() -> Result<(),Error> {
         return self.index() | { _ in self.resetDefault(pathPatterns: []) }
@@ -379,7 +381,7 @@ public extension Repository {
 
 public extension Repository {
     // WTF two ignore checks
-
+    
     func isIgnored(path: String) -> R<Bool> {
         var ignored : Int32 = 0
         return git_try("git_ignore_path_is_ignored") {

@@ -6,14 +6,29 @@ public enum BranchTarget : DuoUser {
     case HEAD
     case branch(Branch)
     case branchShortName(String)
+    case oid(OID)
     
-    func branch(in repo: Repository) -> R<Branch> {
+    public func branch(in repo: Repository) -> R<Branch> {
         switch self {
         case .HEAD: return repo.headBranch()
         case let .branch(branch): return .success(branch)
-            
+        case .oid(_): return .wtf("This oid possibly is not a Branch")
+        case let .branchShortName(name): return repo.branchLookup(name: "refs/heads/\(name)")
+        }
+    }
+    
+    public func oid(in repo: Repository) -> R<OID> {
+        switch self {
+        case .HEAD:
+            return repo.headCommit().map{ $0.oid }
+        case let .branch(branch):
+            return branch
+                .targetOID
+        case let .oid(oid):
+            return .success(oid)
         case let .branchShortName(name):
             return repo.branchLookup(name: "refs/heads/\(name)")
+                .flatMap{ $0.targetOID }
         }
     }
 }
