@@ -8,6 +8,7 @@
 
 import Clibgit2
 import Essentials
+import Foundation
 
 public class Reference: Branch { // Branch: InstanceProtocol
     public var pointer: OpaquePointer
@@ -23,6 +24,7 @@ public class Reference: Branch { // Branch: InstanceProtocol
 
 public extension Reference {
     var nameAsReference: String { String(validatingUTF8: git_reference_name(pointer)) ?? "" }
+    var nameAsReferenceSymbolic: String{ String(validatingUTF8: git_reference_symbolic_target(pointer)) ?? "" }
     
     var nameAsReferenceCleaned: String{ nameAsReference.fixNameAsReference() }
 
@@ -47,17 +49,21 @@ public extension Reference {
         }
         return nil
     }
-
+    
+    @available(*, deprecated, message: "prefered to use Duo<Reference,Repository> instead if possible")
     var targetOID: Result<OID, Error> {
         if isSymbolic {
-            var resolved: OpaquePointer?
-            defer {
-                git_reference_free(resolved)
-            }
-
-            return git_try("git_reference_resolve")
-                { git_reference_resolve(&resolved, self.pointer) }
-                .map { OID(git_reference_target(resolved).pointee) }
+//            var resolved: OpaquePointer?
+//            defer {
+//                git_reference_free(resolved)
+//            }
+            
+            return .wtf("This is a TaoGit bug. Must be used targetOID from Duo<Reference,Repository>. Speak with taogit support.")
+            
+//            git_try("git_reference_name_to_id")
+//                { git_reference_resolve(&resolved, self.pointer) }
+//                .map { OID(git_reference_target(resolved).pointee) }
+            
         } else {
             return .success(OID(git_reference_target(pointer).pointee))
         }
@@ -70,19 +76,46 @@ public extension Repository {
         defer {
             git_strarray_free(&strarray) // free results of the git_reference_list call
         }
-
+        
         return git_try("git_reference_list") {
             git_reference_list(&strarray, self.pointer)
         }
         .map { strarray.filter { $0.hasPrefix(prefix) } }
         .flatMap { $0.flatMap { self.reference(name: $0) } }
     }
-
+    
     func reference(name: String) -> Result<Reference, Error> {
         var pointer: OpaquePointer?
-
+        
         return _result({ Reference(pointer!) }, pointOfFailure: "git_reference_lookup") {
             git_reference_lookup(&pointer, self.pointer, name)
+        }
+    }
+}
+
+fileprivate extension Repository {
+    func referenceTarget(name: String) -> R<OID> {
+        var oid = git_oid() // out
+        
+        return git_try("git_reference_name_to_id") {
+                name.withCString { name in
+                    git_reference_name_to_id(&oid, self.pointer, name)
+                }
+            }
+            .map {
+                OID(oid)
+            }
+    }
+}
+
+public extension Duo where T1 == Reference, T2 == Repository {
+    func targetOID() -> R<OID> {
+        let (ref, repo) = value
+        
+        if ref.isSymbolic {
+            return repo.referenceTarget(name: ref.nameAsReferenceSymbolic)
+        } else {
+            return ref.targetOID
         }
     }
 }

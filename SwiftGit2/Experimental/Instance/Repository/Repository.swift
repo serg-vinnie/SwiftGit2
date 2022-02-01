@@ -229,7 +229,7 @@ public extension Repository {
         }
         
         return HEAD()
-        | { $0.targetOID }
+        | { Duo($0, self).targetOID() }
         | { self.commit(oid: $0) }
         | { resetDefault(commit: $0, paths: pathPatterns) }
     }
@@ -366,7 +366,7 @@ public extension Repository {
         
         if headIsDetached {
             return HEAD()
-                .flatMap{ $0.targetOID }
+                .flatMap { Duo($0, self).targetOID() }
                 .map { "\($0.description)".substring(to: 8) }
         }
         

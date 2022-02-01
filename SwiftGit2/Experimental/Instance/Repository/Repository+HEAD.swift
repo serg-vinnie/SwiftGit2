@@ -26,10 +26,9 @@ public extension Repository {
         guard headIsDetached else {
             return .success(.notNecessary)
         }
-
-        let headOID = HEAD()
-            .flatMap { $0.targetOID }
-
+        
+        let headOID = HEAD().flatMap{ Duo($0, self).targetOID() }
+        
         let br_infos = branches(.local)
             .flatMap { $0.flatMap { Branch_Info.create(from: $0) } }
 
