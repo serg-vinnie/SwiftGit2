@@ -12,15 +12,14 @@ import Essentials
 
 public extension Repository {
     // TODO: Optimize to use OIDs instead of Commit
-    func pendingCommits(_ target: BranchTarget, _ direction: Direction) -> R<[Commit]> {
+    func pendingCommitsOIDs(_ target: BranchTarget, _ direction: Direction) -> R<[OID]> {
         let branch = target.branch(in: self)
         let branchName = branch | { $0.nameAsReference }
         let upstreamName = branch | { $0.upstream() } | { $0.nameAsReference }
         
         if direction == .push && branchName.maybeSuccess != nil && upstreamName.maybeFailure != nil {
             return branchName | { branch in Revwalk.new(in: self) | { $0.push(ref: branch) } }
-            | { $0.all() }
-            | { $0.flatMap { self.commit(oid: $0) } }
+                | { $0.all() }
         }
   
         return combine(branchName, upstreamName)
@@ -29,7 +28,7 @@ public extension Repository {
 }
 
 internal extension Repository {
-    func pendingCommits(local: String, remote: String, direction: Direction) -> Result<[Commit], Error> {
+    func pendingCommits(local: String, remote: String, direction: Direction) -> Result<[OID], Error> {
         switch direction {
         case .push:
             return walk(hideRef: remote, pushRef: local)
@@ -38,12 +37,11 @@ internal extension Repository {
         }
     }
     
-    func walk(hideRef: String, pushRef: String) -> Result<[Commit], Error> {
+    func walk(hideRef: String, pushRef: String) -> Result<[OID], Error> {
         Revwalk.new(in: self)
             | { $0.push(ref: pushRef) }
             | { $0.hide(ref: hideRef) }
             | { $0.all() }
-            | { $0.flatMap { self.commit(oid: $0) } }
     }
 }
 
