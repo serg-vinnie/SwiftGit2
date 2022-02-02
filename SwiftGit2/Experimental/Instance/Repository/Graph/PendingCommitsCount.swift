@@ -12,7 +12,7 @@ import Essentials
 
 public enum PendingCommitsCount {
     case pushpull(Int,Int)
-    case push(Int)          // no upastream
+    case publish_pending(Int)          // no upastream
     case undefined
 }
 
@@ -42,7 +42,7 @@ public extension Repository {
         //
         return combine(local,upstream)
             .flatMap { graphAheadBehind(local: $0, upstream: $1) }
-            .map { ahead, behind in .push(ahead) }
+            .map { ahead, behind in .publish_pending(ahead) }
     }
 
     func _pendingCommitsCount(_ target: BranchTarget) -> R<(Int,Int)> {
@@ -80,7 +80,7 @@ extension PendingCommitsCount: Equatable {
     public static func == (lhs: PendingCommitsCount, rhs: PendingCommitsCount) -> Bool {
         switch (lhs, rhs) {
         case (.undefined, .undefined): return true
-        case let (.push(lp), .push(rp)): return lp == rp
+        case let (.publish_pending(lp), .publish_pending(rp)): return lp == rp
         case let (.pushpull(lpush,lpull), .pushpull(rpush, rpull)): return lpush == rpush && lpull == rpull
         default:
             return false
