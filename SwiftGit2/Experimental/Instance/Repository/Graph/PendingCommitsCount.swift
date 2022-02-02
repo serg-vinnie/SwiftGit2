@@ -34,7 +34,7 @@ public extension Repository {
     func _pendingCommits(remoteBranches branches : [Branch], target: BranchTarget) -> R<PendingCommitsCount> {
         let names = branches.compactMap { $0.nameAsBranch }
         if names.isEmpty {
-            return .success(.undefined)
+            return pendingCommits(target, .push) | { $0.count } | { .publish_pending($0) }
         }
         
         let local = target.branch(in: self) | { $0.targetOID }

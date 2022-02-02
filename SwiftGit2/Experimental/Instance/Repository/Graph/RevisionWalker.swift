@@ -11,10 +11,17 @@ import Essentials
 
 
 public extension Repository {
+    // TODO: Optimize to use OIDs instead of Commit
     func pendingCommits(_ target: BranchTarget, _ direction: Direction) -> R<[Commit]> {
         let branch = target.branch(in: self)
         let branchName = branch | { $0.nameAsReference }
         let upstreamName = branch | { $0.upstream() } | { $0.nameAsReference }
+        
+        if direction == .push && branchName.maybeSuccess != nil && upstreamName.maybeFailure != nil {
+            return branchName | { branch in Revwalk.new(in: self) | { $0.push(ref: branch) } }
+            | { $0.all() }
+            | { $0.flatMap { self.commit(oid: $0) } }
+        }
   
         return combine(branchName, upstreamName)
             | { pendingCommits(local: $0, remote: $1, direction: direction) }
