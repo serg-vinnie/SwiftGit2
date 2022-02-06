@@ -9,15 +9,14 @@ struct TestsRepoConfig {
     
     init() {
         _ = work_root.makeSureDirExist()
+        if !Repository.exists(at: emptyRepoURL) {
+            _ = Repository.create(at: emptyRepoURL)
+        }
     }
     
     var invalidURL : URL { URL(fileURLWithPath: "some_shit") }
+    var emptyRepoURL : URL { work_root.appendingPathComponent("empty_repo") }
 }
-
-fileprivate let url = URL(fileURLWithPath: "/Users/loki/dev/taogit")
-fileprivate let url_bad = URL(fileURLWithPath: "/Users/loki/dev/taogit_bbbbbb")
-
-fileprivate let work_dir = URL.userHome.appendingPathComponent(".git_tests")
 
 class ModuleTests: XCTestCase {
     override func setUpWithError()    throws {} // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -27,11 +26,16 @@ class ModuleTests: XCTestCase {
         let moduleNotExists = Repository.module(at: TestsRepoConfig().invalidURL).shouldSucceed()!
         XCTAssert(moduleNotExists.exists == false)
     }
+    
+    func test_moduleShouldExists() {
+        let moduleNotExists = Repository.module(at: TestsRepoConfig().emptyRepoURL).shouldSucceed()!
+        XCTAssert(moduleNotExists.exists == true)
+    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {
-            _ = Repository.module(at: url)
+            _ = Repository.module(at: TestsRepoConfig().emptyRepoURL)
         }
     }
 }

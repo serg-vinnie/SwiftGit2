@@ -18,6 +18,6 @@ public extension Repository {
         guard Repository.exists(at: url) else {
             return .success(Module(url: url, exists: false, subModules: [:]))
         }
-        return .notImplemented
+        return .success(Module(url: url, exists: true, subModules: [:]))
     }
 }
