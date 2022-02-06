@@ -123,6 +123,18 @@ public extension Repository {
             .flatMap{ $0.asBranch() }
     }
     
+    func tagLookup(oid: OID) -> R<Tag> {
+        var tagPointer: OpaquePointer? = nil
+        var oidNeeded = oid.oid
+        
+        return git_try("git_tag_lookup_prefix") {
+            git_tag_lookup_prefix(&tagPointer, self.pointer, &oidNeeded, 40);
+        }
+        .map {
+            Tag(tagPointer!)
+        }
+    }
+    
     internal func createBranch(from commit: Commit, name: String, checkout: Bool, force: Bool = false) -> Result<Reference, Error> {
         var pointer: OpaquePointer?
         

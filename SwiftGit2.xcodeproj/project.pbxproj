@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D0AFF642534AC440045D68D /* StatusOptions.Flags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */; };
+		1D306D8C27B05E6A0015CE6C /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D306D8B27B05E6A0015CE6C /* Tag.swift */; };
 		1D496A4225372FA800789177 /* git_strarray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D496A4125372FA800789177 /* git_strarray.swift */; };
 		1D4BCEF727440F95008831DC /* Repository+Staging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4BCEF627440F95008831DC /* Repository+Staging.swift */; };
 		1D4C9B5426AD79C600ADBBDE /* Repository+Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4C9B5326AD79C600ADBBDE /* Repository+Blob.swift */; };
@@ -132,6 +133,7 @@
 
 /* Begin PBXFileReference section */
 		1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusOptions.Flags.swift; sourceTree = "<group>"; };
+		1D306D8B27B05E6A0015CE6C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		1D496A4125372FA800789177 /* git_strarray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = git_strarray.swift; sourceTree = "<group>"; };
 		1D4BCEF627440F95008831DC /* Repository+Staging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Staging.swift"; sourceTree = "<group>"; };
 		1D4C9B5326AD79C600ADBBDE /* Repository+Blob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Blob.swift"; sourceTree = "<group>"; };
@@ -565,6 +567,7 @@
 				E68A3ACB2663A26300B0244C /* Branch+Repository.swift */,
 				1D991AE2251934FF00335255 /* Remote.swift */,
 				1D764BD7252CD148008417A7 /* Submodule.swift */,
+				1D306D8B27B05E6A0015CE6C /* Tag.swift */,
 			);
 			path = Reference;
 			sourceTree = "<group>";
@@ -727,6 +730,7 @@
 				1D4BCEF727440F95008831DC /* Repository+Staging.swift in Sources */,
 				E63EDF7C265DBAE500A3D048 /* ProxyOptions.swift in Sources */,
 				E6D4A92024DEACC000E8041E /* Repository.swift in Sources */,
+				1D306D8C27B05E6A0015CE6C /* Tag.swift in Sources */,
 				E6AF628D26938457007D0585 /* Repository+Sync.swift in Sources */,
 				E6AF6288269256CD007D0585 /* Repository+Graph.swift in Sources */,
 				E6AF629026939D31007D0585 /* BranchTarget.swift in Sources */,
