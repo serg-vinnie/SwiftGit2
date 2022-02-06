@@ -118,6 +118,22 @@ public extension Duo where T1 == Reference, T2 == Repository {
             return ref.targetOID
         }
     }
+    
+    // Getting oid for Advanced or LightWeight tag
+    func getTagOid() -> R<OID> {
+        let repo = value.1
+        
+        return self.targetOID()
+            .flatMap { oid -> R<OID> in
+                if repo.commitExist(oid: oid) {
+                    // this is lightWeight Tag
+                    return .success(oid)
+                } else {
+                    // this is Advanced Tag
+                    return repo.tagLookup(oid: oid).map{ $0.targetOid }
+                }
+            }
+    }
 }
 
 
@@ -128,5 +144,20 @@ public extension Duo where T1 == Reference, T2 == Repository {
 fileprivate extension String {
     func fixNameAsReference() -> String {
         self.split(separator: "/").dropFirst(2).joined(separator:"/")
+    }
+}
+
+fileprivate extension Repository {
+    func commitExist(oid: OID) -> Bool {
+        var oidInternal = oid.oid
+        var resPointer: OpaquePointer?
+        
+        git_commit_lookup(&resPointer, self.pointer, &oidInternal)
+        
+        if let _ = resPointer {
+            return true
+        }
+        
+        return false
     }
 }

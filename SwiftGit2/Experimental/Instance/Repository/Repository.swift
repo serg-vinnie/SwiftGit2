@@ -123,6 +123,8 @@ public extension Repository {
             .flatMap{ $0.asBranch() }
     }
     
+    
+    /// Looks like works with advanced tags only
     func tagLookup(oid: OID) -> R<Tag> {
         var tagPointer: OpaquePointer? = nil
         var oidNeeded = oid.oid
@@ -134,6 +136,17 @@ public extension Repository {
             Tag(tagPointer!)
         }
     }
+    
+// Use commit(oid) instead
+//    func commitLookup(oid: OID) -> R<Commit?> {
+//        var oidInternal = oid.oid
+//        var resPointer: OpaquePointer?
+//
+//        return git_try("git_commit_lookup") {
+//            git_commit_lookup(&resPointer, self.pointer, &oidInternal)
+//        }
+//        .map { Commit(resPointer!) }
+//    }
     
     internal func createBranch(from commit: Commit, name: String, checkout: Bool, force: Bool = false) -> Result<Reference, Error> {
         var pointer: OpaquePointer?
