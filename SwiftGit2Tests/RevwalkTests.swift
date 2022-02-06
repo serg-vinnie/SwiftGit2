@@ -36,7 +36,7 @@ class RevwalkTests: XCTestCase {
         repo1.t_commit(msg: "commit for Revvalk")
             .assertFailure()
 
-        repo1.pendingCommits(.HEAD, .push)
+        repo1.pendingCommitsOIDs(.HEAD, .push)
             .map { $0.count }
             .assertEqual(to: 1, "repo1.pendingCommits(.HEAD, .push)")
                 
@@ -49,7 +49,7 @@ class RevwalkTests: XCTestCase {
         repo2.mergeAnalysisUpstream(.HEAD)
             .assertEqual(to: [.fastForward, .normal])
         
-        repo2.pendingCommits(.HEAD, .fetch)
+        repo2.pendingCommitsOIDs(.HEAD, .fetch)
             .map { $0.count }
             .assertEqual(to: 1, "repo2.pendingCommits(.HEAD, .fetch)")
     }

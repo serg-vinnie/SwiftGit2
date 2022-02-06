@@ -119,7 +119,7 @@ class RepositoryRemoteTests: XCTestCase {
             .assertFailure()
         
         repo.pendingCommitsCount(.branchShortName("newBranch"))
-            .assertEqual(to: .push(1), ".pendingCommitsCount(.branchShortName(newBranch))")
+            .assertEqual(to: .publish_pending(1), ".pendingCommitsCount(.branchShortName(newBranch))")
         
 //        repo.pendingCommits(.branchShortName("newBranch"), .push)
 //            .assertFailure("repo.pendingCommits(.branch($0), .push)")
