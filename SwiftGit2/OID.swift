@@ -21,46 +21,42 @@ public struct OID {
         if string.lengthOfBytes(using: String.Encoding.ascii) > 40 {
             return .failure(WTF("string length > 40"))
         }
-
+        
         var oid = git_oid()
-
+        
         return git_try("git_oid_fromstr") { git_oid_fromstr(&oid, string) }
             .map { OID(oid) }
     }
-
+    
     // TODO: result
     public init?(string: String) {
         // libgit2 doesn't enforce a maximum length
         if string.lengthOfBytes(using: String.Encoding.ascii) > 40 {
             return nil
         }
-
+        
         let pointer = UnsafeMutablePointer<git_oid>.allocate(capacity: 1)
         let result = git_oid_fromstr(pointer, string)
-
+        
         if result < GIT_OK.rawValue {
             pointer.deallocate()
             return nil
         }
-
+        
         oid = pointer.pointee
         pointer.deallocate()
     }
 }
 
-public extension OID {
-    var oidShort: String { "\( self.description.suffix(8) )" }
-}
-
 extension OID: CustomStringConvertible {
     public var description: String {
-        let length = Int(GIT_OID_RAWSZ) * 2
-        let string = UnsafeMutablePointer<Int8>.allocate(capacity: length)
-        var oid = self.oid
-        git_oid_fmt(string, &oid)
-
-        return String(bytesNoCopy: string, length: length, encoding: .ascii, freeWhenDone: true)!
+        var oidInternal = self.oid
+        return git_oid_tostr_s(&oidInternal)?.asString() ?? "failed to get oid description"
     }
+}
+
+public extension OID {
+    var oidShort: String { String("\( self )".prefix(7)) }
 }
 
 extension OID: Hashable {
@@ -69,7 +65,7 @@ extension OID: Hashable {
             hasher.combine(bytes: $0)
         }
     }
-
+    
     public static func == (lhs: OID, rhs: OID) -> Bool {
         var left = lhs.oid
         var right = rhs.oid
