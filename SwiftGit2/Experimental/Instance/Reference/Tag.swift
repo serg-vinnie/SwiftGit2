@@ -31,7 +31,7 @@ public struct Tag: InstanceProtocol, ObjectType, Hashable  {
     public let name: String
     
     /// The tagger (author) of the tag.
-    public let tagger: git_signature
+    public let tagger: git_signature?
     
     /// The message of the tag.
     public let message: String
@@ -44,7 +44,7 @@ public struct Tag: InstanceProtocol, ObjectType, Hashable  {
         self.targetOid = targetOid
         //target = Pointer(oid: targetOid, type: git_tag_target_type(pointer))!
         name = String(validatingUTF8: git_tag_name(pointer))!
-        tagger = git_tag_tagger(pointer).pointee
+        tagger = git_tag_tagger(pointer)?.pointee
         message = String(validatingUTF8: git_tag_message(pointer))!
     }
 }
