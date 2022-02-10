@@ -114,6 +114,22 @@ public extension Index {
             git_index_conflict_cleanup(self.pointer)
         } | { self.write() }
     }
+    
+    ///Update all index entries to match the working directory
+    func updateAll() -> R<()> {
+        return git_try("git_index_update_all") {
+            git_index_update_all(self.pointer, nil, nil, nil);
+        }
+    }
+    
+    ///Update the contents of an existing index object in memory by reading from the hard disk.
+    func read(force: Bool = false ) -> R<()> {
+        let intForce: Int32 = force ? 1 : 0
+        
+        return git_try("git_index_read") {
+            git_index_read(self.pointer, intForce);
+        }
+    }
 
     func clear() -> Result<Void, Error> {
         _result((), pointOfFailure: "git_index_clear") { git_index_clear(pointer) }
