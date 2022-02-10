@@ -17,7 +17,7 @@ class ModuleTests: XCTestCase {
     
     func test_moduleShouldExists() {
         let sub_folder = folder.sub(folder: "empty_repo")
-        let _ = sub_folder.cleared() | { $0.repoCreate }
+        let _ = sub_folder.clearRepo
         
         let moduleNotExists = Repository.module(at: sub_folder.url).shouldSucceed()!
         XCTAssert(moduleNotExists.exists == true)

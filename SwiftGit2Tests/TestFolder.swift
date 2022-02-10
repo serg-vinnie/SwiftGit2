@@ -4,8 +4,10 @@ import Essentials
 import SwiftGit2
 
 extension TestFolder {
-    var repo : R<Repository> { Repository.at(url: url) }
-    var repoCreate : R<Repository> { Repository.create(at: url) }
+    var clearRepo        : R<Repository> { cleared() | { $0.repoCreate } }
+    
+    var repo             : R<Repository> { Repository.at(url: url) }
+    var repoCreate       : R<Repository> { Repository.create(at: url) }
     var repoOpenOrCreate : R<Repository> {
         if Repository.exists(at: url) {
             return Repository.at(url: url)
