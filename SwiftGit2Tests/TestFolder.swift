@@ -1,6 +1,19 @@
 
 import Foundation
 import Essentials
+import SwiftGit2
+
+extension TestFolder {
+    var repo : R<Repository> { Repository.at(url: url) }
+    var repoCreate : R<Repository> { Repository.create(at: url) }
+    var repoOpenOrCreate : R<Repository> {
+        if Repository.exists(at: url) {
+            return Repository.at(url: url)
+        } else {
+            return Repository.create(at: url)
+        }
+    }
+}
 
 struct TestFolder {
     let url : URL
@@ -14,8 +27,8 @@ struct TestFolder {
         TestFolder(url: self.url.appendingPathComponent(folder))
     }
     
-    func cleared() -> R<URL> {
-        url.rm() | { url.makeSureDirExist() }
+    func cleared() -> R<TestFolder> {
+        url.rm() | { url.makeSureDirExist() } | { _ in self }
     }
 }
 

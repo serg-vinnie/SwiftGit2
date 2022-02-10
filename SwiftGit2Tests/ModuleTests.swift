@@ -4,28 +4,8 @@ import SwiftGit2
 import Essentials
 import EssetialTesting
 
-struct TestEnvironment {
-    let work_root : URL
-    
-    init(project: String) {
-        work_root = URL.userHome.appendingPathComponent(".git_tests").appendingPathComponent(project)
-        _ = work_root.makeSureDirExist()
-        if !Repository.exists(at: emptyRepoURL) {
-            _ = Repository.create(at: emptyRepoURL)
-        }
-    }
-    
-    var emptyRepoURL : URL { work_root.appendingPathComponent("empty_repo") }
-}
-
-
-
-
-
 class ModuleTests: XCTestCase {
     let folder = TestFolder.git_tests.sub(folder: "ModuleTests")
-    
-    let testing = TestEnvironment(project: "ModuleTests")
     
     override func setUpWithError()    throws {} // Put setup code here. This method is called before the invocation of each test method in the class.
     override func tearDownWithError() throws {} // Put teardown code here. This method is called after the invocation of each test method in the class.
@@ -36,14 +16,16 @@ class ModuleTests: XCTestCase {
     }
     
     func test_moduleShouldExists() {
-        let moduleNotExists = Repository.module(at: testing.emptyRepoURL).shouldSucceed()!
+        let sub_folder = folder.sub(folder: "empty_repo")
+        let _ = sub_folder.cleared() | { $0.repoCreate }
+        
+        let moduleNotExists = Repository.module(at: sub_folder.url).shouldSucceed()!
         XCTAssert(moduleNotExists.exists == true)
     }
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            _ = Repository.module(at: testing.emptyRepoURL)
-        }
-    }
+//    func testPerformanceExample() throws {
+//        self.measure {
+//
+//        }
+//    }
 }
