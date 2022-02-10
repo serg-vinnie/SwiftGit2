@@ -10,6 +10,12 @@ import Clibgit2
 import Essentials
 
 public extension Repository {
+    func add(submodule name: String, remote: String, gitlink: Bool) -> R<Submodule> {
+        git_instance(of: Submodule.self, "git_submodule_add_setup") { sub in
+            git_submodule_add_setup(&sub, self.pointer, remote, name, gitlink ? 1 : 0)
+        }
+    }
+    
     var childrenURLs : R<[URL]> {
         let url = self.directoryURL
         let paths = submodules().map { $0.map { $0.path } }

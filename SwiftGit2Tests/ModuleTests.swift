@@ -16,11 +16,33 @@ class ModuleTests: XCTestCase {
     }
     
     func test_moduleShouldExists() {
-        let sub_folder = folder.sub(folder: "empty_repo")
-        let _ = sub_folder.clearRepo
+        let subFolder = folder.sub(folder: "empty_repo")
+        let _ = subFolder.clearRepo
         
-        let moduleNotExists = Repository.module(at: sub_folder.url).shouldSucceed()!
+        let moduleNotExists = Repository.module(at: subFolder.url).shouldSucceed()!
         XCTAssert(moduleNotExists.exists == true)
+    }
+    
+    func test_shouldAddSubmodule() {
+        let root = folder.sub(folder: "shouldAddSubmodule").cleared().shouldSucceed()!
+        let mainRepo = root.sub(folder: "main_repo").repoCreate.shouldSucceed()!
+        
+        root.sub(folder: "sub_repo").repoCreate
+            .shouldSucceed()
+        
+        // add
+        mainRepo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
+            .shouldSucceed()
+        
+        // file .gitmodules should exist
+        (mainRepo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists })
+            .assertEqual(to: true)
+        
+        
+        let submodule = mainRepo.submoduleLookup(named: "SubModule").shouldSucceed()!
+        XCTAssert(submodule.name == "SubModule")
+        XCTAssert(submodule.path == "SubModule")
+        XCTAssert(submodule.url == "../sub_repo")
     }
 
 //    func testPerformanceExample() throws {

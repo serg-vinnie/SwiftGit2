@@ -15,7 +15,10 @@ extension TestFolder {
             return Repository.create(at: url)
         }
     }
+
+    static var git_tests : TestFolder { TestFolder(url: URL.userHome.appendingPathComponent(".git_tests")) }
 }
+
 
 struct TestFolder {
     let url : URL
@@ -32,8 +35,4 @@ struct TestFolder {
     func cleared() -> R<TestFolder> {
         url.rm() | { url.makeSureDirExist() } | { _ in self }
     }
-}
-
-extension TestFolder {
-    static var git_tests : TestFolder { TestFolder(url: URL.userHome.appendingPathComponent(".git_tests")) }
 }
