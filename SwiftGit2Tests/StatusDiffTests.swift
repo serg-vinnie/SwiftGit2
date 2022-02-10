@@ -4,17 +4,8 @@ import XCTest
 import EssetialTesting
 
 class StatusDiffTests: XCTestCase {
-    let urlRoot = URL.userHome.appendingPathComponent(".TaoTestData")
-    lazy var urlHeadIsUnborn = urlRoot.appendingPathComponent("dst/headIsUnborn")
-    lazy var urlOneCommit = urlRoot.appendingPathComponent("dst/oneCommit")
-    
-    override func setUp() {
-        let dstURL = urlRoot.appendingPathComponent("dst")
-        let srcURL = urlRoot.appendingPathComponent("src")
-        srcURL.copy(to: dstURL, replace: true)
-            .shouldSucceed()
-    }
-    
+    let folder = TestFolder.git_tests.sub(folder: "StatusDiffTests")
+        
 //    func test_should_return_content_of_Untracked_Unstaged_File() {
 //        let repo = Repository.at(url: urlHeadIsUnborn)
 //            .shouldSucceed()!
@@ -28,31 +19,33 @@ class StatusDiffTests: XCTestCase {
 //    }
     
     func test_should_return_content_of_Untracked_Staged_File() {
-        var status = Repository.at(url: urlHeadIsUnborn)
-            .flatMap { $0.status() }
-            .shouldSucceed()!
+        let root = folder.sub(folder: "should_return_content_of_Untracked_Staged_File").cleared().shouldSucceed()!
+        _ = root.clearRepo.flatMap { $0.t_with(file: .fileA, with: .oneLine1) }.shouldSucceed()
         
-        let statusEntryHunks1 = Repository
-            .at(url: urlHeadIsUnborn)
+        var status = root.repo
+            .flatMap { $0.status() }
+            .shouldSucceed("status")!
+        
+        let statusEntryHunks1 = root.repo
             .flatMap{ status[0].with($0).hunks }
-            .shouldSucceed()!
+            .shouldSucceed("statusEntryHunks1")!
         
         XCTAssert( statusEntryHunks1.staged.count == 0 && statusEntryHunks1.unstaged.count == 1 )
         
-        Repository
-            .at(url: urlHeadIsUnborn)
+        root.repo
             .flatMap { $0.stage(.all) }
-            .shouldSucceed()
+            .shouldSucceed("stage(.all)")
         
-        status = Repository.at(url: urlHeadIsUnborn)
+        status = root.repo
             .flatMap { $0.status() }
-            .shouldSucceed()!
+            .shouldSucceed("status")!
+                
         XCTAssert(status.count == 1)
         XCTAssert(status[0].statuses.contains(.added))
         
-        let statusEntryHunks2 = Repository.at(url: urlHeadIsUnborn)
+        let statusEntryHunks2 = root.repo
             .flatMap{ status[0].with($0).hunks }
-            .shouldSucceed()!
+            .shouldSucceed("hunks")!
         
         XCTAssert( statusEntryHunks2.staged.count == 1 )
         
@@ -137,13 +130,12 @@ class StatusDiffTests: XCTestCase {
     }
     
     func test_should_return_Hunk_From_File() {
-        let hunk = Repository.at(url: urlHeadIsUnborn)
-            .flatMap{ $0.hunkFrom(relPath: "file.txt") }
-            .shouldSucceed("hunk")!
-        
-        print(hunk)
-        
-        XCTAssert(hunk.lines[0].content == "bla bla bla\n")
+        folder.sub(folder: "test_should_return_Hunk_From_File")
+            .clearRepo
+            .flatMap { $0.t_with(file: .fileA, with: .oneLine1) }
+            .flatMap{ $0.hunkFrom(relPath: TestFile.fileA.rawValue) }
+            .map { $0.lines[0].content }
+            .assertEqual(to: TestFileContent.oneLine1.rawValue, "hunk_0_line")
     }
     
     func test_should_create_hooks_templates() {

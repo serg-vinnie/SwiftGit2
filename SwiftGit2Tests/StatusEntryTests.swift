@@ -33,7 +33,7 @@ class StatusEntryTests: XCTestCase {
     }
     
     func test_should_stage_new_file() {
-        let url = URL.randomTempDirectory().maybeSuccess!
+        let url = URL.randomTempDirectory().shouldSucceed()!
         
         let status = Repository.create(at: url)
             .flatMap { $0.t_with(file: .fileA, with: .random) }

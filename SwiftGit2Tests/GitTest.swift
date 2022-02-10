@@ -24,90 +24,12 @@ struct PublicTestRepo {
     init() {
         localPath = GitTest.localRoot.appendingPathComponent(urlSsh.lastPathComponent).deletingPathExtension()
         localPath2 = GitTest.localRoot.appendingPathComponent(localPath.lastPathComponent + "2")
-        localPath.rm().assertFailure()
-        localPath2.rm().assertFailure()
+        localPath.rm().shouldSucceed()
+        localPath2.rm().shouldSucceed()
     }
 }
 
-extension Result {
-    @discardableResult
-    func assertBlock(_ topic: String? = nil, block: (Success) -> Bool) -> Success? {
-        onSuccess {
-            topic?.print(success: $0)
-            XCTAssert(block($0))
-        }.onFailure {
-            topic?.print(failure: $0)
-            XCTAssert(false)
-        }
-        return maybeSuccess
-    }
-
-    @discardableResult
-    func assertFailure(_ topic: String? = nil) -> Success? {
-        onSuccess {
-            topic?.print(success: $0)
-        }.onFailure {
-            topic?.print(failure: $0)
-            XCTAssert(false)
-        }
-        return maybeSuccess
-    }
-
-    @discardableResult
-    func assertSuccess(_ topic: String? = nil) -> Success? {
-        onSuccess {
-            topic?.print(success: $0)
-            XCTAssert(false)
-        }.onFailure {
-            topic?.print(failure: $0)
-        }
-        return maybeSuccess
-    }
-
-    @discardableResult
-    func assertEqual(to: Success, _ topic: String? = nil) -> Success? where Success: Equatable {
-        onSuccess {
-            XCTAssert(to == $0)
-            topic?.print(success: $0)
-        }.onFailure {
-            topic?.print(failure: $0)
-            XCTAssert(false)
-        }
-        return maybeSuccess
-    }
-
-    @discardableResult
-    func assertNotEqual(to: Success, _ topic: String? = nil) -> Success? where Success: Equatable {
-        onSuccess {
-            XCTAssert(to != $0)
-            topic?.print(success: $0)
-        }.onFailure {
-            topic?.print(failure: $0)
-            XCTAssert(false)
-        }
-        return maybeSuccess
-    }
-
-    var maybeSuccess: Success? {
-        switch self {
-        case let .success(s):
-            return s
-        default:
-            return nil
-        }
-    }
-}
-
-extension String {
-    func print<T>(success: T) {
-        Swift.print("\(self) SUCCEEDED with: \(success)")
-    }
-    
-    func print(failure: Error) {
-        let nsError = failure as NSError
-        Swift.print("\(self) FAILED with(code:\(nsError.code): \(failure.localizedDescription)")
-    }
-    
+extension String {    
     func write(to file: URL) -> Result<Void, Error> {
         do {
             try write(toFile: file.path, atomically: true, encoding: .utf8)

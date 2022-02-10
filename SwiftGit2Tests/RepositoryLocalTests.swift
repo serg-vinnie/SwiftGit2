@@ -1,5 +1,6 @@
 
 import Essentials
+import EssetialTesting
 import Foundation
 @testable import SwiftGit2
 import XCTest
@@ -16,69 +17,69 @@ class RepositoryLocalTests: XCTestCase {
     func testCreateOpenRepo() throws {
         GitTest.tmpURL
             .flatMap { Repository.create(at: $0) }
-            .assertFailure("create repo")
+            .shouldSucceed("create repo")
     }
     
     func testCreateAddFile() throws {
         GitTest.tmpURL
             .flatMap { Repository.create(at: $0) }
             .flatMap { $0.t_commit(msg: "initial commit") }
-            .assertFailure("initial commit")
+            .shouldSucceed("initial commit")
     }
     
     func testCreateRepo() {
         let url = GitTest.localRoot.appendingPathComponent("NewRepo")
         let README_md = "README.md"
-        url.rm().assertFailure("rm")
+        url.rm().shouldSucceed("rm")
         
-        guard let repo = Repository.create(at: url).assertFailure("Repository.create") else { fatalError() }
+        guard let repo = Repository.create(at: url).shouldSucceed("Repository.create") else { fatalError() }
         
         let file = url.appendingPathComponent(README_md)
-        "# test repository".write(to: file).assertFailure("write file")
+        "# test repository".write(to: file).shouldSucceed("write file")
         
-        // if let status = repo.status().assertFailure("status") { XCTAssert(status.count == 1) } else { fatalError() }
+        // if let status = repo.status().shouldSucceed("status") { XCTAssert(status.count == 1) } else { fatalError() }
         
         // repo.reset(paths: )
         repo.addBy(path: README_md)
         //index().flatMap { $0.add(paths: [README_md]) }
-            .assertFailure("index add \(README_md)")
+            .shouldSucceed("index add \(README_md)")
         
         repo.commit(message: "initial commit", signature: Signature(name: "name", email: "email@domain.com"))
-            .assertFailure("initial commit")
+            .shouldSucceed("initial commit")
     }
     
     func testDetachedHead() throws {
         let repo_ = GitTest.tmpURL
             .flatMap { Repository.create(at: $0) }
-            .assertFailure("create repo")
+            .shouldSucceed("create repo")
         
         // for some reason it doesnt compile "let repo = repo"
         guard let repo = repo_ else { fatalError() }
         
         // HEAD is unborn
         XCTAssert(repo.headIsUnborn)
-        guard let fixResultUnborn = repo.detachedHeadFix().assertFailure("detached HEAD fix on unborn") else { fatalError() }
+        guard let fixResultUnborn = repo.detachedHeadFix().shouldSucceed("detached HEAD fix on unborn") else { fatalError() }
         XCTAssert(fixResultUnborn == .notNecessary)
         
         // single commit
-        repo.t_commit(msg: "commit1").assertFailure("commit")
+        repo.t_commit(msg: "commit1").shouldSucceed("commit")
         XCTAssert(!repo.headIsUnborn)
-        guard let fixResultWCommit = repo.detachedHeadFix().assertFailure("detached HEAD fix on commit1") else { fatalError() }
+        guard let fixResultWCommit = repo.detachedHeadFix().shouldSucceed("detached HEAD fix on commit1") else { fatalError() }
         XCTAssert(fixResultWCommit == .notNecessary)
         
         repo.detachHEAD()
-            .assertFailure("set HEAD detached")
+            .shouldSucceed("set HEAD detached")
         
-        guard let fixResultDetached = repo.detachedHeadFix().assertFailure("detached HEAD fix") else { fatalError() }
+        guard let fixResultDetached = repo.detachedHeadFix().shouldSucceed("detached HEAD fix") else { fatalError() }
         XCTAssert(fixResultDetached == .fixed)
         
         repo.createBranch(from: .HEAD, name: "branch1", checkout: false)
-            .assertFailure("create branch1")
+            .shouldSucceed("create branch1")
         
         repo.detachHEAD()
-            .assertFailure("set HEAD detached")
+            .shouldSucceed("set HEAD detached")
         
-        guard let fixResultAmbigues = repo.detachedHeadFix().assertFailure("detached HEAD fix") else { fatalError() }
+        guard let fixResultAmbigues = repo.detachedHeadFix().shouldSucceed("detached HEAD fix") else { fatalError() }
         
         XCTAssert(fixResultAmbigues == .ambiguous(branches: ["refs/heads/branch1", "refs/heads/main"]))
     }
