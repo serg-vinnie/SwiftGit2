@@ -27,7 +27,7 @@ class ModuleTests: XCTestCase {
         let root = folder.sub(folder: "shouldAddSubmodule") //.cleared().shouldSucceed()!
         let repo = (root.with(repo: "main_repo", content: .empty) | { $0.repo }).shouldSucceed()!
         
-        root.with(repo: "sub_repo", content: .empty)
+        root.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()
         
         // add
