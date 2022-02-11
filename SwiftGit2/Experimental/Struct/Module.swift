@@ -10,8 +10,7 @@ public struct Module {
 
 public extension Repository {
     var asModule : R<Module> {
-        
-        return .notImplemented
+        directoryURL | { Module(url: $0, exists: true, subModules: [:]) }
     }
     
     static func module(at url: URL) -> R<Module> {

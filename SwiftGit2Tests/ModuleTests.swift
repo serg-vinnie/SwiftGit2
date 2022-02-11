@@ -24,19 +24,19 @@ class ModuleTests: XCTestCase {
     }
     
     func test_shouldAddAndCloneSubmodule() {
-        let root = folder.sub(folder: "shouldAddSubmodule") //.cleared().shouldSucceed()!
+        let root = folder.sub(folder: "shouldAddSubmodule")
         let repo = (root.with(repo: "main_repo", content: .empty) | { $0.repo }).shouldSucceed()!
         
         root.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
-            .shouldSucceed()
+            .shouldSucceed("make repo")
         
         // add
         repo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
-            .shouldSucceed()
+            .shouldSucceed("add submodule")
         
         // file .gitmodules should exist
         (repo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists })
-            .assertEqual(to: true)
+            .assertEqual(to: true, ".gitmodules exists")
         
         
         let submodule = repo.submoduleLookup(named: "SubModule").shouldSucceed()!
@@ -44,16 +44,17 @@ class ModuleTests: XCTestCase {
         XCTAssert(submodule.path == "SubModule")
         XCTAssert(submodule.url == "../sub_repo")
         
-        let opt = SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)), checkout: CheckoutOptions(strategy: .None, pathspec: [], progress: nil))
+        let opt = SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)), checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
         
         submodule.clone(options: opt)
-            .shouldSucceed()
+            .shouldSucceed("clone")
         
         submodule.finalize()
-            .shouldSucceed()
+            .shouldSucceed("finalize")
         
-        (submodule.repo() | { $0.checkout(branch: "refs/heads/main") })
-            .shouldSucceed("checkout")!
+        repo.asModule
+            .map { $0.subModules.count }
+            .assertEqual(to: 1, "sub-modules count")
     }
 
 //    func testPerformanceExample() throws {
