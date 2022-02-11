@@ -222,8 +222,8 @@ public extension Submodule {
     /// Resolve the setup of a new git submodule. |
     /// This should be called on a submodule once you have called add setup and done the clone of the submodule.
     /// This adds the .gitmodules file and the newly cloned submodule to the index to be ready to be committed (but doesn't actually do the commit).
-    func finalize() -> Result<Void, Error> {
-        return _result({ () }, pointOfFailure: "git_submodule_add_finalize") {
+    func finalize() -> R<Void> {
+        git_try("git_submodule_add_finalize") {
             git_submodule_add_finalize(self.pointer)
         }
     }

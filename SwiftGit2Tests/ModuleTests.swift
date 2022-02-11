@@ -23,7 +23,7 @@ class ModuleTests: XCTestCase {
         XCTAssert(moduleNotExists.exists == true)
     }
     
-    func test_shouldAddSubmodule() {
+    func test_shouldAddAndCloneSubmodule() {
         let root = folder.sub(folder: "shouldAddSubmodule") //.cleared().shouldSucceed()!
         let repo = (root.with(repo: "main_repo", content: .empty) | { $0.repo }).shouldSucceed()!
         
@@ -43,6 +43,17 @@ class ModuleTests: XCTestCase {
         XCTAssert(submodule.name == "SubModule")
         XCTAssert(submodule.path == "SubModule")
         XCTAssert(submodule.url == "../sub_repo")
+        
+        let opt = SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)), checkout: CheckoutOptions(strategy: .None, pathspec: [], progress: nil))
+        
+        submodule.clone(options: opt)
+            .shouldSucceed()
+        
+        submodule.finalize()
+            .shouldSucceed()
+        
+        (submodule.repo() | { $0.checkout(branch: "refs/heads/main") })
+            .shouldSucceed("checkout")!
     }
 
 //    func testPerformanceExample() throws {
