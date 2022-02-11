@@ -23,6 +23,6 @@ extension TestFolder {
 extension TestFolder {
     func with(repo name: String, content: RepositoryContent) -> R<TestFolder> {
         let subFolder = sub(folder: name)
-        return subFolder.clearRepo | { _ in subFolder }
+        return subFolder.clearRepo | { $0.t_with(content: content) } | { _ in subFolder }
     }
 }
