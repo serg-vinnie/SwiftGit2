@@ -19,3 +19,10 @@ extension TestFolder {
 
     static var git_tests : TestFolder { TestFolder(url: URL.userHome.appendingPathComponent(".git_tests")) }
 }
+
+extension TestFolder {
+    func with(repo name: String, content: RepositoryContent) -> R<TestFolder> {
+        let subFolder = sub(folder: name)
+        return subFolder.clearRepo | { _ in subFolder }
+    }
+}

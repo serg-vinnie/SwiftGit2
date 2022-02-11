@@ -4,10 +4,24 @@ import Foundation
 @testable import SwiftGit2
 import XCTest
 
+enum RepositoryContent {
+    case empty
+    case file(TestFile, TestFileContent)
+    case commit(TestFile, TestFileContent, String)
+}
+
 extension Repository {
     static func t_randomRepo() -> Result<Repository, Error> {
         URL.randomTempDirectory()
             .flatMap { Repository.create(at: $0) }
+    }
+    
+    func t_with(content: RepositoryContent) -> R<Repository> {
+        switch content {
+        case     .empty:                        return .success(self)
+        case let .file  (file, content):        return t_with(file: file, with: content)
+        case let .commit(file, content, msg):   return t_commit(file: file, with: content, msg: msg) | { _ in self }
+        }
     }
 
     func t_push_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {

@@ -24,22 +24,22 @@ class ModuleTests: XCTestCase {
     }
     
     func test_shouldAddSubmodule() {
-        let root = folder.sub(folder: "shouldAddSubmodule").cleared().shouldSucceed()!
-        let mainRepo = root.sub(folder: "main_repo").repoCreate.shouldSucceed()!
+        let root = folder.sub(folder: "shouldAddSubmodule") //.cleared().shouldSucceed()!
+        let repo = (root.with(repo: "main_repo", content: .empty) | { $0.repo }).shouldSucceed()!
         
-        root.sub(folder: "sub_repo").repoCreate
+        root.with(repo: "main_repo", content: .empty)
             .shouldSucceed()
         
         // add
-        mainRepo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
+        repo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
             .shouldSucceed()
         
         // file .gitmodules should exist
-        (mainRepo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists })
+        (repo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists })
             .assertEqual(to: true)
         
         
-        let submodule = mainRepo.submoduleLookup(named: "SubModule").shouldSucceed()!
+        let submodule = repo.submoduleLookup(named: "SubModule").shouldSucceed()!
         XCTAssert(submodule.name == "SubModule")
         XCTAssert(submodule.path == "SubModule")
         XCTAssert(submodule.url == "../sub_repo")
