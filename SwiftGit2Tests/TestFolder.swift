@@ -2,6 +2,7 @@
 import Foundation
 import Essentials
 import SwiftGit2
+import EssetialTesting
 
 extension TestFolder {
     var clearRepo        : R<Repository> { cleared() | { $0.repoCreate } }
@@ -17,22 +18,4 @@ extension TestFolder {
     }
 
     static var git_tests : TestFolder { TestFolder(url: URL.userHome.appendingPathComponent(".git_tests")) }
-}
-
-
-struct TestFolder {
-    let url : URL
-    
-    init(url: URL) {
-        self.url = url
-        _ = url.makeSureDirExist()
-    }
-    
-    func sub(folder: String) -> TestFolder {
-        TestFolder(url: self.url.appendingPathComponent(folder))
-    }
-    
-    func cleared() -> R<TestFolder> {
-        url.rm() | { url.makeSureDirExist() } | { _ in self }
-    }
 }
