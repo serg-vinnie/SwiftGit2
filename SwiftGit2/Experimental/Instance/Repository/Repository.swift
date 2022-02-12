@@ -201,7 +201,6 @@ public extension Repository {
 
 public extension Repository {
     class func exists(at url: URL) -> Bool {
-        print(url.path)
         guard url.exists else {
             return false
         }
