@@ -32,18 +32,17 @@ class StatusEntryTests: XCTestCase {
             .assertEqual(to: TestFile.fileA.rawValue)
     }
     
-    func test_should_stage_new_file() {
-        let url = URL.randomTempDirectory().shouldSucceed()!
+    func test_shouldStageNewFile() {
+        let folder = self.folder.with(repo: "shouldStageNewFile", content: .file(.fileA, .random))
         
-        let status = Repository.create(at: url)
-            .flatMap { $0.t_with(file: .fileA, with: .random) }
+        let status = folder.repo
             .flatMap { $0.status() }
             .shouldSucceed()!
         
         XCTAssert(status[0].statuses == [.untracked] )
         XCTAssert(status[0].stageState != .staged)
         
-        let newStatus = Repository.at(url: url)
+        let newStatus = folder.repo
             .flatMap { $0.stage(.entry(status[0])) }
             .flatMap { $0.status() }
             .shouldSucceed()!
@@ -52,9 +51,9 @@ class StatusEntryTests: XCTestCase {
         XCTAssert(newStatus[0].statuses == [.added] )
     }
     
-    func test_commit_file_should_return_pathInWd() {
-        let commitDetails = Repository.t_randomRepo()
-            .flatMap { $0.t_with_commit(file: .fileA, with: .random, msg: "....") }
+    func test_commitedFile_ShouldReturn_stagePath() {
+        let commitDetails = folder.with(repo: "commitedFile_ShouldReturn_stagePath", content: .commit(.fileA, .random, "...."))
+            .repo
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .shouldSucceed()!
         
@@ -62,39 +61,34 @@ class StatusEntryTests: XCTestCase {
         XCTAssert(commitDetails.deltasWithHunks[0].statuses == [.added])
     }
     
-    func test_should_return_EntyFileInfo_Commit() {
-        _ = Repository.t_randomRepo()
-            .flatMap { $0.t_with_commit(file: .fileA, with: .random, msg: "....") }
+    func test_shouldReturn_EntyFileInfo_Commit() {
+        folder.with(repo: "shouldReturn_EntyFileInfo_Commit", content: .commit(.fileA, .random, "...."))
+            .repo
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .flatMap { $0.deltasWithHunks[0].entryFileInfo }
-            .shouldSucceed()!
+            .shouldSucceed()
     }
     
-    func test_should_return_EntyFileInfo_Commit_rename() {
-        let url = URL(fileURLWithPath: NSTemporaryDirectory().appending(UUID().uuidString), isDirectory: true)
+    func test_shouldReturn_EntyFileInfo_Commit_Rename() {
+        let folder = folder.with(repo: "shouldReturn_EntyFileInfo_Commit_Rename", content: .commit(.fileA, .random, "...."))
+            .shouldSucceed()!
         
-        print("REPO_URL \(url.path)")
+        folder.url.moveFile(at: TestFile.fileA.rawValue, to: TestFile.fileB.rawValue)
         
-        Repository.create(at: url)
-            .flatMap { $0.t_with_commit(file: .fileA, with: .random, msg: "....") }
-            .shouldSucceed()
-        
-        url.moveFile(at: TestFile.fileA.rawValue, to: TestFile.fileB.rawValue)
-        
-        let status = Repository.create(at: url)
+        let status = folder.repo
             .flatMap { $0.status() }
             .shouldSucceed()!
         
         XCTAssert(status[0].statuses == [.deleted])
         XCTAssert(status[1].statuses == [.untracked])
         
-        Repository.at(url: url)
+        folder.repo
             .flatMap { $0.stage(.entry(status[0])) }
             .flatMap { $0.stage(.entry(status[1])) }
             .flatMap { $0.commit(message: "rename", signature: GitTest.signature) }
             .shouldSucceed()
         
-        let deltas = Repository.at(url: url)
+        let deltas = folder.repo
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .shouldSucceed("deltas")!
         

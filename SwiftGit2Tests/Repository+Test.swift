@@ -11,11 +11,6 @@ enum RepositoryContent {
 }
 
 extension Repository {
-    static func t_randomRepo() -> Result<Repository, Error> {
-        URL.randomTempDirectory()
-            .flatMap { Repository.create(at: $0) }
-    }
-    
     func t_with(content: RepositoryContent) -> R<Repository> {
         switch content {
         case     .empty:                        return .success(self)
