@@ -24,52 +24,42 @@ class ModuleTests: XCTestCase {
     }
     
     func test_shouldAddAndCloneSubmodule() {
-        let root = folder.sub(folder: "shouldAddSubmodule")
-        let repo = (root.with(repo: "main_repo", content: .empty) | { $0.repo }).shouldSucceed()!
+        let root = folder.sub(folder: "shouldAddAndCloneSubmodule")
+        
+        let repo = (root.with(repo: "main_repo", content: .empty) | { $0.repo })
+            .shouldSucceed()!
         
         root.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
-            .shouldSucceed("make repo")
+            .shouldSucceed()
         
-        repo.asModule
-            .shouldSucceed("asModule 1")
-        
-        // add
+        // ADD
         repo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
-            .shouldSucceed("add submodule")
+            .shouldSucceed()
 
-        repo.asModule
-            .shouldSucceed("asModule 2")
+        (repo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists }) // file .gitmodules should exist
+            .assertEqual(to: true)
 
-        // file .gitmodules should exist
-        (repo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists })
-            .assertEqual(to: true, ".gitmodules exists")
-        
-        
         let submodule = repo.submoduleLookup(named: "SubModule").shouldSucceed()!
         XCTAssert(submodule.name == "SubModule")
         XCTAssert(submodule.path == "SubModule")
         XCTAssert(submodule.url == "../sub_repo")
         
+        // CLONE
         let opt = SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)), checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
         
         submodule.clone(options: opt)
-            .shouldSucceed("clone")
-        
-        repo.asModule
-            .shouldSucceed("asModule 3")
-        
+            .shouldSucceed()
+                
+        // FINALIZE
         submodule.finalize()
-            .shouldSucceed("finalize")
-        
-        repo.asModule
-            .shouldSucceed("asModule 4")
-            //.map { $0.subModules.count }
-            //.assertEqual(to: 1, "sub-modules count")
+            .shouldSucceed()
     }
 
-//    func testPerformanceExample() throws {
-//        self.measure {
-//
-//        }
-//    }
+    func testPerformanceExample() throws {
+        self.measure {
+//            Repository.at(url: URL.userHome.appendingPathComponent("dev/taogit"))
+//                .flatMap { $0.asModule }
+//                .shouldSucceed()
+        }
+    }
 }
