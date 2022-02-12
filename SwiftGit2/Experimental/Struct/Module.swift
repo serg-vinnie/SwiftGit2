@@ -5,28 +5,15 @@ import Essentials
 public struct Module : CustomStringConvertible {
     public let url : URL
     public let exists : Bool
+    public let headIsUnborn : Bool
     public let subModules : [String:Module?]
-    
-    static func from(submodule: Submodule) -> R<Module> {
-        let url = submodule.absURL
         
-        if submodule.repoExist() {
-            return combine(url, submodule.repo()) | { url, repo in
-                repo.subModules | { Module(url: url, exists: true, subModules: $0) }
-            }
-        } else {
-            return url | { Module(url: $0, exists: false, subModules: [:]) }
-        }
-    }
-    
-    public var description: String { "| M: " + url.lastPathComponent + " \(subModules) |" }
+    public var description: String { "| M(\(exists) \(headIsUnborn): " + url.lastPathComponent + " \(subModules) |" }
 }
-
-
 
 public extension Repository {
     var asModule : R<Module> {
-        combine(directoryURL,subModules) | { Module(url: $0, exists: true, subModules: $1) }
+        combine(directoryURL,subModules) | { Module(url: $0, exists: true, headIsUnborn: self.headIsUnborn, subModules: $1) }
     }
     
     var subModules : R<[String:Module?]> {
@@ -34,23 +21,29 @@ public extension Repository {
     }
     
     static func module(at url: URL) -> R<Module> {
-        guard Repository.exists(at: url) else {
-            return .success(Module(url: url, exists: false, subModules: [:]))
+        if Repository.exists(at: url) {
+            return Repository.at(url: url) | { $0.asModule }
         }
-        return .success(Module(url: url, exists: true, subModules: [:]))
+        return .success(Module(url: url, exists: false, headIsUnborn: false, subModules: [:]))
     }
 }
 
 private extension Array where Element == Submodule {
     var asDictionary : [String : Module?] {
         self.toDictionary(key: \.name) { submodule in
-            try? submodule.asModule.get() 
+            try? submodule.asModule.get()
         }
     }
 }
 
 private extension Submodule {
     var asModule : R<Module> {
-        Module.from(submodule: self)
+        if repoExist() {
+            return combine(absURL, repo()) | { url, repo in
+                repo.subModules | { Module(url: url, exists: true, headIsUnborn: repo.headIsUnborn, subModules: $0) }
+            }
+        } else {
+            return absURL | { Module(url: $0, exists: false, headIsUnborn: false, subModules: [:]) }
+        }
     }
 }

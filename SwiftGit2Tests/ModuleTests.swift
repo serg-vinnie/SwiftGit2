@@ -11,16 +11,16 @@ class ModuleTests: XCTestCase {
     override func tearDownWithError() throws {} // Put teardown code here. This method is called after the invocation of each test method in the class.
 
     func test_moduleShouldNotExist() {
-        let moduleNotExists = Repository.module(at: URL(fileURLWithPath: "some_shit")).shouldSucceed()!
-        XCTAssert(moduleNotExists.exists == false)
+        (Repository.module(at: URL(fileURLWithPath: "some_shit")) | { $0.exists })
+            .assertEqual(to: false, "module not exist")
     }
     
     func test_moduleShouldExists() {
-        let subFolder = folder.sub(folder: "empty_repo")
-        let _ = subFolder.clearRepo
-        
-        let moduleNotExists = Repository.module(at: subFolder.url).shouldSucceed()!
-        XCTAssert(moduleNotExists.exists == true)
+        (folder.with(repo: "empty_repo", content: .empty)
+            | { $0.repo }
+            | { $0.asModule }
+            | { $0.exists }
+        ).assertEqual(to: true, "module exists")
     }
     
     func test_shouldAddAndCloneSubmodule() {
@@ -30,10 +30,16 @@ class ModuleTests: XCTestCase {
         root.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed("make repo")
         
+        repo.asModule
+            .shouldSucceed("asModule 1")
+        
         // add
         repo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
             .shouldSucceed("add submodule")
-        
+
+        repo.asModule
+            .shouldSucceed("asModule 2")
+
         // file .gitmodules should exist
         (repo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists })
             .assertEqual(to: true, ".gitmodules exists")
@@ -49,11 +55,14 @@ class ModuleTests: XCTestCase {
         submodule.clone(options: opt)
             .shouldSucceed("clone")
         
+        repo.asModule
+            .shouldSucceed("asModule 3")
+        
         submodule.finalize()
             .shouldSucceed("finalize")
         
         repo.asModule
-            .shouldSucceed("asModule")
+            .shouldSucceed("asModule 4")
             //.map { $0.subModules.count }
             //.assertEqual(to: 1, "sub-modules count")
     }

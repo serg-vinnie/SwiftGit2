@@ -201,7 +201,11 @@ public extension Repository {
 
 public extension Repository {
     class func exists(at url: URL) -> Bool {
-        if case .success(_) = at(url: url) {
+        print(url.path)
+        guard url.exists else {
+            return false
+        }
+        if case .success(_) = at(url: url, fixDetachedHead: false) {
             return true
         }
         return false
