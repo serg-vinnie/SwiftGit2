@@ -6,55 +6,11 @@ import Foundation
 import XCTest
 
 class RepositoryLocalTests: XCTestCase {
-    //    func test_measureStatus() {
-    //        measure {
-    //            Repository.at(path: "/Users/uks/dev/taogit")
-    //                .flatMap{ $0.commitsIn(ref: "refs/heads/master") }
-    //                .shouldSucceed()
-    //        }
-    //    }
+    let folder = TestFolder.git_tests.sub(folder: "RepositoryLocalTests")
     
-    func testCreateOpenRepo() throws {
-        GitTest.tmpURL
-            .flatMap { Repository.create(at: $0) }
-            .shouldSucceed("create repo")
-    }
-    
-    func testCreateAddFile() throws {
-        GitTest.tmpURL
-            .flatMap { Repository.create(at: $0) }
-            .flatMap { $0.t_commit(msg: "initial commit") }
-            .shouldSucceed("initial commit")
-    }
-    
-    func testCreateRepo() {
-        let url = GitTest.localRoot.appendingPathComponent("NewRepo")
-        let README_md = "README.md"
-        url.rm().shouldSucceed("rm")
-        
-        guard let repo = Repository.create(at: url).shouldSucceed("Repository.create") else { fatalError() }
-        
-        let file = url.appendingPathComponent(README_md)
-        "# test repository".write(to: file).shouldSucceed("write file")
-        
-        // if let status = repo.status().shouldSucceed("status") { XCTAssert(status.count == 1) } else { fatalError() }
-        
-        // repo.reset(paths: )
-        repo.addBy(path: README_md)
-        //index().flatMap { $0.add(paths: [README_md]) }
-            .shouldSucceed("index add \(README_md)")
-        
-        repo.commit(message: "initial commit", signature: Signature(name: "name", email: "email@domain.com"))
-            .shouldSucceed("initial commit")
-    }
-    
-    func testDetachedHead() throws {
-        let repo_ = GitTest.tmpURL
-            .flatMap { Repository.create(at: $0) }
-            .shouldSucceed("create repo")
-        
-        // for some reason it doesnt compile "let repo = repo"
-        guard let repo = repo_ else { fatalError() }
+    func test_DetachedHead() throws {
+        let folder = self.folder.with(repo: "DetachedHead", content: .empty).shouldSucceed()!
+        let repo = folder.repo.shouldSucceed()!
         
         // HEAD is unborn
         XCTAssert(repo.headIsUnborn)
