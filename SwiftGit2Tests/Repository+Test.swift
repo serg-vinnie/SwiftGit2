@@ -8,6 +8,7 @@ enum RepositoryContent {
     case empty
     case file(TestFile, TestFileContent)
     case commit(TestFile, TestFileContent, String)
+    case clone(URL, CloneOptions)
 }
 
 extension Repository {
@@ -16,6 +17,7 @@ extension Repository {
         case     .empty:                        return .success(self)
         case let .file  (file, content):        return t_with(file: file, with: content)
         case let .commit(file, content, msg):   return t_commit(file: file, with: content, msg: msg) | { _ in self }
+        case .clone: fatalError("you shouldn't initiate clone from this place")
         }
     }
 

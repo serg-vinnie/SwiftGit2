@@ -22,8 +22,13 @@ extension TestFolder {
 
 extension TestFolder {
     func with(repo name: String, content: RepositoryContent) -> R<TestFolder> {
-        let subFolder = sub(folder: name)
-        return subFolder.clearRepo | { $0.t_with(content: content) } | { _ in subFolder }
+        let subFolder = sub(folder: name).cleared().shouldSucceed()!
+        
+        if case let .clone(url, options) = content {
+            return Repository.clone(from: url, to: subFolder.url, options: options) | { _ in subFolder }
+        } else {
+            return subFolder.clearRepo | { $0.t_with(content: content) } | { _ in subFolder }
+        }
     }
 }
 
