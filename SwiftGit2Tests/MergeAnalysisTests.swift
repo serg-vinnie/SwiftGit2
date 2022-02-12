@@ -9,6 +9,16 @@ fileprivate var cloneOptions : CloneOptions { CloneOptions(fetch: FetchOptions(a
 class MergeAnalysisTests: XCTestCase {
     let root  = TestFolder.git_tests.sub(folder: "MergeAnalysisTests")
     
+    func test_credentilas_ShouldBeReusable() {
+        let folder = root.sub(folder: "credentilas_ShouldBeReusable")
+        let options = CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault)))
+        
+        folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, options))
+            .shouldSucceed("repo1 clone")
+        folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, options))
+            .shouldSucceed("repo2 clone")
+    }
+    
     func testFastForward() throws {
         let folder = root.sub(folder: "fastForward")
         let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
