@@ -4,10 +4,11 @@ import XCTest
 import EssetialTesting
 
 class StatusEntryTests: XCTestCase {
-    func test_new_file_should_have_indexToWorkDir() {
-        let status = Repository
-            .t_randomRepo()
-            .flatMap { $0.t_with(file: .fileA, with: .random) }
+    let folder = TestFolder.git_tests.sub(folder: "StatusEntryTests")
+    
+    func test_new_fileShouldHave_indexToWorkDir() {
+        let status = folder.with(repo: "fileShouldHave_IndexToWorkDir", content: .file(.fileA, .random))
+            .repo
             .flatMap { $0.status() }
             .shouldSucceed()!
         
@@ -23,13 +24,12 @@ class StatusEntryTests: XCTestCase {
         XCTAssert(entrie.indexToWorkDir?.oldFile?.path == entrie.indexToWorkDir?.newFile?.path)
     }
     
-    func test_new_file_should_return_pathInWorkDir() {
-        let status = Repository.t_randomRepo()
-            .flatMap { $0.t_with(file: .fileA, with: .random) }
+    func test_statusShouldHave_stagePath() {
+        folder.with(repo: "statusShouldHave_stagePath", content: .file(.fileA, .random))
+            .repo 
             .flatMap { $0.status() }
-            .shouldSucceed()!
-        
-        XCTAssert(status[0].stagePath == TestFile.fileA.rawValue)
+            .map { $0[0].stagePath }
+            .assertEqual(to: TestFile.fileA.rawValue)
     }
     
     func test_should_stage_new_file() {

@@ -26,3 +26,9 @@ extension TestFolder {
         return subFolder.clearRepo | { $0.t_with(content: content) } | { _ in subFolder }
     }
 }
+
+extension Result where Success == TestFolder, Failure == Error {
+    var repo : R<Repository> {
+        self.flatMap { $0.repo }
+    }
+}
