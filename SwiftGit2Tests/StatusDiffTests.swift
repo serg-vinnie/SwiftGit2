@@ -130,9 +130,8 @@ class StatusDiffTests: XCTestCase {
     }
     
     func test_should_return_Hunk_From_File() {
-        folder.sub(folder: "test_should_return_Hunk_From_File")
-            .clearRepo
-            .flatMap { $0.t_with(file: .fileA, with: .oneLine1) }
+        folder.with(repo: "shoudReturnHunk", content: .file(.fileA, .oneLine1))
+            .flatMap { $0.repo }
             .flatMap{ $0.hunkFrom(relPath: TestFile.fileA.rawValue) }
             .map { $0.lines[0].content }
             .assertEqual(to: TestFileContent.oneLine1.rawValue, "hunk_0_line")
