@@ -24,13 +24,13 @@ class ModuleTests: XCTestCase {
         let folder = root.sub(folder: "AddRemote")
         let repoFolder = folder.with(repo: "repo", content: .empty).shouldSucceed()!
         
-        repoFolder.snapshot(to: "0_repo").shouldSucceed()
+        repoFolder.snapshoted(to: "0_repo").shouldSucceed()
         
         repoFolder.repo
             .flatMap { $0.createRemote(url: PublicTestRepo().urlSsh.path) } // modifies .git/config
             .shouldSucceed("createRemote")
         
-        repoFolder.snapshot(to: "1_repo_with_remote").shouldSucceed()
+        repoFolder.snapshoted(to: "1_repo_with_remote").shouldSucceed()
     }
     
     func test_shouldCloneWithSubmodule() {
@@ -43,13 +43,36 @@ class ModuleTests: XCTestCase {
             .shouldSucceed()
     }
     
+    func test_shouldAddAndCloneSubmodule2() {
+        func cloneSubmoduleIn(repo: Repository) -> R<Repository> {
+            let opt = SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)), checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
+            return repo.submoduleLookup(named: "SubModule")
+                .flatMap { $0.clone(options: opt) }
+        }
+        
+        let folder = root.sub(folder: "AddSubmodule")
+        
+        folder.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
+            .shouldSucceed()
+        
+        folder.with(repo: "main_repo", content: .empty)
+            .run { $0.snapshoted(to: "0_REPO_CLEAN") }
+            .run { $0.repo | { $0.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true) } }
+            .run { $0.snapshoted(to: "1_REPO_ADD_SUB") }
+            .run { f in f.repo | { cloneSubmoduleIn(repo: $0) } | { _ in f } }
+            .run { $0.snapshoted(to: "2_REPO_SUB_AFTER_CLONE") }
+            .run { f in f.repo | { $0.submoduleLookup(named: "SubModule") | { $0.finalize() } } | { _ in f } }
+            .run { $0.snapshoted(to: "3_REPO_SUB_AFTER_FINALIZE") }
+            .shouldSucceed() //! as TestFolder
+    }
+    
     func test_shouldAddAndCloneSubmodule() {
         let folder = root.sub(folder: "AddSubmodule")
         let repo = (folder.with(repo: "main_repo", content: .empty) | { $0.repo })
             .shouldSucceed()!
         
         let folderMainRepo = folder.sub(folder: "main_repo")
-        folderMainRepo.snapshot(to: "0_REPO_CLEAN").shouldSucceed()
+        folderMainRepo.snapshoted(to: "0_REPO_CLEAN").shouldSucceed()
         
         folder.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()
@@ -72,7 +95,7 @@ class ModuleTests: XCTestCase {
         repo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
             .shouldSucceed()
         
-        folderMainRepo.snapshot(to: "1_REPO_ADD_SUB").shouldSucceed()
+        folderMainRepo.snapshoted(to: "1_REPO_ADD_SUB").shouldSucceed()
         
         (repo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists }) // file .gitmodules should exist
             .assertEqual(to: true)
@@ -90,13 +113,13 @@ class ModuleTests: XCTestCase {
         submodule.clone(options: opt)
             .shouldSucceed()
         
-        folderMainRepo.snapshot(to: "2_REPO_SUB_AFTER_CLONE").shouldSucceed()
+        folderMainRepo.snapshoted(to: "2_REPO_SUB_AFTER_CLONE").shouldSucceed()
                 
         // FINALIZE
         submodule.finalize()
             .shouldSucceed()
         
-        folderMainRepo.snapshot(to: "3_REPO_SUB_AFTER_FINALIZE").shouldSucceed()
+        folderMainRepo.snapshoted(to: "3_REPO_SUB_AFTER_FINALIZE").shouldSucceed()
     }
 
     func testPerformanceExample() throws {

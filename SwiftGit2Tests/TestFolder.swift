@@ -18,6 +18,10 @@ extension TestFolder {
     }
 
     static var git_tests : TestFolder { TestFolder(url: URL.userHome.appendingPathComponent(".git_tests")) }
+    
+    func run<T>(_ block: (TestFolder)->R<T>) -> R<TestFolder> {
+        block(self) | { _ in self }
+    }
 }
 
 extension TestFolder {
@@ -31,14 +35,18 @@ extension TestFolder {
         }
     }
     
-    func snapshot(to folder: String) -> R<TestFolder> {
+    func snapshoted(to folder: String) -> R<TestFolder> {
         let destination = url.deletingLastPathComponent().appendingPathComponent(folder)
-        return url.copy(to: destination, replace: true) | { TestFolder(url: destination) }
+        return url.copy(to: destination, replace: true) | { self }
     }
 }
 
 extension Result where Success == TestFolder, Failure == Error {
     var repo : R<Repository> {
         self.flatMap { $0.repo }
+    }
+    
+    func run<T>(_ block: (TestFolder)->R<T>) -> R<TestFolder> {
+        self | { block($0) } | { _ in self }
     }
 }
