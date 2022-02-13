@@ -13,7 +13,7 @@ class ModuleTests: XCTestCase {
     }
     
     func test_moduleShouldExists() {
-        (root.with(repo: "empty_repo", content: .empty)
+        (root.with(repo: "moduleShouldExists", content: .empty)
             | { $0.repo }
             | { $0.asModule }
             | { $0.exists }
