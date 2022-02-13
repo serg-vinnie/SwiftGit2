@@ -31,9 +31,9 @@ extension TestFolder {
         }
     }
     
-    func snapshot(to folder: String) -> R<URL> {
+    func snapshot(to folder: String) -> R<TestFolder> {
         let destination = url.deletingLastPathComponent().appendingPathComponent(folder)
-        return url.copy(to: destination, replace: true) | { destination }
+        return url.copy(to: destination, replace: true) | { TestFolder(url: destination) }
     }
 }
 

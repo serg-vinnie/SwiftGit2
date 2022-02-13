@@ -27,14 +27,14 @@ class ModuleTests: XCTestCase {
         repoFolder.snapshot(to: "0_repo").shouldSucceed()
         
         repoFolder.repo
-            .flatMap { $0.createRemote(url: PublicTestRepo().urlSsh.path) }
+            .flatMap { $0.createRemote(url: PublicTestRepo().urlSsh.path) } // modifies .git/config
             .shouldSucceed("createRemote")
         
         repoFolder.snapshot(to: "1_repo_with_remote").shouldSucceed()
     }
     
     func test_shouldAddAndCloneSubmodule() {
-        let folder = root.sub(folder: "shouldAddAndCloneSubmodule")
+        let folder = root.sub(folder: "AddSubmodule")
         let repo = (folder.with(repo: "main_repo", content: .empty) | { $0.repo })
             .shouldSucceed()!
         
@@ -45,6 +45,20 @@ class ModuleTests: XCTestCase {
             .shouldSucceed()
         
         // ADD
+        //
+        // + /.gitmodules
+        // + .git/config:
+        //
+        //        [submodule "SubModule"]
+        //            url = /Users/loki/.git_tests/ModuleTests/AddSubmodule/sub_repo
+        //
+        // [ gitlink: true ]
+        // + .git/modules/SubModule
+        // + /SubModule/.git: gitdir: ../.git/modules/SubModule/
+        //
+        // [ gitlink: false ]
+        // + /SubModule/.git
+        
         repo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
             .shouldSucceed()
         
