@@ -33,6 +33,16 @@ class ModuleTests: XCTestCase {
         repoFolder.snapshot(to: "1_repo_with_remote").shouldSucceed()
     }
     
+    func test_shouldCloneWithSubmodule() {
+        let folder = root.sub(folder: "Clone")
+        
+        (folder.with(repo: "main_repo", content: .empty) | { $0.repo })
+            .shouldSucceed()
+        
+        folder.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
+            .shouldSucceed()
+    }
+    
     func test_shouldAddAndCloneSubmodule() {
         let folder = root.sub(folder: "AddSubmodule")
         let repo = (folder.with(repo: "main_repo", content: .empty) | { $0.repo })
@@ -71,6 +81,8 @@ class ModuleTests: XCTestCase {
         XCTAssert(submodule.name == "SubModule")
         XCTAssert(submodule.path == "SubModule")
         XCTAssert(submodule.url == "../sub_repo")
+        
+        print("repoExists \(submodule.repoExist())")
         
         // CLONE
         let opt = SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)), checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))

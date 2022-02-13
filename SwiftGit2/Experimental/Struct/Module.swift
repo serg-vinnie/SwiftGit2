@@ -9,6 +9,17 @@ public struct Module : CustomStringConvertible {
     public let subModules : [String:Module?]
         
     public var description: String { "| M(\(exists) \(headIsUnborn): " + url.lastPathComponent + " \(subModules) |" }
+    
+    func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions?) -> R<Void> {
+        let opt = options ?? SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)),
+                                                    checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
+        
+        return Repository.at(url: url)
+        | { $0.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true) }
+        | { $0.cloned(options: opt) }
+        | { $0.finalize() }
+    }
+    
 }
 
 public extension Repository {

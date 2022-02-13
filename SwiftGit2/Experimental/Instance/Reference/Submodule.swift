@@ -159,6 +159,10 @@ public extension Duo where T1 == Submodule, T2 == Repository {
 }
 
 public extension Submodule {
+    func cloned(options: SubmoduleUpdateOptions) -> R<Submodule> {
+        clone(options: options) | { _ in self }
+    }
+    
     func clone(options: SubmoduleUpdateOptions) -> R<Repository> {
         git_instance(of: Repository.self, "git_submodule_clone") { pointer in
             options.with_git_submodule_update_options { options in
