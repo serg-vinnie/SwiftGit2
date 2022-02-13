@@ -19,8 +19,15 @@ extension TestFolder {
 
     static var git_tests : TestFolder { TestFolder(url: URL.userHome.appendingPathComponent(".git_tests")) }
     
+    @discardableResult
     func run<T>(_ block: (TestFolder)->R<T>) -> R<TestFolder> {
         block(self) | { _ in self }
+    }
+    
+    @discardableResult
+    func run<T>(_ block: (TestFolder)->T) -> TestFolder {
+        _ = block(self)
+        return self
     }
 }
 
@@ -46,7 +53,19 @@ extension Result where Success == TestFolder, Failure == Error {
         self.flatMap { $0.repo }
     }
     
+    @discardableResult
     func run<T>(_ block: (TestFolder)->R<T>) -> R<TestFolder> {
         self | { block($0) } | { _ in self }
+    }
+    
+    @discardableResult
+    func run<T>(_ block: (TestFolder)->T) -> R<TestFolder> {
+        _ = self | { block($0) }
+        return self
+    }
+    
+    @discardableResult
+    func run<T>(_ topic: String, block: (TestFolder)->R<T>) -> R<TestFolder> {
+        self | { block($0).shouldSucceed(topic) } | { _ in self }
     }
 }
