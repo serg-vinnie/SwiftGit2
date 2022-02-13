@@ -5,9 +5,6 @@ import Foundation
 import XCTest
 
 struct GitTest {
-    static let prefix = "git_test"
-    static var localRoot = URL(fileURLWithPath: "/tmp/\(prefix)", isDirectory: true)
-    //static var tmpURL: Result<URL, Error> { URL.tmp(.systemUnique, prefix: GitTest.prefix) }
     static let signature = Signature(name: "XCode Unit Test", email: "email@domain.com")
     
     static let credentials_bullshit = Credentials.plaintext(username: "bullshit@gmail.com", password: "bullshit")
@@ -17,16 +14,6 @@ struct GitTest {
 struct PublicTestRepo {
     let urlSsh = URL(string: "git@gitlab.com:sergiy.vynnychenko/test_public.git")!
     let urlHttps = URL(string: "https://gitlab.com/sergiy.vynnychenko/test_public.git")!
-
-    let localPath: URL
-    let localPath2: URL
-
-    init() {
-        localPath = GitTest.localRoot.appendingPathComponent(urlSsh.lastPathComponent).deletingPathExtension()
-        localPath2 = GitTest.localRoot.appendingPathComponent(localPath.lastPathComponent + "2")
-        localPath.rm().shouldSucceed()
-        localPath2.rm().shouldSucceed()
-    }
 }
 
 extension String {    
