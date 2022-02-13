@@ -20,11 +20,26 @@ class ModuleTests: XCTestCase {
         ).assertEqual(to: true, "module exists")
     }
     
+    func test_addRemote() {
+        let folder = root.sub(folder: "AddRemote")
+        let repoFolder = folder.with(repo: "repo", content: .empty).shouldSucceed()!
+        
+        repoFolder.snapshot(to: "0_repo").shouldSucceed()
+        
+        repoFolder.repo
+            .flatMap { $0.createRemote(url: PublicTestRepo().urlSsh.path) }
+            .shouldSucceed("createRemote")
+        
+        repoFolder.snapshot(to: "1_repo_with_remote").shouldSucceed()
+    }
+    
     func test_shouldAddAndCloneSubmodule() {
         let folder = root.sub(folder: "shouldAddAndCloneSubmodule")
-        
         let repo = (folder.with(repo: "main_repo", content: .empty) | { $0.repo })
             .shouldSucceed()!
+        
+        let folderMainRepo = folder.sub(folder: "main_repo")
+        folderMainRepo.snapshot(to: "0_REPO_CLEAN").shouldSucceed()
         
         folder.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()
@@ -32,7 +47,9 @@ class ModuleTests: XCTestCase {
         // ADD
         repo.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true)
             .shouldSucceed()
-
+        
+        folderMainRepo.snapshot(to: "1_REPO_ADD_SUB").shouldSucceed()
+        
         (repo.directoryURL | { $0.appendingPathComponent(".gitmodules").exists }) // file .gitmodules should exist
             .assertEqual(to: true)
 
@@ -46,10 +63,14 @@ class ModuleTests: XCTestCase {
         
         submodule.clone(options: opt)
             .shouldSucceed()
+        
+        folderMainRepo.snapshot(to: "2_REPO_SUB_AFTER_CLONE").shouldSucceed()
                 
         // FINALIZE
         submodule.finalize()
             .shouldSucceed()
+        
+        folderMainRepo.snapshot(to: "3_REPO_SUB_AFTER_FINALIZE").shouldSucceed()
     }
 
     func testPerformanceExample() throws {

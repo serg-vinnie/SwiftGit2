@@ -305,15 +305,9 @@ public extension Repository {
 
 // Remote
 public extension Repository {
-    func createRemote(str: String) -> Result<Remote, Error> {
-        var pointer: OpaquePointer?
-        
-        return _result({ Remote(pointer!) }, pointOfFailure: "git_remote_create") {
-            "origin".withCString { tempName in
-                str.withCString { url in
-                    git_remote_create(&pointer, self.pointer, tempName, url)
-                }
-            }
+    func createRemote(url: String, name: String = "origin") -> Result<Remote, Error> {
+        git_instance(of: Remote.self, "git_remote_create") { pointer in
+            git_remote_create(&pointer, self.pointer, name, url)
         }
     }
 }

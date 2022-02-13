@@ -30,6 +30,11 @@ extension TestFolder {
             return subFolder.clearRepo | { $0.t_with(content: content) } | { _ in subFolder }
         }
     }
+    
+    func snapshot(to folder: String) -> R<URL> {
+        let destination = url.deletingLastPathComponent().appendingPathComponent(folder)
+        return url.copy(to: destination, replace: true) | { destination }
+    }
 }
 
 extension Result where Success == TestFolder, Failure == Error {
