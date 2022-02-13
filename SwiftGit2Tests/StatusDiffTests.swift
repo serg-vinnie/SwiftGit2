@@ -4,7 +4,7 @@ import XCTest
 import EssetialTesting
 
 class StatusDiffTests: XCTestCase {
-    let folder = TestFolder.git_tests.sub(folder: "StatusDiffTests")
+    let root = TestFolder.git_tests.sub(folder: "StatusDiffTests")
         
 //    func test_should_return_content_of_Untracked_Unstaged_File() {
 //        let repo = Repository.at(url: urlHeadIsUnborn)
@@ -19,31 +19,31 @@ class StatusDiffTests: XCTestCase {
 //    }
     
     func test_should_return_content_of_Untracked_Staged_File() {
-        let root = folder.sub(folder: "should_return_content_of_Untracked_Staged_File").cleared().shouldSucceed()!
-        _ = root.clearRepo.flatMap { $0.t_with(file: .fileA, with: .oneLine1) }.shouldSucceed()
+        let folder = root.sub(folder: "should_return_content_of_Untracked_Staged_File").cleared().shouldSucceed()!
+        _ = folder.clearRepo.flatMap { $0.t_with(file: .fileA, with: .oneLine1) }.shouldSucceed()
         
-        var status = root.repo
+        var status = folder.repo
             .flatMap { $0.status() }
             .shouldSucceed("status")!
         
-        let statusEntryHunks1 = root.repo
+        let statusEntryHunks1 = folder.repo
             .flatMap{ status[0].with($0).hunks }
             .shouldSucceed("statusEntryHunks1")!
         
         XCTAssert( statusEntryHunks1.staged.count == 0 && statusEntryHunks1.unstaged.count == 1 )
         
-        root.repo
+        folder.repo
             .flatMap { $0.stage(.all) }
             .shouldSucceed("stage(.all)")
         
-        status = root.repo
+        status = folder.repo
             .flatMap { $0.status() }
             .shouldSucceed("status")!
                 
         XCTAssert(status.count == 1)
         XCTAssert(status[0].statuses.contains(.added))
         
-        let statusEntryHunks2 = root.repo
+        let statusEntryHunks2 = folder.repo
             .flatMap{ status[0].with($0).hunks }
             .shouldSucceed("hunks")!
         
@@ -130,7 +130,7 @@ class StatusDiffTests: XCTestCase {
     }
     
     func test_should_return_Hunk_From_File() {
-        folder.with(repo: "shoudReturnHunk", content: .file(.fileA, .oneLine1))
+        root.with(repo: "shoudReturnHunk", content: .file(.fileA, .oneLine1))
             .flatMap { $0.repo }
             .flatMap{ $0.hunkFrom(relPath: TestFile.fileA.rawValue) }
             .map { $0.lines[0].content }

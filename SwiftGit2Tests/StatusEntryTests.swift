@@ -4,10 +4,10 @@ import XCTest
 import EssetialTesting
 
 class StatusEntryTests: XCTestCase {
-    let folder = TestFolder.git_tests.sub(folder: "StatusEntryTests")
+    let root = TestFolder.git_tests.sub(folder: "StatusEntryTests")
     
     func test_new_fileShouldHave_indexToWorkDir() {
-        let status = folder.with(repo: "fileShouldHave_IndexToWorkDir", content: .file(.fileA, .random))
+        let status = root.with(repo: "fileShouldHave_IndexToWorkDir", content: .file(.fileA, .random))
             .repo
             .flatMap { $0.status() }
             .shouldSucceed()!
@@ -25,7 +25,7 @@ class StatusEntryTests: XCTestCase {
     }
     
     func test_statusShouldHave_stagePath() {
-        folder.with(repo: "statusShouldHave_stagePath", content: .file(.fileA, .random))
+        root.with(repo: "statusShouldHave_stagePath", content: .file(.fileA, .random))
             .repo 
             .flatMap { $0.status() }
             .map { $0[0].stagePath }
@@ -33,7 +33,7 @@ class StatusEntryTests: XCTestCase {
     }
     
     func test_shouldStageNewFile() {
-        let folder = self.folder.with(repo: "shouldStageNewFile", content: .file(.fileA, .random))
+        let folder = self.root.with(repo: "shouldStageNewFile", content: .file(.fileA, .random))
         
         let status = folder.repo
             .flatMap { $0.status() }
@@ -52,7 +52,7 @@ class StatusEntryTests: XCTestCase {
     }
     
     func test_commitedFile_ShouldReturn_stagePath() {
-        let commitDetails = folder.with(repo: "commitedFile_ShouldReturn_stagePath", content: .commit(.fileA, .random, "...."))
+        let commitDetails = root.with(repo: "commitedFile_ShouldReturn_stagePath", content: .commit(.fileA, .random, "...."))
             .repo
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .shouldSucceed()!
@@ -62,7 +62,7 @@ class StatusEntryTests: XCTestCase {
     }
     
     func test_shouldReturn_EntyFileInfo_Commit() {
-        folder.with(repo: "shouldReturn_EntyFileInfo_Commit", content: .commit(.fileA, .random, "...."))
+        root.with(repo: "shouldReturn_EntyFileInfo_Commit", content: .commit(.fileA, .random, "...."))
             .repo
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .flatMap { $0.deltasWithHunks[0].entryFileInfo }
@@ -70,7 +70,7 @@ class StatusEntryTests: XCTestCase {
     }
     
     func test_shouldReturn_EntyFileInfo_Commit_Rename() {
-        let folder = folder.with(repo: "shouldReturn_EntyFileInfo_Commit_Rename", content: .commit(.fileA, .random, "...."))
+        let folder = root.with(repo: "shouldReturn_EntyFileInfo_Commit_Rename", content: .commit(.fileA, .random, "...."))
             .shouldSucceed()!
         
         folder.url.moveFile(at: TestFile.fileA.rawValue, to: TestFile.fileB.rawValue)

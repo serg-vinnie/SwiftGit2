@@ -5,10 +5,7 @@ import Essentials
 import EssetialTesting
 
 class ModuleTests: XCTestCase {
-    let folder = TestFolder.git_tests.sub(folder: "ModuleTests")
-    
-    override func setUpWithError()    throws {} // Put setup code here. This method is called before the invocation of each test method in the class.
-    override func tearDownWithError() throws {} // Put teardown code here. This method is called after the invocation of each test method in the class.
+    let root = TestFolder.git_tests.sub(folder: "ModuleTests")
 
     func test_moduleShouldNotExist() {
         (Repository.module(at: URL(fileURLWithPath: "some_shit")) | { $0.exists })
@@ -16,7 +13,7 @@ class ModuleTests: XCTestCase {
     }
     
     func test_moduleShouldExists() {
-        (folder.with(repo: "empty_repo", content: .empty)
+        (root.with(repo: "empty_repo", content: .empty)
             | { $0.repo }
             | { $0.asModule }
             | { $0.exists }
@@ -24,12 +21,12 @@ class ModuleTests: XCTestCase {
     }
     
     func test_shouldAddAndCloneSubmodule() {
-        let root = folder.sub(folder: "shouldAddAndCloneSubmodule")
+        let folder = root.sub(folder: "shouldAddAndCloneSubmodule")
         
-        let repo = (root.with(repo: "main_repo", content: .empty) | { $0.repo })
+        let repo = (folder.with(repo: "main_repo", content: .empty) | { $0.repo })
             .shouldSucceed()!
         
-        root.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
+        folder.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()
         
         // ADD
