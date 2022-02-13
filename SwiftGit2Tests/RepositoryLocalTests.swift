@@ -6,10 +6,10 @@ import Foundation
 import XCTest
 
 class RepositoryLocalTests: XCTestCase {
-    let folder = TestFolder.git_tests.sub(folder: "RepositoryLocalTests")
+    let root = TestFolder.git_tests.sub(folder: "RepositoryLocalTests")
     
     func test_DetachedHead() throws {
-        let folder = self.folder.with(repo: "DetachedHead", content: .empty).shouldSucceed()!
+        let folder = self.root.with(repo: "DetachedHead", content: .empty).shouldSucceed()!
         let repo = folder.repo.shouldSucceed()!
         
         // HEAD is unborn

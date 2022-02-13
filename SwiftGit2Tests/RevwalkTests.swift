@@ -12,21 +12,14 @@ import EssetialTesting
 import XCTest
 
 class RevwalkTests: XCTestCase {
+    let root  = TestFolder.git_tests.sub(folder: "RevwalkTests")
 
-    var repo1: Repository!
-    var repo2: Repository!
-
-    override func setUpWithError() throws {
-        let info = PublicTestRepo()
-
-        repo1 = Repository.clone(from: info.urlSsh, to: info.localPath, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
-            .shouldSucceed("clone 1")
-
-        repo2 = Repository.clone(from: info.urlSsh, to: info.localPath2, options: CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))
-            .shouldSucceed("clone 2")
-    }
-    
     func testRevwalk() {
+        //let cloneOptions = CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault)))
+        let folder = root.sub(folder: "Revwalk")
+        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))).repo.shouldSucceed("repo1 clone")!
+        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))).repo.shouldSucceed("repo2 clone")!
+        
         
         Revwalk.new(in: repo1)
             .flatMap { $0.push(range: "HEAD~20..HEAD") }
