@@ -10,7 +10,7 @@ public struct Module : CustomStringConvertible {
         
     public var description: String { "| M(\(exists) \(headIsUnborn): " + url.lastPathComponent + " \(subModules) |" }
     
-    func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions?) -> R<Void> {
+    public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions? = nil) -> R<Void> {
         let opt = options ?? SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)),
                                                     checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
         

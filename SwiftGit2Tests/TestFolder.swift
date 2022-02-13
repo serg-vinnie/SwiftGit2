@@ -25,6 +25,19 @@ extension TestFolder {
     }
     
     @discardableResult
+    func run<T>(_ topic: String? = nil, block: (TestFolder)->R<T>) -> R<TestFolder> {
+        let r = block(self)
+        
+        
+        if let _ = r.shouldSucceed(topic) {
+            return .success(self)
+        } else {
+            return r | { _ in self }
+        }
+    }
+
+    
+    @discardableResult
     func run<T>(_ block: (TestFolder)->T) -> TestFolder {
         _ = block(self)
         return self
@@ -53,10 +66,10 @@ extension Result where Success == TestFolder, Failure == Error {
         self.flatMap { $0.repo }
     }
     
-    @discardableResult
-    func run<T>(_ block: (TestFolder)->R<T>) -> R<TestFolder> {
-        self | { block($0) } | { _ in self }
-    }
+//    @discardableResult
+//    func run<T>(_ block: (TestFolder)->R<T>) -> R<TestFolder> {
+//        self | { block($0).shouldSucceed() } | { _ in self }
+//    }
     
     @discardableResult
     func run<T>(_ block: (TestFolder)->T) -> R<TestFolder> {
@@ -65,7 +78,7 @@ extension Result where Success == TestFolder, Failure == Error {
     }
     
     @discardableResult
-    func run<T>(_ topic: String, block: (TestFolder)->R<T>) -> R<TestFolder> {
+    func run<T>(_ topic: String? = nil, block: (TestFolder)->R<T>) -> R<TestFolder> {
         self | { block($0).shouldSucceed(topic) } | { _ in self }
     }
 }
