@@ -19,6 +19,10 @@ public class SubmoduleUpdateOptions {
         self.checkout = checkout
         git_submodule_update_options_init(&options, UInt32(GIT_SUBMODULE_UPDATE_OPTIONS_VERSION))
     }
+    
+    public static var defaultSSH : SubmoduleUpdateOptions {
+        SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.sshDefault)), checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
+    }
 }
 
 extension SubmoduleUpdateOptions {

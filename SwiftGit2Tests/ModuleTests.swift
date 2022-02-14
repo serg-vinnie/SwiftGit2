@@ -31,23 +31,21 @@ class ModuleTests: XCTestCase {
     func test_shouldCloneWithSubmodule() {
         let folder = root.sub(folder: "Clone").cleared().shouldSucceed()!
         
-        folder.run { $0.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit")) }
+//        let sub_remote = "git@github.com:serg-vinnie/SwinjectAutoregistration.git"
+        
+        folder.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()
-        
+
         folder.with(repo: "main_repo", content: .empty)
-            .run { $0.repo | { $0.asModule } | { $0.addSub(module: "SubModule", remote: "../sub_repo") } }
-            .shouldSucceed("add sub")
+            .run { Repository.module(at: $0.url) | { $0.addSub(module: "SubModule", remote: "../sub_repo", gitlink: true, options: .defaultSSH) } }
+            .shouldSucceed("addSub")
         
-        //let options = CloneOptions(fetch: FetchOptions(auth: .credentials(.none)))
-        //Repository.clone(from: folder.sub(folder: "main_repo").url, to: folder.sub(folder: "clone").url, options: options)
-        //    .shouldSucceed("clone")
     }
     
     func test_shouldAddAndCloneSubmodule() {
         func cloneSubmoduleIn(repo: Repository) -> R<Repository> {
-            let opt = SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)), checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
             return repo.submoduleLookup(named: "SubModule")
-                .flatMap { $0.clone(options: opt) }
+                .flatMap { $0.clone(options: .defaultSSH) }
         }
         
         let folder = root.sub(folder: "AddSubmodule").cleared().shouldSucceed()!
@@ -57,13 +55,15 @@ class ModuleTests: XCTestCase {
         
         folder.with(repo: "main_repo", content: .empty)
             .run { $0.snapshoted(to: "0_REPO_CLEAN") }
-            .run { $0.repo | { $0.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true) } }
+            .run { $0.repo | { $0.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true).flatMap { $0.clone(options: .defaultSSH).verify("CLONE") } } }
             .run { $0.snapshoted(to: "1_REPO_ADD_SUB") }
+            
             .run {
                 ($0.repo.flatMap { $0.directoryURL }.map { $0.appendingPathComponent(".gitmodules").exists })
                     .assertEqual(to: true)
-                
+
                 let submodule = ($0.repo | { $0.submoduleLookup(named: "SubModule") }).shouldSucceed()!
+                //print(submodule.absURL)
                 XCTAssert(submodule.name == "SubModule")
                 XCTAssert(submodule.path == "SubModule")
                 XCTAssert(submodule.url == "../sub_repo")
@@ -73,6 +73,7 @@ class ModuleTests: XCTestCase {
             .run { $0.snapshoted(to: "2_REPO_SUB_AFTER_CLONE") }
             .run { $0.repo | { $0.submoduleLookup(named: "SubModule") | { $0.add_finalize() } } }
             .run { $0.snapshoted(to: "3_REPO_SUB_AFTER_FINALIZE") }
+        // commit
             .shouldSucceed()
         
         // ADD

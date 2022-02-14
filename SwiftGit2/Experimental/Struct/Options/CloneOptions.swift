@@ -19,6 +19,8 @@ public class CloneOptions {
 
         git_clone_init_options(&clone_options, UInt32(GIT_CLONE_OPTIONS_VERSION))
     }
+    
+    public static var defaultSSH : CloneOptions { CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))) }
 }
 
 extension CloneOptions {

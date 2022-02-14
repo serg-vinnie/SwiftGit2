@@ -49,9 +49,7 @@ public extension Submodule {
     /// Open the repository for a submodule.
     /// WILL WORK ONLY IF SUBMODULE IS CHECKED OUT INTO WORKING DIRECTORY
     func repo() -> Result<Repository, Error> {
-        var pointer: OpaquePointer?
-
-        return _result({ Repository(pointer!) }, pointOfFailure: "git_submodule_open") {
+        git_instance(of: Repository.self, "git_submodule_open") { pointer in
             git_submodule_open(&pointer, self.pointer)
         }
     }
@@ -164,7 +162,7 @@ public extension Submodule {
     }
     
     func clone(options: SubmoduleUpdateOptions) -> R<Repository> {
-        git_instance(of: Repository.self, "git_submodule_clone") { pointer in
+        return git_instance(of: Repository.self, "git_submodule_clone") { pointer in
             options.with_git_submodule_update_options { options in
                 git_submodule_clone(&pointer, self.pointer, &options)
             }
@@ -178,10 +176,8 @@ public extension Submodule {
 
     // TODO: Test Me
     /// Copy submodule remote info into submodule repo.
-    func sync() -> Result<Void, Error> {
-        return _result({ () }, pointOfFailure: "git_submodule_sync") {
-            git_submodule_sync(self.pointer)
-        }
+    func sync() -> R<Void> {
+        git_try("git_submodule_sync") { git_submodule_sync(self.pointer) }
     }
 
     // TODO: Test Me. // don't know how to test
@@ -227,8 +223,7 @@ public extension Submodule {
     /// This should be called on a submodule once you have called add setup and done the clone of the submodule.
     /// This adds the .gitmodules file and the newly cloned submodule to the index to be ready to be committed (but doesn't actually do the commit).
     func add_finalize() -> R<Void> {
-        print("finalize")
-        return git_try("git_submodule_add_finalize") {
+        git_try("git_submodule_add_finalize") {
             git_submodule_add_finalize(self.pointer)
         }
     }

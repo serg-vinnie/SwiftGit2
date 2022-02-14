@@ -12,16 +12,12 @@ public struct Module : CustomStringConvertible {
         
     public var description: String { "| M(\(exists) \(headIsUnborn): " + url.lastPathComponent + " \(subModules) |" }
     
-    public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions? = nil) -> R<Void> {
-        let opt = options ?? SubmoduleUpdateOptions(fetch: FetchOptions(auth: .credentials(.none)),
-                                                    checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
-        
-        return Repository.at(url: url)
-            .flatMap { $0.add(submodule: module, remote: remote, gitlink: true) }
-            .flatMap { $0.clone(options: opt) }
-            .flatMap { _ in Repository.at(url: url) }
-            .flatMap { $0.submoduleLookup(named: module) }
-            .flatMap { $0.add_finalize() }
+    public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions) -> R<Void> {
+        Repository.at(url: url)
+            .flatMap { $0.add(submodule: module, remote: remote, gitlink: true)
+                .flatMap { $0.cloned(options: options) }
+                .flatMap { $0.add_finalize() }
+            }
     }
     
 }
