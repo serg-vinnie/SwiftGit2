@@ -160,7 +160,7 @@ public extension Duo where T1 == Submodule, T2 == Repository {
 
 public extension Submodule {
     func cloned(options: SubmoduleUpdateOptions) -> R<Submodule> {
-        clone(options: options) | { _ in self }
+        clone(options: options).map { _ in self }
     }
     
     func clone(options: SubmoduleUpdateOptions) -> R<Repository> {
@@ -226,8 +226,9 @@ public extension Submodule {
     /// Resolve the setup of a new git submodule. |
     /// This should be called on a submodule once you have called add setup and done the clone of the submodule.
     /// This adds the .gitmodules file and the newly cloned submodule to the index to be ready to be committed (but doesn't actually do the commit).
-    func finalize() -> R<Void> {
-        git_try("git_submodule_add_finalize") {
+    func add_finalize() -> R<Void> {
+        print("finalize")
+        return git_try("git_submodule_add_finalize") {
             git_submodule_add_finalize(self.pointer)
         }
     }

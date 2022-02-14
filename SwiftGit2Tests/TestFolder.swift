@@ -72,13 +72,12 @@ extension Result where Success == TestFolder, Failure == Error {
 //    }
     
     @discardableResult
-    func run<T>(_ block: (TestFolder)->T) -> R<TestFolder> {
-        _ = self | { block($0) }
-        return self
+    func run<T>(_ topic: String? = nil, _ block: (TestFolder)->T) -> R<TestFolder> {
+        (self | { block($0) } | { _ in self }).verify(topic)
     }
     
     @discardableResult
     func run<T>(_ topic: String? = nil, block: (TestFolder)->R<T>) -> R<TestFolder> {
-        self | { block($0).shouldSucceed(topic) } | { _ in self }
+        self | { block($0).verify(topic) } | { _ in self }
     }
 }

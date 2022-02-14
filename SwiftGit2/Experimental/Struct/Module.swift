@@ -2,6 +2,8 @@
 import Foundation
 import Essentials
 
+
+// TODO: fix detached head
 public struct Module : CustomStringConvertible {
     public let url : URL
     public let exists : Bool
@@ -15,9 +17,11 @@ public struct Module : CustomStringConvertible {
                                                     checkout: CheckoutOptions(strategy: .Force, pathspec: [], progress: nil))
         
         return Repository.at(url: url)
-        | { $0.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true) }
-        | { $0.cloned(options: opt) }
-        | { $0.finalize() }
+            .flatMap { $0.add(submodule: module, remote: remote, gitlink: true) }
+            .flatMap { $0.clone(options: opt) }
+            .flatMap { _ in Repository.at(url: url) }
+            .flatMap { $0.submoduleLookup(named: module) }
+            .flatMap { $0.add_finalize() }
     }
     
 }

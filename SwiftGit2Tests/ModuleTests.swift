@@ -25,16 +25,22 @@ class ModuleTests: XCTestCase {
             .with(repo: "repo", content: .empty)
             .run { $0.snapshoted(to: "0_repo") }
             .run("createRemote") { $0.repo | { $0.createRemote(url: PublicTestRepo().urlSsh.path) } }
+            
     }
             
     func test_shouldCloneWithSubmodule() {
-        let folder = root.sub(folder: "Clone")
+        let folder = root.sub(folder: "Clone").cleared().shouldSucceed()!
         
         folder.run { $0.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit")) }
             .shouldSucceed()
         
         folder.with(repo: "main_repo", content: .empty)
             .run { $0.repo | { $0.asModule } | { $0.addSub(module: "SubModule", remote: "../sub_repo") } }
+            .shouldSucceed("add sub")
+        
+        //let options = CloneOptions(fetch: FetchOptions(auth: .credentials(.none)))
+        //Repository.clone(from: folder.sub(folder: "main_repo").url, to: folder.sub(folder: "clone").url, options: options)
+        //    .shouldSucceed("clone")
     }
     
     func test_shouldAddAndCloneSubmodule() {
@@ -65,7 +71,7 @@ class ModuleTests: XCTestCase {
             }
             .run { $0.repo | { cloneSubmoduleIn(repo: $0) } }
             .run { $0.snapshoted(to: "2_REPO_SUB_AFTER_CLONE") }
-            .run { $0.repo | { $0.submoduleLookup(named: "SubModule") | { $0.finalize() } } }
+            .run { $0.repo | { $0.submoduleLookup(named: "SubModule") | { $0.add_finalize() } } }
             .run { $0.snapshoted(to: "3_REPO_SUB_AFTER_FINALIZE") }
             .shouldSucceed()
         
