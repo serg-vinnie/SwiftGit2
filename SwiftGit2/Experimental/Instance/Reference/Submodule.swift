@@ -157,6 +157,10 @@ public extension Duo where T1 == Submodule, T2 == Repository {
 }
 
 public extension Submodule {
+    
+    // ACHTUNG  !!!!!!!
+    // ACHTUNG: keep reference to parent repository during function call
+    // ACHTUNG  !!!!!!!
     func cloned(options: SubmoduleUpdateOptions) -> R<Submodule> {
         clone(options: options).map { _ in self }
     }
