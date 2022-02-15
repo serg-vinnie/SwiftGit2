@@ -55,6 +55,18 @@ extension TestFolder {
         }
     }
     
+    func with(submodule: String, content: RepositoryContent) -> R<TestFolder> {
+        guard Repository.exists(at: self.url) else {
+            return .wtf("Can't add submodule. Repository doesn't exist at \(self.url)")
+        }
+        
+        let holder = url.deletingLastPathComponent()
+        
+        return TestFolder(url: holder).with(repo: submodule, content: content)
+            .flatMap { f in Repository.module(at: url) | { $0.addSub(module: submodule, remote: f.url.path, options: .defaultSSH, signature: GitTest.signature) } }
+            .map { _ in self }
+    }
+    
     func snapshoted(to folder: String) -> R<TestFolder> {
         let destination = url.deletingLastPathComponent().appendingPathComponent(folder)
         return url.copy(to: destination, replace: true) | { self }

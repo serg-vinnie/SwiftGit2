@@ -38,11 +38,11 @@ class ModuleTests: XCTestCase {
             .run { Repository.module(at: $0.url) | { $0.addSub(module: "SubModule", remote: "../sub_repo", gitlink: true, options: .defaultSSH, signature: GitTest.signature) } }
             .shouldSucceed("addSub")
         
-        let source = folder.sub(folder: "main_repo").url
-        
-        folder.with(repo: "clone", content: .clone(source, .defaultSSH))
-            .flatMap { $0.repo | { $0.asModule } | { $0.updateSubModules() } }
-            .shouldSucceed("clone")
+//        let source = folder.sub(folder: "main_repo").url.path
+//        
+//        folder.with(repo: "clone", content: .clone(source, .defaultSSH))
+//            .flatMap { $0.repo | { $0.asModule } | { $0.updateSubModules() } }
+//            .shouldSucceed("clone")
     }
     
     func test_shouldAddAndCloneSubmodule() {
