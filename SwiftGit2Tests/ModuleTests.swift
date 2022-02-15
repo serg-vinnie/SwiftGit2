@@ -36,9 +36,14 @@ class ModuleTests: XCTestCase {
         folder.with(repo: "sub_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()
 
-        folder.with(repo: "main_repo", content: .empty)
+        folder.with(repo: "main_repo", content: .file(.fileA, .random))
             .run { Repository.module(at: $0.url) | { $0.addSub(module: "SubModule", remote: "../sub_repo", gitlink: true, options: .defaultSSH) } }
             .shouldSucceed("addSub")
+        
+        let source = folder.sub(folder: "main_repo").url
+        
+        folder.with(repo: "clone", content: .clone(source, .defaultSSH))
+            .shouldSucceed("clone")
         
     }
     

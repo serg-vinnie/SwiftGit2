@@ -314,15 +314,20 @@ public extension Repository {
 
 // STATIC funcs
 public extension Repository {
-    static func clone(from remoteURL: URL, to localURL: URL, options: CloneOptions) -> Result<Repository, Error> {
-        var pointer: OpaquePointer?
-        let remoteURLString = (remoteURL as NSURL).isFileReferenceURL() ? remoteURL.path : remoteURL.absoluteString
-        
-        return git_try("git_clone") {
+    static func clone(from remoteURL: String, to localURL: URL, options: CloneOptions) -> R<Repository> {
+        git_instance(of: Repository.self, "git_clone") { pointer in
             options.with_git_clone_options { clone_options in
-                localURL.withUnsafeFileSystemRepresentation { git_clone(&pointer, remoteURLString, $0, &clone_options) }
+                localURL.withUnsafeFileSystemRepresentation { destination in
+                    git_clone(&pointer, remoteURL, destination, &clone_options)
+                }
             }
-        }.map { Repository(pointer!) }
+        }
+    }
+
+    
+    static func clone(from remoteURL: URL, to localURL: URL, options: CloneOptions) -> Result<Repository, Error> {
+        let remoteURLString = (remoteURL as NSURL).isFileReferenceURL() ? remoteURL.path : remoteURL.absoluteString
+        return clone(from: remoteURLString, to: localURL, options: options)
     }
 }
 
