@@ -352,6 +352,12 @@ extension RepositoryError: LocalizedError {
 /// STAGE and unstage all files
 ///////////////////////////////////////////
 public extension Repository {
+    func fixBrokenIndex() -> R<Repository> {
+        (self.directoryURL | { $0.appendingPathComponent(".git/index") } | { $0.rm() })
+            .flatMap { _ in self.stateCleanup() | { $0.reset(.Mixed) } }
+            .map { _ in self }
+    }
+    
     /// stageAllFiles
     func addAllFiles() -> Result<Repository,Error> {
         return self.index()
@@ -411,10 +417,10 @@ public extension Repository {
             .asRepoState()
     }
     
-    func stateClean() -> R<()> {
+    func stateCleanup() -> R<Repository> {
         return git_try("git_repository_state_cleanup") {
             git_repository_state_cleanup(self.pointer)
-        }
+        }.map { self }
     }
 }
 

@@ -7,13 +7,18 @@ import EssetialTesting
 class ModuleTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "ModuleTests")
 
-    func test_wtf() {
-        Repository.at(url: URL.userHome.appendingPathComponent("dev/taogit wtf"))
-            .flatMap { $0.headCommit() }
-            //.flatMap { $0.index() }
-            //.flatMap { $0.status() }
-            .shouldSucceed("headCommit")
-    }
+//    func test_wtf() {
+//        let repo = Repository.at(url: URL.userHome.appendingPathComponent("dev/taogit wtf"))
+//        
+//        (repo | { $0.status() } | { $0.count })
+//            .shouldFail("status")
+//
+//        (repo | { $0.fixBrokenIndex() })
+//            .shouldSucceed("fixBrokenIndex")
+//
+//        (repo | { $0.status() } | { $0.count })
+//            .shouldSucceed("status")
+//    }
     
     func test_moduleShouldNotExist() {
         (Repository.module(at: URL(fileURLWithPath: "some_shit")) | { $0.exists })

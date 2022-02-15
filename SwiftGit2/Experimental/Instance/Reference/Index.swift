@@ -182,7 +182,7 @@ public extension Duo where T1 == Index, T2 == Repository {
             }
             // RevFiles cleanup
             .flatMap { commit in
-                repo.stateClean()
+                repo.stateCleanup()
                     .map { _ in commit}
             }
     }
