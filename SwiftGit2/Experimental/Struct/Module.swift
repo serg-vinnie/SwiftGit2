@@ -12,14 +12,30 @@ public struct Module : CustomStringConvertible {
         
     public var description: String { "| M(\(exists) \(headIsUnborn): " + url.lastPathComponent + " \(subModules) |" }
     
-    public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions) -> R<Void> {
-        Repository.at(url: url)
-            .flatMap { $0.add(submodule: module, remote: remote, gitlink: true)
-                .flatMap { $0.cloned(options: options) }
-                .flatMap { $0.add_finalize() }
+    public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions, signature: Signature) -> R<Void> {
+        let canCommit = Repository.at(url: url) | { $0.status() } | { $0.count == 0 }
+        
+        let operation = Repository.at(url: url)
+            .flatMap { repo in
+                repo.add(submodule: module, remote: remote, gitlink: true)
+                    .flatMap { $0.cloned(options: options) }
+                    .flatMap { $0.add_finalize() }
             }
+        
+        let msg = "Submodule \(module) was added"
+        
+        return combine(canCommit, operation)
+            .map { canCommit, _ in canCommit }
+            .if(\.self, then: { _ in
+                Repository.at(url: url) | { $0.stage(.all) } | { $0.commit(message: msg, signature: signature) } | { _ in () }
+            }, else: { _ in
+                    .success(())
+            })
     }
     
+    public func updateSubModules() -> R<()> {
+        .notImplemented("updateSubModules")
+    }
 }
 
 public extension Repository {
