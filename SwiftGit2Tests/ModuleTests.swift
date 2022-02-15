@@ -20,12 +20,33 @@ class ModuleTests: XCTestCase {
         ).assertEqual(to: true, "module exists")
     }
     
-    func test_addRemote2() {
+    func test_addRemote1() {
         root.sub(folder: "AddRemote")
             .with(repo: "repo", content: .empty)
             .run { $0.snapshoted(to: "0_repo") }
             .run("createRemote") { $0.repo | { $0.createRemote(url: PublicTestRepo().urlSsh.path) } }
-            
+    }
+    
+    func test_shouldAddSubmoduleAndCommit() {
+        let folder = root.sub(folder: "AddSub_And_Commit").cleared().shouldSucceed()!
+        
+        folder.with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
+            .flatMap { $0.with(submodule: "sub_repo", content: .commit(.fileB, .random, "initial commit")) }
+            .shouldSucceed("addSub")
+        
+        (folder.sub(folder: "main_repo").repo | { $0.status() } | { $0.count })
+            .assertEqual(to: 0, "no files in workdir")
+    }
+    
+    func test_shouldAddSubmoduleAnd_NotCommit() {
+        let folder = root.sub(folder: "AddSub_And_NotCommit").cleared().shouldSucceed()!
+        
+        folder.with(repo: "main_repo", content: .file(.fileA, .random))
+            .flatMap { $0.with(submodule: "sub_repo", content: .commit(.fileB, .random, "initial commit")) }
+            .shouldSucceed()
+        
+        (folder.sub(folder: "main_repo").repo | { $0.status() } | { $0.count })
+            .assertEqual(to: 3, "3 files in workdir")
     }
             
     func test_shouldCloneWithSubmodule() {
