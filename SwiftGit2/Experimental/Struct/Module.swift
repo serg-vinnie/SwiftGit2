@@ -1,15 +1,30 @@
 
 import Foundation
 import Essentials
+import OrderedCollections
 
 
 // TODO: fix detached head
 public struct Module : CustomStringConvertible {
     public let url : URL
     public let exists : Bool
-    public let subModules : [String:Module?]
+    public let subModules : OrderedDictionary<String,Module?>
+    public var subModulesRecursive : OrderedDictionary<String,Module?> {
+        var results = OrderedDictionary<String,Module?>()
         
-    public var description: String { "| M(\(exists)): " + url.lastPathComponent + " \(subModules) |" }
+        for item in subModules {
+            results[item.key] = item.value
+            if let module = item.value {
+                for item in module.subModules {
+                    results[item.key] = item.value
+                }
+            }
+        }
+        
+        return results
+    }
+    
+    public var description: String { "| M(\(exists)): " + url.lastPathComponent + " \(subModulesRecursive.count)" + " \(subModulesRecursive.map { "\(($0.value == nil) ? "." : "" )" + $0.key }) |" }
     
     public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions, signature: Signature) -> R<Void> {
         let canCommit = Repository.at(url: url) | { $0.status() } | { $0.count == 0 }
@@ -42,8 +57,8 @@ public extension Repository {
         combine(directoryURL,subModules) | { Module(url: $0, exists: true, subModules: $1) }
     }
     
-    var subModules : R<[String:Module?]> {
-        return submodules() | { $0.asDictionary }
+    var subModules : R<OrderedDictionary<String,Module?>> {
+        return submodules() | { $0.asOrderedDictionary }
     }
     
     static func module(at url: URL) -> R<Module> {
@@ -55,8 +70,8 @@ public extension Repository {
 }
 
 private extension Array where Element == Submodule {
-    var asDictionary : [String : Module?] {
-        self.toDictionary(key: \.name) { submodule in
+    var asOrderedDictionary : OrderedDictionary<String,Module?> {
+        self.toOrderedDictionary(key: \.name) { submodule in
             try? submodule.asModule.get()
         }
     }
@@ -72,4 +87,15 @@ private extension Submodule {
             return absURL | { Module(url: $0, exists: false, subModules: [:]) }
         }
     }
+}
+
+public extension Sequence {
+    func toOrderedDictionary<Key: Hashable, Value>(key: KeyPath<Element, Key>, block: (Element)->(Value)) -> OrderedDictionary<Key,Value> {
+        var dic: OrderedDictionary<Key,Value> = [:]
+        for element in self {
+            dic[element[keyPath: key]] = block(element)
+        }
+        return dic
+    }
+
 }

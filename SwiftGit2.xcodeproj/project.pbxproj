@@ -96,6 +96,7 @@
 		E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */; };
 		E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */; };
 		E6F29F0027B58ADD00F473A1 /* TestFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder.swift */; };
+		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -251,6 +252,7 @@
 			files = (
 				E62B73C4268092B400B7D881 /* Essentials in Frameworks */,
 				BEB31FA01A0E595600F525B9 /* libz.dylib in Frameworks */,
+				E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */,
 				BEB31F9E1A0E595100F525B9 /* libiconv.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -616,6 +618,7 @@
 			name = "SwiftGit2-OSX";
 			packageProductDependencies = (
 				E62B73C3268092B400B7D881 /* Essentials */,
+				E6FC107527BD94CE002C9CEE /* OrderedCollections */,
 			);
 			productName = "SwiftGit2-OSX";
 			productReference = BEB31F231A0D6F7A00F525B9 /* SwiftGit2.framework */;
@@ -676,6 +679,7 @@
 			packageReferences = (
 				E62B73C2268092B400B7D881 /* XCRemoteSwiftPackageReference "essentials" */,
 				1D5E1F432742A7DC00498539 /* XCRemoteSwiftPackageReference "essential_tests" */,
+				E6FC107427BD94CE002C9CEE /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			productRefGroup = BEB31F241A0D6F7A00F525B9 /* Products */;
 			projectDirPath = "";
@@ -1096,6 +1100,14 @@
 				kind = branch;
 			};
 		};
+		E6FC107427BD94CE002C9CEE /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1113,6 +1125,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E62B73C2268092B400B7D881 /* XCRemoteSwiftPackageReference "essentials" */;
 			productName = Essentials;
+		};
+		E6FC107527BD94CE002C9CEE /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E6FC107427BD94CE002C9CEE /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

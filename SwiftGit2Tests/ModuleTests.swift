@@ -9,6 +9,8 @@ class ModuleTests: XCTestCase {
 
     func test_submodules() {
         let url = URL.userHome.appendingPathComponent("dev/taogit")
+        Repository.module(at: url)
+            .shouldSucceed("module")
         (Repository.module(at: url) | { $0.subModules } | { $0.count })
             .assertEqual(to: 3, "taogit submodules")
     }
