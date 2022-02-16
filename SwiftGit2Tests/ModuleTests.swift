@@ -7,6 +7,12 @@ import EssetialTesting
 class ModuleTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "ModuleTests")
 
+    func test_submodules() {
+        let url = URL.userHome.appendingPathComponent("dev/taogit")
+        (Repository.module(at: url) | { $0.subModules } | { $0.count })
+            .assertEqual(to: 3, "taogit submodules")
+    }
+    
 //    func test_wtf() {
 //        let repo = Repository.at(url: URL.userHome.appendingPathComponent("dev/taogit wtf"))
 //        
@@ -49,6 +55,9 @@ class ModuleTests: XCTestCase {
         
         (folder.sub(folder: "main_repo").repo | { $0.status() } | { $0.count })
             .assertEqual(to: 0, "no files in workdir")
+        
+        (folder.sub(folder: "main_repo").repo | { $0.asModule } | { $0.subModules.count })
+            .assertEqual(to: 1, "one sub module should exists")
     }
     
     func test_shouldAddSubmoduleAnd_NotCommit() {
@@ -65,8 +74,8 @@ class ModuleTests: XCTestCase {
     func test_shouldCloneWithSubmodule() {
         let folder = root.sub(folder: "Clone").cleared().shouldSucceed()!
 
-        folder.with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
-            .flatMap { $0.with(submodule: "sub_repo", content: .commit(.fileB, .random, "initial commit")) }
+        folder   .with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
+            .with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
             .shouldSucceed("addSub")
         
         let source = folder.sub(folder: "main_repo").url

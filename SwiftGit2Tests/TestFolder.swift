@@ -92,4 +92,8 @@ extension Result where Success == TestFolder, Failure == Error {
     func run<T>(_ topic: String? = nil, block: (TestFolder)->R<T>) -> R<TestFolder> {
         self | { block($0).verify(topic) } | { _ in self }
     }
+    
+    func with(submodule: String, content: RepositoryContent) -> R<TestFolder> {
+        self | { $0.with(submodule: submodule, content: content) }
+    }
 }
