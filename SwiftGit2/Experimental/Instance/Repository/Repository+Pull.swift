@@ -10,6 +10,15 @@ import Clibgit2
 import Essentials
 import Foundation
 
+#if DEBUG
+let checkoutStrategy      : CheckoutStrategy = .Safe
+let checkoutStrategyMerge : CheckoutStrategy = [.Safe, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3]
+#else
+let checkoutStrategy      : CheckoutStrategy = .Force
+let checkoutStrategyMerge : CheckoutStrategy = [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3]
+
+#endif
+
 public enum MergeResult {
     case upToDate
     case fastForward
@@ -56,7 +65,7 @@ public extension Repository {
             return combine(targetOID, message)
                 | { oid, message in ourLocal.set(target: oid, message: message) }
                 | { $0.asBranch() }
-                | { self.checkout(branch: $0, strategy: .Force, progress: options.checkoutProgress) }
+                | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress) }
                 | { _ in .fastForward }
             
         } else if anal.contains(.normal) {
@@ -99,14 +108,14 @@ public extension Repository {
                                     .setOid(from: $0[1] )
                                     .save()
                             } | { _ in
-                                repo.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3], progress: options.checkoutProgress)
+                                repo.checkout(index: index, strategy: checkoutStrategyMerge , progress: options.checkoutProgress)
                                     | { _ in .success(.threeWayConflict(index)) }
                             }
                     },
                     else: { index in
                         combine(message, parents)
                             | { index.commit(into: self, signature: options.signature, message: $0, parents: $1) }
-                            | { _ in self.checkout(branch: branchName, strategy: .Force, progress: options.checkoutProgress) }
+                            | { _ in self.checkout(branch: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress) }
                             | { _ in .threeWaySuccess }
                     })
         }
