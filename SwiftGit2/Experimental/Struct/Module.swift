@@ -15,7 +15,7 @@ public struct Module : CustomStringConvertible {
         for item in subModules {
             results[item.key] = item.value
             if let module = item.value {
-                for item in module.subModules {
+                for item in module.subModulesRecursive {
                     results[item.key] = item.value
                 }
             }
