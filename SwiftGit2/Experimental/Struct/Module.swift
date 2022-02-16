@@ -8,6 +8,14 @@ import OrderedCollections
 public struct Module : CustomStringConvertible {
     public let url : URL
     public let exists : Bool
+    public var recurse : OrderedDictionary<String,Module?> {
+        var result = OrderedDictionary<String,Module?>()
+        result[self.url.lastPathComponent] = self
+        for item in subModulesRecursive {
+            result[item.key] = item.value
+        }
+        return result //.merging(subModulesRecursive) { a, b in a }
+    }
     public let subModules : OrderedDictionary<String,Module?>
     public var subModulesRecursive : OrderedDictionary<String,Module?> {
         var results = OrderedDictionary<String,Module?>()
