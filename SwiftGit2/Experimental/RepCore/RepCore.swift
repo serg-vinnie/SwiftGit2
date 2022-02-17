@@ -9,13 +9,13 @@
 import Foundation
 import Essentials
 
-struct RepCore<T> {
-    let containers : [RepoID:T]
-    let roots : [RepoID:Module]
-    static var empty : RepCore<T> { RepCore(containers: [:], roots: [:]) }
+public struct RepCore<T> {
+    public let containers : [RepoID:T]
+    public let roots : [RepoID:Module]
+    public static var empty : RepCore<T> { RepCore(containers: [:], roots: [:]) }
 }
 
-extension RepCore {
+public extension RepCore {
     func appendingRoot(repoID: RepoID) -> R<RepCore<T>> {
         roots.with(repoID: repoID) | { RepCore(containers: [:], roots: $0) }
     }
