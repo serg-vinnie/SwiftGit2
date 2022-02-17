@@ -11,6 +11,15 @@ import Essentials
 import Foundation
 
 public extension Repository {
+    func commit(branch: String) -> R<Commit> {
+        reference(name: branch) | { $0.asBranch() } | { $0.targetOID } | { self.instanciate($0)}
+    }
+    
+    func merge(from: String, into: String, signature: Signature) -> R<Commit> {
+        return combine(commit(branch: from), commit(branch: into))
+            .flatMap { c1, c2 in self.mergeAndCommit(our: c1, their: c2, msg: "Merge: \(from) -> \(into)", signature: signature)}
+    }
+    
     func mergeBase(one: OID, two: OID) -> Result<OID, Error> {
         var out = git_oid()
 
