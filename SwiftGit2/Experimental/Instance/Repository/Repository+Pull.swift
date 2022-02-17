@@ -10,14 +10,14 @@ import Clibgit2
 import Essentials
 import Foundation
 
-#if DEBUG
-let checkoutStrategy      : CheckoutStrategy = .Safe
-let checkoutStrategyMerge : CheckoutStrategy = [.Safe, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3]
-#else
+//#if DEBUG
+//let checkoutStrategy      : CheckoutStrategy = .Safe
+//let checkoutStrategyMerge : CheckoutStrategy = [.Safe, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3]
+//#else
 let checkoutStrategy      : CheckoutStrategy = .Force
 let checkoutStrategyMerge : CheckoutStrategy = [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3]
 
-#endif
+//#endif
 
 public enum MergeResult {
     case upToDate

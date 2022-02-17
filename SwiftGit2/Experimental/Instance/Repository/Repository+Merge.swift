@@ -43,7 +43,7 @@ public extension Repository {
         return merge(our: our, their: their)
             .flatMap { index in
                 Duo(index, self)
-                    .commit(message: "TAO_MERGE", signature: signature)
+                    .commit(message: msg, signature: signature)
             }
     }
     
