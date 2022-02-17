@@ -16,10 +16,9 @@ public struct RepoID : Hashable {
     public init(path: String) { self.path = path.skippingLastSlash }
     public init(url: URL)     { self.path = url.path.skippingLastSlash }
     
+    var module : R<Module> { Repository.module(at: url) }
 }
 
 extension RepoID : CustomStringConvertible {
-    public var description: String {
-        return path
-    }
+    public var description: String { return "RepoID " + path }
 }
