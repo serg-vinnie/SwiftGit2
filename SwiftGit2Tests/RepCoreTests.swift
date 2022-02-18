@@ -11,13 +11,16 @@ import EssetialTesting
 import SwiftGit2
 
 class TestContainer {
+    static var counter = 0
     let repoID: RepoID
     init(repoID: RepoID) {
+        TestContainer.counter += 1
         self.repoID = repoID
-        print("TestContainer.init \(repoID)")
+        print("INIT.TestContainer \(repoID)")
     }
     deinit {
-        print("TestContainer.deinit \(repoID)")
+        TestContainer.counter -= 1
+        print("DE-INIT.TestContainer \(repoID)")
     }
 }
 
@@ -33,11 +36,14 @@ class RepCoreTests: XCTestCase {
 
         let repoID = RepoID(url: folder.sub(folder: "main_repo").url)
         
-        let repCore = RepCore<TestContainer>.empty.appendingRoot(repoID: repoID, block: { TestContainer(repoID: $0) })
+        var repCore = RepCore<TestContainer>.empty.appendingRoot(repoID: repoID, block: { TestContainer(repoID: $0) })
             .shouldSucceed("RepCore")!
         
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        XCTAssert(TestContainer.counter == 2)
+        
+        repCore = repCore.removingRoot(repoID: repoID)
+        
+        XCTAssert(TestContainer.counter == 0)
     }
 
 }

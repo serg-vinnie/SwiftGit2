@@ -108,3 +108,9 @@ public extension Sequence {
     }
 
 }
+
+extension OrderedDictionary where Key == String, Value == Module? {
+    var asRepoIDs : [RepoID] {
+        values.compactMap { $0?.repoID }
+    }
+}
