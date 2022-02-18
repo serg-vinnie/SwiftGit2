@@ -8,6 +8,12 @@ import XCTest
 class RepositoryLocalTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "RepositoryLocalTests")
     
+    func test_bla() {
+        //let url =
+        let repoID = RepoID(url: URL.userHome.appendingPathComponent("dev/z-ua.com"))
+        repoID.re
+    }
+    
     func test_DetachedHead() throws {
         let folder = self.root.with(repo: "DetachedHead", content: .empty).shouldSucceed()!
         let repo = folder.repo.shouldSucceed()!
