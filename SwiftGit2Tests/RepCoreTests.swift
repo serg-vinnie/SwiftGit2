@@ -31,9 +31,10 @@ class RepCoreTests: XCTestCase {
             .flatMap { $0.with(submodule: "sub_repo", content: .commit(.fileB, .random, "initial commit")) }
             .shouldSucceed("addSub")
 
+        let repoID = RepoID(url: folder.sub(folder: "main_repo").url)
         
-        RepCore<TestContainer>.empty.appendingRoot(repoID: RepoID(url: folder.sub(folder: "main_repo").url))
-            .shouldSucceed("RepCore")
+        let repCore = RepCore<TestContainer>.empty.appendingRoot(repoID: repoID, block: { TestContainer(repoID: $0) })
+            .shouldSucceed("RepCore")!
         
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.

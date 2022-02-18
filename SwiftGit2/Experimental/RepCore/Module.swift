@@ -6,6 +6,7 @@ import OrderedCollections
 
 // TODO: fix detached head
 public struct Module : CustomStringConvertible {
+    public var repoID : RepoID { RepoID(url: url) }
     public let url : URL
     public let exists : Bool
     public var recurse : OrderedDictionary<String,Module?> {
