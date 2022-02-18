@@ -8,10 +8,14 @@ import XCTest
 class RepositoryLocalTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "RepositoryLocalTests")
     
-    func test_bla() {
+    func test_deltas_measure() {
         //let url =
         let repoID = RepoID(url: URL.userHome.appendingPathComponent("dev/z-ua.com"))
-        repoID.re
+        
+        self.measure {
+            (repoID.repo | { $0.deltas(target: .commit(OID(string: "719c6fb2b8d9dee5b9ee94e852ee03f7f2ea85ea")!), findOptions: []) })
+                .shouldSucceed()
+        }
     }
     
     func test_DetachedHead() throws {
