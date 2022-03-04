@@ -12,25 +12,10 @@ internal extension NSError {
         let code = Int(errorCode)
         var userInfo: [String: String] = [:]
 
-        var domain = "lib."
-        if let pointOfFailure = pointOfFailure {
-            userInfo[NSLocalizedFailureReasonErrorKey] = "\(pointOfFailure) failed."
-            domain += "\(pointOfFailure) failed: "
-        }
-
-        if let message = errorMessage(errorCode) {
-            if let pof = pointOfFailure {
-                userInfo[NSLocalizedDescriptionKey] = "[\(pof)]: \(message)"
-            } else {
-                userInfo[NSLocalizedDescriptionKey] = message
-            }
-            domain += message
-        } else {
-            userInfo[NSLocalizedDescriptionKey] = "Unknown libgit2 error."
-            domain += "unknown"
-        }
-
-        self.init(domain: domain, code: code, userInfo: userInfo)
+        userInfo[NSLocalizedFailureReasonErrorKey] = errorMessage(errorCode)
+        userInfo[NSLocalizedDescriptionKey] = pointOfFailure
+        
+        self.init(domain: "LibGit2", code: code, userInfo: userInfo)
     }
 }
 

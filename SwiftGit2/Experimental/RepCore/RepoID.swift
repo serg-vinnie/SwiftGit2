@@ -22,5 +22,9 @@ public struct RepoID : Hashable {
 }
 
 extension RepoID : CustomStringConvertible {
-    public var description: String { return "RepoID " + path }
+    #if DEBUG
+    public var description: String { "RepoID " + path.replace(of: "/Users/loki/dev", to: "􀋀").replace(of: "Carthage/Checkouts", to: "􀋀") }
+    #else
+    public var description: String { "RepoID " + path }
+    #endif
 }

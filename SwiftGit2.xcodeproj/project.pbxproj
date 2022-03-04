@@ -504,7 +504,6 @@
 			isa = PBXGroup;
 			children = (
 				E66360DD27BF061F001292FB /* RepCore */,
-				E66360DC27BF037F001292FB /* New Group */,
 				E69D5D102573B21400AEBA28 /* Instance */,
 				E6AB53AF2575311600364E5F /* Struct */,
 				1D496A4125372FA800789177 /* git_strarray.swift */,
@@ -512,13 +511,6 @@
 				1DA3413C26B964FC0097E488 /* RevFile.swift */,
 			);
 			path = Experimental;
-			sourceTree = "<group>";
-		};
-		E66360DC27BF037F001292FB /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "New Group";
 			sourceTree = "<group>";
 		};
 		E66360DD27BF061F001292FB /* RepCore */ = {
