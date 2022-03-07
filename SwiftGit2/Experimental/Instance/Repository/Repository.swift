@@ -410,7 +410,7 @@ public extension Repository {
 
 
 public extension Repository {
-    var State: RepoState {
+    var state: RepoState {
         let state: Int32 = git_repository_state(self.pointer)
         
         return git_repository_state_t(UInt32(state))
