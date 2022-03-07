@@ -35,7 +35,7 @@ public extension Repository {
             .flatMapError {
                 let error = $0 as NSError
                 
-                if let reason = error.localizedFailureReason, reason.starts(with: "git_branch_upstream") {
+                if error.localizedDescription == "git_branch_upstream" {
                     if error.code == -3 {
                         return .success(false)
                     }

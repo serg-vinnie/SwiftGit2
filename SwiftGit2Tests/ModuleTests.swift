@@ -100,7 +100,7 @@ class ModuleTests: XCTestCase {
         
         folder.with(repo: "main_repo", content: .empty)
             .run { $0.snapshoted(to: "0_REPO_CLEAN") }
-            .run { $0.repo | { $0.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true).flatMap { $0.clone(options: .defaultSSH).verify("CLONE") } } }
+            .run { $0.repo | { $0.add(submodule: "SubModule", remote: "../sub_repo", gitlink: true) } }
             .run { $0.snapshoted(to: "1_REPO_ADD_SUB") }
             
             .run {
