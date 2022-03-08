@@ -98,6 +98,7 @@
 		E6E9923A268BC1BE00F8E8BD /* Essentials in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E6E99238268BC1BE00F8E8BD /* Essentials */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */; };
 		E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */; };
+		E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */; };
 		E6F29F0027B58ADD00F473A1 /* TestFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder.swift */; };
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
 /* End PBXBuildFile section */
@@ -248,6 +249,7 @@
 		E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevwalkTests.swift; sourceTree = "<group>"; };
 		E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntry.swift; sourceTree = "<group>"; };
 		E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Discard.swift"; sourceTree = "<group>"; };
+		E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Unborn.swift; sourceTree = "<group>"; };
 		E6F29EFF27B58ADD00F473A1 /* TestFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -519,6 +521,7 @@
 				E66360DE27BF063D001292FB /* RepCore.swift */,
 				E6AA18F827AF815E002AFC33 /* Module.swift */,
 				E66360DA27BEEC1C001292FB /* RepoID.swift */,
+				E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */,
 			);
 			path = RepCore;
 			sourceTree = "<group>";
@@ -774,6 +777,7 @@
 				BE36354C1A632C9700D37EC8 /* Libgit2.swift in Sources */,
 				E653907C23E73CDE00C08416 /* Patch.swift in Sources */,
 				1DEC291127722FB8007C32FF /* StatusEntry.Status.swift in Sources */,
+				E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */,
 				E6D4A91C24DEA9AD00E8041E /* Branch.swift in Sources */,
 				E6D4A92424DF40CA00E8041E /* Index.swift in Sources */,
 				E6D4A91824DEA8EC00E8041E /* Instance.swift in Sources */,

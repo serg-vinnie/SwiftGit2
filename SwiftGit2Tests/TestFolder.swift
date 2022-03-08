@@ -49,7 +49,8 @@ extension TestFolder {
         let subFolder = sub(folder: name).cleared().shouldSucceed()!
         
         if case let .clone(url, options) = content {
-            return Repository.clone(from: url, to: subFolder.url, options: options) | { _ in subFolder }
+            return Unborn(repoURL: subFolder.url)
+                .clone(from: url, options: options) | { _ in subFolder }
         } else {
             return subFolder.clearRepo | { $0.t_with(content: content) } | { _ in subFolder }
         }
