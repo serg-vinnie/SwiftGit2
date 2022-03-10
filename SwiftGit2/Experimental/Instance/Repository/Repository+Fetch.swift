@@ -33,14 +33,10 @@ public extension Repository {
             .flatMap { $0.upstream() }
             .map { _ in true }
             .flatMapError {
-                let error = $0 as NSError
-                
-                if error.localizedDescription == "git_branch_upstream" {
-                    if error.code == -3 {
-                        return .success(false)
-                    }
+                if $0.isGit2(func: "git_branch_upstream", code: -3) {
+                    return .success(false)
                 }
-                return .failure(error)
+                return .failure($0)
             }
     }
 }
