@@ -52,6 +52,7 @@ extension Repository {
 enum TestFile: String {
     case fileA = "fileA.txt"
     case fileB = "fileB.txt"
+    case fileLong = "pneumonoultramicroscopicsilicovolcanoconiosis.txt"
 }
 
 enum TestFileContent: String {

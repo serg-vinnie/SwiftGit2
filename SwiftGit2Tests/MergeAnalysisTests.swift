@@ -73,11 +73,11 @@ class MergeAnalysisTests: XCTestCase {
         let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
         
         // fileA
-        repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
+        repo2.t_push_commit(file: .fileLong, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
                    .shouldSucceed("t_push_commit")
         
         // Same fileA
-        repo1.t_commit(file: .fileA, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
+        repo1.t_commit(file: .fileLong, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
             .shouldSucceed()
         
         repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
