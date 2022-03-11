@@ -16,6 +16,14 @@ import XCTest
 class RepositoryRemoteTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "RepositoryRemoteTests")
     
+//    func test_accessShouldFail() {
+//        let repo = root.with(repo: "test_accessShouldFail", content: .empty).repo.maybeSuccess!
+//        
+//        repo.createRemote(url: PublicTestRepo().urlSsh.path)
+//            .flatMap { $0.connect(direction: .fetch, auth: .credentials(.none)) }
+//            .shouldSucceed("connect")
+//    }
+    
     func testHttpsAnonymouseClone() {
         let info = PublicTestRepo()
         

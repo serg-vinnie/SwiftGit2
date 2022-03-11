@@ -24,6 +24,10 @@ public extension Error {
         let nsError = self as NSError
         return self.localizedDescription == name && nsError.code == code
     }
+    
+    func isGit2(func name: String) -> Bool {
+        return self.localizedDescription == name
+    }
 }
 
 /// Returns the libgit2 error message for the given error code.
