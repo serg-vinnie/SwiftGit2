@@ -10,13 +10,6 @@ import Clibgit2
 import Foundation
 
 public typealias TransferProgressCB = (git_indexer_progress) -> (Bool) // return false to cancel progree
-public typealias AuthCB = (_ url: String?, _ username: String?) -> (Credentials)
-
-public enum Auth {
-    case match(AuthCB)
-    case credentials(Credentials)
-    case list([Credentials])
-}
 
 public class RemoteCallbacks: GitPayload {
     var list = [Credentials]()

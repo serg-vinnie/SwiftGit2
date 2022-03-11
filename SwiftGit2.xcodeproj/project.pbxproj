@@ -42,6 +42,7 @@
 		BEB31F9E1A0E595100F525B9 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BEB31F9D1A0E595100F525B9 /* libiconv.dylib */; };
 		BEB31FA01A0E595600F525B9 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BEB31F9F1A0E595600F525B9 /* libz.dylib */; };
 		DA5914761A94579000AED74C /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5914751A94579000AED74C /* Errors.swift */; };
+		E60364B727DB338100E9D4D0 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60364B627DB338100E9D4D0 /* Auth.swift */; };
 		E623A308263486A500484E11 /* FetchOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623A307263486A500484E11 /* FetchOptions.swift */; };
 		E623A3142634883100484E11 /* CloneOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623A3132634883100484E11 /* CloneOptions.swift */; };
 		E623A31F2634885800484E11 /* CheckoutOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623A31E2634885800484E11 /* CheckoutOptions.swift */; };
@@ -194,6 +195,7 @@
 		BEB31F9D1A0E595100F525B9 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		BEB31F9F1A0E595600F525B9 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		DA5914751A94579000AED74C /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		E60364B627DB338100E9D4D0 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		E623A307263486A500484E11 /* FetchOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchOptions.swift; sourceTree = "<group>"; };
 		E623A3132634883100484E11 /* CloneOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloneOptions.swift; sourceTree = "<group>"; usesTabs = 0; };
 		E623A31E2634885800484E11 /* CheckoutOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOptions.swift; sourceTree = "<group>"; usesTabs = 0; };
@@ -529,6 +531,7 @@
 		E68A3ACD2665346800B0244C /* User */ = {
 			isa = PBXGroup;
 			children = (
+				E60364B627DB338100E9D4D0 /* Auth.swift */,
 				622726331C84E52500C53D17 /* Credentials.swift */,
 				E68A3ACE266534B400B0244C /* Signature.swift */,
 			);
@@ -731,6 +734,7 @@
 				1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */,
 				E69D5CEE2573AC8E00AEBA28 /* Repository+Submodules.swift in Sources */,
 				1D991AE12518FA7900335255 /* Duo.swift in Sources */,
+				E60364B727DB338100E9D4D0 /* Auth.swift in Sources */,
 				1DEC291527723308007C32FF /* StatusEntryHunks.swift in Sources */,
 				1DB0F84E24EFFB2D00637B9B /* Repository+Checkout.swift in Sources */,
 				E623A308263486A500484E11 /* FetchOptions.swift in Sources */,
