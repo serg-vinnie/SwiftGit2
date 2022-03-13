@@ -139,14 +139,14 @@ internal extension Index {
 }
 
 extension MergeResult: Equatable {
-    var hasConflict: Bool {
+    public var hasConflict: Bool {
         if case .threeWayConflict = self {
             return true
         } else {
             return false
         }
     }
-
+    
     public static func == (lhs: MergeResult, rhs: MergeResult) -> Bool {
         switch (lhs, rhs) {
         case (.upToDate, .upToDate): return true
