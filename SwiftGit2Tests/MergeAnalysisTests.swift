@@ -68,7 +68,51 @@ class MergeAnalysisTests: XCTestCase {
     }
     
     func testShouldHasConflict() throws {
-        let folder = root.sub(folder: "ShouldHasConflict")
+        try createConflict(subFolder: "ShouldHasConflict")
+    }
+    
+    func test_should_success_mine() throws {
+        try createConflict(subFolder: "test_should_success_mine")
+        
+        let repoID = RepoID(url: root.sub(folder: "test_should_success_mine").url.appendingPathComponent("repo1") )
+        
+        _ = repoID.repo.flatMap { $0.index() }
+            .map{ $0.hasConflicts }
+            .assertEqual(to: true, "has conflicts. This is ok")
+        
+        let entrie = repoID
+            .repo
+            .flatMap{ $0.status() }
+            .map{ $0.first! }
+            .shouldSucceed("success to get element from status")!
+            //!.filter{ $0.path = "" }
+        
+        
+//        repoID.actions?.conflicts.resolveAsMine(entry: entrie , isSubmodule: false)
+        
+        
+        _ = repoID.repo.flatMap { $0.index() }
+            .map{ $0.hasConflicts }
+            .assertEqual(to: false, "has NO conflicts. This is ok")
+        
+    }
+    
+    func test_should_success_their() throws {
+        try createConflict(subFolder: "test_should_success_their")
+    }
+    
+    func test_should_success_both() throws {
+        try createConflict(subFolder: "test_should_success_both")
+    }
+}
+
+
+
+
+
+extension MergeAnalysisTests {
+    private func createConflict(subFolder: String) throws {
+        let folder = root.sub(folder: subFolder)
         let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
         let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
         
@@ -93,5 +137,12 @@ class MergeAnalysisTests: XCTestCase {
         repo1.pull(.HEAD, options: options)
             .map { $0.hasConflict }
             .assertEqual(to: true, "pull has conflict")
+    }
+    
+    private func getFirstConflict(repoID: RepoID) -> Index.Conflict  {
+        repoID.repo.flatMap{ $0.index() }
+            .flatMap{ $0.conflicts() }
+            .map{ $0.first! }
+            .shouldSucceed("First conflict found")!
     }
 }
