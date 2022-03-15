@@ -100,13 +100,14 @@ class MergeAnalysisTests: XCTestCase {
         
         let repoID = RepoID(url: root.sub(folder: "test_should_success_mine").url.appendingPathComponent("repo1") )
         
-        _ = repoID.repo.flatMap { $0.index() }
-            .map{ $0.hasConflicts }
-            .assertEqual(to: true, "has conflicts. This is ok")
+        let cfl = Conflicts(repoID: repoID)
         
-        let firstCoflict = getFirstConflict(repoID: repoID)
+        _ = cfl.exist().shouldSucceed("Conflicts exist")!
         
-        resolveConflict(repoID: repoID, conflict: firstCoflict, resolveAsTheir: false)
+        let firstConflict = cfl.all().shouldSucceed("Conflicts exist")!.first!
+        
+        
+        resolveConflict(repoID: repoID, conflict: firstConflict, resolveAsTheir: false)
             .shouldSucceed("Conflict resolved as mine")
         
         _ = repoID.repo.flatMap { $0.index() }
