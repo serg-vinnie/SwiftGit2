@@ -19,7 +19,7 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed("repo2 clone")
     }
     
-    func testFastForward() throws {
+    func testFastForward() {
         let folder = root.sub(folder: "fastForward")
         let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
         let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
@@ -42,7 +42,7 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: .fastForward, "pull fast forward merge")
     }
 
-    func testThreWaySuccess() throws {
+    func testThreWaySuccess() {
         let folder = root.sub(folder: "ThreeWayMerge")
         let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
         let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
@@ -67,7 +67,7 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: .threeWaySuccess)
     }
     
-    func testShouldHasConflict() throws {
+    func testShouldHasConflict() {
         let folder = root.sub(folder: "ShouldHasConflict")
         let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
         let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
