@@ -68,11 +68,35 @@ class MergeAnalysisTests: XCTestCase {
     }
     
     func testShouldHasConflict() throws {
-        try createConflict(subFolder: "ShouldHasConflict")
+        let folder = root.sub(folder: "ShouldHasConflict")
+        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
+        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
+        
+        // fileA
+        repo2.t_push_commit(file: .fileLong, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
+                   .shouldSucceed("t_push_commit")
+        
+        // Same fileA
+        repo1.t_commit(file: .fileLong, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
+            .shouldSucceed()
+        
+        repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
+            .shouldSucceed()
+        
+        let merge = repo1.mergeAnalysisUpstream(.HEAD)
+            .assertNotEqual(to: [.fastForward])
+        
+        XCTAssert(merge == .normal)
+        
+        let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.sshDefault)))
+        
+        repo1.pull(.HEAD, options: options)
+            .map { $0.hasConflict }
+            .assertEqual(to: true, "pull has conflict")
     }
     
     func test_should_success_mine() throws {
-        try createConflict(subFolder: "test_should_success_mine")
+        createConflict(subFolder: "test_should_success_mine")
         
         let repoID = RepoID(url: root.sub(folder: "test_should_success_mine").url.appendingPathComponent("repo1") )
         
@@ -105,7 +129,7 @@ class MergeAnalysisTests: XCTestCase {
 
 
 extension MergeAnalysisTests {
-    private func createConflict(subFolder: String) throws {
+    private func createConflict(subFolder: String) {
         let folder = root.sub(folder: subFolder)
         let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
         let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
