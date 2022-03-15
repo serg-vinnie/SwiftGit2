@@ -21,4 +21,49 @@ public struct Conflicts {
         repoID.repo.flatMap { $0.index() }
             .map{ $0.hasConflicts }
     }
+    
+    public func resolve(path: String, resolveAsTheir: Bool) -> R<()> {
+        let repo = repoID.repo.maybeSuccess!
+        let rConflict: R<Index.Conflict> = all().map{ $0.filter{ $0.our.path == path || $0.their.path == path }.first! }
+        
+        let index = repo.index()
+        
+        return zip(index, rConflict)
+            .flatMap { index, conflict -> R<()> in
+                let sideEntry = resolveAsTheir ? conflict.their : conflict.our
+                
+                return index
+                    .removeAll(pathPatterns: [sideEntry.path])
+                    // Видаляємо конфлікт
+                    .map{ index.conflictRemove(relPath: sideEntry.path) }
+                    // додаємо файл чи сабмодуль в індекс
+                    .flatMap { _ -> R<()> in
+                        return index.add(sideEntry)
+                    }
+                    // чекаутим файл чи сабмодуль з цього індекса
+                    .flatMap { _ in
+                        repo.checkout( index: index, strategy: [.Force, .DontWriteIndex])//, relPaths: [sideEntry.path] )
+                    }
+            }
+            .flatMap{ _ in .success(()) }
+    }
+}
+
+
+// HELPERS
+// CODE DUPLICATE FROM ASYNC NINJA
+/// Combines successes of two failables or returns fallible with first error
+public func zip<A, B>(
+  _ a: Fallible<A>,
+  _ b: Fallible<B>
+  ) -> Fallible<(A, B)> {
+  switch (a, b) {
+  case let (.success(successA), .success(successB)):
+    return .success((successA, successB))
+  case let (.failure(failure), _),
+       let (_, .failure(failure)):
+    return .failure(failure)
+  default:
+    fatalError()
+  }
 }

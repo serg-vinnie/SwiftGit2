@@ -109,18 +109,17 @@ class MergeAnalysisTests: XCTestCase {
             .map { $0.count }
             .assertEqual(to: 1)
         
-//
-//
-//        let firstConflict = cfl.all().shouldSucceed("Conflicts exist")!.first!
-//
-//
-//        resolveConflict(repoID: repoID, conflict: firstConflict, resolveAsTheir: false)
-//            .shouldSucceed("Conflict resolved as mine")
-//
-//        _ = repoID.repo.flatMap { $0.index() }
-//            .map{ $0.hasConflicts }
-//            .assertEqual(to: false, "has NO conflicts. This is ok")
+        let first = Conflicts(repoID: repoID)
+            .all()
+            .maybeSuccess!.first!
         
+        Conflicts(repoID: repoID)
+            .resolve(path: first.our.path, resolveAsTheir: true)
+            .shouldSucceed("Conflict Resolved")
+        
+        Conflicts(repoID: repoID)
+            .exist()
+            .assertEqual(to: false)
     }
     
 //    func test_should_success_their() throws {
@@ -166,57 +165,4 @@ extension MergeAnalysisTests {
         
         return folder
     }
-    
-    private func getFirstConflict(repoID: RepoID) -> Index.Conflict  {
-        repoID.repo.flatMap{ $0.index() }
-            .flatMap{ $0.conflicts() }
-            .map{ $0.first! }
-            .shouldSucceed("First conflict found")!
-    }
-}
-
-
-func resolveConflict(repoID: RepoID, conflict: Index.Conflict, resolveAsTheir: Bool) -> R<Void> {
-    let repo = repoID.repo.shouldSucceed("Got the Repo")!
-    let rConflict: R<Index.Conflict> = .success(conflict)
-    
-    
-    let index = repo.index()
-    
-    return zip(index, rConflict)
-        .flatMap { index, conflict -> R<()> in
-            let sideEntry = resolveAsTheir ? conflict.their : conflict.our
-            
-            return index
-                .removeAll(pathPatterns: [sideEntry.path])
-                // Видаляємо конфлікт
-                .map{ index.conflictRemove(relPath: sideEntry.path) }
-                // додаємо файл чи сабмодуль в індекс
-                .flatMap { _ -> R<()> in
-                    return index.add(sideEntry)
-                }
-                // чекаутим файл чи сабмодуль з цього індекса
-                .flatMap { _ in
-                    repo.checkout( index: index, strategy: [.Force, .DontWriteIndex])//, relPaths: [sideEntry.path] )
-                }
-        }
-        .flatMap{ _ in .success(()) }
-}
-
-// HELPERS
-// CODE DUPLICATE FROM ASYNC NINJA
-/// Combines successes of two failables or returns fallible with first error
-public func zip<A, B>(
-  _ a: Fallible<A>,
-  _ b: Fallible<B>
-  ) -> Fallible<(A, B)> {
-  switch (a, b) {
-  case let (.success(successA), .success(successB)):
-    return .success((successA, successB))
-  case let (.failure(failure), _),
-       let (_, .failure(failure)):
-    return .failure(failure)
-  default:
-    fatalError()
-  }
 }
