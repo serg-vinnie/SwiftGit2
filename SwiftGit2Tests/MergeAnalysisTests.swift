@@ -70,8 +70,8 @@ class MergeAnalysisTests: XCTestCase {
 
     }
     
-    func test_shouldResolveConflict() {
-        let folder = root.sub(folder: "conflict")
+    func test_shouldResolveConflictTheir() {
+        let folder = root.sub(folder: "conflictResolveTheir")
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
 
@@ -82,7 +82,7 @@ class MergeAnalysisTests: XCTestCase {
                 
         (dst.repo | { $0.pull(.HEAD, options: .local) })
             .shouldSucceed()
-
+        
         // -------------------------------------------------------------------
         
         let repoID = RepoID(url: dst.url )
@@ -90,11 +90,6 @@ class MergeAnalysisTests: XCTestCase {
         Conflicts(repoID: repoID)
             .exist()
             .assertEqual(to: true)
-        
-        Conflicts(repoID: repoID)
-            .all()
-            .map { $0.count }
-            .assertEqual(to: 1)
         
         let path = TestFile.fileA.rawValue
         
