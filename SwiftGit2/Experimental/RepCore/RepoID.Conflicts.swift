@@ -16,6 +16,7 @@ public enum ConflictType {
 
 public struct Conflicts {
     public let repoID: RepoID
+    public init(repoID: RepoID) { self.repoID = repoID }
     
     public func all() -> R<[Index.Conflict]> {
         repoID.repo.flatMap{ $0.index() }
