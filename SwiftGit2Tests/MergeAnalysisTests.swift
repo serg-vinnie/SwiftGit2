@@ -22,11 +22,8 @@ class MergeAnalysisTests: XCTestCase {
     func test_shouldMergeFastForward() {
         let folder = root.sub(folder: "fastForward").cleared().shouldSucceed()!
         
-        let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit"))
-            .shouldSucceed()!
-        
-        let dst = folder.with(repo: "dst", content: .clone(src.url, cloneOptions))
-            .shouldSucceed()!
+        let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
+        let dst = folder.with(repo: "dst", content: .clone(src.url, cloneOptions)).shouldSucceed()!
         
         (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "second commit") })
             .shouldSucceed()
@@ -44,6 +41,14 @@ class MergeAnalysisTests: XCTestCase {
         
         (dst.repo | { $0.pull(.HEAD, options: options) })
             .assertEqual(to: .fastForward, "pull fast forward merge")
+    }
+    
+    func test_shouldMergeThreeWay() {
+        let folder = root.sub(folder: "threeWay")
+        let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
+        let dst = folder.with(repo: "dst", content: .clone(src.url, cloneOptions)).shouldSucceed()!
+
+        
     }
 
     func testThreWaySuccess() {
