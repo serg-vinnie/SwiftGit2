@@ -56,10 +56,29 @@ public struct Module : CustomStringConvertible {
             })
     }
     
-    public func updateSubModules() -> R<()> {
-        .notImplemented("updateSubModules")
+    public func updateSubModules(options: SubmoduleUpdateOptions, `init`: Bool) -> R<()> {
+        repoID.repo | {     // keep repository reference during work with submodules
+            $0.submodules() | { $0 | { $0.update(options: options, init: `init`) } }
+        } | { _ in () }
     }
 }
+
+/*
+ 
+ let cloneOpt = SubmoduleUpdateOptions(fetch: fetch, checkout: checkout)
+ let ret = self.update(options: cloneOpt, init: true)
+ 
+ func updateSubmodules(a: TreeProgressAccum, auth: Auth) -> Channel<TreeProgressAccum,Void> {
+     let duos = submodules() | { $0 | { Duo($0,self) } }
+     
+     return duos
+         .flatMap { $0.flatMap { duo in duo.getSubmoduleAbsPath().map { (duo.submodule.headOID,$0,duo) } } }
+         .map { $0.filter { oid, path, duo in !a.contains(oid: oid, at: path) } }
+         .map { $0.map { $0.2 } }
+         .flatMap { $0.foldr(a) { a, host in host.updateRecursive(a: a, auth: auth) } }
+ }
+ 
+ */
 
 public extension Repository {
     var asModule : R<Module> {

@@ -45,3 +45,7 @@ extension CloneOptions {
     static var local : CloneOptions { CloneOptions(fetch: .local) }
     static var ssh   : CloneOptions { CloneOptions(fetch: .ssh) }
 }
+
+extension SubmoduleUpdateOptions {
+    static var local : SubmoduleUpdateOptions { SubmoduleUpdateOptions(fetch: .local, checkout: CheckoutOptions()) }
+}

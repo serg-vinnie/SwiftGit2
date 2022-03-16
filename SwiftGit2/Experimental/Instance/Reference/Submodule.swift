@@ -202,11 +202,9 @@ public extension Submodule {
     /// then the submodule is fetched using the fetch options supplied in options.
     func update(options: SubmoduleUpdateOptions, `init`: Bool = false) -> R<Void>
     {
-        let initBeforeUpdateInt: Int32 = `init` ? 1 : 0
-
-        return _result({ () }, pointOfFailure: "git_submodule_update") {
+        git_try("git_submodule_update") {
             options.with_git_submodule_update_options { opt in
-                git_submodule_update(self.pointer, initBeforeUpdateInt, &opt)
+                git_submodule_update(self.pointer, `init` ? 1 : 0, &opt)
             }
         }
     }
