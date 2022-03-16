@@ -26,3 +26,18 @@ extension String {
         }
     }
 }
+
+extension FetchOptions {
+    static var local : FetchOptions { FetchOptions(auth: .credentials(.none)) }
+    static var ssh   : FetchOptions { FetchOptions(auth: .credentials(.sshDefault)) }
+}
+
+extension PullOptions {
+    static var local : PullOptions { PullOptions(signature: GitTest.signature, fetch: .local) }
+    static var ssh   : PullOptions { PullOptions(signature: GitTest.signature, fetch: .ssh) }
+}
+
+extension CloneOptions {
+    static var local : CloneOptions { CloneOptions(fetch: .local) }
+    static var ssh   : CloneOptions { CloneOptions(fetch: .ssh) }
+}

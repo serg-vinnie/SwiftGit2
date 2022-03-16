@@ -4,8 +4,6 @@ import Essentials
 import XCTest
 import EssetialTesting
 
-fileprivate var cloneOptions : CloneOptions { CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))) }
-
 class MergeAnalysisTests: XCTestCase {
     let root  = TestFolder.git_tests.sub(folder: "MergeAnalysisTests")
     
@@ -23,7 +21,7 @@ class MergeAnalysisTests: XCTestCase {
         let folder = root.sub(folder: "fastForward").cleared().shouldSucceed()!
         
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
-        let dst = folder.with(repo: "dst", content: .clone(src.url, cloneOptions)).shouldSucceed()!
+        let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
         (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "second commit") })
             .shouldSucceed()
@@ -31,30 +29,35 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: .upToDate)
         
-        (dst.repo | { $0.fetch(.HEAD, options: FetchOptions(auth: .credentials(.none)))})
+        (dst.repo | { $0.fetch(.HEAD, options: .local)})
             .shouldSucceed()
         
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: [.fastForward, .normal])
-
-        let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.none)))
         
-        (dst.repo | { $0.pull(.HEAD, options: options) })
+        (dst.repo | { $0.pull(.HEAD, options: .local) })
             .assertEqual(to: .fastForward, "pull fast forward merge")
     }
     
     func test_shouldMergeThreeWay() {
-        let folder = root.sub(folder: "threeWay")
+        let folder = root.sub(folder: "threeWay").cleared().shouldSucceed()!
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
-        let dst = folder.with(repo: "dst", content: .clone(src.url, cloneOptions)).shouldSucceed()!
+        let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
 
+        (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "second commit src repo") })
+            .shouldSucceed()
+        (dst.repo | { $0.t_commit(file: .fileB, with: .random, msg: "second commit dst repo") })
+            .shouldSucceed()
+        
+        (dst.repo | { $0.fetch(.HEAD, options: .local) })
+            .shouldSucceed()
         
     }
 
     func testThreWaySuccess() {
         let folder = root.sub(folder: "ThreeWayMerge")
-        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
-        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
+        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo1 clone")!
+        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo2 clone")!
         
         repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY **SUCCESSFUL** MERGE test")
             .shouldSucceed()
@@ -78,8 +81,8 @@ class MergeAnalysisTests: XCTestCase {
     
     func testShouldHasConflict() {
         let folder = root.sub(folder: "ShouldHasConflict")
-        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
-        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
+        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo1 clone")!
+        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo2 clone")!
         
         // fileA
         repo2.t_push_commit(file: .fileLong, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
@@ -147,8 +150,8 @@ class MergeAnalysisTests: XCTestCase {
 extension MergeAnalysisTests {
     private func createConflict(subFolder: String) -> TestFolder {
         let folder = root.sub(folder: subFolder)
-        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
-        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
+        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo1 clone")!
+        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo2 clone")!
         
         // fileA
         repo2.t_push_commit(file: .fileLong, with: .random, msg: "[THEIR] for THREE WAY SUCCESSFUL MERGE test")
