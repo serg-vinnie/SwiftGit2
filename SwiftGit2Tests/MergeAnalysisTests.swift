@@ -70,8 +70,8 @@ class MergeAnalysisTests: XCTestCase {
 
     }
     
-    func test_shouldResolveConflict() throws {
-        let folder = root.sub(folder: "conflict").cleared().shouldSucceed()!
+    func test_shouldResolveConflict() {
+        let folder = root.sub(folder: "conflict")
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
 
