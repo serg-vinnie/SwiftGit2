@@ -83,7 +83,7 @@ class ModuleTests: XCTestCase {
         let source = folder.sub(folder: "main_repo").url
         
         folder.with(repo: "clone", content: .clone(source, .defaultSSH))
-            .flatMap { $0.repo | { $0.asModule } | { $0.updateSubModules(options: .local ,init: true) } }
+            .flatMap { $0.repo | { $0.asModule } | { $0.updateSubModules(options: .local, init: true) } }
             .shouldSucceed("clone")
     }
     

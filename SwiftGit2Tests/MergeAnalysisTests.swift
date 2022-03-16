@@ -102,7 +102,7 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: false)
     }
     
-    func test_shouldResolveSubmoduleConflictTheir() {
+    func test_shouldResolveSubmoduleConflict() {
         let folder = root.sub(folder: "conflictSubmodule")
         
         // create repo with submodule
@@ -111,7 +111,11 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed("addSub")!
         
         // clone repo
-        let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
+        let dst = folder.with(repo: "dst", content: .clone(src.url, .local))
+            .shouldSucceed()!
+        
+        (dst.repo | { $0.asModule } | { $0.updateSubModules(options: .local, init: true) } )
+            .shouldSucceed()!
         
         // create commit #2 in sub_repo
         (folder.sub(folder: "sub_repo").repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 2") })
@@ -130,14 +134,23 @@ class MergeAnalysisTests: XCTestCase {
         (folder.sub(folder: "sub_repo").repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 3") })
             .shouldSucceed()
         
-//        // update submodule in DST repo
-//        (dst.sub(folder: "sub_repo").repo | { $0.pull(.HEAD, options: .local) })
-//            .shouldSucceed()
-//        (dst.repo | { $0.addBy(path: "sub_repo") })
-//            .shouldSucceed()
-//        (dst.repo | { $0.commit(message: "update sub repo to commit 3", signature: .test) })
-//            .shouldSucceed()
+        // update submodule in DST repo
+        (dst.sub(folder: "sub_repo").repo | { $0.pull(.HEAD, options: .local) })
+            .shouldSucceed()
+        (dst.repo | { $0.addBy(path: "sub_repo") })
+            .shouldSucceed()
+        (dst.repo | { $0.commit(message: "update sub repo to commit 3", signature: .test) })
+            .shouldSucceed()
 
+        // ---------------------------------
+        (dst.repo | { $0.pull(.HEAD, options: .local) })
+            .shouldSucceed()
+        
+        let repoID = RepoID(url: dst.url )
+        
+        Conflicts(repoID: repoID)
+            .exist()
+            .assertEqual(to: true)
     }
     
 //    func test_should_success_their() throws {
