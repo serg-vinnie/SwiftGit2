@@ -58,10 +58,10 @@ public struct Conflicts {
                 return index
                     .removeAll(pathPatterns: [sideEntry.path])
                     // Видаляємо конфлікт
-                    .map{ $0.conflictRemove(relPath: sideEntry.path) }
+                    .flatMap{ $0.conflictRemove(relPath: sideEntry.path) }
                     // додаємо файл чи сабмодуль в індекс
-                    .flatMap { _ -> R<()> in
-                        return index.add(sideEntry)
+                    .flatMap {
+                        $0.add(sideEntry)
                     }
                     // чекаутим файл чи сабмодуль з цього індекса
                     .flatMap { _ in

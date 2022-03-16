@@ -62,12 +62,12 @@ public extension Index {
         }
     }
     
-    func add(_ entry: Index.Entry) -> R<()> {
+    func add(_ entry: Index.Entry) -> R<Index> {
         var entry1 = entry.wrappedEntry
         
         return _result((), pointOfFailure: "git_index_add") {
             git_index_add(self.pointer, &entry1 )
-        } | { self.write() }
+        } | { self.write() } | { self }
     }
     
     func addBy(relPath: String) -> R<()> {
