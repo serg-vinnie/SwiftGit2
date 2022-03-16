@@ -101,12 +101,12 @@ public extension Index {
         } | { self.write() } | { self }
     }
     
-    func conflictRemove(relPath: String) -> R<()> {
+    func conflictRemove(relPath: String) -> R<Index> {
         return _result({ () }, pointOfFailure: "git_index_conflict_remove") {
             relPath.withCString { path in
                 git_index_conflict_remove(self.pointer, path);
             }
-        } | { self.write() }
+        } | { self.write() } | { self }
     }
     
     func conflictRemoveAll() -> R<()> {

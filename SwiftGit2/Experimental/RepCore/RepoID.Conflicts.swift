@@ -29,13 +29,15 @@ public struct Conflicts {
     
     public func resolve(path: String, type: ConflictType) -> R<()> {
         let repo = repoID.repo
-        let index = repo | { $0.index() }
+        var index = repo | { $0.index() }
         let conflict = index | { $0.conflict(path: path) }
         let entry = conflict | { type == .their ? $0.their : $0.our }
         
         //combine(index, entry) | { index, entry in index }
         
-        _ = index | { $0.removeAll(pathPatterns: [path]) } //| { }
+        index = index | { $0.removeAll(pathPatterns: [path]) } | { $0.conflictRemove(relPath: path) }
+            
+        _ = combine(index, entry) | { index, entry in index.add(entry) }
         
         
         return .notImplemented
@@ -49,7 +51,7 @@ public struct Conflicts {
         
         
         
-        return zip(index, rConflict)
+        return combine(index, rConflict)
             .flatMap { index, conflict -> R<()> in
                 let sideEntry = resolveAsTheir ? conflict.their : conflict.our
                 
@@ -70,33 +72,8 @@ public struct Conflicts {
     }
 }
 
-extension Repository {
-    func conflict(path: String) -> R<Index.Conflict> {
-        index() | { $0.conflicts() } | { $0.first { $0.our.path == path || $0.their.path == path } } | { $0.asNonOptional }
-    }
-}
-
 extension Index {
     func conflict(path: String) -> R<Index.Conflict> {
         conflicts() | { $0.first { $0.our.path == path || $0.their.path == path } } | { $0.asNonOptional }
     }
-}
-
-
-// HELPERS
-// CODE DUPLICATE FROM ASYNC NINJA
-/// Combines successes of two failables or returns fallible with first error
-public func zip<A, B>(
-  _ a: Fallible<A>,
-  _ b: Fallible<B>
-  ) -> Fallible<(A, B)> {
-  switch (a, b) {
-  case let (.success(successA), .success(successB)):
-    return .success((successA, successB))
-  case let (.failure(failure), _),
-       let (_, .failure(failure)):
-    return .failure(failure)
-  default:
-    fatalError()
-  }
 }
