@@ -24,6 +24,17 @@ class RepositoryRemoteTests: XCTestCase {
 //            .shouldSucceed("connect")
 //    }
     
+    func test_credentilas_ShouldBeReusable() {
+        let folder = root.sub(folder: "credentilas_ShouldBeReusable")
+        let options = CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault)))
+        
+        folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, options))
+            .shouldSucceed("repo1 clone")
+        folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, options))
+            .shouldSucceed("repo2 clone")
+    }
+
+    
     func testHttpsAnonymouseClone() {
         let info = PublicTestRepo()
         
