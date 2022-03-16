@@ -70,7 +70,7 @@ class MergeAnalysisTests: XCTestCase {
 
     }
     
-    func test_shouldConflict2() throws {
+    func test_shouldResolveConflict() throws {
         let folder = root.sub(folder: "conflict").cleared().shouldSucceed()!
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
@@ -98,13 +98,13 @@ class MergeAnalysisTests: XCTestCase {
         
         let path = TestFile.fileA.rawValue
         
-//        Conflicts(repoID: repoID)
-//            .resolve(path: path, resolveAsTheir: true)
-//            .shouldSucceed("Conflict Resolved")
+        Conflicts(repoID: repoID)
+            .resolve(path: path, type: .their)
+            .shouldSucceed("Conflict Resolved")
         
-//        Conflicts(repoID: repoID)
-//            .exist()
-//            .assertEqual(to: false)
+        Conflicts(repoID: repoID)
+            .exist()
+            .assertEqual(to: false)
     }
     
 //    func test_should_success_their() throws {
