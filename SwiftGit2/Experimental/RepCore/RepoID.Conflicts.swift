@@ -34,14 +34,12 @@ public struct Conflicts {
         let conflict = index | { $0.conflict(path: path) }
         let entry = conflict | { type == .their ? $0.their : $0.our }
         
-        //combine(index, entry) | { index, entry in index }
+        index = index | { $0.removeAll(pathPatterns: [path]) }
+                      | { $0.conflictRemove(relPath: path) }
         
-        index = index | { $0.removeAll(pathPatterns: [path]) } | { $0.conflictRemove(relPath: path) }
-            
-        _ = combine(index, entry) | { index, entry in index.add(entry) }
+        index = combine(index, entry) | { index, entry in index.add(entry) }
         
-        
-        return .notImplemented
+        return combine(repo, index) | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) } | { _ in () }
     }
     
     public func resolve(path: String, resolveAsTheir: Bool) -> R<()> {
