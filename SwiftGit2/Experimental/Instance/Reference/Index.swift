@@ -94,11 +94,11 @@ public extension Index {
         } | { self.write() }
     }
     
-    func removeAll(pathPatterns: [String] = ["*"]) -> Result<Void, Error> {
+    func removeAll(pathPatterns: [String] = ["*"]) -> R<Index> {
         git_try("git_index_remove_all") {
             pathPatterns.with_git_strarray { strarray in
                 git_index_remove_all(pointer, &strarray, nil, nil) }
-        } | { self.write() }
+        } | { self.write() } | { self }
     }
     
     func conflictRemove(relPath: String) -> R<()> {

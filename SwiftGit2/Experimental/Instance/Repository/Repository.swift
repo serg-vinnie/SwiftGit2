@@ -253,7 +253,7 @@ public extension Repository {
     func resetDefault(pathPatterns: [String] = ["*"]) -> R<Void> {
         if self.headIsUnborn {
             return index()
-                .flatMap{ $0.removeAll(pathPatterns: pathPatterns) }
+                .flatMap{ $0.removeAll(pathPatterns: pathPatterns) } | { _ in () }
         }
         
         return HEAD()
@@ -299,7 +299,7 @@ public extension Repository {
     
     func remove(relPaths: [String]) -> R<()> {
         index()
-            .flatMap { $0.removeAll(pathPatterns: relPaths) }
+            .flatMap { $0.removeAll(pathPatterns: relPaths) } | { _ in () }
     }
 }
 
