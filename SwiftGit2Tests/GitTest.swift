@@ -4,6 +4,10 @@ import Foundation
 @testable import SwiftGit2
 import XCTest
 
+extension Signature {
+    static var test : Signature { GitTest.signature }
+}
+
 struct GitTest {
     static let signature = Signature(name: "XCode Unit Test", email: "email@domain.com")
     

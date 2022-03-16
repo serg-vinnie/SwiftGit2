@@ -102,6 +102,44 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: false)
     }
     
+    func test_shouldResolveSubmoduleConflictTheir() {
+        let folder = root.sub(folder: "conflictSubmodule")
+        
+        // create repo with submodule
+        let src = folder.with(repo: "src", content: .commit(.fileA, .random, "src commit 1"))
+            .flatMap { $0.with(submodule: "sub_repo", content: .commit(.fileB, .random, "sub commit 1")) }
+            .shouldSucceed("addSub")!
+        
+        // clone repo
+        let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
+        
+        // create commit #2 in sub_repo
+        (folder.sub(folder: "sub_repo").repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 2") })
+            .shouldSucceed()
+        
+        // update submodule in SRC repo
+        (src.sub(folder: "sub_repo").repo | { $0.pull(.HEAD, options: .local) })
+            .shouldSucceed()
+        (src.repo | { $0.addBy(path: "sub_repo") })
+            .shouldSucceed()
+        (src.repo | { $0.commit(message: "update sub repo to commit 2", signature: .test) })
+            .shouldSucceed()
+        
+        
+        // create commit #3 in sub_repo
+        (folder.sub(folder: "sub_repo").repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 3") })
+            .shouldSucceed()
+        
+//        // update submodule in DST repo
+//        (dst.sub(folder: "sub_repo").repo | { $0.pull(.HEAD, options: .local) })
+//            .shouldSucceed()
+//        (dst.repo | { $0.addBy(path: "sub_repo") })
+//            .shouldSucceed()
+//        (dst.repo | { $0.commit(message: "update sub repo to commit 3", signature: .test) })
+//            .shouldSucceed()
+
+    }
+    
 //    func test_should_success_their() throws {
 //        try createConflict(subFolder: "test_should_success_their")
 //    }
