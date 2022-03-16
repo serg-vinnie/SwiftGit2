@@ -19,8 +19,8 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed("repo2 clone")
     }
     
-    func testFastForward_local() {
-        let folder = root.sub(folder: "fastForward_2")
+    func test_shouldMergeFastForward() {
+        let folder = root.sub(folder: "fastForward").cleared().shouldSucceed()!
         
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()!
@@ -45,30 +45,6 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.pull(.HEAD, options: options) })
             .assertEqual(to: .fastForward, "pull fast forward merge")
     }
-
-    
-//    func testFastForward() {
-//        let folder = root.sub(folder: "fastForward")
-//        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo1 clone")!
-//        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, cloneOptions)).repo.shouldSucceed("repo2 clone")!
-//        
-//        repo2.t_push_commit(file: .fileA, with: .random, msg: "for FAST FORWARD MERGE Test")
-//            .shouldSucceed("repo2 push")
-//
-//        repo1.mergeAnalysisUpstream(.HEAD)
-//            .assertEqual(to: .upToDate)
-//
-//        repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
-//            .shouldSucceed()
-//
-//        repo1.mergeAnalysisUpstream(.HEAD)
-//            .assertEqual(to: [.fastForward, .normal])
-//
-//        let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.sshDefault)))
-//        
-//        repo1.pull(.HEAD, options: options)
-//            .assertEqual(to: .fastForward, "pull fast forward merge")
-//    }
 
     func testThreWaySuccess() {
         let folder = root.sub(folder: "ThreeWayMerge")
