@@ -52,30 +52,10 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.fetch(.HEAD, options: .local) })
             .shouldSucceed()
         
-    }
-
-    func testThreWaySuccess() {
-        let folder = root.sub(folder: "ThreeWayMerge")
-        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo1 clone")!
-        let repo2 = folder.with(repo: "repo2", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo2 clone")!
+        (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
+            .assertEqual(to: .normal)
         
-        repo2.t_push_commit(file: .fileA, with: .random, msg: "[THEIR] for THREE WAY **SUCCESSFUL** MERGE test")
-            .shouldSucceed()
-
-        repo1.t_commit(file: .fileB, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
-            .shouldSucceed()
-
-        repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
-            .shouldSucceed()
-
-        let merge = repo1.mergeAnalysisUpstream(.HEAD)
-            .assertNotEqual(to: [.fastForward], "merge analysis")
-
-        XCTAssert(merge == .normal)
-
-        let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.sshDefault)))
-        
-        repo1.pull(.HEAD, options: options)
+        (dst.repo | { $0.pull(.HEAD, options: .local) })
             .assertEqual(to: .threeWaySuccess)
     }
     
