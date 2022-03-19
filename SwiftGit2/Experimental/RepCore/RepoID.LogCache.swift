@@ -18,8 +18,13 @@ public class LogCache {
         //deque.reserveCapacity(5000)
     }
     
-    func fetchHEAD() {
-        _ = (repoID.repo | { $0.logHEAD() })
+    @discardableResult
+    public func fetchHEAD() -> R<[OID]> {
+        (repoID.repo | { $0.logHEAD() })
+    }
+    
+    public func fetchHEAD_Commits() -> R<[Commit]> {
+        (repoID.repo | { repo in repo.logHEAD() | { $0 | { repo.commit(oid: $0) } } })
     }
 }
 
