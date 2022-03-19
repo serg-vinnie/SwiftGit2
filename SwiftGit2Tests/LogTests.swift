@@ -13,41 +13,82 @@ import EssetialTesting
 
 class LogTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "LogTests")
+    //lazy var big_repo : TestFolder = { root.sub }()
     
-    func test_generate100k_commits() {
-        let big_repo = root.with(repo: "big_repo", content: .empty).shouldSucceed()!
-        
-        for i in 0..<10000 {
-            _ = (big_repo.repo | { $0.commit(message: "commit \(i)", signature: .test) })
+    override func setUp() {
+        let repo_10k = root.sub(folder: "repo_10k")
+        if !Repository.exists(at: repo_10k.url) {
+            Repository.create(at: repo_10k.url)
+                .shouldSucceed()
+            
+            for i in 1...10000 {
+                (repo_10k.repo | { $0.t_commit(file: .fileA, with: .random, msg: "commit \(i)") })
+                    .shouldSucceed()
+                if i % 1000 == 0 {
+                    print("\(i) commits generated")
+                }
+            }
         }
         
-        let log = LogCache(repoID: RepoID(url: big_repo.url))
-        
-        self.measure {
-            log.fetchHEAD()
-        }
-        
-//        self.measure {
-//            log.fetchHEAD_Commits()
-//        }
-    }
-
-    func testPerformanceExample() {
-        let url = URL.userHome.appendingPathComponent("/dev/taogit")
-        let log = LogCache(repoID: RepoID(url: url))
-
-        self.measure {
-            log.fetchHEAD()
+        let repo_50k = root.sub(folder: "repo_50k")
+        if !Repository.exists(at: repo_50k.url) {
+            Repository.create(at: repo_50k.url)
+                .shouldSucceed()
+            
+            for i in 1...50000 {
+                (repo_50k.repo | { $0.t_commit(file: .fileA, with: .random, msg: "commit \(i)") })
+                    .shouldSucceed()
+                if i % 1000 == 0 {
+                    print("\(i) commits generated")
+                }
+            }
         }
     }
     
-    func testPerformanceExample2() {
-        let url = URL.userHome.appendingPathComponent("/dev/taogit")
-        let log = LogCache(repoID: RepoID(url: url))
+    func test_measure_10k_oids() {
+        let big_repo = root.sub(folder: "repo_10k")
         
         self.measure {
-            log.fetchHEAD_Commits()
+            LogCache(repoID: RepoID(url: big_repo.url))
+                .fetchHEAD()
+                .onSuccess { print("oids fetched: \($0.count)")}
+                .shouldSucceed()
         }
     }
+    
+    func test_measure_10k_commits() {
+        let big_repo = root.sub(folder: "repo_10k")
+        
+        self.measure {
+            LogCache(repoID: RepoID(url: big_repo.url))
+                .fetchHEAD_Commits()
+                .onSuccess { print("commits fetched: \($0.count)")}
+                .shouldSucceed()
+        }
+    }
+    
+    func test_measure_50k_oids() {
+        let big_repo = root.sub(folder: "repo_50k")
+        
+        self.measure {
+            LogCache(repoID: RepoID(url: big_repo.url))
+                .fetchHEAD()
+                .onSuccess { print("oids fetched: \($0.count)")}
+                .shouldSucceed()
+        }
+    }
+    
+    func test_measure_50k_commits() {
+        let big_repo = root.sub(folder: "repo_50k")
+        
+        self.measure {
+            LogCache(repoID: RepoID(url: big_repo.url))
+                .fetchHEAD_Commits()
+                .onSuccess { print("commits fetched: \($0.count)")}
+                .shouldSucceed()
+        }
+    }
+    
+    
 
 }
