@@ -156,7 +156,7 @@ public extension Repository {
         }
         .map { Reference(pointer!) }
         .if ( checkout,
-              then: { self.checkout(reference: $0, strategy: .Safe) })
+              then: { self.checkout(reference: $0, strategy: .Safe, pathspec: []) })
     }
     
     func createTag(from commitOid: OID, tag: String, message: String, signature: Signature) -> Result<OID, Error> {

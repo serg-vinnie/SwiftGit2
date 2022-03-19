@@ -25,24 +25,45 @@ public struct Conflicts {
     
     public func exist() -> R<Bool> {
         repoID.repo.flatMap { $0.index() }
-            .map{ $0.hasConflicts }
+            .flatMap{ $0.conflicts() }
+            .map{ $0.count > 0}
     }
     
     public func resolve(path: String, type: ConflictType) -> R<()> {
         let repo = repoID.repo
         var index = repo | { $0.index() }
         let conflict = index | { $0.conflict(path: path) }
-        let entry = conflict | { type == .their ? $0.their : $0.our }
+        let sideEntry = conflict | { type == .their ? $0.their : $0.our }
+        
+        let ssEntry = sideEntry.maybeSuccess!
+        
+        //repo.map{ $0.checkout(commit: <#T##Commit#>) }
+        
+        
+        
+        
+       // repo.map{ $0.checkout(commit: <#T##Commit#>, strategy: , progress: <#T##CheckoutProgressBlock?##CheckoutProgressBlock?##(String?, Int, Int) -> Void#>) }
         
         // Видаляємо конфлікт
-        index = index | { $0.removeAll(pathPatterns: [path]) }
-                      | { $0.conflictRemove(relPath: path) }
+        index = index | { $0.conflictRemove(relPath: path) }
+        
+//        let currEntry = repo
+//            .flatMap { $0.status() }
+//            .maybeSuccess!
+//            .filter{ $0.stagePath == path }.first!
+//        
+//        _ = repo.flatMap{ $0.discard(entry: currEntry) }
         
         // додаємо файл чи сабмодуль в індекс
-        index = combine(index, entry) | { index, entry in index.add(entry) }
+        index = combine(index, sideEntry)
+                | { index, sideEntry in index.add(sideEntry) }
         
         // чекаутим файл чи сабмодуль з цього індекса
-        return combine(repo, index) | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) } | { _ in () }
+        return combine(repo, index)
+            | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) }
+            //| { _ in index | { $0.addBy(relPath: path) } }
+            //| { _ in .success(()) }
+        
     }
     
 //    public func resolve(path: String, resolveAsTheir: Bool) -> R<()> {

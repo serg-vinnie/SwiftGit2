@@ -17,18 +17,18 @@ public extension Repository {
             .flatMap { self.checkout(branch: $0, strategy: strategy, progress: progress) }
     }
 
-    func checkout(branch: Branch, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
+    func checkout(branch: Branch, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String] = []) -> Result<Void, Error> {
         setHEAD(branch)
-            .flatMap { self.checkoutHead(strategy: strategy, progress: progress) }
+            .flatMap { self.checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
     }
 
-    func checkout(commit: Commit, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
-        checkout(commit.oid, strategy: strategy, progress: progress) | { _ in () }
+    func checkout(commit: Commit, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Void, Error> {
+        checkout(commit.oid, strategy: strategy, progress: progress, pathspec: pathspec) | { _ in () }
     }
     
-    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> Result<Repository, Error> {
+    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = []) -> Result<Repository, Error> {
         setHEAD_detached(oid)
-            | { checkoutHead(strategy: strategy, progress: progress) }
+        | { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
             | { self }
     }
 
@@ -48,16 +48,16 @@ public extension Repository {
         }
     }
     
-    func checkoutHead(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [] ) -> Result<Void, Error> {
+    func checkoutHead(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Void, Error> {
         return git_try("git_checkout_head") {
             CheckoutOptions(strategy: strategy, pathspec: pathspec, progress: progress)
                 .with_git_checkout_options { git_checkout_head(self.pointer, &$0) }
         }
     }
 
-    func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> Result<Reference, Error> {
+    func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Reference, Error> {
         setHEAD(reference)
-            .flatMap { checkoutHead(strategy: strategy, progress: progress) }
+            .flatMap { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
             .map { reference }
     }
 

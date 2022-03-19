@@ -48,6 +48,8 @@ extension TestFolder {
     func with(repo name: String, content: RepositoryContent) -> R<TestFolder> {
         let subFolder = sub(folder: name).cleared().shouldSucceed()!
         
+        print("USED_PATH: \(subFolder.url.path)")
+        
         if case let .clone(url, options) = content {
             return Unborn(repoURL: subFolder.url)
                 .clone(from: url, options: options) | { _ in subFolder }
