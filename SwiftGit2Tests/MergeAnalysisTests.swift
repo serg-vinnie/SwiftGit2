@@ -33,7 +33,7 @@ class MergeAnalysisTests: XCTestCase {
         let folder = root.sub(folder: "threeWay").cleared().shouldSucceed()!
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
-
+        
         (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
             .shouldSucceed()
         (dst.repo | { $0.t_commit(file: .fileB, with: .random, msg: "File B") })
@@ -53,7 +53,7 @@ class MergeAnalysisTests: XCTestCase {
         let folder = root.sub(folder: "conflict").cleared().shouldSucceed()!
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
-
+        
         (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
             .shouldSucceed()
         (dst.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
@@ -67,19 +67,20 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.pull(.HEAD, options: .local) })
             .map { $0.hasConflict }
             .assertEqual(to: true, "Pull has conflict")
-
     }
     
-    func test_shouldResolveConflictTheir() {
-        shouldResolveConflict( type: .their, folderName: "conflictResolveTheir")
+    ///////////////////////////////////////////////////////
+    ///RESOLVE FILE THEIR
+    ///////////////////////////////////////////////////////
+    func test_shouldResolveConflict_Their_File() {
+        shouldResolveConflictFile( type: .their, folderName: "conflictResolveTheir")
     }
     
-    func test_shouldResolveConflictOur() {
-        shouldResolveConflict( type: .our, folderName: "conflictResolveOur")
+    func test_shouldResolveConflict_Our_File() {
+        shouldResolveConflictFile( type: .our, folderName: "conflictResolveOur")
     }
     
-    
-    func shouldResolveConflict(type: ConflictType, folderName: String) {
+    func shouldResolveConflictFile(type: ConflictType, folderName: String) {
         let folder = root.sub(folder: folderName)
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
@@ -100,7 +101,7 @@ class MergeAnalysisTests: XCTestCase {
             .exist()
             .assertEqual(to: true)
         
-        let path = "fileA.txt" //TestFile.fileA.rawValue
+        let path = TestFile.fileA.rawValue
         
         Conflicts(repoID: repoID)
             .resolve(path: path, type: type)
@@ -110,10 +111,22 @@ class MergeAnalysisTests: XCTestCase {
             .exist()
             .assertEqual(to: false)
     }
+    /////////////////////////////////////////////////////
     
     
-    func test_shouldResolveSubmoduleConflict() {
-        let folder = root.sub(folder: "conflictSubmodule")
+    ///////////////////////////////////////////////////////
+    ///RESOLVE FILE OUR
+    ///////////////////////////////////////////////////////
+    func test_shouldResolveConflict_Our_Submod() {
+        shouldResolveConflict_Submodule(type: .our, folderName:"Conflict_Submod_Resolve_Our")
+    }
+    
+    func test_shouldResolveConflict_Their_Submod() {
+        shouldResolveConflict_Submodule(type:.their, folderName:"Conflict_Submod_Resolve_Their")
+    }
+    
+    func shouldResolveConflict_Submodule(type: ConflictType, folderName: String) {
+        let folder = root.sub(folder: folderName)
         
         // create repo with submodule
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "src commit 1"))
@@ -150,7 +163,7 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed()
         (dst.repo | { $0.commit(message: "update sub repo to commit 3", signature: .test) })
             .shouldSucceed()
-
+        
         // ---------------------------------
         (dst.repo | { $0.pull(.HEAD, options: .local) })
             .shouldSucceed()
@@ -160,15 +173,16 @@ class MergeAnalysisTests: XCTestCase {
         Conflicts(repoID: repoID)
             .exist()
             .assertEqual(to: true)
+        
+        Conflicts(repoID: repoID)
+            .resolve(path: "sub_repo", type: type)
+            .shouldSucceed("Conflict Resolved")
+        
+        Conflicts(repoID: repoID)
+            .exist()
+            .shouldSucceed()
     }
-    
-//    func test_should_success_their() throws {
-//        try createConflict(subFolder: "test_should_success_their")
-//    }
-//
-//    func test_should_success_both() throws {
-//        try createConflict(subFolder: "test_should_success_both")
-//    }
+    /////////////////////////////////////////////////////
 }
 
 

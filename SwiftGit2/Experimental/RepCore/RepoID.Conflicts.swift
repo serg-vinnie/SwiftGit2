@@ -48,7 +48,7 @@ public struct Conflicts {
     }
 }
 
-extension Index {
+public extension Index {
     func conflict(path: String) -> R<Index.Conflict> {
         conflicts() | { $0.first { $0.our.path == path || $0.their.path == path } } | { $0.asNonOptional }
     }
