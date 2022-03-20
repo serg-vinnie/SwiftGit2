@@ -104,7 +104,7 @@ class MergeAnalysisTests: XCTestCase {
         let path = TestFile.fileA.rawValue
         
         Conflicts(repoID: repoID)
-            .resolve(path: path, type: type)
+            .resolveNew(path: path, type: type)
             .shouldSucceed("Conflict Resolved")
         
         Conflicts(repoID: repoID)

@@ -46,6 +46,30 @@ public struct Conflicts {
             | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) }
             | { _ in index | { $0.addBy(relPath: path) } }
     }
+    
+    public func resolveNew(path: String, type: ConflictType) -> R<()> {
+        let repo = repoID.repo
+        var index = repo | { $0.index() }
+        let conflict = index | { $0.conflict(path: path) }
+        let sideEntry = conflict | { type == .their ? $0.their : $0.our }
+        
+        if type == .our {
+            return index
+                | { $0.conflictRemove(relPath: path) }
+                | { _ in () }
+        }
+        
+        // Видаляємо конфлікт
+        index = index | { $0.conflictRemove(relPath: path) }
+        // додаємо файл чи сабмодуль в індекс
+        index = combine(index, sideEntry)
+            .flatMap { index, sideEntry in index.add(sideEntry)  }
+        
+        // чекаутим файл чи сабмодуль з цього індекса
+        return combine(repo, index)
+            | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) }
+            | { _ in index | { $0.addBy(relPath: path) } }
+    }
 }
 
 public extension Index {
