@@ -85,9 +85,9 @@ class MergeAnalysisTests: XCTestCase {
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
-        (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
+        (src.repo | { $0.t_commit(file: .fileA, with: .oneLine1, msg: "File A") })
             .shouldSucceed()
-        (dst.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
+        (dst.repo | { $0.t_commit(file: .fileA, with: .oneLine2, msg: "File A") })
             .shouldSucceed()
                 
         (dst.repo | { $0.pull(.HEAD, options: .local) })
@@ -106,6 +106,14 @@ class MergeAnalysisTests: XCTestCase {
         Conflicts(repoID: repoID)
             .resolveNew(path: path, type: type)
             .shouldSucceed("Conflict Resolved")
+        
+        if type == .our {
+            repoID.url.appendingPathComponent(path).readToString
+                .assertEqual(to: TestFileContent.oneLine2.rawValue)
+        } else {
+            repoID.url.appendingPathComponent(path).readToString
+                .assertEqual(to: TestFileContent.oneLine1.rawValue)
+        }
         
         Conflicts(repoID: repoID)
             .exist()
