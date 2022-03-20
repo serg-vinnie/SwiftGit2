@@ -31,71 +31,74 @@ public struct Conflicts {
     }
     
     public func resolve(path: String, type: ConflictType) -> R<()> {
-        let repo = repoID.repo
-        var index = repo | { $0.index() }
-        let conflict = index | { $0.conflict(path: path) }
-        let sideEntry = conflict | { type == .their ? $0.their : $0.our }
-        
-        // Видаляємо конфлікт
-        index = index | { $0.conflictRemove(relPath: path) }
-        // додаємо файл чи сабмодуль в індекс
-        index = combine(index, sideEntry)
-            .flatMap { index, sideEntry in index.add(sideEntry)  }
-        
-        // чекаутим файл чи сабмодуль з цього індекса
-        return combine(repo, index)
-            | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) }
-            | { _ in index | { $0.addBy(relPath: path) } }
-    }
-    
-    public func resolveNew(path: String, type: ConflictType) -> R<()> {
-        let repo = repoID.repo
-        var index = repo | { $0.index() }
-        let conflict = index | { $0.conflict(path: path) }
-        let sideEntry = conflict | { type == .their ? $0.their : $0.our }
-        
-        if type == .markAsResolved {
-            return index
-                | { $0.conflictRemove(relPath: path) }
-                | { _ in index | { $0.addBy(relPath: path) } }
+        switch type {
+        case .markAsResolved:
+            return resolveConflictMarkResolved(path: path)
+        case .our:
+            return resolveConflictAsOur(path: path)
+        case .their:
+            return resolveConflictAsTheir(path: path)
         }
-        
-        if type == .our {
-            return index
-                | { $0.conflictRemove(relPath: path) }
-                | { _ in
-                    repo.flatMap { $0.status() }
-                    .map{ $0.filter{ $0.allPaths.contains(path) } }
-                    .map{ $0.first }
-                    .flatMap { entry -> R<()> in
-                        if let entry = entry {
-                            return repo.flatMap { $0.discard(entry: entry) }
-                        }
-                        
-                        return .wtf("Failed to find entry to resolve")
-                    }
-                }
-        }
-        
-        
-        
-        
-        
-        // Видаляємо конфлікт
-        index = index | { $0.conflictRemove(relPath: path) }
-        // додаємо файл чи сабмодуль в індекс
-        index = combine(index, sideEntry)
-            .flatMap { index, sideEntry in index.add(sideEntry)  }
-        
-        // чекаутим файл чи сабмодуль з цього індекса
-        return combine(repo, index)
-            | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) }
-            | { _ in index | { $0.addBy(relPath: path) } }
     }
 }
 
 public extension Index {
     func conflict(path: String) -> R<Index.Conflict> {
         conflicts() | { $0.first { $0.our.path == path || $0.their.path == path } } | { $0.asNonOptional }
+    }
+}
+
+fileprivate extension Conflicts {
+    func resolveConflictMarkResolved(path: String) -> R<()> {
+        let repo = repoID.repo
+        let index = repo | { $0.index() }
+        
+        return index
+            | { $0.conflictRemove(relPath: path) }
+            | { _ in index | { $0.addBy(relPath: path) } }
+    }
+    
+    func resolveConflictAsOur(path: String) -> R<()> {
+        let repo = repoID.repo
+        
+        return repo
+            | { $0.index() }
+            | { $0.conflictRemove(relPath: path) }
+            | { _ in
+                repo.flatMap { $0.status() }
+                .map{ $0.filter{ $0.allPaths.contains(path) } }
+                .map{ $0.first }
+                .flatMap { entry -> R<()> in
+                    if let entry = entry {
+                        return repo.flatMap { $0.discard(entry: entry) }
+                    }
+                    
+                    return .wtf("Failed to find entry to resolve")
+                }
+            }
+    }
+    
+    func resolveConflictAsTheir(path: String) -> R<()> {
+        let repo = repoID.repo
+        let index = repo | { $0.index() }
+        
+        return repo.map{ OidRevFile(repo: $0, type: .MergeHead)?.contentAsOids ?? [] }
+            .map { $0.first }
+            .flatMap { oid -> R<Commit> in
+                if let oid = oid {
+                    return repo | { $0.commit(oid: oid) }
+                }
+                
+                return .wtf("Failed to get commit OID from MergeHead RevFile")
+            }
+            .flatMap { commit -> R<()> in
+                index.flatMap { $0.conflictRemove(relPath: path) }
+                .flatMap{ _ in
+                    repo.flatMap {
+                        $0.checkout(commit: commit, strategy: [.Force, .DontWriteIndex], pathspec: [path])
+                    }
+                }
+                .flatMap { _ in index | { $0.addBy(relPath: path) } }
+            }
     }
 }
