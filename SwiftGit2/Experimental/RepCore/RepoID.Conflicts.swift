@@ -12,6 +12,7 @@ import Essentials
 public enum ConflictType {
     case our
     case their
+    case markAsResolved
 }
 
 public struct Conflicts {
@@ -53,11 +54,32 @@ public struct Conflicts {
         let conflict = index | { $0.conflict(path: path) }
         let sideEntry = conflict | { type == .their ? $0.their : $0.our }
         
+        if type == .markAsResolved {
+            return index
+                | { $0.conflictRemove(relPath: path) }
+                | { _ in index | { $0.addBy(relPath: path) } }
+        }
+        
         if type == .our {
             return index
                 | { $0.conflictRemove(relPath: path) }
-                | { _ in () }
+                | { _ in
+                    repo.flatMap { $0.status() }
+                    .map{ $0.filter{ $0.allPaths.contains(path) } }
+                    .map{ $0.first }
+                    .flatMap { entry -> R<()> in
+                        if let entry = entry {
+                            return repo.flatMap { $0.discard(entry: entry) }
+                        }
+                        
+                        return .wtf("Failed to find entry to resolve")
+                    }
+                }
         }
+        
+        
+        
+        
         
         // Видаляємо конфлікт
         index = index | { $0.conflictRemove(relPath: path) }

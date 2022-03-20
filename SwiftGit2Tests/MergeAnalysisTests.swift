@@ -80,6 +80,10 @@ class MergeAnalysisTests: XCTestCase {
         shouldResolveConflictFile( type: .our, folderName: "conflictResolveOur")
     }
     
+    func test_shouldResolveConflict_MarkResolved_File() {
+        shouldResolveConflictFile( type: .markAsResolved, folderName: "conflictResolveMarkResolved")
+    }
+    
     func shouldResolveConflictFile(type: ConflictType, folderName: String) {
         let folder = root.sub(folder: folderName)
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
@@ -107,17 +111,23 @@ class MergeAnalysisTests: XCTestCase {
             .resolveNew(path: path, type: type)
             .shouldSucceed("Conflict Resolved")
         
-        if type == .our {
-            repoID.url.appendingPathComponent(path).readToString
-                .assertEqual(to: TestFileContent.oneLine2.rawValue)
-        } else {
-            repoID.url.appendingPathComponent(path).readToString
-                .assertEqual(to: TestFileContent.oneLine1.rawValue)
-        }
-        
         Conflicts(repoID: repoID)
             .exist()
             .assertEqual(to: false)
+        
+        switch type{
+        case .our:
+            repoID.url.appendingPathComponent(path).readToString
+                .assertEqual(to: TestFileContent.oneLine2.rawValue)
+        case .their:
+            repoID.url.appendingPathComponent(path).readToString
+                .assertEqual(to: TestFileContent.oneLine1.rawValue)
+        case .markAsResolved:
+            repoID.url.appendingPathComponent(path).readToString
+                .map{ $0.contains("||||||| ancestor") }
+                .assertEqual(to: true, "Content is correct")
+        }
+        
     }
     /////////////////////////////////////////////////////
     
