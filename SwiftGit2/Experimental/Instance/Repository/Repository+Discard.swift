@@ -52,7 +52,8 @@ public extension Repository {
         case .indexRenamed:
             return combine(self.index(), entry.headToIndexNEWFilePath)
                 | { index, path in index.removeAll(pathPatterns: paths) }
-                | { entry.with(self).headToIndexNewFileURL } | { $0.rm() }
+                | { _ in entry.with(self).headToIndexNewFileURL }
+                | { $0.rm() }
                 | { entry.headToIndexOLDFilePath }
                 | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
             

@@ -56,6 +56,7 @@ fileprivate extension Conflicts {
         return index
             | { $0.conflictRemove(relPath: path) }
             | { _ in index | { $0.addBy(relPath: path) } }
+            | { _ in () }
     }
     
     func resolveConflictAsOur(path: String) -> R<()> {
@@ -64,18 +65,7 @@ fileprivate extension Conflicts {
         return repo
             | { $0.index() }
             | { $0.conflictRemove(relPath: path) }
-            | { _ in
-                repo.flatMap { $0.status() }
-                .map{ $0.filter{ $0.allPaths.contains(path) } }
-                .map{ $0.first }
-                .flatMap { entry -> R<()> in
-                    if let entry = entry {
-                        return repo.flatMap { $0.discard(entry: entry) }
-                    }
-                    
-                    return .wtf("Failed to find entry to resolve")
-                }
-            }
+            | { _ in Discard(repoID: repoID).path(path) }
     }
     
     func resolveConflictAsTheir(path: String) -> R<()> {
