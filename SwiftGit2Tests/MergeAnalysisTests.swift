@@ -101,17 +101,17 @@ class MergeAnalysisTests: XCTestCase {
         
         let repoID = RepoID(url: dst.url )
         
-        Conflicts(repoID: repoID)
+        GitConflicts(repoID: repoID)
             .exist()
             .assertEqual(to: true)
         
         let path = TestFile.fileA.rawValue
         
-        Conflicts(repoID: repoID)
+        GitConflicts(repoID: repoID)
             .resolve(path: path, type: type)
             .shouldSucceed("Conflict Resolved")
         
-        Conflicts(repoID: repoID)
+        GitConflicts(repoID: repoID)
             .exist()
             .assertEqual(to: false)
         
@@ -194,15 +194,15 @@ class MergeAnalysisTests: XCTestCase {
         
         let repoID = RepoID(url: dst.url )
         
-        Conflicts(repoID: repoID)
+        GitConflicts(repoID: repoID)
             .exist()
             .assertEqual(to: true)
         
-        Conflicts(repoID: repoID)
+        GitConflicts(repoID: repoID)
             .resolve(path: "sub_repo", type: type)
             .shouldSucceed("Conflict Resolved")
         
-        Conflicts(repoID: repoID)
+        GitConflicts(repoID: repoID)
             .exist()
             .shouldSucceed()
     }

@@ -15,7 +15,7 @@ public enum ConflictType {
     case markAsResolved
 }
 
-public struct Conflicts {
+public struct GitConflicts {
     public let repoID: RepoID
     public init(repoID: RepoID) { self.repoID = repoID }
     
@@ -48,7 +48,7 @@ public extension Index {
     }
 }
 
-fileprivate extension Conflicts {
+fileprivate extension GitConflicts {
     func resolveConflictMarkResolved(path: String) -> R<()> {
         let repo = repoID.repo
         let index = repo | { $0.index() }
