@@ -65,7 +65,7 @@ fileprivate extension Conflicts {
         return repo
             | { $0.index() }
             | { $0.conflictRemove(relPath: path) }
-            | { _ in Discard(repoID: repoID).path(path) }
+            | { _ in GitDiscard(repoID: repoID).path(path) }
     }
     
     func resolveConflictAsTheir(path: String) -> R<()> {

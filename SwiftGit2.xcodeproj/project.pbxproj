@@ -69,7 +69,7 @@
 		E63EDF7E265FF5A300A3D048 /* UrlSshHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63EDF7D265FF5A300A3D048 /* UrlSshHttp.swift */; };
 		E63EDF80265FF7E100A3D048 /* Repository+Push.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63EDF7F265FF7E100A3D048 /* Repository+Push.swift */; };
 		E63EDF8226617ADA00A3D048 /* Repository+Fetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63EDF8126617ADA00A3D048 /* Repository+Fetch.swift */; };
-		E64F957527E8B91B00E2D5D7 /* RepoID.Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64F957427E8B91B00E2D5D7 /* RepoID.Discard.swift */; };
+		E64F957527E8B91B00E2D5D7 /* Git.Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */; };
 		E653907A23E7328200C08416 /* Diff+Delta.swift in Sources */ = {isa = PBXBuildFile; fileRef = E653907923E7328200C08416 /* Diff+Delta.swift */; };
 		E653907C23E73CDE00C08416 /* Patch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E653907B23E73CDE00C08416 /* Patch.swift */; };
 		E66360DB27BEEC1C001292FB /* RepoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DA27BEEC1C001292FB /* RepoID.swift */; };
@@ -227,7 +227,7 @@
 		E63EDF7D265FF5A300A3D048 /* UrlSshHttp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlSshHttp.swift; sourceTree = "<group>"; };
 		E63EDF7F265FF7E100A3D048 /* Repository+Push.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Push.swift"; sourceTree = "<group>"; };
 		E63EDF8126617ADA00A3D048 /* Repository+Fetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Fetch.swift"; sourceTree = "<group>"; };
-		E64F957427E8B91B00E2D5D7 /* RepoID.Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Discard.swift; sourceTree = "<group>"; };
+		E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.Discard.swift; sourceTree = "<group>"; };
 		E653907923E7328200C08416 /* Diff+Delta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Diff+Delta.swift"; sourceTree = "<group>"; };
 		E653907B23E73CDE00C08416 /* Patch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Patch.swift; sourceTree = "<group>"; };
 		E66360DA27BEEC1C001292FB /* RepoID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.swift; sourceTree = "<group>"; };
@@ -518,6 +518,7 @@
 		E64A9DB124D78BF8005B643E /* Experimental */ = {
 			isa = PBXGroup;
 			children = (
+				E64F957627E8CD4600E2D5D7 /* GitActions */,
 				E66360DD27BF061F001292FB /* RepCore */,
 				E69D5D102573B21400AEBA28 /* Instance */,
 				E6AB53AF2575311600364E5F /* Struct */,
@@ -526,6 +527,14 @@
 				1DA3413C26B964FC0097E488 /* RevFile.swift */,
 			);
 			path = Experimental;
+			sourceTree = "<group>";
+		};
+		E64F957627E8CD4600E2D5D7 /* GitActions */ = {
+			isa = PBXGroup;
+			children = (
+				E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */,
+			);
+			path = GitActions;
 			sourceTree = "<group>";
 		};
 		E66360DD27BF061F001292FB /* RepCore */ = {
@@ -537,7 +546,6 @@
 				E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */,
 				1DC8A54227E1247600860A0F /* RepoID.Conflicts.swift */,
 				E67E84D027E52F70009E5B31 /* RepoID.LogCache.swift */,
-				E64F957427E8B91B00E2D5D7 /* RepoID.Discard.swift */,
 			);
 			path = RepCore;
 			sourceTree = "<group>";
@@ -814,7 +822,7 @@
 				1D5E1F492742CEF000498539 /* Repository+Entries.swift in Sources */,
 				DA5914761A94579000AED74C /* Errors.swift in Sources */,
 				1D991AE3251934FF00335255 /* Remote.swift in Sources */,
-				E64F957527E8B91B00E2D5D7 /* RepoID.Discard.swift in Sources */,
+				E64F957527E8B91B00E2D5D7 /* Git.Discard.swift in Sources */,
 				E6332E082652D20E004990E7 /* GitPayload.swift in Sources */,
 				E66360DB27BEEC1C001292FB /* RepoID.swift in Sources */,
 				E63EDF80265FF7E100A3D048 /* Repository+Push.swift in Sources */,
