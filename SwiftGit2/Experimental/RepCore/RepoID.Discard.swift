@@ -5,11 +5,11 @@ public struct Discard {
     public let repoID : RepoID
     public init(repoID : RepoID) { self.repoID = repoID }
     
-    func entry( _ entry: StatusEntry) -> R<Void> {
+    public func entry( _ entry: StatusEntry) -> R<Void> {
         repoID.repo | { $0.discard(entry: entry) }
     }
     
-    func path( _ path: String) -> R<Void> {
+    public func path( _ path: String) -> R<Void> {
         repoID.repo | { repo in
             repo.status()
                 | { $0.first { $0.allPaths.contains(path) } }
@@ -19,7 +19,7 @@ public struct Discard {
     }
 }
 
-public extension Repository {
+extension Repository {
     func discard(entry: StatusEntry) -> R<Void> {
         let paths = entry.allPaths.compactMap{ $0 }.distinct()
         
