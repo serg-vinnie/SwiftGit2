@@ -72,17 +72,25 @@ fileprivate extension GitConflicts {
         let repo = repoID.repo
         var index = repo | { $0.index() }
         let conflict = index | { $0.conflict(path: path) }
-        let sideEntry = conflict.map { $0.their }.maybeSuccess!
         
-        let tmpIndex = Index.new().flatMap { $0.add(sideEntry, inMemory: true) }
-            .onFailure{ print("\($0)") }
-        let res = tmpIndex.flatMap { $0.entries() }.maybeSuccess!
-        let sideEntryC = res.first
+        let tmpIndex = conflict.map { $0.their }
+            .flatMap{ sideEntry in
+                Index.new().flatMap { $0.add(sideEntry, inMemory: true) }
+            }
+            .onFailure { print("\($0)") }
+        
+        let tmpIndexFirstEntry = tmpIndex.flatMap { $0.entries().map{ $0.first } }
         
         // Видаляємо конфлікт
         index = index | { $0.conflictRemove(relPath: path) }
-        // додаємо файл чи сабмодуль в індекс
-        index = index | { $0.add(sideEntryC!) }
+        
+        // додаємо файл чи сабмодуль в індекс з тимчасового індекса
+        index = tmpIndexFirstEntry.flatMap { sideEntryC -> R<Index> in
+            guard let sideEntryC = sideEntryC
+            else {return .wtf("Failed to get .THEIR entry from temp index")  }
+            
+            return index | { $0.add(sideEntryC) }
+        }
         
         // чекаутим файл чи сабмодуль з цього індекса
         return combine(repo, index)
