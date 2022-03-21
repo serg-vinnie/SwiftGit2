@@ -19,3 +19,43 @@ public struct Discard {
     }
 }
 
+public extension Repository {
+    func discard(entry: StatusEntry) -> R<Void> {
+        let paths = entry.allPaths.compactMap{ $0 }.distinct()
+        
+        switch entry.status {
+        case .current: return .success(())
+        case .ignored: return .failure(WTF("Repository.discard doesn't support ignored status"))
+        case .conflicted: return .failure(WTF("Repository.discard doesn't support conflicted status"))
+        
+        case .workTreeNew:
+            return entry.with(self).indexToWorkDirNewFileURL | { $0.rm() }
+        
+        case .indexRenamed:
+            return combine(self.index(), entry.headToIndexNEWFilePath)
+                | { index, path in index.removeAll(pathPatterns: paths) }
+                | { _ in entry.with(self).headToIndexNewFileURL }
+                | { $0.rm() }
+                | { entry.headToIndexOLDFilePath }
+                | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
+            
+        case .workTreeRenamed:
+            return entry.with(self).indexToWorkDirNewFileURL
+                | { $0.rm() }
+                | { entry.headToIndexOLDFilePath }
+                | { self.checkoutHead(strategy: [.Force], progress: nil, pathspec: [$0] ) }
+            
+        case .indexNew, .indexDeleted, .indexModified, .indexTypeChange,
+             .workTreeDeleted, .workTreeModified, .workTreeUnreadable, .workTreeTypeChange:
+             
+            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: paths )
+            
+        default:
+            print("discard(entry) -- HORRIBLE ERROR? Or not?")
+            
+            //assert(false)
+            // Stage file if mixed? Maybe some another situations?
+            return self.checkoutHead(strategy: [.Force], progress: nil, pathspec: paths)
+        }
+    }
+}
