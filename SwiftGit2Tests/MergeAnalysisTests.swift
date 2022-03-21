@@ -122,6 +122,12 @@ class MergeAnalysisTests: XCTestCase {
         case .their:
             repoID.url.appendingPathComponent(path).readToString
                 .assertEqual(to: TestFileContent.oneLine1.rawValue)
+            
+            repoID.repo
+                .flatMap { $0.status() }
+                .map { $0.count == 1 }
+                .assertEqual(to: true , "After --resolve as Their-- must be 1 file with changes")
+            
         case .markAsResolved:
             repoID.url.appendingPathComponent(path).readToString
                 .map{ $0.contains("||||||| ancestor") }

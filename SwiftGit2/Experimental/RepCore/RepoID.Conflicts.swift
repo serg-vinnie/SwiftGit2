@@ -80,25 +80,24 @@ fileprivate extension Conflicts {
     
     func resolveConflictAsTheir(path: String) -> R<()> {
         let repo = repoID.repo
-        let index = repo | { $0.index() }
+        var index = repo | { $0.index() }
+        let conflict = index | { $0.conflict(path: path) }
+        let sideEntry = conflict.map { $0.their }.maybeSuccess!
         
-        return repo.map{ OidRevFile(repo: $0, type: .MergeHead)?.contentAsOids ?? [] }
-            .map { $0.first }
-            .flatMap { oid -> R<Commit> in
-                if let oid = oid {
-                    return repo | { $0.commit(oid: oid) }
-                }
-                
-                return .wtf("Failed to get commit OID from MergeHead RevFile")
-            }
-            .flatMap { commit -> R<()> in
-                index.flatMap { $0.conflictRemove(relPath: path) }
-                .flatMap{ _ in
-                    repo.flatMap {
-                        $0.checkout(commit: commit, strategy: [.Force, .DontWriteIndex], pathspec: [path])
-                    }
-                }
-                .flatMap { _ in index | { $0.addBy(relPath: path) } }
-            }
+        let tmpIndex = Index.new().flatMap { $0.add(sideEntry, inMemory: true) }
+            .onFailure{ print("\($0)") }
+        let res = tmpIndex.flatMap { $0.entries() }.maybeSuccess!
+        let sideEntryC = res.first
+        
+        // Видаляємо конфлікт
+        index = index | { $0.conflictRemove(relPath: path) }
+        // додаємо файл чи сабмодуль в індекс
+        index = index | { $0.add(sideEntryC!) }
+        
+        // чекаутим файл чи сабмодуль з цього індекса
+        return combine(repo, index)
+            | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) }
+            | { _ in index.flatMap { $0.addBy(relPath: path) } }
+            | { _ in .success(()) }
     }
 }

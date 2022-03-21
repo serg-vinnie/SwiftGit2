@@ -62,20 +62,31 @@ public extension Index {
         }
     }
     
-    func add(_ entry: Index.Entry) -> R<Index> {
+    func add(_ entry: Index.Entry, inMemory: Bool = false) -> R<Index> {
         var entry1 = entry.wrappedEntry
         
-        return _result((), pointOfFailure: "git_index_add") {
+        let action = _result((), pointOfFailure: "git_index_add") {
             git_index_add(self.pointer, &entry1 )
-        } | { self.write() } | { self }
+        }
+        
+        if inMemory {
+            return action
+                | { self }
+        } else {
+            return action
+                | { self.write() }
+                | { self }
+        }
     }
     
-    func addBy(relPath: String) -> R<()> {
+    func addBy(relPath: String) -> R<Index> {
         return git_try("git_index_add_bypath") {
             relPath.withCString { path in
                 git_index_add_bypath(self.pointer, path)
             }
-        } | { self.write() }
+        }
+        | { self.write() }
+        | { .success(self) }
     }
     
     func addAll(pathPatterns: [String] = ["*"]) -> R<()> {
@@ -86,12 +97,13 @@ public extension Index {
          } | { self.write() }
     }
     
-    func removeBy(relPath: String) -> R<()> {
+    func removeBy(relPath: String) -> R<Index> {
         return git_try("git_index_remove_bypath") {
             relPath.withCString { path in
                 git_index_remove_bypath(self.pointer, path)
             }
         } | { self.write() }
+        | { .success(self) }
     }
     
     func removeAll(pathPatterns: [String] = ["*"]) -> R<Index> {
