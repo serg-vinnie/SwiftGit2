@@ -35,7 +35,7 @@ public struct GitConflicts {
             .map{ $0.count > 0}
     }
     
-    public func resolve(path: String, side: ConflictSide, type: ConflictType = .file) -> R<()> {
+    public func resolve(path: String, side: ConflictSide, type: ConflictType) -> R<()> {
         switch side {
         case .markAsResolved:
             return resolveConflictMarkResolved(path: path)
