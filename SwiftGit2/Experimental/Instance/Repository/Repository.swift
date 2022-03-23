@@ -289,7 +289,7 @@ public extension Repository {
     }
     
     func addBy(path: String) -> R<Repository> {
-        index() | { $0.addBy(relPath: path) } | { self }
+        index() | { $0.addBy(relPath: path) } | { _ in self }
     }
     
     ///Stage files by relative path

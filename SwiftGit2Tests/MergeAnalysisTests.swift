@@ -212,7 +212,7 @@ class MergeAnalysisTests: XCTestCase {
             .exist()
             .assertEqual(to: false)
         
-        switch type {
+        switch side {
         case .our:
             // TODO:
             // Maybe we need to get oidStr from commit by some way? For comparation

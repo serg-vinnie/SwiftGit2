@@ -42,7 +42,10 @@ public struct GitConflicts {
         case .our:
             return resolveConflictAsOur(path: path)
         case .their:
-            return resolveConflictAsTheir(path: path, type: type)
+            if type == .file {
+                return resolveConflictAsTheirFile(path: path)
+            }
+            return resolveConflictAsTheirSubmodule(path: path)
         }
     }
 }
@@ -73,7 +76,7 @@ fileprivate extension GitConflicts {
             | { _ in GitDiscard(repoID: repoID).path(path) }
     }
     
-    func resolveConflictAsTheir(path: String, type: ConflictType) -> R<()> {
+    func resolveConflictAsTheirFile(path: String) -> R<()> {
         let repo = repoID.repo
         var index = repo | { $0.index() }
         let conflict = index | { $0.conflict(path: path) }
@@ -102,5 +105,41 @@ fileprivate extension GitConflicts {
             | { repo, index in repo.checkout(index: index, strategy: [.Force, .DontWriteIndex]) }
             | { _ in index.flatMap { $0.addBy(relPath: path) } }
             | { _ in .success(()) }
+    }
+    
+    func resolveConflictAsTheirSubmodule(path: String) -> R<()> {
+        let repo = repoID.repo
+        var index = repo | { $0.index() }
+        
+        let submodCommitOid = index
+            .flatMap { $0.conflict(path: path) }
+            .map{ $0.their }
+            .map{ $0.oid }
+            .maybeSuccess!
+        
+        // Видаляємо конфлікт
+        index = index | { $0.conflictRemove(relPath: path) }
+        
+        let submoduleRepo = repoID.module
+            .map{ $0.subModules }
+            .map{ $0.filter{ $0.key == path } }
+            .map{ $0.first! }
+            .map{ $0.value! }
+            .map{ $0.repoID.url.deletingLastPathComponent() }
+            .flatMap{ Repository.at(url: $0) }
+        
+        let submoduleCommit = submoduleRepo.flatMap { $0.commit(oid: submodCommitOid) }
+        
+        return combine(submoduleRepo, submoduleCommit)
+            .flatMap { subModRepo, commit in
+                subModRepo.checkout(commit: commit, strategy: [.Force], progress: nil, pathspec: [])
+            }
+            .flatMap{ _ in repo }
+            .flatMap{ $0.status() }
+            .map{ $0.filter { $0.stagePath == path } }
+            .flatMap{ entries in
+                entries.flatMap { entry in repo.map{ $0.unStage(.entry(entry)) } }
+            }
+            .flatMap{ _ in .success(())}
     }
 }
