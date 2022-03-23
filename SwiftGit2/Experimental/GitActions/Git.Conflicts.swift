@@ -9,10 +9,15 @@
 import Foundation
 import Essentials
 
-public enum ConflictType {
+public enum ConflictSide {
     case our
     case their
     case markAsResolved
+}
+
+public enum ConflictType {
+    case file
+    case submodule
 }
 
 public struct GitConflicts {
@@ -30,14 +35,14 @@ public struct GitConflicts {
             .map{ $0.count > 0}
     }
     
-    public func resolve(path: String, type: ConflictType) -> R<()> {
-        switch type {
+    public func resolve(path: String, side: ConflictSide, type: ConflictType = .file) -> R<()> {
+        switch side {
         case .markAsResolved:
             return resolveConflictMarkResolved(path: path)
         case .our:
             return resolveConflictAsOur(path: path)
         case .their:
-            return resolveConflictAsTheir(path: path)
+            return resolveConflictAsTheir(path: path, type: type)
         }
     }
 }
@@ -68,7 +73,7 @@ fileprivate extension GitConflicts {
             | { _ in GitDiscard(repoID: repoID).path(path) }
     }
     
-    func resolveConflictAsTheir(path: String) -> R<()> {
+    func resolveConflictAsTheir(path: String, type: ConflictType) -> R<()> {
         let repo = repoID.repo
         var index = repo | { $0.index() }
         let conflict = index | { $0.conflict(path: path) }

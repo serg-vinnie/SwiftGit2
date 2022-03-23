@@ -84,7 +84,7 @@ class MergeAnalysisTests: XCTestCase {
         shouldResolveConflictFile( type: .markAsResolved, folderName: "conflictResolveMarkResolved")
     }
     
-    func shouldResolveConflictFile(type: ConflictType, folderName: String) {
+    func shouldResolveConflictFile(type: ConflictSide, folderName: String) {
         let folder = root.sub(folder: folderName)
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
@@ -108,7 +108,7 @@ class MergeAnalysisTests: XCTestCase {
         let path = TestFile.fileA.rawValue
         
         GitConflicts(repoID: repoID)
-            .resolve(path: path, type: type)
+            .resolve(path: path, side: type)
             .shouldSucceed("Conflict Resolved")
         
         GitConflicts(repoID: repoID)
@@ -147,15 +147,16 @@ class MergeAnalysisTests: XCTestCase {
     ///RESOLVE FILE OUR
     ///////////////////////////////////////////////////////
     func test_shouldResolveConflict_Our_Submod() {
-        shouldResolveConflict_Submodule(type: .our, folderName:"Conflict_Submod_Resolve_Our")
+        shouldResolveConflict_Submodule(side: .our, folderName:"Conflict_Submod_Resolve_Our")
     }
     
     func test_shouldResolveConflict_Their_Submod() {
-        shouldResolveConflict_Submodule(type:.their, folderName:"Conflict_Submod_Resolve_Their")
+        shouldResolveConflict_Submodule(side: .their, folderName:"Conflict_Submod_Resolve_Their")
     }
     
-    func shouldResolveConflict_Submodule(type: ConflictType, folderName: String) {
+    func shouldResolveConflict_Submodule(side: ConflictSide, folderName: String) {
         let folder = root.sub(folder: folderName)
+        let subRepo = "sub_repo"
         
         // create repo with submodule
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "src commit 1"))
@@ -170,25 +171,25 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed()!
         
         // create commit #2 in sub_repo
-        (folder.sub(folder: "sub_repo").repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 2") })
+        (folder.sub(folder: subRepo).repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 2") })
             .shouldSucceed()
         
         // update submodule in SRC repo
-        (src.sub(folder: "sub_repo").repo | { $0.pull(.HEAD, options: .local) })
+        (src.sub(folder: subRepo).repo | { $0.pull(.HEAD, options: .local) })
             .shouldSucceed()
-        (src.repo | { $0.addBy(path: "sub_repo") })
+        (src.repo | { $0.addBy(path: subRepo) })
             .shouldSucceed()
         (src.repo | { $0.commit(message: "update sub repo to commit 2", signature: .test) })
             .shouldSucceed()
         
         // create commit #3 in sub_repo
-        (folder.sub(folder: "sub_repo").repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 3") })
+        (folder.sub(folder: subRepo).repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 3") })
             .shouldSucceed()
         
         // update submodule in DST repo
-        (dst.sub(folder: "sub_repo").repo | { $0.pull(.HEAD, options: .local) })
+        (dst.sub(folder: subRepo).repo | { $0.pull(.HEAD, options: .local) })
             .shouldSucceed()
-        (dst.repo | { $0.addBy(path: "sub_repo") })
+        (dst.repo | { $0.addBy(path: subRepo) })
             .shouldSucceed()
         (dst.repo | { $0.commit(message: "update sub repo to commit 3", signature: .test) })
             .shouldSucceed()
@@ -204,12 +205,37 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: true)
         
         GitConflicts(repoID: repoID)
-            .resolve(path: "sub_repo", type: type)
+            .resolve(path: subRepo, side: side, type: .submodule)
             .shouldSucceed("Conflict Resolved")
         
         GitConflicts(repoID: repoID)
             .exist()
-            .shouldSucceed()
+            .assertEqual(to: false)
+        
+        switch type {
+        case .our:
+            // TODO:
+            // Maybe we need to get oidStr from commit by some way? For comparation
+            // let oidStr = OidRevFile(repo: repoID.repo.maybeSuccess!, type: .MergeHead).debugDescription
+            
+            repoID.repo
+                .flatMap { $0.status() }
+                .map { $0.count == 0 }
+                .assertEqual(to: true , "After --resolve as OUR-- must be 0 file with changes")
+        case .their:
+            // TODO:
+            // Maybe we need to get oidStr from commit by some way? For comparation
+            // let oidStr = OidRevFile(repo: repoID.repo.maybeSuccess!, type: .MergeHead).debugDescription
+            
+            repoID.repo
+                .flatMap { $0.status() }
+                .map { $0.count == 1 }
+                .assertEqual(to: true , "After --resolve as THEIR-- must be 1 file with changes")
+            
+        case .markAsResolved:
+            //Nothing to do
+            break
+        }
     }
     /////////////////////////////////////////////////////
 }
