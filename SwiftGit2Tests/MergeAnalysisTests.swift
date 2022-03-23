@@ -73,18 +73,18 @@ class MergeAnalysisTests: XCTestCase {
     ///RESOLVE FILE THEIR
     ///////////////////////////////////////////////////////
     func test_shouldResolveConflict_Their_File() {
-        shouldResolveConflictFile( type: .their, folderName: "conflictResolveTheir")
+        shouldResolveConflictFile( side: .their, folderName: "conflictResolveTheir")
     }
     
     func test_shouldResolveConflict_Our_File() {
-        shouldResolveConflictFile( type: .our, folderName: "conflictResolveOur")
+        shouldResolveConflictFile( side: .our, folderName: "conflictResolveOur")
     }
     
     func test_shouldResolveConflict_MarkResolved_File() {
-        shouldResolveConflictFile( type: .markAsResolved, folderName: "conflictResolveMarkResolved")
+        shouldResolveConflictFile( side: .markAsResolved, folderName: "conflictResolveMarkResolved")
     }
     
-    func shouldResolveConflictFile(type: ConflictSide, folderName: String) {
+    func shouldResolveConflictFile(side: ConflictSide, folderName: String) {
         let folder = root.sub(folder: folderName)
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
@@ -108,14 +108,14 @@ class MergeAnalysisTests: XCTestCase {
         let path = TestFile.fileA.rawValue
         
         GitConflicts(repoID: repoID)
-            .resolve(path: path, side: type)
+            .resolve(path: path, side: side, type: .file)
             .shouldSucceed("Conflict Resolved")
         
         GitConflicts(repoID: repoID)
             .exist()
             .assertEqual(to: false)
         
-        switch type {
+        switch side {
         case .our:
             repoID.url.appendingPathComponent(path).readToString
                 .assertEqual(to: TestFileContent.oneLine2.rawValue)
@@ -237,7 +237,6 @@ class MergeAnalysisTests: XCTestCase {
             break
         }
     }
-    /////////////////////////////////////////////////////
 }
 
 

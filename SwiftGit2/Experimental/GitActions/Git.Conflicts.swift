@@ -115,7 +115,6 @@ fileprivate extension GitConflicts {
             .flatMap { $0.conflict(path: path) }
             .map{ $0.their }
             .map{ $0.oid }
-            .maybeSuccess!
         
         // Видаляємо конфлікт
         index = index | { $0.conflictRemove(relPath: path) }
@@ -128,7 +127,10 @@ fileprivate extension GitConflicts {
             .map{ $0.repoID.url.deletingLastPathComponent() }
             .flatMap{ Repository.at(url: $0) }
         
-        let submoduleCommit = submoduleRepo.flatMap { $0.commit(oid: submodCommitOid) }
+        let submoduleCommit = combine(submoduleRepo, submodCommitOid)
+            .flatMap { submoduleRepo, submodCommitOid in
+                submoduleRepo.commit(oid: submodCommitOid)
+            }
         
         return combine(submoduleRepo, submoduleCommit)
             .flatMap { subModRepo, commit in
