@@ -6,16 +6,16 @@ public struct StatusEntry {
     public let status: Status
     public let headToIndex: Diff.Delta?
     public let indexToWorkDir: Diff.Delta?
-
+    
     public init(from statusEntry: git_status_entry) {
         status = Status(rawValue: statusEntry.status.rawValue)
-
+        
         if let htoi = statusEntry.head_to_index {
             headToIndex = Diff.Delta(htoi.pointee)
         } else {
             headToIndex = nil
         }
-
+        
         if let itow = statusEntry.index_to_workdir {
             indexToWorkDir = Diff.Delta(itow.pointee)
         } else {

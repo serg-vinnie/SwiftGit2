@@ -8,12 +8,13 @@
 
 import Clibgit2
 import Essentials
+import Dispatch
 
 public extension Repository {
     func hunksFrom(delta: Diff.Delta, options: DiffOptions = DiffOptions()) -> Result<[Diff.Hunk], Error> {
         let old = delta.oldFile != nil ? (try? blob(oid: delta.oldFile!.oid).get()) : nil
         let new = delta.newFile != nil ? (try? blob(oid: delta.newFile!.oid).get()) : nil
-
+        
         return hunksBetweenBlobs(old: old, new: new, options: options)
     }
     
