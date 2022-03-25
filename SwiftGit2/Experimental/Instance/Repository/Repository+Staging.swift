@@ -14,7 +14,7 @@ public extension Repository {
         switch t {
         case .all:
             return self.index()
-                .flatMap { $0.addAll() }
+                .flatMap { $0.addAll().map{ _ in () } }
                 .map{ self }
         case .entry(let entry):
             guard entry.stagePath != "" else { return .wtf("Staging: can't resolve entry.stagePath") }
@@ -24,7 +24,7 @@ public extension Repository {
             if case .success(let url) = url {
                 if url.isDirExist {
                     return self.index()
-                        .flatMap { $0.addAll(pathPatterns: ["\(entry.stagePath)"]) }
+                        .flatMap { $0.addAll(pathPatterns: ["\(entry.stagePath)"]).map{ _ in () } }
                         .map{ self }
                 }
             }

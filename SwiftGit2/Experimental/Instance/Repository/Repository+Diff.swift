@@ -54,9 +54,6 @@ public extension Repository {
 
 public extension Repository {
     func hunkFrom(relPath: String) -> R<Diff.Hunk> {
-        
-        //let repo = self
-        
         self.directoryURL
             .map{ $0.appendingPathComponent(relPath).path }
             .flatMap { self.blobCreateFromDisk(path: $0 )}

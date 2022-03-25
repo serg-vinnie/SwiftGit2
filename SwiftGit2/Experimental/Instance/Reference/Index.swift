@@ -89,12 +89,21 @@ public extension Index {
         | { .success(self) }
     }
     
-    func addAll(pathPatterns: [String] = ["*"]) -> R<()> {
-         git_try("git_index_add_all") {
+    func addAll(pathPatterns: [String] = ["*"], inMemory: Bool = false) -> R<Index> {
+        let action = git_try("git_index_add_all") {
              pathPatterns.with_git_strarray { strarray in
                  git_index_add_all(pointer, &strarray, 0, nil, nil)
              }
-         } | { self.write() }
+         }
+        
+        if inMemory {
+            return action
+                | { self }
+        } else {
+            return action
+                | { self.write() }
+                | { self }
+        }
     }
     
     func removeBy(relPath: String) -> R<Index> {

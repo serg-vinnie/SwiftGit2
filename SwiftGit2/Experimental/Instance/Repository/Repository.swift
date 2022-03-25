@@ -295,6 +295,7 @@ public extension Repository {
     ///Stage files by relative path
     func add(relPaths: [String]) -> R<()> {
         index().flatMap { $0.addAll(pathPatterns: relPaths) }
+        .map{ _ in () }
     }
     
     func remove(relPaths: [String]) -> R<()> {
