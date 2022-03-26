@@ -52,6 +52,21 @@ public extension Index {
         return .success(entries)
     }
     
+    func entry(relPath: String) -> Index.Entry? {
+        let stage: Int32 = 0
+        var res: UnsafePointer<git_index_entry>?
+        
+        relPath.withCString { path in
+           res = git_index_get_bypath(self.pointer, path, stage)
+        }
+        
+        if let res = res {
+            return Index.Entry(entry: res.pointee)
+        }
+        
+        return nil
+    }
+    
     func conflicts() -> Result<[Conflict], Error> {
         conflictIterator().flatMap { $0.all() }
     }
