@@ -30,22 +30,25 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
             stagedHunks = .success([])
         }
         
-        let unStagedHunks : R<[Diff.Hunk]>
-        
-        
-//        var virtualIndex = Index.new()
+// 1
+//        let sizeIsSmall = indexToWorkDirNewFileURL
+//            .map { $0.fileSize2() < 1024 * 500 } // 500 kb +-
 //
-//        virtualIndex = virtualIndex.flatMap{ $0.addBy(relPath: entry.stagePath, inMemory: true) }
+//        let entryNotExistInIndex = repo.index().map{ $0.entry(relPath: entry.stagePath) == nil }
 //
-//        unStagedHunks = virtualIndex
-//            .flatMap { index in
-//                repo.diffIndexToWorkdir(index: index)
+//        let temp = combine(sizeIsSmall, entryNotExistInIndex)
+//            .flatMap { sizeIsSmall, entryNotExistInIndex -> R<()> in
+//                if sizeIsSmall && entryNotExistInIndex {
+//                    return repo.index().flatMap{ $0.addBy(relPath: entry.stagePath) }.map { _ in () }
+//                }
+//                return .success(())
 //            }
-//            .flatMap{ $0.asDeltasWithHunks() }
-//            .map { $0.first!.hunks }
-//            .onFailure{ print("ZZZ \($0)" ) }
+        
+        var unStagedHunks : R<[Diff.Hunk]>
         
         if let unStaged = entry.unStagedDeltas {
+// 1
+//            unStagedHunks = temp.flatMap{ repo.hunksFrom(delta: unStaged ) }
             unStagedHunks = repo.hunksFrom(delta: unStaged )
         } else {
             unStagedHunks = .success([])
@@ -53,5 +56,47 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         
         return combine(stagedHunks, unStagedHunks)
             .map{ StatusEntryHunks(staged: $0, unstaged: $1) }
+    }
+}
+
+extension URL {
+    func fileSize( units: ByteCountFormatter.Units ) -> UInt64 {
+        let byteCountFormatter: ByteCountFormatter = ByteCountFormatter()
+        byteCountFormatter.countStyle = ByteCountFormatter.CountStyle.file
+        
+        var fileSizeValue: UInt64 = 0
+                
+        do {
+            let fileAttribute: [FileAttributeKey : Any] = try FileManager.default.attributesOfItem(atPath: self.path)
+            
+            if let fileNumberSize: NSNumber = fileAttribute[FileAttributeKey.size] as? NSNumber {
+                fileSizeValue = UInt64(truncating: fileNumberSize)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        return fileSizeValue
+    }
+}
+
+extension URL {
+    func fileSize2() -> Int {
+        do {
+            let resources = try self.resourceValues(forKeys:[.fileSizeKey])
+            let fileSize = resources.fileSize!
+            return fileSize
+        } catch {
+            return 0
+        }
+    }
+    
+    private func getHumanReadebleSize(bytes: Int) -> String {
+        let bcf = ByteCountFormatter()
+        //bcf.allowedUnits = [.useMB, .useKB] // optional: restricts the units to MB and KB only
+        bcf.countStyle = .file
+        bcf.isAdaptive = true
+        let string = bcf.string(fromByteCount: Int64(bytes))
+        return string
     }
 }
