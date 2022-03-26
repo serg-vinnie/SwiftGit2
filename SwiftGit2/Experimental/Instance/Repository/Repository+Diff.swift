@@ -50,6 +50,14 @@ public extension Repository {
             git_object_lookup(&blob_pointer, self.pointer, &oid, GIT_OBJECT_BLOB)
         }
     }
+    
+    func diffIndexToWorkdir(index: Index) -> Result<Diff, Error> {
+        var diff_pointer: OpaquePointer?
+        
+        return _result( { Diff(diff_pointer!) }, pointOfFailure: "git_diff_index_to_workdir") {
+            git_diff_index_to_workdir(&diff_pointer, self.pointer, index.pointer, nil )
+        }
+    }
 }
 
 public extension Repository {

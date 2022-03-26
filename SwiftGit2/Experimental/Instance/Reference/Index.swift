@@ -79,14 +79,21 @@ public extension Index {
         }
     }
     
-    func addBy(relPath: String) -> R<Index> {
-        return git_try("git_index_add_bypath") {
+    func addBy(relPath: String, inMemory: Bool = false) -> R<Index> {
+        let action = git_try("git_index_add_bypath") {
             relPath.withCString { path in
                 git_index_add_bypath(self.pointer, path)
             }
         }
-        | { self.write() }
-        | { .success(self) }
+        
+        if inMemory {
+            return action
+                | { self }
+        } else {
+            return action
+                | { self.write() }
+                | { self }
+        }
     }
     
     func addAll(pathPatterns: [String] = ["*"], inMemory: Bool = false) -> R<Index> {
