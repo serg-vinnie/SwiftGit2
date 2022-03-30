@@ -20,6 +20,12 @@ public struct Signature {
     }
 }
 
+extension Signature : CustomStringConvertible {
+    public var description: String {
+        "\(name) <\(email)>"
+    }
+}
+
 internal extension Signature {
     func make() -> Result<SignatureInternal, Error> {
         var out: UnsafeMutablePointer<git_signature>?
