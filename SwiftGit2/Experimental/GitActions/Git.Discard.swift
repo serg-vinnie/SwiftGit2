@@ -26,6 +26,12 @@ public struct GitDiscard {
                 .flatMap { $0.flatMap{ $0 }.map{ _ in () } }
         }
     }
+    
+    public func all() -> R<Void> {
+        repoID.repo | { repo in
+            repo.discardAll()
+        }
+    }
 }
 
 extension Repository {
