@@ -17,6 +17,15 @@ public struct GitDiscard {
                 | { repo.discard(entry: $0) }
         }
     }
+    
+    public func paths( _ path: [String]) -> R<Void> {
+        repoID.repo | { repo in
+            repo.status()
+                .map { $0.filter { path.contains( $0.stagePath ) } }
+                .map { entries in entries.map { repo.discard(entry: $0) } }
+                .flatMap { $0.flatMap{ $0 }.map{ _ in () } }
+        }
+    }
 }
 
 extension Repository {
