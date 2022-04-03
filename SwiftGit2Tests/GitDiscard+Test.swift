@@ -9,11 +9,13 @@ class GitDiscardTests: XCTestCase {
     func test_shouldDicardSingle() {
         let src = root.with(repo: "test_shouldDicardAll", content: .file(.fileA, .content1)).shouldSucceed()!
         
-        let repoID = RepoID(url: src.url ).shouldSucceed()!
+        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 1, "status count is correct")
         
+        let repoID = RepoID(url: src.url )
         
+        _ = GitDiscard(repoID: repoID).path( TestFile.fileA.rawValue ).shouldSucceed()!
         
-        
+        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 0, "status count is correct")
     }
     
 //    func test_shouldDicardAll() {
