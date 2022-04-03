@@ -7,7 +7,6 @@ import XCTest
 enum RepositoryContent {
     case empty
     case file(TestFile, TestFileContent)
-    case files
     case commit(TestFile, TestFileContent, String)
     case clone(URL, CloneOptions)
 }
@@ -17,9 +16,6 @@ extension Repository {
         switch content {
         case     .empty:                        return .success(self)
         case let .file  (file, content):        return t_with(file: file, with: content)
-        case .files:                            return t_with(file: .fileA, with: .random)
-                .flatMap{ _ in t_with(file: .fileB, with: .random) }
-                .flatMap{ _ in t_with(file: .fileLong, with: .random) }
         case let .commit(file, content, msg):   return t_commit(file: file, with: content, msg: msg) | { _ in self }
         case .clone: fatalError("you shouldn't initiate clone from this place")
         }
@@ -56,6 +52,7 @@ extension Repository {
 enum TestFile: String {
     case fileA = "fileA.txt"
     case fileB = "fileB.txt"
+    case fileC = "fileC.txt"
     case fileLong = "pneumonoultramicroscopicsilicovolcanoconiosis.txt"
 }
 
@@ -82,6 +79,18 @@ enum TestFileContent: String {
     03
     04 "Begin at the beginning," the King said gravely, "and go on
     05 till you come to the end; then stop."
+    06
+    07
+    08
+    09  << LINE INSERTION >>
+    """
+    
+    case content3 = """
+    01 UKS IS THE BEST MAN IN THE WORLD
+    02 Glory to Ukraine
+    03
+    04 Slava Ukraini
+    05 Heroyam Slava
     06
     07
     08

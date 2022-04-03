@@ -28,15 +28,23 @@ class GitDiscardTests: XCTestCase {
             .assertEqual(to: 0, "status count is correct")
     }
     
-//    func test_shouldDicardAll() {
-//        let src = root.with(repo: "test_shouldDicardAll", content: .files).shouldSucceed()!
-//
-////        root.with(repo: "test_shouldDicardAll", content: .file(.fileA, .)).shouldSucceed()!
-////        root.with(repo: "test_shouldDicardAll", content: .file(.fileB, "asdf")).shouldSucceed()!
-////        root.with(repo: "test_shouldDicardAll", content: .file(.fileLong, "asdf")).shouldSucceed()!
-//
-//        let repoID = RepoID(path: src.url.path )
-//
-//        GitDiscard(repoID: repoID).all().shouldSucceed()!
-//    }
+    
+    func test_shouldDicardAll() {
+        let src = root.with(repo: "DicardAll", content: .empty).shouldSucceed()!
+        
+        let repoID = RepoID(path: src.url.path )
+        
+        ( repoID.repo
+            | { $0.t_with(file: .fileA, with: .content1) }
+            | { $0.t_with(file: .fileB, with: .content2) }
+            | { $0.t_with(file: .fileC, with: .content3) }
+        )
+        .shouldSucceed()
+        
+        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 3, "status count is correct")
+        
+        GitDiscard(repoID: repoID).all().shouldSucceed()
+
+        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 0, "status count is correct")
+    }
 }
