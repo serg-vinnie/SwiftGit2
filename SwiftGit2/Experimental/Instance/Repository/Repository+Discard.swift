@@ -12,6 +12,15 @@ import Essentials
 
 public extension Repository {
     func discardAll() -> R<()> {
+        let repo = self
+        
+        if self.headIsUnborn {
+            return self.status().flatMap {
+                $0.map { repo.discard(entry: $0 ) }.flatMap { $0 }.map{ _ in () }
+            }
+        }
+        
+        
         return directoryURL
             .flatMap { url -> R<()> in
                 
