@@ -102,4 +102,22 @@ class GitDiscardTests: XCTestCase {
         
         src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 2, "status count is correct")
     }
+    
+    func test_discardFew() {
+        let src = root.with(repo: "DiscardByEntry_oneOfLot", content: .file(.fileA, .content1)).shouldSucceed()!
+        
+        let repoID = RepoID(path: src.url.path )
+        
+        ( repoID.repo
+            | { $0.t_with(file: .fileB, with: .content2) }
+            | { $0.t_with(file: .fileC, with: .content3) }
+        )
+        .shouldSucceed()
+        
+        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 3, "status count is correct")
+        
+        GitDiscard(repoID: repoID).paths([TestFile.fileA.rawValue, TestFile.fileB.rawValue ]).shouldSucceed()
+        
+        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 1, "status count is correct")
+    }
 }
