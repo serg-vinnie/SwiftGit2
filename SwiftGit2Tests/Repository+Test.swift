@@ -7,6 +7,7 @@ import XCTest
 enum RepositoryContent {
     case empty
     case file(TestFile, TestFileContent)
+    case files
     case commit(TestFile, TestFileContent, String)
     case clone(URL, CloneOptions)
 }
@@ -16,6 +17,9 @@ extension Repository {
         switch content {
         case     .empty:                        return .success(self)
         case let .file  (file, content):        return t_with(file: file, with: content)
+        case .files:                            return t_with(file: .fileA, with: .random)
+                .flatMap{ _ in t_with(file: .fileB, with: .random) }
+                .flatMap{ _ in t_with(file: .fileLong, with: .random) }
         case let .commit(file, content, msg):   return t_commit(file: file, with: content, msg: msg) | { _ in self }
         case .clone: fatalError("you shouldn't initiate clone from this place")
         }

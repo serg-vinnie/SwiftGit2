@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D0AFF642534AC440045D68D /* StatusOptions.Flags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */; };
+		1D2E4DEF27F9B07700A90463 /* GitDiscard+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2E4DEE27F9B07700A90463 /* GitDiscard+Test.swift */; };
 		1D306D8C27B05E6A0015CE6C /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D306D8B27B05E6A0015CE6C /* Tag.swift */; };
 		1D496A4225372FA800789177 /* git_strarray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D496A4125372FA800789177 /* git_strarray.swift */; };
 		1D4BCEF727440F95008831DC /* Repository+Staging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4BCEF627440F95008831DC /* Repository+Staging.swift */; };
@@ -145,6 +146,7 @@
 
 /* Begin PBXFileReference section */
 		1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusOptions.Flags.swift; sourceTree = "<group>"; };
+		1D2E4DEE27F9B07700A90463 /* GitDiscard+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GitDiscard+Test.swift"; sourceTree = "<group>"; };
 		1D306D8B27B05E6A0015CE6C /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		1D496A4125372FA800789177 /* git_strarray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = git_strarray.swift; sourceTree = "<group>"; };
 		1D4BCEF627440F95008831DC /* Repository+Staging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Staging.swift"; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 				E6332DD0265167F0004990E7 /* Info.plist */,
 				E63EDF6D265BC30800A3D048 /* GitTest.swift */,
 				E63EDF6F265BF7FD00A3D048 /* Repository+Test.swift */,
+				1D2E4DEE27F9B07700A90463 /* GitDiscard+Test.swift */,
 			);
 			path = SwiftGit2Tests;
 			sourceTree = "<group>";
@@ -839,6 +842,7 @@
 			files = (
 				1DD99229276A24540088848F /* StatusDiffTests.swift in Sources */,
 				E6F29F0027B58ADD00F473A1 /* TestFolder.swift in Sources */,
+				1D2E4DEF27F9B07700A90463 /* GitDiscard+Test.swift in Sources */,
 				E67E84D727E5DAAF009E5B31 /* LogTests.swift in Sources */,
 				E6E99235268BBF5E00F8E8BD /* RevwalkTests.swift in Sources */,
 				E6332DCF265167F0004990E7 /* RepositoryRemoteTests.swift in Sources */,
