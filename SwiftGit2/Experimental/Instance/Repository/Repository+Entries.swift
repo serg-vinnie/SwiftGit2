@@ -12,19 +12,20 @@ import Essentials
 extension Repository {
    public func entries(target: CommitTarget, statusOptions: StatusOptions = StatusOptions(), findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<Entries> {
        return self.statusConflictSafe(options: statusOptions)
-           .if(\.isEmpty,
-                then: { _ in
+           .flatMap { status -> R<Entries> in
                if self.headIsUnborn {
                    return .success(.headIsUnborn)
-               } else {
-                   return self.deltas(target: target, findOptions: findOptions)
-                       .map { .commit($0) } as R<Entries>
                }
-           },
-                else: { status in
-                   .success(.status(status))
-           })
-   }
+               
+               if status.isEmpty == false {
+                   return .success(.status(status))
+               }
+               
+               // self.headIsUnborn == false
+               return self.deltas(target: target, findOptions: findOptions)
+                  .map { .commit($0) } as R<Entries>
+            }
+        }
 }
 
 public extension Repository {
