@@ -18,6 +18,26 @@ public enum Credentials {
     case ssh(publicKey: String, privateKey: String, passphrase: String)
     
     public var isNone : Bool { if case .none = self { return true } else { return false } }
+    
+    public static func == (l: Credentials, r: Credentials) -> Bool {
+        switch (l,r) {
+        case     (.none, .none):                        return true
+        case     (.default, .default):                  return true
+        case     (.sshAgent, .sshAgent):                return true
+        case let (.plaintext(l1,l2),.plaintext(r1,r2)): return l1 == r1 && l2 == r2
+        case let (.sshMemory(l1,l2,l3,l4),.sshMemory(r1,r2,r3,r4)):
+            return l1 == r1
+                && l2 == r2
+                && l3 == r3
+                && l4 == r4
+        case let (.ssh(l1,l2,l3), .ssh(r1,r2,r3)):
+            return l1 == r1
+                && l2 == r2
+                && l3 == r3
+        default:
+            return false
+        }
+    }
 }
 
 public extension Credentials {
