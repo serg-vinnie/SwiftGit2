@@ -45,6 +45,7 @@
 		BEB31FA01A0E595600F525B9 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BEB31F9F1A0E595600F525B9 /* libz.dylib */; };
 		DA5914761A94579000AED74C /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5914751A94579000AED74C /* Errors.swift */; };
 		E60364B727DB338100E9D4D0 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60364B627DB338100E9D4D0 /* Auth.swift */; };
+		E6169DF628149496001EB8A6 /* Git.Remotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6169DF528149496001EB8A6 /* Git.Remotes.swift */; };
 		E623A308263486A500484E11 /* FetchOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623A307263486A500484E11 /* FetchOptions.swift */; };
 		E623A3142634883100484E11 /* CloneOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623A3132634883100484E11 /* CloneOptions.swift */; };
 		E623A31F2634885800484E11 /* CheckoutOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623A31E2634885800484E11 /* CheckoutOptions.swift */; };
@@ -204,6 +205,7 @@
 		BEB31F9F1A0E595600F525B9 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		DA5914751A94579000AED74C /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		E60364B627DB338100E9D4D0 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
+		E6169DF528149496001EB8A6 /* Git.Remotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.Remotes.swift; sourceTree = "<group>"; };
 		E623A307263486A500484E11 /* FetchOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchOptions.swift; sourceTree = "<group>"; };
 		E623A3132634883100484E11 /* CloneOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloneOptions.swift; sourceTree = "<group>"; usesTabs = 0; };
 		E623A31E2634885800484E11 /* CheckoutOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutOptions.swift; sourceTree = "<group>"; usesTabs = 0; };
@@ -537,6 +539,7 @@
 			children = (
 				1DC8A54227E1247600860A0F /* Git.Conflicts.swift */,
 				E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */,
+				E6169DF528149496001EB8A6 /* Git.Remotes.swift */,
 			);
 			path = GitActions;
 			sourceTree = "<group>";
@@ -790,6 +793,7 @@
 				E6D4A92024DEACC000E8041E /* Repository.swift in Sources */,
 				1D306D8C27B05E6A0015CE6C /* Tag.swift in Sources */,
 				E6AF628D26938457007D0585 /* Repository+Sync.swift in Sources */,
+				E6169DF628149496001EB8A6 /* Git.Remotes.swift in Sources */,
 				E6AF6288269256CD007D0585 /* Repository+Graph.swift in Sources */,
 				E6AF629026939D31007D0585 /* BranchTarget.swift in Sources */,
 				E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */,
