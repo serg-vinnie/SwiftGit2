@@ -15,7 +15,7 @@ protocol RepoContainer {
 
 public struct RepCore<T> {
     public let containers   : [RepoID:T]
-    public let roots        : [RepoID:Module]
+    public let roots        : [RepoID:GitModule]
 }
 
 extension RepCore : CustomStringConvertible {
@@ -52,7 +52,7 @@ public extension RepCore {
 }
 
 extension Dictionary where Key == RepoID {
-    func with(module: Module, block: (RepoID) -> Value) -> Self {
+    func with(module: GitModule, block: (RepoID) -> Value) -> Self {
         var dic = self
         
         for repoID in module.recurse.asRepoIDs {
@@ -62,8 +62,8 @@ extension Dictionary where Key == RepoID {
     }
 }
 
-extension Dictionary where Key == RepoID, Value == Module {
-    func with(module: Module)  -> Self {
+extension Dictionary where Key == RepoID, Value == GitModule {
+    func with(module: GitModule)  -> Self {
         var dic = self
         dic[module.repoID] = module
         return dic

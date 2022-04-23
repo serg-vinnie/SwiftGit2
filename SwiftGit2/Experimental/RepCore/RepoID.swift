@@ -16,7 +16,7 @@ public struct RepoID : Hashable {
     public init(path: String) { self.path = path.skippingLastSlash }
     public init(url: URL)     { self.path = url.path.skippingLastSlash }
     
-    public var module          : R<Module>         { Repository.module(at: url) }
+    public var module          : R<GitModule>         { Repository.module(at: url) }
     public var exists          : Bool              { Repository.exists(at: path)                     }
     public var repo            : R<Repository>     { Repository.at(url: self.path.asURL())           }
 }

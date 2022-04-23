@@ -5,21 +5,21 @@ import OrderedCollections
 
 
 // TODO: fix detached head
-public struct Module : CustomStringConvertible {
+public struct GitModule : CustomStringConvertible {
     public var repoID : RepoID { RepoID(url: url) }
     public let url : URL
     public let exists : Bool
-    public var recurse : OrderedDictionary<String,Module?> {
-        var result = OrderedDictionary<String,Module?>()
+    public var recurse : OrderedDictionary<String,GitModule?> {
+        var result = OrderedDictionary<String,GitModule?>()
         result[self.url.lastPathComponent] = self
         for item in subModulesRecursive {
             result[item.key] = item.value
         }
         return result //.merging(subModulesRecursive) { a, b in a }
     }
-    public let subModules : OrderedDictionary<String,Module?>
-    public var subModulesRecursive : OrderedDictionary<String,Module?> {
-        var results = OrderedDictionary<String,Module?>()
+    public let subModules : OrderedDictionary<String,GitModule?>
+    public var subModulesRecursive : OrderedDictionary<String,GitModule?> {
+        var results = OrderedDictionary<String,GitModule?>()
         
         for item in subModules {
             results[item.key] = item.value
@@ -81,24 +81,24 @@ public struct Module : CustomStringConvertible {
  */
 
 public extension Repository {
-    var asModule : R<Module> {
-        combine(directoryURL,subModules) | { Module(url: $0, exists: true, subModules: $1) }
+    var asModule : R<GitModule> {
+        combine(directoryURL,subModules) | { GitModule(url: $0, exists: true, subModules: $1) }
     }
     
-    var subModules : R<OrderedDictionary<String,Module?>> {
+    var subModules : R<OrderedDictionary<String,GitModule?>> {
         return submodules() | { $0.asOrderedDictionary }
     }
     
-    static func module(at url: URL) -> R<Module> {
+    static func module(at url: URL) -> R<GitModule> {
         if Repository.exists(at: url) {
             return Repository.at(url: url) | { $0.asModule }
         }
-        return .success(Module(url: url, exists: false, subModules: [:]))
+        return .success(GitModule(url: url, exists: false, subModules: [:]))
     }
 }
 
 private extension Array where Element == Submodule {
-    var asOrderedDictionary : OrderedDictionary<String,Module?> {
+    var asOrderedDictionary : OrderedDictionary<String,GitModule?> {
         self.toOrderedDictionary(key: \.name) { submodule in
             try? submodule.asModule.get()
         }
@@ -106,13 +106,13 @@ private extension Array where Element == Submodule {
 }
 
 private extension Submodule {
-    var asModule : R<Module> {
+    var asModule : R<GitModule> {
         if repoExist() {
             return combine(absURL, repo()) | { url, repo in
-                repo.subModules | { Module(url: url, exists: true, subModules: $0) }
+                repo.subModules | { GitModule(url: url, exists: true, subModules: $0) }
             }
         } else {
-            return absURL | { Module(url: $0, exists: false, subModules: [:]) }
+            return absURL | { GitModule(url: $0, exists: false, subModules: [:]) }
         }
     }
 }
@@ -128,7 +128,7 @@ public extension Sequence {
 
 }
 
-extension OrderedDictionary where Key == String, Value == Module? {
+extension OrderedDictionary where Key == String, Value == GitModule? {
     var asRepoIDs : [RepoID] {
         values.compactMap { $0?.repoID }
     }
