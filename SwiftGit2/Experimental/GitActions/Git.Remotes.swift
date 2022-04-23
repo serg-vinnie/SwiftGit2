@@ -9,6 +9,9 @@ public struct GitRemotes {
     public func add(url: String, name: String) -> R<Remote> {
         repoID.repo | { $0.createRemote(url: url, name: name) }
     }
+    
+    var list  : R<[Remote]> { repoID.repo | { $0.remoteList()     } }
+    var names : R<[String]> { repoID.repo | { $0.remoteNameList() } }
 }
 
 // Remote
