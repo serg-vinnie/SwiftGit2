@@ -18,6 +18,10 @@ public struct GitRemotes {
         repoID.repo | { $0.renameRemote(old: old, new: new) } | { _ in () }
     }
     
+    public func set(remote: String, url: String) -> R<Void> {
+        repoID.repo | { $0.set(remote: remote, url: url) }
+    }
+    
     public var list  : R<[Remote]> { repoID.repo | { $0.remoteList()     } }
     public var names : R<[String]> { repoID.repo | { $0.remoteNameList() } }
     public var urls  : R<[String:String]> { list | { $0.toDictionary(key: \.name) { $0.url } } }
@@ -36,6 +40,12 @@ extension Repository {
         return git_try("git_remote_rename") {
             git_remote_rename(&strarray, self.pointer, old, new)
         } | { strarray.map { $0 } }
+    }
+    
+    func set(remote: String, url: String) -> R<Void> {
+        git_try("git_remote_set_url") {
+            git_remote_set_url(self.pointer, remote, url)
+        }
     }
 }
 
