@@ -18,7 +18,7 @@ public struct RepoID : Hashable {
     
     public var module          : R<GitModule>         { Repository.module(at: url) }
     public var exists          : Bool              { Repository.exists(at: path)                     }
-    public var repo            : R<Repository>     { Repository.at(url: self.path.asURL())           }
+    public var repo            : R<Repository>     { Repository.at(url: self.path.asURL(), fixDetachedHead: false)           }
 }
 
 extension RepoID : CustomStringConvertible {

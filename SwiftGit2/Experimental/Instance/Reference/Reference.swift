@@ -108,6 +108,13 @@ fileprivate extension Repository {
     }
 }
 
+public extension Reference {
+    func with(_ repo: Repository) -> Duo<Reference, Repository> {
+        return Duo(self, repo)
+    }
+}
+
+
 public extension Duo where T1 == Reference, T2 == Repository {
     func targetOID() -> R<OID> {
         let (ref, repo) = value

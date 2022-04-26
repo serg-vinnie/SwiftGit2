@@ -15,6 +15,11 @@ struct GitTest {
     static let credentials_01 = Credentials.plaintext(username: "xr.satan@gmail.com", password: "y2XvsUpdAw7PC28")
 }
 
+extension URL {
+    static var testRepoSSH : URL { URL(string: "git@gitlab.com:sergiy.vynnychenko/test_public.git")! }
+    static var testRepoHTTPS : URL { URL(string: "https://gitlab.com/sergiy.vynnychenko/test_public.git")! }
+}
+
 struct PublicTestRepo {
     let urlSsh = URL(string: "git@gitlab.com:sergiy.vynnychenko/test_public.git")!
     let urlHttps = URL(string: "https://gitlab.com/sergiy.vynnychenko/test_public.git")!
