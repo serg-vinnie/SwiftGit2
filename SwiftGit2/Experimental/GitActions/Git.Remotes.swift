@@ -27,6 +27,13 @@ public struct GitRemotes {
     public var urls  : R<[String:String]> { list | { $0.toDictionary(key: \.name) { $0.url } } }
 }
 
+public extension GitRemotes {
+    func fetchAll(options: @escaping (String)->FetchOptions) -> R<()> {
+        (list | { $0 | { $0.fetch(options: options($0.url)) } })
+            .map { _ in () }
+    }
+}
+
 extension Repository {
     func deleteRemote(name: String) -> R<()> {
         git_try("git_remote_delete") {
