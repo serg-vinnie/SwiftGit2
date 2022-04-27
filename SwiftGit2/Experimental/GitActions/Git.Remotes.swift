@@ -29,7 +29,7 @@ public struct GitRemotes {
 
 public extension GitRemotes {
     func fetchAll(options: @escaping (String)->FetchOptions) -> R<()> {
-        (list | { $0 | { $0.fetch(options: options($0.url)) } })
+        (repoID.repo | { $0.remoteList() | { $0 | { $0.fetch(options: options($0.url)) } } } )
             .map { _ in () }
     }
 }
