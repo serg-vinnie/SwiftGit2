@@ -27,7 +27,7 @@ public extension Submodule {
     var path: String { String(cString: git_submodule_path(pointer)) }
 
     var absURL : R<URL> {
-        self.repo() | { $0.directoryURL | { $0.appendingPathComponent(self.path) } }
+        self.repo() | { $0.directoryURL }
     }
     /// Url to remote repo (https or ssh)
     var url: String { String(cString: git_submodule_url(pointer)) }
