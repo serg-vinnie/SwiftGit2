@@ -11,10 +11,6 @@ public struct GitBranches {
     public let repoID : RepoID
     public init(repoID : RepoID) { self.repoID = repoID }
     
-    func createBranch(from target: BranchTarget, name: String, checkout: Bool) -> R<Reference> {
-        repoID.repo | { $0.createBranch(from: target, name: name, checkout: checkout) }       
-    }
-
 }
 
 public extension Repository {
