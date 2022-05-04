@@ -55,11 +55,7 @@ extension Repository: CustomDebugStringConvertible {
 
 
 
-public enum BranchBase { 
-    case head
-    case commit(Commit)
-    case branch(Branch)
-}
+
 
 public extension Repository {
     func createReference(name: String, oid: OID, force: Bool, reflog: String)-> R<Reference> {
@@ -81,18 +77,7 @@ public extension Repository {
 //        }
 //    }
     
-    func createBranch(from target: BranchTarget, name: String, checkout: Bool) -> Result<Reference, Error> {
-        let repo = self
-        
-        return target.oid(in: self)
-            .flatMap { repo.commit(oid: $0) }
-            .flatMap { commit in repo.createBranch(from: commit, name: name, checkout: checkout) }
-    }
-    
-    func branchLookup(name: String) -> R<Branch>{
-        reference(name: name)
-            .flatMap{ $0.asBranch() }
-    }
+
     
     
     /// Looks like works with advanced tags only
@@ -119,16 +104,7 @@ public extension Repository {
 //        .map { Commit(resPointer!) }
 //    }
     
-    internal func createBranch(from commit: Commit, name: String, checkout: Bool, force: Bool = false) -> Result<Reference, Error> {
-        var pointer: OpaquePointer?
-        
-        return git_try("git_branch_create") {
-            git_branch_create(&pointer, self.pointer, name, commit.pointer, force ? 0 : 1)
-        }
-        .map { Reference(pointer!) }
-        .if ( checkout,
-              then: { self.checkout(reference: $0, strategy: .Safe, pathspec: []) })
-    }
+
     
     func createTag(from commitOid: OID, tag: String, message: String, signature: Signature) -> Result<OID, Error> {
         var oid = git_oid()
