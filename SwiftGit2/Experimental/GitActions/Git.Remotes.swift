@@ -22,6 +22,17 @@ public struct GitRemotes {
         repoID.repo | { $0.set(remote: remote, url: url) }
     }
     
+    public func remoteOf(reference: String) -> R<Remote> {
+        guard reference.starts(with: "/refs/remotes/") else {
+            return .wtf("remoteOf(reference: should be remote")
+        }
+        if let remoteName = reference.replace(of: "/refs/remotes/", to: "").split(separator: "/").first {
+            return repoID.repo | { $0.remote(name: String(remoteName)) }
+        }
+        
+        return .wtf("remoteOf(reference: IMPOSIBRU")
+    }
+    
     public var list  : R<[Remote]> { repoID.repo | { $0.remoteList()     } }
     public var names : R<[String]> { repoID.repo | { $0.remoteNameList() } }
     public var urls  : R<[String:String]> { list | { $0.toDictionary(key: \.name) { $0.url } } }
