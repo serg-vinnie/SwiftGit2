@@ -23,10 +23,10 @@ public struct GitRemotes {
     }
     
     public func remoteOf(reference: String) -> R<Remote> {
-        guard reference.starts(with: "/refs/remotes/") else {
+        guard reference.starts(with: "refs/remotes/") else {
             return .wtf("remoteOf(reference: should be remote")
         }
-        if let remoteName = reference.replace(of: "/refs/remotes/", to: "").split(separator: "/").first {
+        if let remoteName = reference.replace(of: "refs/remotes/", to: "").split(separator: "/").first {
             return repoID.repo | { $0.remote(name: String(remoteName)) }
         }
         
