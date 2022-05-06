@@ -26,7 +26,6 @@
 		1DA3413D26B964FC0097E488 /* RevFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA3413C26B964FC0097E488 /* RevFile.swift */; };
 		1DB0F84E24EFFB2D00637B9B /* Repository+Checkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB0F84D24EFFB2D00637B9B /* Repository+Checkout.swift */; };
 		1DB4D5DD28241A0A0080BB6B /* BranchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB4D5DC28241A0A0080BB6B /* BranchTests.swift */; };
-		1DB4D5DF28241AD40080BB6B /* BranchID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB4D5DE28241AD40080BB6B /* BranchID.swift */; };
 		1DC8A54327E1247600860A0F /* Git.Conflicts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC8A54227E1247600860A0F /* Git.Conflicts.swift */; };
 		1DD99229276A24540088848F /* StatusDiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD99228276A24530088848F /* StatusDiffTests.swift */; };
 		1DDFC0FB261B4DBD00EBBDE9 /* RevisionWalker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDFC0FA261B4DBD00EBBDE9 /* RevisionWalker.swift */; };
@@ -867,7 +866,6 @@
 				E63EDF6E265BC30800A3D048 /* GitTest.swift in Sources */,
 				E6AA18FB27AF825C002AFC33 /* ModuleTests.swift in Sources */,
 				E66360E127BF1403001292FB /* RepCoreTests.swift in Sources */,
-				1DB4D5DF28241AD40080BB6B /* BranchID.swift in Sources */,
 				E63EDF6C265BC0F200A3D048 /* MergeAnalysisTests.swift in Sources */,
 				1D5E1F422742A34D00498539 /* StatusEntryTests.swift in Sources */,
 				E63EDF70265BF7FD00A3D048 /* Repository+Test.swift in Sources */,

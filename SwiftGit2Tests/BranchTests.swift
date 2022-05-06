@@ -24,14 +24,15 @@ class BranchTests: XCTestCase {
         let folder = root.sub(folder: "createBranch").cleared().shouldSucceed()!
         let src = folder.with(repo: "createBr", content: .commit(.fileA, .random, "Commit 1")).shouldSucceed()!
         
-        let repoID = RepoID(url: root.url.appendingPathComponent("createBr") )
+        let repoID = RepoID(url: folder.url.appendingPathComponent("createBr") )
         
         src.repo
             .flatMap {  $0.createBranch(from: .HEAD, name: "anotherBr", checkout: false) }
             .shouldSucceed()
         
-        let br = try! src.repo.flatMap{ $0.branchLookup(name: "refs/heads/anotherBr") }.get()
-        let brId = br.asBranchId(repoID: repoID)
+        /////// Checkout "anotherBr"
+        
+        let brId = BranchID(repoID: repoID, ref: "refs/heads/anotherBr")
         
         brId.checkout().shouldSucceed()
         
@@ -40,10 +41,9 @@ class BranchTests: XCTestCase {
             .map { $0.nameAsReference }
             .assertEqual(to: "refs/heads/anotherBr")
         
-        //////////////// Checkout Main
+        //////////////// Checkout "main"
         
-        let br2 = try! src.repo.flatMap{ $0.branchLookup(name: "refs/heads/main") }.get()
-        let brId2 = br.asBranchId(repoID: repoID)
+        let brId2 = BranchID(repoID: repoID, ref: "refs/heads/main")
         
         brId2.checkout().shouldSucceed()
         
