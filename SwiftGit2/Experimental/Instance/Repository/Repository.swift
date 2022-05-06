@@ -316,7 +316,7 @@ public extension Repository {
     
     func headName() -> R<String> {
         if repoIsBare || headIsUnborn {
-            return .success("master")
+            return .success("main")
         }
         
         if headIsDetached {
