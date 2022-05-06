@@ -19,6 +19,12 @@ public struct BranchID {
     }
 }
 
+extension BranchID: Identifiable {
+    public var id: String {
+        self.reference
+    }
+}
+
 public extension BranchID {
     var shortNameUnified: String { reference.replace(of: "refs/heads/", to: "") } 
 }
