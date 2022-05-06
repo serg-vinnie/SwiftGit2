@@ -10,7 +10,7 @@ import Foundation
 import Essentials
 
 public struct BranchID {
-    let repoID : RepoID
+    public let repoID : RepoID
     public let upstreamName: String
     
     private let branch: Branch
@@ -24,36 +24,68 @@ public struct BranchID {
     public var localCommitOid: OID? { try? branch.targetOID.get() }
     
     public var shortNameUnified: String { branch.shortNameUnified }
-    public var shortNameUnifiedFromUpstream: String? {
-        if isLocalOnly { return nil }
-        
-        var components = upstreamName.components(separatedBy: "/")
-        
-        components.remove(atOffsets: [0,1,2] )
-        
-        return components.joined(separator: "/")
-    }
+
     
-    init(repoID: RepoID, local branch: Branch, upstreamName: String = "") {
+    public init(repoID: RepoID, local branch: Branch, upstreamName: String = "") {
         self.repoID = repoID
         self.branch = branch
         self.upstreamName = upstreamName
     }
     
-    init(repoID: RepoID, remote branch: Branch) {
+    public init(repoID: RepoID, remote branch: Branch) {
         self.repoID = repoID
         self.branch = branch
         self.upstreamName = branch.nameAsReference
     }
 }
 
-extension Branch {
+public extension Branch {
     func asBranchId(repoID: RepoID) -> BranchID {
         return BranchID(repoID: repoID, local: self)
     }
+    
+    var shortNameUnified: String {
+        if let name = nameAsBranch {
+            if name.contains("/"){
+                return name.split(separator: "/")
+                    .dropFirst()
+                    .joined(separator: "/")
+            }
+            
+            return name
+        } else {
+            let newName = nameAsReference
+                .split(separator: "/")
+                .dropFirst(2)
+                .joined(separator: "/")
+            
+            return newName
+        }
+    }
+    
+    func checkBranchType() -> BranchID.BranchType {
+        var isRemote = self.isRemote
+        let isLocal = self.isBranch
+        
+        // TODO: Hack
+        // and this hack works only on local branches
+        if isLocal && !isRemote {
+            if let _ = self.upstreamName().maybeSuccess {
+                isRemote = true
+            }
+        }
+        
+        if isLocal && isRemote {
+            return .localAndRemote
+        } else if isLocal {
+            return .local
+        }
+        
+        return .remote
+    }
 }
 
-extension BranchID {
+public extension BranchID {
     enum BranchType: Comparable  {
         case local
         case remote
@@ -83,7 +115,7 @@ extension BranchID {
     }
 }
 
-extension BranchID {
+public extension BranchID {
     var isLocal: Bool { return type == .local || type == .localAndRemote }
     var isLocalOnly: Bool { return type == .local }
     
@@ -139,11 +171,7 @@ extension BranchID {
     }
 }
 
-extension BranchID {
-    var isHead : Bool { repoID.verify(default: false) { repoID.repo | { $0.HEAD() | { $0.nameAsReference == self.reference } } } }
-}
-
-extension BranchID {
+public extension BranchID {
     func checkout(strategy: CheckoutStrategy = .Force, progress: CheckoutProgressBlock? = nil)  -> Result<Void, Error>  {
         let brId = self
         

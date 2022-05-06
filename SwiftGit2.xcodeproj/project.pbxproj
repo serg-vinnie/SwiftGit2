@@ -20,6 +20,7 @@
 		1D5E1F492742CEF000498539 /* Repository+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F482742CEF000498539 /* Repository+Entries.swift */; };
 		1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6EFB29252BA5A1000D0BE1 /* Tree.swift */; };
 		1D764BD8252CD148008417A7 /* Submodule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D764BD7252CD148008417A7 /* Submodule.swift */; };
+		1D7BEE7A28253D8400EC4C6F /* BranchID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB4D5DE28241AD40080BB6B /* BranchID.swift */; };
 		1D991AE12518FA7900335255 /* Duo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D991AE02518FA7900335255 /* Duo.swift */; };
 		1D991AE3251934FF00335255 /* Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D991AE2251934FF00335255 /* Remote.swift */; };
 		1DA3413D26B964FC0097E488 /* RevFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA3413C26B964FC0097E488 /* RevFile.swift */; };
@@ -787,6 +788,7 @@
 				E63EDF7E265FF5A300A3D048 /* UrlSshHttp.swift in Sources */,
 				E6332CDD264E80FD004990E7 /* DiffOptions.swift in Sources */,
 				E63EDF8226617ADA00A3D048 /* Repository+Fetch.swift in Sources */,
+				1D7BEE7A28253D8400EC4C6F /* BranchID.swift in Sources */,
 				1D4C9B5426AD79C600ADBBDE /* Repository+Blob.swift in Sources */,
 				E63EDF76265D255500A3D048 /* Repository+HEAD.swift in Sources */,
 				BE276B291ACCD3CF00D6DAD7 /* CheckoutStrategy.swift in Sources */,
