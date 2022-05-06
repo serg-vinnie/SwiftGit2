@@ -13,12 +13,12 @@ extension Repository {
    public func entries(target: CommitTarget, statusOptions: StatusOptions = StatusOptions(), findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<Entries> {
        return self.statusConflictSafe(options: statusOptions)
            .flatMap { status -> R<Entries> in
-               if self.headIsUnborn {
-                   return .success(.headIsUnborn)
-               }
-               
                if status.isEmpty == false {
                    return .success(.status(status))
+               }
+               
+               if self.headIsUnborn {
+                   return .success(.headIsUnborn)
                }
                
                // self.headIsUnborn == false
