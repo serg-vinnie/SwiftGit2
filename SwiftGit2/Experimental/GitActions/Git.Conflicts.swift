@@ -46,7 +46,7 @@ public struct GitConflicts {
                 return resolveConflictAsTheirFile(path: path)
             }
             
-            // resolve submodule .their
+            // type == .their for submodule
             return resolveConflictAsTheirSubmodule(path: path)
         }
     }
