@@ -36,6 +36,7 @@ public struct GitRemotes {
     public var list  : R<[Remote]> { repoID.repo | { $0.remoteList()     } }
     public var names : R<[String]> { repoID.repo | { $0.remoteNameList() } }
     public var urls  : R<[String:String]> { list | { $0.toDictionary(key: \.name) { $0.url } } }
+    public var count : R<Int> { names | { $0.count }}
 }
 
 public extension GitRemotes {
