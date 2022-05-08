@@ -121,7 +121,7 @@ fileprivate extension GitConflicts {
             | { _ in .success(()) }
     }
     
-    func resolveConflictAsTheirSubmodule(path: String) -> R<()> {
+    func resolveConflictAsTheirSubmoduleOLD(path: String) -> R<()> {
         let repo = repoID.repo
         var index = repo | { $0.index() }
         
@@ -148,7 +148,7 @@ fileprivate extension GitConflicts {
         
         return combine(submoduleRepo, submoduleCommit)
             .flatMap { subModRepo, commit in
-                subModRepo.checkout(commit: commit, strategy: [.Force], progress: nil, pathspec: [])
+                subModRepo.checkout(commit: commit, strategy: [.Force], progress: nil, pathspec: [path])
             }
             .flatMap{ _ in repo }
             .flatMap{ $0.status() }
@@ -156,6 +156,43 @@ fileprivate extension GitConflicts {
             .flatMap{ entries in
                 entries.flatMap { entry in repo.map{ $0.unStage(.entry(entry)) } }
             }
+            .flatMap{ _ in .success(())}
+    }
+    
+    func resolveConflictAsTheirSubmodule(path: String) -> R<()> {
+        let repo = repoID.repo
+        var index = repo | { $0.index() }
+        
+        let submodCommitOid = repoID.repo
+            .map { OidRevFile(repo: $0, type: .MergeHead)?.contentAsOids ?? [] }
+            .flatMap { $0.first.asNonOptional }
+        
+        // Видаляємо конфлікт
+        index = index | { $0.conflictRemove(relPath: path) }
+        
+        let submoduleRepo = repoID.module
+            .map{ $0.subModules }
+            .map{ $0.filter{ $0.key == path } }
+            .map{ $0.first! }
+            .map{ $0.value! }
+            .map{ $0.repoID.url.deletingLastPathComponent() }
+            .flatMap{ Repository.at(url: $0) }
+        
+        let submoduleCommit = combine(submoduleRepo, submodCommitOid)
+            .flatMap { submoduleRepo, submodCommitOid in
+                submoduleRepo.commit(oid: submodCommitOid)
+            }
+        
+        return combine(submoduleRepo, submoduleCommit)
+            .flatMap { subModRepo, commit in
+                subModRepo.index().flatMap{ $0.addBy(relPath: path) }
+            }
+//            .flatMap{ _ in repo }
+//            .flatMap{ $0.status() }
+//            .map{ $0.filter { $0.stagePath == path } }
+//            .flatMap{ entries in
+//                entries.flatMap { entry in repo.map{ $0.unStage(.entry(entry)) } }
+//            }
             .flatMap{ _ in .success(())}
     }
 }

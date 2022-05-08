@@ -97,7 +97,7 @@ public extension Repository {
 //    func commitLookup(oid: OID) -> R<Commit?> {
 //        var oidInternal = oid.oid
 //        var resPointer: OpaquePointer?
-//
+//        
 //        return git_try("git_commit_lookup") {
 //            git_commit_lookup(&resPointer, self.pointer, &oidInternal)
 //        }
