@@ -40,7 +40,7 @@ public struct GitConflicts {
         case .markAsResolved:
             return resolveConflictMarkResolved(path: path)
         case .our:
-            return resolveConflictAsOur(path: path)
+            return resolveConflictAsOur(path: path, type: type)
         case .their:
             if type == .file {
                 return resolveConflictAsTheirFile(path: path)
@@ -69,11 +69,25 @@ fileprivate extension GitConflicts {
             | { _ in () }
     }
     
-    func resolveConflictAsOur(path: String) -> R<()> {
-        return repoID.repo
-            | { $0.index() }
-            | { $0.conflictRemove(relPath: path) }
-            | { _ in GitDiscard(repoID: repoID).path(path) }
+    func resolveConflictAsOur(path: String, type: ConflictType) -> R<()> {
+        let conflictRemoveR =
+            repoID.repo
+                | { $0.index() }
+                | { $0.conflictRemove(relPath: path) }
+        
+        switch type {
+        case .file:
+             return conflictRemoveR
+                | { _ in GitDiscard(repoID: repoID).path(path) }
+            
+        case .submodule:
+            return conflictRemoveR
+            .flatMap { _ in repoID.repo }
+            .flatMap { repo in
+                repo.index().flatMap{ $0.addBy(relPath: path) }
+            }
+            .map{ _ in () }
+        }
     }
     
     func resolveConflictAsTheirFile(path: String) -> R<()> {
