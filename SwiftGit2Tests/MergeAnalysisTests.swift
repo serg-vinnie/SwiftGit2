@@ -222,6 +222,11 @@ class MergeAnalysisTests: XCTestCase {
                 .flatMap { $0.status() }
                 .map { $0.count == 0 }
                 .assertEqual(to: true , "After --resolve as OUR-- must be 0 file with changes")
+            
+            // sub_repo exists!
+            Repository.at(url: folder.url.appendingPathComponent("dst/sub_repo") )
+                .shouldSucceed()
+            
         case .their:
             // TODO:
             // Maybe we need to get oidStr from commit by some way? For comparation
@@ -232,6 +237,9 @@ class MergeAnalysisTests: XCTestCase {
                 .map { $0.count == 1 }
                 .assertEqual(to: true , "After --resolve as THEIR-- must be 1 file with changes")
             
+            // sub_repo exists!
+            Repository.at(url: folder.url.appendingPathComponent("dst/sub_repo") )
+                .shouldSucceed()
         case .markAsResolved:
             //Nothing to do
             break

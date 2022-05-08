@@ -45,6 +45,8 @@ public struct GitConflicts {
             if type == .file {
                 return resolveConflictAsTheirFile(path: path)
             }
+            
+            // resolve submodule .their
             return resolveConflictAsTheirSubmodule(path: path)
         }
     }
@@ -68,9 +70,7 @@ fileprivate extension GitConflicts {
     }
     
     func resolveConflictAsOur(path: String) -> R<()> {
-        let repo = repoID.repo
-        
-        return repo
+        return repoID.repo
             | { $0.index() }
             | { $0.conflictRemove(relPath: path) }
             | { _ in GitDiscard(repoID: repoID).path(path) }
