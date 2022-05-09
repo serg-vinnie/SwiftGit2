@@ -38,6 +38,13 @@ extension Repository {
     func discard(entry: StatusEntry) -> R<Void> {
         let paths = entry.allPaths.compactMap{ $0 }.distinct()
         
+        if self.headIsUnborn {
+            return self.unStage(.entry(entry))
+                .flatMap { _ in directoryURL }
+                .map{ $0.appendingPathComponent(entry.stagePath).path }
+                .map { FS.delete($0, silent: false) }
+        }
+        
         switch entry.status {
         case .current: return .success(())
         case .ignored: return .failure(WTF("Repository.discard doesn't support ignored status"))
