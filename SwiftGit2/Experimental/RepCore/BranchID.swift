@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftGit2
 import Essentials
 
 public struct BranchID {
@@ -26,7 +27,23 @@ extension BranchID: Identifiable {
 }
 
 public extension BranchID {
-    var shortNameUnified: String { reference.replace(of: "refs/heads/", to: "") } 
+    var shortNameUnified: String {
+        reference.hasSuffix("refs/heads/") ? shortNameUnifiedFromLocal : shortNameUnifiedFromUpstream
+    }
+}
+
+private extension BranchID {
+    
+    var shortNameUnifiedFromLocal: String {
+        reference.replace(of: "refs/heads/", to: "")
+    }
+    
+    var shortNameUnifiedFromUpstream: String {
+        return reference
+                .components(separatedBy: "/")
+                .dropFirst(3)
+                .joined(separator: "/")
+    }
 }
 
 
