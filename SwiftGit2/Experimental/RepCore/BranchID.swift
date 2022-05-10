@@ -21,16 +21,14 @@ public struct BranchID {
 }
 
 public extension BranchID {
-    var isLocal: Bool { reference.hasSuffix("refs/heads") }
+    var isLocal: Bool { reference.starts(with: "refs/heads") }
     
     var shortNameUnified: String {
         let partsToSkip = isLocal ? 2 : 3
         
-        let tmp = reference.components(separatedBy: "/")
+        return reference.components(separatedBy: "/")
             .dropFirst(partsToSkip)
             .joined(separator: "/")
-        
-        return tmp
     }
 }
 
