@@ -28,8 +28,10 @@ extension BranchID: Identifiable {
 
 public extension BranchID {
     var shortNameUnified: String {
-        reference.hasSuffix("refs/heads/") ? shortNameUnifiedFromLocal : shortNameUnifiedFromUpstream
+        isLocal ? shortNameUnifiedFromLocal : shortNameUnifiedFromUpstream
     }
+    
+    var isLocal: Bool { reference.hasSuffix("refs/heads/") }
 }
 
 private extension BranchID {
