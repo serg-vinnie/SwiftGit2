@@ -20,34 +20,19 @@ public struct BranchID {
     }
 }
 
-extension BranchID: Identifiable {
-    public var id: String {
-        self.reference
-    }
-}
-
 public extension BranchID {
+    var isLocal: Bool { reference.hasSuffix("refs/heads") }
+    
     var shortNameUnified: String {
-        isLocal ? shortNameUnifiedFromLocal : shortNameUnifiedFromUpstream
-    }
-    
-    var isLocal: Bool { reference.hasSuffix("refs/heads/") }
-}
-
-private extension BranchID {
-    
-    var shortNameUnifiedFromLocal: String {
-        reference.replace(of: "refs/heads/", to: "")
-    }
-    
-    var shortNameUnifiedFromUpstream: String {
-        return reference
-                .components(separatedBy: "/")
-                .dropFirst(3)
-                .joined(separator: "/")
+        let partsToSkip = isLocal ? 2 : 3
+        
+        let tmp = reference.components(separatedBy: "/")
+            .dropFirst(partsToSkip)
+            .joined(separator: "/")
+        
+        return tmp
     }
 }
-
 
 //public extension BranchID {
 //    public var reference : String { branch.nameAsReference }
@@ -134,5 +119,15 @@ public extension BranchID {
                     .branchLookup(name: brId.reference)
                     .flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress) }
             }
+    }
+}
+
+//////////////////////////////////////
+// HELPERS
+//////////////////////////////////////
+
+extension BranchID: Identifiable {
+    public var id: String {
+        self.reference
     }
 }
