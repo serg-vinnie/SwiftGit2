@@ -51,7 +51,9 @@ public extension Reference {
     }
     
     @available(*, deprecated, message: "prefered to use Duo<Reference,Repository> instead if possible")
-    var targetOID: Result<OID, Error> {
+    var targetOID: Result<OID, Error> { targetOIDNoWarning }
+    
+    var targetOIDNoWarning: Result<OID, Error> {
         if isSymbolic {
 //            var resolved: OpaquePointer?
 //            defer {
@@ -122,7 +124,7 @@ public extension Duo where T1 == Reference, T2 == Repository {
         if ref.isSymbolic {
             return repo.referenceTarget(name: ref.nameAsReferenceSymbolic)
         } else {
-            return ref.targetOID
+            return ref.targetOIDNoWarning
         }
     }
     

@@ -43,7 +43,7 @@ public extension Reference {
     private func rename(_ newName: String, force: Bool = false) -> Result<Reference, Error> {
         var pointer: OpaquePointer?
 
-        return targetOID.flatMap { oid in
+        return targetOIDNoWarning.flatMap { oid in
             let logMsg = "Reference.rename: [OID: \(oid)] \(self.nameAsReference) -> \(newName)"
 
             return git_try("git_reference_rename") {

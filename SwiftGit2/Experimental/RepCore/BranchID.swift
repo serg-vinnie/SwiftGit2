@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SwiftGit2
 import Essentials
 
 public struct BranchID {
