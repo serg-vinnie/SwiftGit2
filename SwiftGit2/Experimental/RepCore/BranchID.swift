@@ -21,6 +21,7 @@ public struct BranchID {
 
 public extension BranchID {
     var isLocal: Bool { reference.starts(with: "refs/heads") }
+    var isRemote: Bool { reference.starts(with: "refs/remotes/") }
     
     var shortNameUnified: String {
         let partsToSkip = isLocal ? 2 : 3
