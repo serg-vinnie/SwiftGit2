@@ -95,11 +95,11 @@ public extension Repository {
                 .flatMap { $0.flatMap { $0.asBranch() } }
         }
     }
-
+    
     /// Get upstream name by branchName
     func upstreamName(branchName: String) -> Result<String, Error> {
         var buf = git_buf(ptr: nil, asize: 0, size: 0)
-
+        
         return _result({ Buffer(buf: buf) }, pointOfFailure: "") {
             branchName.withCString { refname in
                 git_branch_upstream_name(&buf, self.pointer, refname)
@@ -112,7 +112,7 @@ public extension Repository {
 private extension Branch {
     private var branchName: Result<String, Error> {
         var pointer: UnsafePointer<Int8>? // Pointer to the abbreviated reference name. Owned by ref, do not free.
-
+        
         return git_try("git_branch_name") {
             git_branch_name(&pointer, self.pointer)
         }
