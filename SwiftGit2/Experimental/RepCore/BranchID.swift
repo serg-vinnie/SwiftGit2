@@ -117,6 +117,13 @@ public extension BranchID {
                     .flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress) }
             }
     }
+    
+    func branch() -> R<Branch> {
+        self.repoID.repo
+            .flatMap { repo in
+                repo.branchLookup(name: reference)
+            }
+    }
 }
 
 //////////////////////////////////////
