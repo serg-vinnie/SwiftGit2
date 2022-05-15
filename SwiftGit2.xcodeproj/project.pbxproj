@@ -20,7 +20,7 @@
 		1D5E1F492742CEF000498539 /* Repository+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F482742CEF000498539 /* Repository+Entries.swift */; };
 		1D6C643628319C41003E9072 /* GitStash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C643528319C41003E9072 /* GitStash.swift */; };
 		1D6C643828319D8F003E9072 /* GitStash+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C643728319D8F003E9072 /* GitStash+Test.swift */; };
-		1D6C643A28319FE2003E9072 /* Stash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C643928319FE1003E9072 /* Stash.swift */; };
+		1D6C643B2831B38F003E9072 /* Stash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C643928319FE1003E9072 /* Stash.swift */; };
 		1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6EFB29252BA5A1000D0BE1 /* Tree.swift */; };
 		1D764BD8252CD148008417A7 /* Submodule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D764BD7252CD148008417A7 /* Submodule.swift */; };
 		1D7BEE7A28253D8400EC4C6F /* BranchID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB4D5DE28241AD40080BB6B /* BranchID.swift */; };
@@ -841,6 +841,7 @@
 				BE7A753F1A4A2BCC002DA7E3 /* Pointers.swift in Sources */,
 				E6D4A92224DF1B4300E8041E /* Object.swift in Sources */,
 				1DDFC0FB261B4DBD00EBBDE9 /* RevisionWalker.swift in Sources */,
+				1D6C643B2831B38F003E9072 /* Stash.swift in Sources */,
 				E6332B9126496F95004990E7 /* SubmoduleUpdateOptions.swift in Sources */,
 				E6AF629226939D65007D0585 /* RemoteTarget.swift in Sources */,
 				E653907A23E7328200C08416 /* Diff+Delta.swift in Sources */,
@@ -874,7 +875,6 @@
 				E6E99235268BBF5E00F8E8BD /* RevwalkTests.swift in Sources */,
 				E6332DCF265167F0004990E7 /* RepositoryRemoteTests.swift in Sources */,
 				E63EDF74265C0A6B00A3D048 /* RepositoryLocalTests.swift in Sources */,
-				1D6C643A28319FE2003E9072 /* Stash.swift in Sources */,
 				E63EDF6E265BC30800A3D048 /* GitTest.swift in Sources */,
 				E6AA18FB27AF825C002AFC33 /* ModuleTests.swift in Sources */,
 				E66360E127BF1403001292FB /* RepCoreTests.swift in Sources */,

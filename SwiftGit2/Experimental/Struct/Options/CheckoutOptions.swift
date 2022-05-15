@@ -45,6 +45,6 @@ extension CheckoutOptions {
 private func checkoutProgressCallback(path: UnsafePointer<Int8>?, completedSteps: Int, totalSteps: Int, payload: UnsafeMutableRawPointer?) {
     guard let payload = payload else { return }
     guard let checkoutProgress = CheckoutOptions.unretained(pointer: payload).checkoutProgressCB else { return }
-
+    
     checkoutProgress(path.flatMap(String.init(validatingUTF8:)), completedSteps, totalSteps)
 }
