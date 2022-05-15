@@ -1,4 +1,5 @@
 import Foundation
+import Essentials
 
 public struct GitStash {
     public let repoID: RepoID
@@ -11,11 +12,9 @@ public struct GitStash {
         
     }
     
-    func items() -> [Int] {
-        
-        
-        
-        return []
+    func items() -> R<[Stash]> {
+        return repoID.repo
+            .flatMap { $0.stashForeach() }
     }
     
     func remove() {

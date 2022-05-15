@@ -13,7 +13,7 @@ class GitStashTests: XCTestCase {
         
         let gitStash = GitStash(repoID: repoID)
         
-        let items = gitStash.items()
+        let items = gitStash.items().shouldSucceed()!
         
         XCTAssertEqual(items.count, 0)
     }

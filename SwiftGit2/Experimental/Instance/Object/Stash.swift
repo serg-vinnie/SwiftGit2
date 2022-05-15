@@ -11,11 +11,11 @@ import Essentials
 import CoreMIDI
 
 public extension Repository {
-    func stashForeach() -> Result<[Stash], Error> {
-        let cb = StashCallbacks()
+    func stashForeach() -> R<[Stash]> {
+        var cb = StashCallbacks()
         
         return _result( { cb.stashes } , pointOfFailure: "git_stash_foreach") {
-            git_stash_foreach(self.pointer, cb.git_stash_cb, nil)
+            git_stash_foreach(self.pointer, cb.git_stash_cb, &cb)
         }
     }
 }
