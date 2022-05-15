@@ -11,8 +11,11 @@ public struct GitStash {
         
     }
     
-    func listStashes() {
+    func items() -> [Int] {
         
+        
+        
+        return []
     }
     
     func remove() {
