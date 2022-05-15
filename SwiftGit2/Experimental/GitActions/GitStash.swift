@@ -7,14 +7,13 @@ public struct GitStash {
         
     }
     
-    func apply() {
+    func load() {
         
     }
     
-    func all() {
+    func listStashes() {
         
     }
-    
     
     func remove() {
         //Drop
