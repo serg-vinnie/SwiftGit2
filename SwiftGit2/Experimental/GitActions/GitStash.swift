@@ -4,8 +4,9 @@ import Essentials
 public struct GitStash {
     public let repoID: RepoID
     
-    func save() {
-        
+    func save(signature: Signature, message: String, flags: StashFlags = .defaultt ) -> R<OID>  {
+        return repoID.repo
+            .flatMap { $0.stashSave(signature: signature, message: message, flags: flags) }
     }
     
     func load() {

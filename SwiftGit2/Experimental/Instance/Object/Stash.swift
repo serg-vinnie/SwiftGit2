@@ -19,7 +19,7 @@ public extension Repository {
         }
     }
     
-    func stashSave(signature: Signature, message: String, flags: StashFlags ) -> R<OID?> {
+    func stashSave(signature: Signature, message: String, flags: StashFlags ) -> R<OID> {
         var oid: git_oid = git_oid() // out
         
         return signature.make()
