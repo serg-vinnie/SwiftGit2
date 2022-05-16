@@ -22,13 +22,12 @@ class GitStashTests: XCTestCase {
         let repoID = RepoID(url: folder.url )
         let gitStash = GitStash(repoID: repoID)
         
-        
         createStash(folder: folder, gitStash: gitStash, expectedStashCount: 1)
         
         let stashItems = gitStash.items().shouldSucceed()!
         let stash = stashItems.first!
         
-        gitStash.load(stash)
+        gitStash.load(stash).shouldSucceed()!
         
         XCTAssertEqual(stashItems.count, 1)
         gitStash.repoID.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 2)

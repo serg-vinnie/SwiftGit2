@@ -34,14 +34,9 @@ public extension Repository {
     }
     
     func stashLoad(_ stash: Stash) -> R<()> {
-        return .success(())
-//        var optionsPointer: UnsafeMutablePointer<git_stash_apply_options>
-//
-//        git_stash_apply_options_init(optionsPointer, UInt32(GIT_STASH_APPLY_OPTIONS_VERSION))
-//
-//        return _result( { () } , pointOfFailure: "git_stash_apply") {
-//            git_stash_apply(self.pointer, stash.index, optionsPointer)
-//        }
+        return _result( { () } , pointOfFailure: "git_stash_apply") {
+            git_stash_apply(self.pointer, stash.index, nil)
+        }
     }
     
     func stashDrop(_ stash: Stash) -> R<()> {
@@ -61,18 +56,6 @@ public struct StashFlags: OptionSet {
     public static let keepIndex = StashFlags(rawValue: GIT_STASH_KEEP_INDEX.rawValue)
     public static let includeUntracked = StashFlags(rawValue: GIT_STASH_INCLUDE_UNTRACKED.rawValue)
     public static let includeIgnored = StashFlags(rawValue: GIT_STASH_INCLUDE_IGNORED.rawValue)
-}
-
-public class StashCallbacks_ {
-    
-    let git_stash_cb : git_stash_cb = { index, message, id, payload   in
-//        callbacks.unsafelyUnwrapped
-//            .bindMemory(to: StashCallbacks.self, capacity: 1)
-//            .pointee
-//            .file(delta: Diff.Delta(delta.unsafelyUnwrapped.pointee), progress: progress)
-        
-        return 0
-    }
 }
 
 public struct Stash {
