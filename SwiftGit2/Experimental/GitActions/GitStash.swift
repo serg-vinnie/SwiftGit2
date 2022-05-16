@@ -9,7 +9,7 @@ public struct GitStash {
             .flatMap { $0.stashSave(signature: signature, message: message, flags: flags) }
     }
     
-    func load() {
+    func load(_ stash: Stash) {
         
     }
     
@@ -18,7 +18,7 @@ public struct GitStash {
             .flatMap { $0.stashForeach() }
     }
     
-    func remove() {
+    func remove(_ stash: Stash) {
         //Drop
     }
 }
