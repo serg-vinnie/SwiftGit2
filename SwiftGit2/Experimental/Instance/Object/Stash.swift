@@ -32,6 +32,23 @@ public extension Repository {
             }
             .map { _ in OID(oid) }
     }
+    
+    func stashLoad(_ stash: Stash) -> R<()> {
+        return .success(())
+//        var optionsPointer: UnsafeMutablePointer<git_stash_apply_options>
+//
+//        git_stash_apply_options_init(optionsPointer, UInt32(GIT_STASH_APPLY_OPTIONS_VERSION))
+//
+//        return _result( { () } , pointOfFailure: "git_stash_apply") {
+//            git_stash_apply(self.pointer, stash.index, optionsPointer)
+//        }
+    }
+    
+    func stashDrop(_ stash: Stash) -> R<()> {
+        return _result( { () } , pointOfFailure: "git_stash_drop") {
+            git_stash_drop(self.pointer, stash.index)
+        }
+    }
 }
 
 public struct StashFlags: OptionSet {
@@ -60,11 +77,10 @@ public class StashCallbacks_ {
 
 public struct Stash {
     let message: String?
+    let index: Int
     let id: OID?
     var commitOIDofStash: OID? { id }
 }
-
-
 
 //////////////////////////////////
 ///HELPERS
@@ -84,7 +100,7 @@ public class StashCallbacks {
             { msg = String(cString:msgCCchar) }
             else { msg = nil }
         
-        let sth = Stash(message: msg, id: (id?.pointee)?.asOID() )
+        let sth = Stash(message: msg, index: index, id: (id?.pointee)?.asOID() )
         
         stashCallbacksInstance.stashes.append( sth )
         

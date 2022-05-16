@@ -10,7 +10,8 @@ public struct GitStash {
     }
     
     func load(_ stash: Stash) {
-        
+//        repoID.repo
+//            .flatMap { $0.stashLoad() }
     }
     
     func items() -> R<[Stash]> {
@@ -18,7 +19,8 @@ public struct GitStash {
             .flatMap { $0.stashForeach() }
     }
     
-    func remove(_ stash: Stash) {
-        //Drop
+    func remove(_ stash: Stash) -> R<()> {
+        return repoID.repo
+            .flatMap { $0.stashDrop(stash) }
     }
 }

@@ -42,10 +42,9 @@ class GitStashTests: XCTestCase {
         
         createStash(folder: folder, gitStash: gitStash, expectedStashCount: 1)
         
-        
         let firstStash = gitStash.items().shouldSucceed()!.first!
         
-        gitStash.remove(firstStash)
+        gitStash.remove(firstStash).shouldSucceed()!
         
         let items = gitStash.items().shouldSucceed()!
         
