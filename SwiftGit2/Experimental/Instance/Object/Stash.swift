@@ -18,10 +18,24 @@ public extension Repository {
             git_stash_foreach(self.pointer, cb.git_stash_cb, &cb)
         }
     }
+    
+    func stashSave(signature: Signature, message: String, flags: StashFlags ) -> R<OID?> {
+        var oid: git_oid = git_oid() // out
+        
+        return signature.make()
+            .flatMap { signat in
+                git_try("git_stash_save") {
+                    message.withCString { msg in
+                        git_stash_save(&oid, self.pointer, signat.pointer, msg, flags.rawValue)
+                    }
+                }
+            }
+            .map { _ in OID(oid) }
+    }
 }
 
 public struct StashFlags: OptionSet {
-    public let rawValue: UInt32
+    public var rawValue: UInt32
     public init(rawValue: UInt32){
         self.rawValue = rawValue
     }
