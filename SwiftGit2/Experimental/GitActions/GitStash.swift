@@ -8,7 +8,7 @@ public struct GitStash {
         self.repoID = repoID
     }
     
-    public func save(signature: Signature, message: String, flags: StashFlags = .defaultt ) -> R<OID>  {
+    public func save(signature: Signature, message: String?, flags: StashFlags = .defaultt ) -> R<OID>  {
         return repoID.repo
             .flatMap { $0.stashSave(signature: signature, message: message, flags: flags) }
     }

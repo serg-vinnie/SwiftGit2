@@ -19,15 +19,25 @@ public extension Repository {
         }
     }
     
-    func stashSave(signature: Signature, message: String, flags: StashFlags ) -> R<OID> {
+    func stashSave(signature: Signature, message: String?, flags: StashFlags ) -> R<OID> {
         var oid: git_oid = git_oid() // out
+        
+        if let message = message {
+            return signature.make()
+                .flatMap { signat in
+                    git_try("git_stash_save") {
+                        message.withCString { msg in
+                            git_stash_save(&oid, self.pointer, signat.pointer, msg, flags.rawValue)
+                        }
+                    }
+                }
+                .map { _ in OID(oid) }
+        }
         
         return signature.make()
             .flatMap { signat in
                 git_try("git_stash_save") {
-                    message.withCString { msg in
-                        git_stash_save(&oid, self.pointer, signat.pointer, msg, flags.rawValue)
-                    }
+                    git_stash_save(&oid, self.pointer, signat.pointer, nil, flags.rawValue)
                 }
             }
             .map { _ in OID(oid) }
@@ -59,10 +69,10 @@ public struct StashFlags: OptionSet {
 }
 
 public struct Stash {
-    let message: String?
-    let index: Int
-    let id: OID?
-    var commitOIDofStash: OID? { id }
+    public let message: String?
+    public let index: Int
+    public let id: OID?
+    public var commitOIDofStash: OID? { id }
 }
 
 //////////////////////////////////
