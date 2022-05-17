@@ -13,9 +13,9 @@ public struct GitStash {
             .flatMap { $0.stashSave(signature: signature, message: message, flags: flags) }
     }
     
-    public func load(_ stash: Stash) -> R<()> {
+    public func apply(_ stash: Stash) -> R<()> {
         repoID.repo
-            .flatMap { $0.stashLoad(stash) }
+            .flatMap { $0.stashApply(stash) }
     }
     
     public func items() -> R<[Stash]> {

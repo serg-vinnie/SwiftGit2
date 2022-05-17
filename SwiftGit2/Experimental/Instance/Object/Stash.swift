@@ -43,7 +43,7 @@ public extension Repository {
             .map { _ in OID(oid) }
     }
     
-    func stashLoad(_ stash: Stash) -> R<()> {
+    func stashApply(_ stash: Stash) -> R<()> {
         return _result( { () } , pointOfFailure: "git_stash_apply") {
             git_stash_apply(self.pointer, stash.index, nil)
         }
