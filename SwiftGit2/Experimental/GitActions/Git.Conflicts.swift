@@ -23,19 +23,21 @@ public enum ConflictType {
 public struct GitConflicts {
     public let repoID: RepoID
     public init(repoID: RepoID) { self.repoID = repoID }
-    
+}
+
+public extension GitConflicts {
 //    public func all() -> R<[Index.Conflict]> {
 //        repoID.repo.flatMap{ $0.index() }
 //            .flatMap{ $0.conflicts() }
 //    }
     
-    public func exist() -> R<Bool> {
+    func exist() -> R<Bool> {
         repoID.repo.flatMap { $0.index() }
             .flatMap{ $0.conflicts() }
             .map{ $0.count > 0}
     }
     
-    public func resolve(path: String, side: ConflictSide, type: ConflictType) -> R<()> {
+    func resolve(path: String, side: ConflictSide, type: ConflictType) -> R<()> {
         switch side {
         case .markAsResolved:
             return resolveConflictMarkResolved(path: path)

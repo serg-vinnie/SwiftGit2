@@ -4,12 +4,14 @@ import Essentials
 public struct GitDiscard {
     public let repoID : RepoID
     public init(repoID : RepoID) { self.repoID = repoID }
-    
-    public func entry( _ entry: StatusEntry) -> R<Void> {
+}
+
+public extension GitDiscard {
+    func entry( _ entry: StatusEntry) -> R<Void> {
         repoID.repo | { $0.discard(entry: entry) }
     }
     
-    public func path( _ path: String) -> R<Void> {
+    func path( _ path: String) -> R<Void> {
         repoID.repo | { repo in
             repo.status()
                 | { $0.first { $0.allPaths.contains(path) } }
@@ -18,7 +20,7 @@ public struct GitDiscard {
         }
     }
     
-    public func paths( _ path: [String]) -> R<Void> {
+    func paths( _ path: [String]) -> R<Void> {
         repoID.repo | { repo in
             repo.status()
                 .map { $0.filter { path.contains( $0.stagePath ) } }
@@ -27,7 +29,7 @@ public struct GitDiscard {
         }
     }
     
-    public func all() -> R<Void> {
+    func all() -> R<Void> {
         repoID.repo | { repo in
             repo.discardAll()
         }
