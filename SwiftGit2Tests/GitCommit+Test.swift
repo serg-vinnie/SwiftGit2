@@ -12,10 +12,16 @@ class GitCommitTests: XCTestCase {
         let repoID = RepoID(path: src.url.path )
         
         let commitToRevert = (src.repo | { $0.t_commit(file: .fileA, with: .content2, msg: "2") }).shouldSucceed()!
-        _ = (src.repo | { $0.t_commit(file: .fileA, with: .content3, msg: "3") }).shouldSucceed()!
         
         let gitCommit = GitCommit(repoID: repoID)
         
         gitCommit.revert(commit: commitToRevert).shouldSucceed()
+        
+        _ = (src.repo | { $0.t_add_all_and_commit(msg: "reverted to 1") }).shouldSucceed()!
+        
+        let currContent = File(url: src.url.appendingPathComponent("\(TestFile.fileA.rawValue)") ).getContent()
+        let contentMustBe = TestFileContent.content1.rawValue
+        
+        XCTAssertEqual(currContent, contentMustBe)
     }
 }
