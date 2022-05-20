@@ -12,5 +12,7 @@ public struct GitCommit {
 
 
 public extension GitCommit {
-    
+    func revert(commit: Commit) -> R<()> {
+        self.repoID.repo.flatMap{ $0.revert(commit: commit) }
+    }
 }

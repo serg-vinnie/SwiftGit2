@@ -364,6 +364,15 @@ public extension Repository {
     }
 }
 
+
+extension Repository {
+    func revert(commit: Commit) -> R<()>{
+        return git_try("git_revert") {
+            git_revert(self.pointer, commit.pointer, nil)
+        }
+    }
+}
+
 /////////////////
 ///HELPERS
 ///////////////////
