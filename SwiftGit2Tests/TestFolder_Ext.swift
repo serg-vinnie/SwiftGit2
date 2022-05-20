@@ -100,3 +100,38 @@ extension Result where Success == TestFolder, Failure == Error {
         self | { $0.with(submodule: submodule, content: content) }
     }
 }
+
+
+// UKS TEST_FOLDER EXT
+extension TestFolder {
+    var statusCount : R<Int> {
+        return repo.flatMap { $0.status() }.map{ $0.count }
+    }
+    
+    func urlOf(file: TestFile) -> URL {
+        return self.url.appendingPathComponent("\(file.rawValue)")
+    }
+    
+    func urlOf(fileName: String) -> URL {
+        return self.url.appendingPathComponent("\(fileName)")
+    }
+    
+    func addAllAndCommit(msg: String) -> R<Commit> {
+        return self.repo
+            .flatMap { $0.t_add_all_and_commit(msg: msg) }
+    }
+    
+    func commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {
+        return self.repo
+            .flatMap { $0.t_commit(file: file, with: content, msg: msg) }
+    }
+    
+    func fetchHead(options: FetchOptions) -> Result<Branch, Error> {
+        self.repo
+            .flatMap { $0.fetch(.HEAD, options: options) }
+    }
+    
+    var repoID: RepoID {
+        RepoID(url: self.url )
+    }
+}

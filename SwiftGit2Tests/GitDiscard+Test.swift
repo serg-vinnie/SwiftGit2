@@ -11,15 +11,13 @@ class GitDiscardTests: XCTestCase {
         
         let repoID = RepoID(url: src.url )
         
-        repoID.repo.flatMap { $0.status() }
-            .map{ $0.count }
+        src.statusCount
             .assertEqual(to: 1, "status count is correct")
         
         GitDiscard(repoID: repoID).path( TestFile.fileA.rawValue )
             .shouldSucceed()
         
-        repoID.repo.flatMap { $0.status() }
-            .map{ $0.count }
+        src.statusCount
             .assertEqual(to: 0, "status count is correct")
     }
     
@@ -37,11 +35,11 @@ class GitDiscardTests: XCTestCase {
         )
         .shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 2, "status count is correct")
+        src.statusCount.assertEqual(to: 2, "status count is correct")
         
         GitDiscard(repoID: repoID).path(TestFile.fileA.rawValue).shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 1, "status count is correct")
+        src.statusCount.assertEqual(to: 1, "status count is correct")
         
     }
     
@@ -57,11 +55,11 @@ class GitDiscardTests: XCTestCase {
         )
         .shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 3, "status count is correct")
+        src.statusCount.assertEqual(to: 3, "status count is correct")
         
         GitDiscard(repoID: repoID).all().shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 0, "status count is correct")
+        src.statusCount.assertEqual(to: 0, "status count is correct")
     }
     
     func test_shouldDicardAll_headIsBorn() {
@@ -75,11 +73,11 @@ class GitDiscardTests: XCTestCase {
         )
         .shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 2, "status count is correct")
+        src.statusCount.assertEqual(to: 2, "status count is correct")
         
         GitDiscard(repoID: repoID).all().shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 0, "status count is correct")
+        src.statusCount.assertEqual(to: 0, "status count is correct")
     }
     
     func test_discardByEntry_oneOfLot() {
@@ -93,14 +91,13 @@ class GitDiscardTests: XCTestCase {
         )
         .shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 3, "status count is correct")
-        
+        src.statusCount.assertEqual(to: 3, "status count is correct")
         
         let entry = src.repo.flatMap { $0.status() }.maybeSuccess!.first!
         
         GitDiscard(repoID: repoID).entry(entry).shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 2, "status count is correct")
+        src.statusCount.assertEqual(to: 2, "status count is correct")
     }
     
     func test_discardFew() {
@@ -114,10 +111,10 @@ class GitDiscardTests: XCTestCase {
         )
         .shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 3, "status count is correct")
+        src.statusCount.assertEqual(to: 3, "status count is correct")
         
         GitDiscard(repoID: repoID).paths([TestFile.fileA.rawValue, TestFile.fileB.rawValue ]).shouldSucceed()
         
-        src.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 1, "status count is correct")
+        src.statusCount.assertEqual(to: 1, "status count is correct")
     }
 }

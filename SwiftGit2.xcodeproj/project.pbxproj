@@ -115,7 +115,7 @@
 		E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */; };
 		E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */; };
 		E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */; };
-		E6F29F0027B58ADD00F473A1 /* TestFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder.swift */; };
+		E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */; };
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
 /* End PBXBuildFile section */
 
@@ -281,7 +281,7 @@
 		E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntry.swift; sourceTree = "<group>"; };
 		E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Discard.swift"; sourceTree = "<group>"; };
 		E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Unborn.swift; sourceTree = "<group>"; };
-		E6F29EFF27B58ADD00F473A1 /* TestFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder.swift; sourceTree = "<group>"; };
+		E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder_Ext.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -510,9 +510,9 @@
 		E6332DCD265167F0004990E7 /* SwiftGit2Tests */ = {
 			isa = PBXGroup;
 			children = (
+				E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */,
 				E67E84D627E5DAAF009E5B31 /* LogTests.swift */,
 				E66360E027BF1403001292FB /* RepCoreTests.swift */,
-				E6F29EFF27B58ADD00F473A1 /* TestFolder.swift */,
 				E6AA18FA27AF825C002AFC33 /* ModuleTests.swift */,
 				1DD99228276A24530088848F /* StatusDiffTests.swift */,
 				1D5E1F412742A34D00498539 /* StatusEntryTests.swift */,
@@ -874,7 +874,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1DD99229276A24540088848F /* StatusDiffTests.swift in Sources */,
-				E6F29F0027B58ADD00F473A1 /* TestFolder.swift in Sources */,
+				E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */,
 				1D2E4DEF27F9B07700A90463 /* GitDiscard+Test.swift in Sources */,
 				1D6C643828319D8F003E9072 /* GitStash+Test.swift in Sources */,
 				1DB4D5DD28241A0A0080BB6B /* BranchTests.swift in Sources */,

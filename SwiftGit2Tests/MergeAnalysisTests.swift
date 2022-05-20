@@ -13,14 +13,12 @@ class MergeAnalysisTests: XCTestCase {
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "Commit 1")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
-        (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "Commit 2") })
-            .shouldSucceed()
+        src.commit(file: .fileA, with: .random, msg: "Commit 2").shouldSucceed()
         
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: .upToDate)
         
-        (dst.repo | { $0.fetch(.HEAD, options: .local)})
-            .shouldSucceed()
+        dst.fetchHead(options: .local).shouldSucceed()
         
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: [.fastForward, .normal])
@@ -34,13 +32,10 @@ class MergeAnalysisTests: XCTestCase {
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
-        (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
-            .shouldSucceed()
-        (dst.repo | { $0.t_commit(file: .fileB, with: .random, msg: "File B") })
-            .shouldSucceed()
+        src.commit(file: .fileA, with: .random, msg: "File A").shouldSucceed()
+        dst.commit(file: .fileB, with: .random, msg: "File B").shouldSucceed()
         
-        (dst.repo | { $0.fetch(.HEAD, options: .local) })
-            .shouldSucceed()
+        dst.fetchHead(options: .local).shouldSucceed()
         
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: .normal)
@@ -54,13 +49,11 @@ class MergeAnalysisTests: XCTestCase {
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
-        (src.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
-            .shouldSucceed()
-        (dst.repo | { $0.t_commit(file: .fileA, with: .random, msg: "File A") })
-            .shouldSucceed()
+        src.commit(file: .fileA, with: .random, msg: "File A").shouldSucceed()
+        dst.commit(file: .fileA, with: .random, msg: "File A").shouldSucceed()
         
-        (dst.repo | { $0.fetch(.HEAD, options: .local) })
-            .shouldSucceed()
+        dst.fetchHead(options: .local).shouldSucceed()
+        
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: .normal)
         
@@ -89,17 +82,15 @@ class MergeAnalysisTests: XCTestCase {
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
-        (src.repo | { $0.t_commit(file: .fileA, with: .oneLine1, msg: "File A") })
-            .shouldSucceed()
-        (dst.repo | { $0.t_commit(file: .fileA, with: .oneLine2, msg: "File A") })
-            .shouldSucceed()
+        src.commit(file: .fileA, with: .oneLine1, msg: "File A").shouldSucceed()
+        dst.commit(file: .fileA, with: .oneLine2, msg: "File A").shouldSucceed()
                 
         (dst.repo | { $0.pull(.HEAD, options: .local) })
             .shouldSucceed()
         
         // -------------------------------------------------------------------
         
-        let repoID = RepoID(url: dst.url )
+        let repoID = dst.repoID
         
         GitConflicts(repoID: repoID)
             .exist()

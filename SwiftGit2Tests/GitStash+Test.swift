@@ -57,8 +57,10 @@ class GitStashTests: XCTestCase {
 ///////////////////////////////////
 
 fileprivate func createStash(folder: TestFolder, gitStash: GitStash, expectedStashCount: Int) {
-    try? File(url: folder.url.appendingPathComponent("file_1.txt")).setContent("file_1")
-    try? File(url: folder.url.appendingPathComponent("file_2.txt")).setContent("file_2")
+    
+    
+    try? File(url: folder.urlOf(fileName: "file_1.txt")).setContent("file_1")
+    try? File(url: folder.urlOf(fileName: "file_2.txt")).setContent("file_2")
     
     _ = gitStash.repoID.repo.map{ $0.stage(.all) }.shouldSucceed()!
     
