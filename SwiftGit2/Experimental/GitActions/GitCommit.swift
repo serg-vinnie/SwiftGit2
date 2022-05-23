@@ -18,4 +18,9 @@ public extension GitCommit {
                 self.repoID.repo.flatMap{ $0.revert(commit: commitFromRepo) }
             }
     }
+    
+    func cherryPick(commit: Commit) -> R<()> {
+        //https://libgit2.org/libgit2/#HEAD/group/cherrypick/git_cherrypick
+        return .success(())
+    }
 }
