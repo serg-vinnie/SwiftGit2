@@ -17,7 +17,11 @@ extension StatusEntryHunks {
     var all : [Diff.Hunk] {
         staged.appending(contentsOf: unstaged)
             .sorted{ $0.newStart < $1.newStart }
-   }
+    }
+    
+    public static func empty() -> StatusEntryHunks {
+        return StatusEntryHunks(staged: [], unstaged: [])
+    }
 }
 
 extension Diff.Hunk : CustomStringConvertible {
