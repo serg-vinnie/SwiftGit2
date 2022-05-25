@@ -75,6 +75,10 @@ public struct Stash {
     public var commitOIDofStash: OID? { id }
 }
 
+extension Stash: Identifiable { }
+
+extension Stash: Hashable { }
+
 //////////////////////////////////
 ///HELPERS
 ////////////////////////////////
