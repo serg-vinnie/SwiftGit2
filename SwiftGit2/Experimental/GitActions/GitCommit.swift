@@ -23,4 +23,14 @@ public extension GitCommit {
         //https://libgit2.org/libgit2/#HEAD/group/cherrypick/git_cherrypick
         return .success(())
     }
+    
+    func getLastCommitsDescrForUser(name: String, email: String, count: Int = 10) -> R<[String]> {
+        repoID.repo
+            .flatMap{ $0.commitsFromHead(num:300) }
+            .map {
+                $0.filter{ $0.commiter.name.asString() == name || $0.commiter.email.asString() == email }
+            }
+            .map{ $0.map{ $0.description } }
+            .map{ $0.first(count).map{ $0 } }
+    }
 }

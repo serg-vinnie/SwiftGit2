@@ -5,7 +5,7 @@ import Essentials
 public extension Repository {
     func HEAD() -> Result<Reference, Error> {
         var pointer: OpaquePointer?
-
+        
         return _result({ Reference(pointer!) }, pointOfFailure: "git_repository_head") {
             git_repository_head(&pointer, self.pointer)
         }
@@ -13,6 +13,21 @@ public extension Repository {
 
     var headIsUnborn: Bool { git_repository_head_unborn(pointer) == 1 }
     var headIsDetached: Bool { git_repository_head_detached(pointer) == 1 }
+    
+    func commitsFromHead(num: Int) -> R<[Commit]> {
+        self.commitsIn(range: "HEAD~\(num)..HEAD")
+            .flatMapError{_ in self.commitsFromHead() }
+    }
+    
+    func commitsIn(range: String) -> R<[Commit]> {
+        let oids = Revwalk.new(in: self) | { $0.push(range: range) } | { $0.all() }
+        return oids.flatMap { $0.flatMap { self.commit(oid: $0) } }
+    }
+    
+    func commitsFromHead() -> R<[Commit]> {
+        let oids = Revwalk.new(in: self) | { $0.pushHead() } | { $0.all() }
+        return oids.flatMap { $0.flatMap { self.commit(oid: $0) } }
+    }
 }
 
 public enum DetachedHeadFix {

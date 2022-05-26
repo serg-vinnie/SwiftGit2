@@ -26,10 +26,10 @@ extension Repository {
             .flatMap { commit in self.push(.HEAD, options: PushOptions(auth: .credentials(.sshDefault))).map{ commit } }
     }
 
-    func t_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {
+    func t_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> Result<Commit, Error> {
         t_write(file: file, with: content)
             .flatMap { file in self.addBy(path: file) }
-            .flatMap { _ in self.commit(message: msg, signature: GitTest.signature) }
+            .flatMap { _ in self.commit(message: msg, signature: signature) }
     }
     
     func t_add_all_and_commit(msg: String) -> Result<Commit, Error> {

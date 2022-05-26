@@ -121,9 +121,9 @@ extension TestFolder {
             .flatMap { $0.t_add_all_and_commit(msg: msg) }
     }
     
-    func commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {
+    func commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> Result<Commit, Error> {
         return self.repo
-            .flatMap { $0.t_commit(file: file, with: content, msg: msg) }
+            .flatMap { $0.t_commit(file: file, with: content, msg: msg, signature: signature) }
     }
     
     func fetchHead(options: FetchOptions) -> Result<Branch, Error> {
