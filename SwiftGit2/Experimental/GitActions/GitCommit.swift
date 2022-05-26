@@ -1,7 +1,6 @@
 import Foundation
 import Essentials
 
-
 public struct GitCommit {
     public let repoID: RepoID
     
@@ -9,7 +8,6 @@ public struct GitCommit {
         self.repoID = repoID
     }
 }
-
 
 public extension GitCommit {
     func revert(commit: Commit) -> R<()> {
@@ -31,6 +29,8 @@ public extension GitCommit {
                 $0.filter{ $0.commiter.name.asString() == name || $0.commiter.email.asString() == email }
             }
             .map{ $0.map{ $0.description } }
+            .map{ $0.distinct() }
             .map{ $0.first(count).map{ $0 } }
+            .map{ $0.reversed() }
     }
 }

@@ -11,8 +11,8 @@ import Essentials
 import Foundation
 
 public struct Signature {
-    let name: String
-    let email: String
+    public let name: String
+    public let email: String
 
     public init(name: String, email: String) {
         self.name = name
