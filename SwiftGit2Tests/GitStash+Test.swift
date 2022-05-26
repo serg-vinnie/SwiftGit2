@@ -27,7 +27,7 @@ class GitStashTests: XCTestCase {
         let stashItems = gitStash.items().shouldSucceed()!
         let stash = stashItems.first!
         
-        gitStash.apply(stash).shouldSucceed()!
+        gitStash.apply(stashIdx: stash.index).shouldSucceed()!
         
         XCTAssertEqual(stashItems.count, 1)
         gitStash.repoID.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 2)
@@ -43,7 +43,7 @@ class GitStashTests: XCTestCase {
         
         let firstStash = gitStash.items().shouldSucceed()!.first!
         
-        gitStash.remove(firstStash).shouldSucceed()!
+        gitStash.remove(stashIdx: firstStash.index).shouldSucceed()!
         
         let items = gitStash.items().shouldSucceed()!
         

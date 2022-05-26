@@ -12,9 +12,9 @@ public extension GitStash {
             .flatMap { $0.stashSave(signature: signature, message: message, flags: flags) }
     }
     
-    func apply(_ stash: Stash) -> R<()> {
+    func apply(stashIdx: Int) -> R<()> {
         repoID.repo
-            .flatMap { $0.stashApply(stash) }
+            .flatMap { $0.stashApply(stashIdx:stashIdx) }
     }
     
     func items() -> R<[Stash]> {
@@ -22,8 +22,8 @@ public extension GitStash {
             .flatMap { $0.stashForeach() }
     }
     
-    func remove(_ stash: Stash) -> R<()> {
+    func remove(stashIdx: Int) -> R<()> {
         return repoID.repo
-            .flatMap { $0.stashDrop(stash) }
+            .flatMap { $0.stashDrop(stashIdx: stashIdx) }
     }
 }
