@@ -31,7 +31,7 @@ public extension GitCommit {
             .map{ $0.map{ $0.description } }
             .map{ $0.filter { !$0.contains("MERGE") } }
             .map{ $0.distinct() }
-            .map{ $0.first(count).map{ $0 } }
             .map{ $0.reversed() }
+            .map{ $0.first(count).map{ $0 } }
     }
 }
