@@ -85,7 +85,7 @@ public extension Repository {
 ////////////////////////////
 //HELPERS
 ////////////////////////////
-internal class FS {
+class FS {
     static func delete(_ path : String, silent: Bool = true) {
         if !silent {
             print("FS: going to delete file: \(path)")
