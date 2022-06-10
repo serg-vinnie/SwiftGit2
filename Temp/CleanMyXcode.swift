@@ -5,6 +5,7 @@ import SwiftUI
 public class CleanMyXCode {
     public static var shared = CleanMyXCode()
     static var libraryDir = URL.userHome.appendingPathComponent("Library")
+    public static var xcodeBundle = "com.apple.dt.Xcode"
     
     public func clean(config: [CleanXcodeGlobal]) -> R<()> {
         //Correct code
@@ -26,13 +27,11 @@ public class CleanMyXCode {
             .map { $0! }
     }
     
-    public func getWeightForHuman(of type: CleanXcodeGlobal) -> Result<String, Error> {
-        getWeight(of: type)
-            .map { bites in
-                let bcf = ByteCountFormatter()
-                
-                return bcf.string(fromByteCount: Int64(bites))
-            }
+    public func getWeight(fromBites bites: Int) -> String {
+        let bcf = ByteCountFormatter()
+        
+        return bcf.string(fromByteCount: Int64(bites))
+            .replace(of: "Zero", to: "0")
     }
     
     public func getWeight2(of type: CleanXcodeGlobal) -> Result<String?, Error> {
@@ -46,7 +45,7 @@ public class CleanMyXCode {
     public var xcodeIsRunned: Bool {
         let runnedAppsBundles = NSWorkspace.shared.runningApplications.map{ $0.bundleIdentifier }.compactMap{ $0 }
         
-        return runnedAppsBundles.contains("com.apple.dt.Xcode")
+        return runnedAppsBundles.contains(CleanMyXCode.xcodeBundle)
     }
 }
 
