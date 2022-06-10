@@ -17,6 +17,11 @@ class CleanMyXcodeTests: XCTestCase {
             
             print("Human Readeble Weight: \(txtToPrint)")
         }
+        
+        XCTAssertEqual(CleanXcodeGlobal.derivedData.asUrl.path,
+                       "/Users/\(NSUserName())/Library/Developer/Xcode/DerivedData")
+        XCTAssertEqual(CleanXcodeGlobal.deviceSupport.asUrl.path,
+                       "/Users/\(NSUserName())/Library/Developer/Xcode/iOS DeviceSupport")
     }
     
     func test_XcodeIsRunned() {

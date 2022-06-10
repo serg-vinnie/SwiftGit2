@@ -4,7 +4,7 @@ import SwiftUI
 
 public class CleanMyXCode {
     public static var shared = CleanMyXCode()
-    static var libraryDir = FileManager.default.homeDirectory(forUser: NSUserName() )!.appendingPathComponent("Library")
+    static var libraryDir = URL.userHome.appendingPathComponent("Library")
     
     public func clean(config: [CleanXcodeGlobal]) -> R<()> {
         //Correct code
