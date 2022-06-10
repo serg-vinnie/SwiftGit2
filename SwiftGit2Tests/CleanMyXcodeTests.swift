@@ -19,4 +19,7 @@ class CleanMyXcodeTests: XCTestCase {
         }
     }
     
+    func test_XcodeIsRunned() {
+        XCTAssertTrue(CleanMyXCode.shared.xcodeIsRunned)
+    }
 }

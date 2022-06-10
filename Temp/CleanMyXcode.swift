@@ -4,6 +4,7 @@ import SwiftUI
 
 public class CleanMyXCode {
     public static var shared = CleanMyXCode()
+    static var libraryDir = FileManager.default.homeDirectory(forUser: NSUserName() )!.appendingPathComponent("Library")
     
     public func clean(config: [CleanXcodeGlobal]) -> R<()> {
         //Correct code
@@ -39,11 +40,13 @@ public class CleanMyXCode {
     }
     
     public var isGlobalDirsReacheble : Result<Bool, Error> {
-        let libFldrUrl = FileManager.default
-            .homeDirectoryForCurrentUser
-            .appendingPathComponent("Library")
+        return CleanMyXCode.libraryDir.isDirectoryAndReachableR()
+    }
+    
+    public var xcodeIsRunned: Bool {
+        let runnedAppsBundles = NSWorkspace.shared.runningApplications.map{ $0.bundleIdentifier }.compactMap{ $0 }
         
-        return libFldrUrl.isDirectoryAndReachableR()
+        return runnedAppsBundles.contains("com.apple.dt.Xcode")
     }
 }
 
@@ -64,9 +67,7 @@ public enum CleanXcodeLocal: CaseIterable {
 
 public extension CleanXcodeGlobal {
     var asUrl: URL {
-        let libFldr = FileManager.default
-            .homeDirectoryForCurrentUser
-            .appendingPathComponent("Library")
+        let libFldr = CleanMyXCode.libraryDir
     
         switch self {
         case .derivedData:
