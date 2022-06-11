@@ -28,9 +28,8 @@ public class CleanMyXCode {
     }
     
     public func getWeight(fromBites bites: Int) -> String {
-        let bcf = ByteCountFormatter()
-        
-        return bcf.string(fromByteCount: Int64(bites))
+        ByteCountFormatter()
+            .string(fromByteCount: Int64(bites))
             .replace(of: "Zero", to: "0")
     }
     
@@ -54,6 +53,7 @@ public enum CleanXcodeGlobal: CaseIterable {
     case archives
     case simulatorData
     case deviceSupport
+    case swiftPmCashes
 }
 
 public enum CleanXcodeLocal: CaseIterable {
@@ -77,6 +77,23 @@ public extension CleanXcodeGlobal {
             return libFldr.appendingPathComponent("Developer/Xcode/iOS DeviceSupport")
         case .simulatorData:
             return libFldr.appendingPathComponent("Developer/CoreSimulator/Devices")
+        case .swiftPmCashes:
+            return libFldr.appendingPathComponent("Caches/org.swift.swiftpm/")
+        }
+    }
+    
+    var asTitle: String {
+        switch self {
+        case .derivedData:
+            return "Derived Data (global)"
+        case .archives:
+            return "Archives"
+        case .deviceSupport:
+            return "iOS DeviceSupport"
+        case .simulatorData:
+            return "CoreSimulator"
+        case .swiftPmCashes:
+            return "Swift packages Cashes"
         }
     }
 }
@@ -126,4 +143,14 @@ fileprivate extension URL {
         return byteCount + " on disk"
     }
     private static let byteCountFormatter = ByteCountFormatter()
+}
+
+
+
+fileprivate func getPlistValue(url: URL, key: String) -> String? {
+    if let xml = FileManager.default.contents(atPath: url.path) {
+        return (try? PropertyListSerialization.propertyList(from: xml, options: .mutableContainersAndLeaves, format: nil)) as? String
+    }
+    
+    return nil
 }
