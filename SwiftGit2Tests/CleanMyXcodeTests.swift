@@ -8,15 +8,8 @@ class CleanMyXcodeTests: XCTestCase {
     func test_GetWeightAndIsReacheble() {
         CleanMyXCode.shared.isGlobalDirsReacheble.assertEqual(to: true)
         
-        for folderType in [CleanXcodeGlobal.derivedData, CleanXcodeGlobal.simulatorData] {
-            let a = CleanMyXCode.shared.getWeight(of: folderType).shouldSucceed()!
-            
-            XCTAssertTrue( a > 0 )
-            
-            let txtToPrint = CleanMyXCode.shared.getWeightForHuman(of: folderType).shouldSucceed()!
-            
-            print("Human Readeble Weight: \(txtToPrint)")
-        }
+        let a = CleanMyXCode.shared.getWeight(of: CleanXcodeGlobal.derivedData.asUrl).shouldSucceed()!
+        XCTAssertTrue( a > 0 )
         
         XCTAssertEqual(CleanXcodeGlobal.derivedData.asUrl.path,
                        "/Users/\(NSUserName())/Library/Developer/Xcode/DerivedData")

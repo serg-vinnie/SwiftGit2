@@ -7,24 +7,14 @@ public class CleanMyXCode {
     static var libraryDir = URL.userHome.appendingPathComponent("Library")
     public static var xcodeBundle = "com.apple.dt.Xcode"
     
-    public func clean(config: [CleanXcodeGlobal]) -> R<()> {
-        //Correct code
-//        config.map { $0.asUrl }
-//            .map { FS.delete($0.path) }
-//            .flatMap { $0 }
-//            .map { _ in () }
-        
-        //INCORRECT code
-        config.map { $0.asUrl }
-            .map { FS.delete($0.path) }
-        
-        return .success(())
+    public func clean(urls: [URL]) {
+        let _ = urls.map { FS.delete($0.path) }
     }
     
-    public func getWeight(of type: CleanXcodeGlobal) -> Result<Int, Error> {
-        type.asUrl.directoryTotalAllocatedSizeR(includingSubfolders: true)
+    public func getWeight(of url: URL) -> Result<Int, Error> {
+        url.directoryTotalAllocatedSizeR(includingSubfolders: true)
             .flatMapError { _ in return .success(0) }
-            .map { $0! }
+            .map { $0 ?? 1 }
     }
     
     public func getWeight(fromBites bites: Int) -> String {
@@ -32,11 +22,11 @@ public class CleanMyXCode {
             .string(fromByteCount: Int64(bites))
             .replace(of: "Zero", to: "0")
     }
-    
-    public func getWeight2(of type: CleanXcodeGlobal) -> Result<String?, Error> {
-        type.asUrl.sizeOnDiskR()
-    }
-    
+//    
+//    public func getWeight2(of type: CleanXcodeGlobal) -> Result<String?, Error> {
+//        type.asUrl.sizeOnDiskR()
+//    }
+//    
     public var isGlobalDirsReacheble : Result<Bool, Error> {
         return CleanMyXCode.libraryDir.isDirectoryAndReachableR()
     }
@@ -54,14 +44,6 @@ public enum CleanXcodeGlobal: CaseIterable {
     case simulatorData
     case deviceSupport
     case swiftPmCashes
-}
-
-public enum CleanXcodeLocal: CaseIterable {
-    case packagesResolved //URL(string:".xcworkspace/xcshareddata/swiftpm")
-    case xcworkspaceXcuserdata // .xcworkspace/xcuserdata/
-    case xcodeprojXcuserdata // .xcodeproj/xcuserdata/
-    
-    //case ???? TaoGit.xcodeproj/xcshareddata/ - це МОЖЛИВО потрібно!!!! Але точно не в гітігнор https://stackoverflow.com/a/53039267/4423545
 }
 
 public extension CleanXcodeGlobal {
