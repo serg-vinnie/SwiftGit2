@@ -43,7 +43,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:SwiftGit2Tests/SwiftGit2-OSX.xctestplan"
+            reference = "container:SwiftGit2Tests/Base/SwiftGit2-OSX.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>

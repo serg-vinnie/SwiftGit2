@@ -334,6 +334,18 @@
 			path = MOVE_TO_ESSENTIALS;
 			sourceTree = "<group>";
 		};
+		1D914FBA28567A1300034EC1 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				E68A3AD126658A9E00B0244C /* SwiftGit2-OSX.xctestplan */,
+				E63EDF6F265BF7FD00A3D048 /* Repository+Test.swift */,
+				E63EDF6D265BC30800A3D048 /* GitTest.swift */,
+				E67E84D627E5DAAF009E5B31 /* LogTests.swift */,
+				E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
 		1DB0F84F24EFFD7B00637B9B /* Repository */ = {
 			isa = PBXGroup;
 			children = (
@@ -536,26 +548,22 @@
 		E6332DCD265167F0004990E7 /* SwiftGit2Tests */ = {
 			isa = PBXGroup;
 			children = (
-				E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */,
-				E67E84D627E5DAAF009E5B31 /* LogTests.swift */,
 				E66360E027BF1403001292FB /* RepCoreTests.swift */,
 				E6AA18FA27AF825C002AFC33 /* ModuleTests.swift */,
 				1DD99228276A24530088848F /* StatusDiffTests.swift */,
 				1D5E1F412742A34D00498539 /* StatusEntryTests.swift */,
 				E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */,
-				E68A3AD126658A9E00B0244C /* SwiftGit2-OSX.xctestplan */,
 				E63EDF73265C0A6B00A3D048 /* RepositoryLocalTests.swift */,
 				E63EDF6B265BC0F200A3D048 /* MergeAnalysisTests.swift */,
 				E6332DCE265167F0004990E7 /* RepositoryRemoteTests.swift */,
-				E6332DD0265167F0004990E7 /* Info.plist */,
-				E63EDF6D265BC30800A3D048 /* GitTest.swift */,
-				E63EDF6F265BF7FD00A3D048 /* Repository+Test.swift */,
 				1D2E4DEE27F9B07700A90463 /* GitDiscard+Test.swift */,
 				1D6C643728319D8F003E9072 /* GitStash+Test.swift */,
 				1D6C64422837FAFA003E9072 /* GitCommit+Test.swift */,
 				1DB4D5DC28241A0A0080BB6B /* BranchTests.swift */,
 				1D667C332851324100900A5E /* CleanMyXcodeTests.swift */,
 				1DB6CBB52856773F00E2244A /* StatusCustomTest.swift */,
+				E6332DD0265167F0004990E7 /* Info.plist */,
+				1D914FBA28567A1300034EC1 /* Base */,
 			);
 			path = SwiftGit2Tests;
 			sourceTree = "<group>";

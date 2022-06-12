@@ -104,7 +104,7 @@ class StatusEntryTests: XCTestCase {
 
 }
 
-extension URL {
+fileprivate extension URL {
     func moveFile(at: String, to _to: String) {
         let from  = self.appendingPathComponent(at)
         let to  = self.appendingPathComponent(_to)
