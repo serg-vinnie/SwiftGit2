@@ -116,9 +116,22 @@ extension TestFolder {
         return self.url.appendingPathComponent("\(fileName)")
     }
     
+    @discardableResult
     func addAllAndCommit(msg: String) -> R<Commit> {
         return self.repo
             .flatMap { $0.t_add_all_and_commit(msg: msg) }
+    }
+    
+    @discardableResult
+    func addAll() -> R<Repository> {
+        return self.repo
+            .flatMap { $0.addAllFiles() }
+    }
+    
+    @discardableResult
+    func removeAll() -> R<()> {
+        return self.repo
+            .flatMap { $0.remove(relPaths: ["*"]) }
     }
     
     func commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> Result<Commit, Error> {

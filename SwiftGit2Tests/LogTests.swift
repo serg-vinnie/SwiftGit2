@@ -88,7 +88,4 @@ class LogTests: XCTestCase {
                 .shouldSucceed()
         }
     }
-    
-    
-
 }

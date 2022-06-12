@@ -373,6 +373,54 @@ extension Repository {
     }
 }
 
+extension Repository {
+    public func workDirFiles() -> R<StatusIterator> {
+        let flags : StatusOptions.Flags? = [
+            .includeIgnored,
+            .includeUnmodified,
+            .includeUntracked,
+            
+            .excludeSubmodules,
+            
+            .recurseUntrackedDirs,
+            .recurseIgnoredDirs,
+            
+            .disablePathspecMatch
+        ]
+        
+        let opt = StatusOptions(flags: flags, show: .workdirOnly)
+        
+        return self.status(options: opt)
+    }
+    
+    public func unTrackedAndUnIgnoredFiles() -> R<[StatusEntry]> {
+        let flags : StatusOptions.Flags? = [
+            .includeIgnored,
+            .includeUnmodified,
+            .includeUntracked,
+            
+            .excludeSubmodules,
+            
+            .recurseUntrackedDirs,
+            .recurseIgnoredDirs,
+            
+            .excludeSubmodules,
+            .disablePathspecMatch
+        ]
+        
+        let opt = StatusOptions(flags: flags, show: .indexOnly)
+        
+        
+        return combine( workDirFiles(), self.status(options: opt) )
+            .map { wd, status in
+                print("WD: \(wd.count) | Status: \(status.count)")
+                
+                return wd.filter { wdEntry in !status.contains{ $0.stagePath == wdEntry.stagePath } }
+            }
+    }
+}
+
+
 /////////////////
 ///HELPERS
 ///////////////////
