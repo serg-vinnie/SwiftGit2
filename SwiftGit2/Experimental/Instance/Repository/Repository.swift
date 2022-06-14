@@ -393,7 +393,7 @@ extension Repository {
         return self.status(options: opt)
     }
     
-    public func unTrackedAndUnIgnoredFiles() -> R<[StatusEntry]> {
+    public func unTrackedAndIgnoredFiles() -> R<[StatusEntry]> {
         let flags : StatusOptions.Flags? = [
             .includeIgnored,
             .includeUnmodified,
@@ -409,7 +409,6 @@ extension Repository {
         ]
         
         let opt = StatusOptions(flags: flags, show: .indexOnly)
-        
         
         return combine( workDirFiles(), self.status(options: opt) )
             .map { wd, status in

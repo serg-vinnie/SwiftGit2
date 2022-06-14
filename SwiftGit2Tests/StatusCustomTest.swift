@@ -28,11 +28,11 @@ class GitIgnoreTmpTests: XCTestCase {
         
         XCTAssertEqual(workDirFiles.count, 6) // Ignored x3 + .gitignore + fileA + untrackedFile.txt
         
-        var unTrackedAndUnIgnoredFiles = src.repo.flatMap { $0.unTrackedAndUnIgnoredFiles() }.shouldSucceed()!
+        var unTrackedAndUnIgnoredFiles = src.repo.flatMap { $0.unTrackedAndIgnoredFiles() }.shouldSucceed()!
         XCTAssertEqual(unTrackedAndUnIgnoredFiles.count, 3)
         
         src.removeAll()
-        unTrackedAndUnIgnoredFiles = src.repo.flatMap { $0.unTrackedAndUnIgnoredFiles() }.shouldSucceed()!
+        unTrackedAndUnIgnoredFiles = src.repo.flatMap { $0.unTrackedAndIgnoredFiles() }.shouldSucceed()!
         
         XCTAssertEqual(unTrackedAndUnIgnoredFiles.count, 4)
         
