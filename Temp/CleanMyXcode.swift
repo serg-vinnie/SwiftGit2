@@ -7,6 +7,9 @@ public class CleanMyXCode {
     static var libraryDir = URL.userHome.appendingPathComponent("Library")
     public static var xcodeBundle = "com.apple.dt.Xcode"
     
+    
+    
+    
     public func clean(urls: [URL]) {
         let _ = urls.map { FS.delete($0.path) }
     }
@@ -38,47 +41,115 @@ public class CleanMyXCode {
     }
 }
 
-public enum CleanXcodeGlobal: CaseIterable {
-    case derivedData
-    case archives
-    case simulatorData
-    case deviceSupport
-    case swiftPmCashes
+public protocol CashDir {
+    static var url: URL { get }
+    static var title: String { get }
 }
 
-public extension CleanXcodeGlobal {
-    var asUrl: URL {
-        let libFldr = CleanMyXCode.libraryDir
-    
-        switch self {
-        case .derivedData:
-            return libFldr.appendingPathComponent("Developer/Xcode/DerivedData")
-        case .archives:
-            return libFldr.appendingPathComponent("Developer/Xcode/Archives")
-        case .deviceSupport:
-            return libFldr.appendingPathComponent("Developer/Xcode/iOS DeviceSupport")
-        case .simulatorData:
-            return libFldr.appendingPathComponent("Developer/CoreSimulator/Devices")
-        case .swiftPmCashes:
-            return libFldr.appendingPathComponent("Caches/org.swift.swiftpm/")
-        }
-    }
-    
-    var asTitle: String {
-        switch self {
-        case .derivedData:
-            return "Derived Data (global)"
-        case .archives:
-            return "Archives"
-        case .deviceSupport:
-            return "iOS DeviceSupport"
-        case .simulatorData:
-            return "CoreSimulator"
-        case .swiftPmCashes:
-            return "Swift packages Cashes"
+public extension CleanMyXCode {
+    class GlobalDerivedData : CashDir {
+        public static let url = CleanMyXCode.libraryDir.appendingPathComponent("Developer/Xcode/DerivedData")
+        public static let title = "Derived Data (global)"
+        public static var exist: Bool { url.exists }
+        
+        public static func cleanup() {
+            FS.delete(url.path)
         }
     }
 }
+
+public extension CleanMyXCode {
+    class GlobalArchives : CashDir {
+        public static let url = CleanMyXCode.libraryDir.appendingPathComponent("Developer/Xcode/Archives")
+        public static let title = "Archives"
+        public static var exist: Bool { url.exists }
+        
+        public static func cleanup() {
+            FS.delete(url.path)
+        }
+    }
+}
+
+public extension CleanMyXCode {
+    class GlobalDeviceSupport : CashDir {
+        public static let url = CleanMyXCode.libraryDir.appendingPathComponent("Developer/Xcode/iOS DeviceSupport")
+        public static let title = "iOS DeviceSupport"
+        public static var exist: Bool { url.exists }
+        
+        public static func cleanup() {
+            FS.delete(url.path)
+        }
+    }
+}
+
+public extension CleanMyXCode {
+    class GlobalCoreSimulator : CashDir {
+        public static let url = CleanMyXCode.libraryDir.appendingPathComponent("Developer/CoreSimulator/Devices")
+        public static let title = "CoreSimulator"
+        public static var exist: Bool { url.exists }
+        
+        public static func cleanup() {
+            FS.delete(url.path)
+        }
+    }
+}
+
+public extension CleanMyXCode {
+    class GlobalSwiftPackagesCashes : CashDir {
+        public static let url = CleanMyXCode.libraryDir.appendingPathComponent("Caches/org.swift.swiftpm")
+        public static let title = "Swift packages Cashes"
+        public static var exist: Bool { url.exists }
+        
+        public static func cleanup() {
+            FS.delete(url.path)
+        }
+    }
+}
+
+
+
+
+//public enum CleanXcodeGlobal: CaseIterable {
+//    case derivedData
+//    case archives
+//    case simulatorData
+//    case deviceSupport
+//    case swiftPmCashes
+//}
+//
+//public extension CleanXcodeGlobal {
+//    var asUrl: URL {
+//        let libFldr = CleanMyXCode.libraryDir
+//
+//        switch self {
+//        case .derivedData:
+//            return libFldr.appendingPathComponent("Developer/Xcode/DerivedData")
+//        case .archives:
+//            return libFldr.appendingPathComponent("Developer/Xcode/Archives")
+//        case .deviceSupport:
+//            return libFldr.appendingPathComponent("Developer/Xcode/iOS DeviceSupport")
+//        case .simulatorData:
+//            return libFldr.appendingPathComponent("Developer/CoreSimulator/Devices")
+//        case .swiftPmCashes:
+//            return libFldr.appendingPathComponent("Caches/org.swift.swiftpm/")
+//        }
+//    }
+//
+//    var asTitle: String {
+//        switch self {
+//        case .derivedData:
+//            return "Derived Data (global)"
+//        case .archives:
+//            return "Archives"
+//        case .deviceSupport:
+//            return "iOS DeviceSupport"
+//        case .simulatorData:
+//            return "CoreSimulator"
+//        case .swiftPmCashes:
+//            return "Swift packages Cashes"
+//        }
+//    }
+//}
 
 fileprivate extension URL {
     func isDirectoryAndReachableR() -> Result<Bool, Error> {
