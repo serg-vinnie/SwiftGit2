@@ -135,6 +135,8 @@ public extension CleanMyXCode {
             
             //case ???? TaoGit.xcodeproj/xcshareddata/ - це МОЖЛИВО потрібно!!!!
             //https://stackoverflow.com/a/53039267/4423545
+            
+            //getPlistValue() можна використать у випадку якщо потрібно дістати шлях кастомного дерайвед дата якщо він знаходиться поза проектом в лівому місці
         }
     }
 }
