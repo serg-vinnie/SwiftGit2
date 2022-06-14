@@ -98,50 +98,46 @@ public extension CleanMyXCode {
     }
 }
 
-
-
-
-//public enum CleanXcodeGlobal: CaseIterable {
-//    case derivedData
-//    case archives
-//    case simulatorData
-//    case deviceSupport
-//    case swiftPmCashes
-//}
-//
-//public extension CleanXcodeGlobal {
-//    var asUrl: URL {
-//        let libFldr = CleanMyXCode.libraryDir
-//
-//        switch self {
-//        case .derivedData:
-//            return libFldr.appendingPathComponent("Developer/Xcode/DerivedData")
-//        case .archives:
-//            return libFldr.appendingPathComponent("Developer/Xcode/Archives")
-//        case .deviceSupport:
-//            return libFldr.appendingPathComponent("Developer/Xcode/iOS DeviceSupport")
-//        case .simulatorData:
-//            return libFldr.appendingPathComponent("Developer/CoreSimulator/Devices")
-//        case .swiftPmCashes:
-//            return libFldr.appendingPathComponent("Caches/org.swift.swiftpm/")
-//        }
-//    }
-//
-//    var asTitle: String {
-//        switch self {
-//        case .derivedData:
-//            return "Derived Data (global)"
-//        case .archives:
-//            return "Archives"
-//        case .deviceSupport:
-//            return "iOS DeviceSupport"
-//        case .simulatorData:
-//            return "CoreSimulator"
-//        case .swiftPmCashes:
-//            return "Swift packages Cashes"
-//        }
-//    }
-//}
+public extension CleanMyXCode {
+    class LocalCashes {
+        public private(set) var packageResolved: URL? = nil
+        public private(set) var xcworkspaceXcuserdata: URL? = nil
+        public private(set) var xcodeprojXcuserdata: [URL]?
+        
+        public init(repoPath: String?) {
+            guard let repoPath = repoPath
+            else {
+                packageResolved = nil
+                xcworkspaceXcuserdata = nil
+                xcodeprojXcuserdata = []
+                return
+            }
+            
+            let workspace = XcodeHelper
+                .getXcodeProjetPaths(repoPath: repoPath)
+                .filter{ $0.hasSuffix(".xcworkspace")}
+                .first
+            
+            if let packageUrl = workspace?.appending("/xcshareddata/swiftpm/Package.resolved").asURL() {
+                self.packageResolved = packageUrl.exists ? packageUrl : nil
+            }
+            
+            if let xcuserdataUrl = workspace?.appending("/xcuserdata").asURL(){
+                self.xcworkspaceXcuserdata = xcuserdataUrl.exists ? xcuserdataUrl : nil
+            }
+            
+            ////// ///
+            self.xcodeprojXcuserdata = XcodeHelper
+                .getXcodeProjetPaths(repoPath: repoPath)
+                .filter{ !$0.hasSuffix(".xcworkspace") }
+                .map{ $0.asURL().appendingPathComponent("/xcuserdata") }
+                .filter{ $0.exists }
+            
+            //case ???? TaoGit.xcodeproj/xcshareddata/ - це МОЖЛИВО потрібно!!!!
+            //https://stackoverflow.com/a/53039267/4423545
+        }
+    }
+}
 
 fileprivate extension URL {
     func isDirectoryAndReachableR() -> Result<Bool, Error> {
@@ -190,12 +186,58 @@ fileprivate extension URL {
     private static let byteCountFormatter = ByteCountFormatter()
 }
 
-
-
 fileprivate func getPlistValue(url: URL, key: String) -> String? {
     if let xml = FileManager.default.contents(atPath: url.path) {
         return (try? PropertyListSerialization.propertyList(from: xml, options: .mutableContainersAndLeaves, format: nil)) as? String
     }
     
     return nil
+}
+
+public class XcodeHelper {
+    public static func getXcodeProjetPaths(repoPath: String) -> [String] {
+        var urls = [String]()
+        
+        if let paths = try? FileManager.default.contentsOfDirectory(atPath: repoPath) {
+            urls = paths.map{ path -> String? in
+                if path.hasSuffix(".xcworkspace") || path.hasSuffix(".xcodeproj") {
+                    return "\(repoPath)/\(path)"
+                }
+                
+                return nil
+            }
+            .compactMap{ $0 }
+        }
+        
+        if urls.count == 0 {
+            urls = getXcodeProjetUrlsDeep(repoUrl: repoPath.asURL() )
+        }
+        
+        return urls
+    }
+
+    // DO NOT USE ME IN ANOTHER PLACES EXCEPT getXcodeProjetPaths
+    fileprivate static func getXcodeProjetUrlsDeep(repoUrl: URL) -> [String] {
+        var urls = [URL]()
+        if let dirContents = FileManager.default.enumerator(at: repoUrl, includingPropertiesForKeys: nil) {
+            
+            var fileCounter = 0
+            
+            while let url = dirContents.nextObject() as? URL {
+                fileCounter += 1
+                
+                if fileCounter > 1000 {
+                    break
+                }
+                
+                if url.path.hasSuffix(".xcworkspace") || url.path.hasSuffix(".xcodeproj") {
+                    urls.append(url)
+                }
+            }
+        }
+        
+        return urls
+            .sorted{ $0.pathComponents.count < $1.pathComponents.count }
+            .map{ $0.path }
+    }
 }
