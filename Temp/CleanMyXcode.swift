@@ -3,38 +3,30 @@ import Essentials
 import SwiftUI
 
 public class CleanMyXCode {
-    public static var shared = CleanMyXCode()
     static var libraryDir = URL.userHome.appendingPathComponent("Library")
     public static var xcodeBundle = "com.apple.dt.Xcode"
     
-    
-    
-    
-    public func clean(urls: [URL]) {
+    public static func clean(urls: [URL]) {
         let _ = urls.map { FS.delete($0.path) }
     }
     
-    public func getWeight(of url: URL) -> Result<Int, Error> {
+    public static func getWeight(of url: URL) -> Result<Int, Error> {
         url.directoryTotalAllocatedSizeR(includingSubfolders: true)
             .flatMapError { _ in return .success(0) }
             .map { $0 ?? 1 }
     }
     
-    public func getWeight(fromBites bites: Int) -> String {
+    public static func getWeight(fromBites bites: Int) -> String {
         ByteCountFormatter()
             .string(fromByteCount: Int64(bites))
             .replace(of: "Zero", to: "0")
     }
-//    
-//    public func getWeight2(of type: CleanXcodeGlobal) -> Result<String?, Error> {
-//        type.asUrl.sizeOnDiskR()
-//    }
-//    
-    public var isGlobalDirsReacheble : Result<Bool, Error> {
+    
+    public static var isLibraryIsReacheble : Result<Bool, Error> {
         return CleanMyXCode.libraryDir.isDirectoryAndReachableR()
     }
     
-    public var xcodeIsRunned: Bool {
+    public static var xcodeIsRunned: Bool {
         let runnedAppsBundles = NSWorkspace.shared.runningApplications.map{ $0.bundleIdentifier }.compactMap{ $0 }
         
         return runnedAppsBundles.contains(CleanMyXCode.xcodeBundle)

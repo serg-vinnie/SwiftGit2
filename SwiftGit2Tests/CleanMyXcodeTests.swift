@@ -15,13 +15,24 @@ class CleanMyXcodeTests: XCTestCase {
     }
     
     func test_GetWeightAndIsReacheble() {
-        CleanMyXCode.shared.isGlobalDirsReacheble.assertEqual(to: true)
+        CleanMyXCode.isLibraryIsReacheble.assertEqual(to: true)
         
-        let a = CleanMyXCode.shared.getWeight(of: CleanMyXCode.GlobalDerivedData.url ).shouldSucceed()!
+        let a = CleanMyXCode.getWeight(of: CleanMyXCode.GlobalDerivedData.url ).shouldSucceed()!
         XCTAssertTrue( a > 0 )
+        
+        CleanMyXCode.GlobalDeviceSupport.url.mkdir().shouldSucceed()!
+        try? File(url: CleanMyXCode.GlobalDeviceSupport.url.appendingPathComponent("File.txt")).setContent(String(repeating: "String____Help_me_they_can kill_me!", count: 50000))
+        
+        let b = CleanMyXCode.getWeight(of: CleanMyXCode.GlobalDeviceSupport.url ).shouldSucceed()!
+        XCTAssertTrue( b > 0 )
+        
+        CleanMyXCode.clean(urls: [CleanMyXCode.GlobalDeviceSupport.url])
+        
+        let c = CleanMyXCode.getWeight(of: CleanMyXCode.GlobalDeviceSupport.url ).shouldSucceed()!
+        XCTAssertTrue( c == 0 )
     }
     
     func test_XcodeIsRunned() {
-        XCTAssertTrue(CleanMyXCode.shared.xcodeIsRunned)
+        XCTAssertTrue(CleanMyXCode.xcodeIsRunned)
     }
 }
