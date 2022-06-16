@@ -9,6 +9,20 @@ public extension URL {
     func exist() -> Bool {
         return URL.exist(at: self.path)
     }
+    
+    var fileSize: UInt64 {
+        return attributes?[.size] as? UInt64 ?? UInt64(0)
+        //possibly better to use "self.resourceBytes" ?
+    }
+    
+    var attributes: [FileAttributeKey : Any]? {
+        do {
+            return try FileManager.default.attributesOfItem(atPath: path)
+        } catch let error as NSError {
+            print("FileAttribute error: \(error)")
+        }
+        return nil
+    }
 }
 
 public extension URL {
@@ -38,4 +52,29 @@ public extension URL {
     static func exist(at path: String) -> Bool {
         return FileManager.default.fileExists(atPath: path)
     }
+    
+    static func fileSize(at filePath: String) -> UInt64 {
+        do {
+            let attr = try FileManager.default.attributesOfItem(atPath: filePath)
+            return (attr[FileAttributeKey.size] as? UInt64 ) ?? 0
+        } catch {
+            print("Error: \(error)")
+        }
+        
+        return 0
+    }
+    
+    static func sizeOnDisk(_ size: Int) throws -> String? {
+        try? sizeOnDisk(UInt64(size))
+    }
+    
+    static func sizeOnDisk(_ size: UInt64) throws -> String? {
+        URL.byteCountFormatter.countStyle = .file
+        
+        guard let byteCount = URL.byteCountFormatter.string(for: size) else { return nil}
+        
+        return byteCount + " on disk"
+    }
+    
+    private static let byteCountFormatter = ByteCountFormatter()
 }

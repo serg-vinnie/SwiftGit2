@@ -181,11 +181,9 @@ fileprivate extension URL {
     
     private func sizeOnDisk() throws -> String? {
         guard let size = try directoryTotalAllocatedSize(includingSubfolders: true) else { return nil }
-        URL.byteCountFormatter.countStyle = .file
-        guard let byteCount = URL.byteCountFormatter.string(for: size) else { return nil}
-        return byteCount + " on disk"
+        
+        return try URL.sizeOnDisk(size)
     }
-    private static let byteCountFormatter = ByteCountFormatter()
 }
 
 fileprivate func getPlistValue(url: URL, key: String) -> String? {
