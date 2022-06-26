@@ -10,7 +10,7 @@ import Clibgit2
 import Essentials
 import Foundation
 
-public struct Signature {
+public struct Signature : Equatable {
     public let name: String
     public let email: String
 

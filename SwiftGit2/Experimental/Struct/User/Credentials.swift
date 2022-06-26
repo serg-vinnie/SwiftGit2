@@ -114,6 +114,13 @@ extension Credentials : CustomStringConvertible {
             return "publicKey: \(publicKey)\nprivateKey: \(privateKey)"
         }
     }
+    
+    public var asKeyName : String? {
+        if case let .ssh(_, privateKey, _) = self {
+            return URL(fileURLWithPath: privateKey).lastPathComponent
+        }
+        return nil
+    }
 }
 
 private extension String {
