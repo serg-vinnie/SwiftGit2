@@ -1,6 +1,7 @@
 import Foundation
 import Essentials
 import SwiftUI
+import AppCore
 
 public class CleanMyXCode {
     static var libraryDir = URL.userHome.appendingPathComponent("Library")
@@ -230,7 +231,7 @@ public class XcodeHelper {
                     break
                 }
                 
-                if url.path.hasSuffix(".xcworkspace") || url.path.hasSuffix(".xcodeproj") {
+                if url.isXCode {
                     urls.append(url)
                 }
             }
@@ -239,5 +240,49 @@ public class XcodeHelper {
         return urls
             .sorted{ $0.pathComponents.count < $1.pathComponents.count }
             .map{ $0.path }
+    }
+}
+
+extension URL {
+    func scan(url: URL, depth: Int = -1, block: (URL)->Bool) -> [URL] {
+        guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: nil) else { return [] }
+        
+        var selectedULRs = [URL]()
+        
+        while let url = enumerator.nextObject() as? URL {
+            if block(url) {
+                selectedULRs.append(url)
+            }
+        }
+        
+        return selectedULRs
+    }
+}
+
+
+fileprivate extension URL {
+    var isXCode : Bool {
+        pathExtension == "xcworkspace"          ||
+        pathExtension == "xcodeproj"            ||
+        lastPathComponent == "Package.swift"
+    }
+}
+
+struct XCode {
+    static func open(url: URL) {
+        let xcodeAppURL = NSURL(fileURLWithPath: "/Applications/Xcode.app", isDirectory: true) as URL
+        
+        if xcodeAppURL.exists {
+            NSWorkspace.shared.open([url], withApplicationAt: xcodeAppURL, configuration: NSWorkspace.OpenConfiguration()) { app, error in
+                if let error = error {
+                    AppCore.log(title: "XCode.open", error: error)
+                }
+                if let _ = app {
+                    AppCore.log(title: "XCode.open", msg: url.path)
+                }
+            }
+        } else {
+            NSWorkspace.shared.open(url)
+        }
     }
 }
