@@ -18,8 +18,6 @@
 		1D5E1F452742A7DC00498539 /* EssetialTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 1D5E1F442742A7DC00498539 /* EssetialTesting */; };
 		1D5E1F472742B31700498539 /* IEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F462742B31700498539 /* IEntry.swift */; };
 		1D5E1F492742CEF000498539 /* Repository+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F482742CEF000498539 /* Repository+Entries.swift */; };
-		1D667C322851321C00900A5E /* CleanMyXcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D667C312851321C00900A5E /* CleanMyXcode.swift */; };
-		1D667C342851324100900A5E /* CleanMyXcodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D667C332851324100900A5E /* CleanMyXcodeTests.swift */; };
 		1D6C643628319C41003E9072 /* GitStash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C643528319C41003E9072 /* GitStash.swift */; };
 		1D6C643828319D8F003E9072 /* GitStash+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C643728319D8F003E9072 /* GitStash+Test.swift */; };
 		1D6C643B2831B38F003E9072 /* Stash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C643928319FE1003E9072 /* Stash.swift */; };
@@ -168,8 +166,6 @@
 		1D5E1F412742A34D00498539 /* StatusEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryTests.swift; sourceTree = "<group>"; };
 		1D5E1F462742B31700498539 /* IEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEntry.swift; sourceTree = "<group>"; };
 		1D5E1F482742CEF000498539 /* Repository+Entries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Entries.swift"; sourceTree = "<group>"; };
-		1D667C312851321C00900A5E /* CleanMyXcode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanMyXcode.swift; sourceTree = "<group>"; };
-		1D667C332851324100900A5E /* CleanMyXcodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanMyXcodeTests.swift; sourceTree = "<group>"; };
 		1D6C643528319C41003E9072 /* GitStash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitStash.swift; sourceTree = "<group>"; };
 		1D6C643728319D8F003E9072 /* GitStash+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GitStash+Test.swift"; sourceTree = "<group>"; };
 		1D6C643928319FE1003E9072 /* Stash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stash.swift; sourceTree = "<group>"; };
@@ -318,14 +314,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1D667C302851320E00900A5E /* Temp */ = {
-			isa = PBXGroup;
-			children = (
-				1D667C312851321C00900A5E /* CleanMyXcode.swift */,
-			);
-			path = Temp;
-			sourceTree = "<group>";
-		};
 		1D914FB72856796B00034EC1 /* MOVE_TO_ESSENTIALS */ = {
 			isa = PBXGroup;
 			children = (
@@ -404,7 +392,6 @@
 		BEB31F191A0D6F7A00F525B9 = {
 			isa = PBXGroup;
 			children = (
-				1D667C302851320E00900A5E /* Temp */,
 				BEB31F251A0D6F7A00F525B9 /* SwiftGit2 */,
 				BEB31F261A0D6F7A00F525B9 /* Supporting Files */,
 				BEB31FA11A0E63C100F525B9 /* Libraries */,
@@ -560,7 +547,6 @@
 				1D6C643728319D8F003E9072 /* GitStash+Test.swift */,
 				1D6C64422837FAFA003E9072 /* GitCommit+Test.swift */,
 				1DB4D5DC28241A0A0080BB6B /* BranchTests.swift */,
-				1D667C332851324100900A5E /* CleanMyXcodeTests.swift */,
 				1DB6CBB52856773F00E2244A /* StatusCustomTest.swift */,
 				E6332DD0265167F0004990E7 /* Info.plist */,
 				1D914FBA28567A1300034EC1 /* Base */,
@@ -901,7 +887,6 @@
 				E63EDF80265FF7E100A3D048 /* Repository+Push.swift in Sources */,
 				E6332D51264EF48B004990E7 /* Repository+Merge.swift in Sources */,
 				1DEC2913277230BF007C32FF /* UiStatusEntryX.swift in Sources */,
-				1D667C322851321C00900A5E /* CleanMyXcode.swift in Sources */,
 				BE14AA501A1974010015B439 /* SwiftGit2.m in Sources */,
 				E6D4A92824DF55E400E8041E /* Reference+Write.swift in Sources */,
 			);
@@ -913,7 +898,6 @@
 			files = (
 				1DD99229276A24540088848F /* StatusDiffTests.swift in Sources */,
 				E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */,
-				1D667C342851324100900A5E /* CleanMyXcodeTests.swift in Sources */,
 				1D2E4DEF27F9B07700A90463 /* GitDiscard+Test.swift in Sources */,
 				1D6C643828319D8F003E9072 /* GitStash+Test.swift in Sources */,
 				1DB4D5DD28241A0A0080BB6B /* BranchTests.swift in Sources */,
