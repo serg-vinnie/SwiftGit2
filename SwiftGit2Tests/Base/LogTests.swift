@@ -45,47 +45,47 @@ class LogTests: XCTestCase {
         }
     }
     
-    func test_measure_10k_oids() {
-        let big_repo = root.sub(folder: "repo_10k")
-        
-        self.measure {
-            LogCache(repoID: RepoID(url: big_repo.url))
-                .fetchHEAD()
-                .onSuccess { print("oids fetched: \($0.count)")}
-                .shouldSucceed()
-        }
-    }
-    
-    func test_measure_10k_commits() {
-        let big_repo = root.sub(folder: "repo_10k")
-        
-        self.measure {
-            LogCache(repoID: RepoID(url: big_repo.url))
-                .fetchHEAD_Commits()
-                .onSuccess { print("commits fetched: \($0.count)")}
-                .shouldSucceed()
-        }
-    }
-    
-    func test_measure_50k_oids() {
-        let big_repo = root.sub(folder: "repo_50k")
-        
-        self.measure {
-            LogCache(repoID: RepoID(url: big_repo.url))
-                .fetchHEAD()
-                .onSuccess { print("oids fetched: \($0.count)")}
-                .shouldSucceed()
-        }
-    }
-    
-    func test_measure_50k_commits() {
-        let big_repo = root.sub(folder: "repo_50k")
-        
-        self.measure {
-            LogCache(repoID: RepoID(url: big_repo.url))
-                .fetchHEAD_Commits()
-                .onSuccess { print("commits fetched: \($0.count)")}
-                .shouldSucceed()
-        }
-    }
+//    func test_measure_10k_oids() {
+//        let big_repo = root.sub(folder: "repo_10k")
+//        
+//        self.measure {
+//            LogCache(repoID: RepoID(url: big_repo.url))
+//                .fetchHEAD()
+//                .onSuccess { print("oids fetched: \($0.count)")}
+//                .shouldSucceed()
+//        }
+//    }
+//    
+//    func test_measure_10k_commits() {
+//        let big_repo = root.sub(folder: "repo_10k")
+//        
+//        self.measure {
+//            LogCache(repoID: RepoID(url: big_repo.url))
+//                .fetchHEAD_Commits()
+//                .onSuccess { print("commits fetched: \($0.count)")}
+//                .shouldSucceed()
+//        }
+//    }
+//    
+//    func test_measure_50k_oids() {
+//        let big_repo = root.sub(folder: "repo_50k")
+//        
+//        self.measure {
+//            LogCache(repoID: RepoID(url: big_repo.url))
+//                .fetchHEAD()
+//                .onSuccess { print("oids fetched: \($0.count)")}
+//                .shouldSucceed()
+//        }
+//    }
+//    
+//    func test_measure_50k_commits() {
+//        let big_repo = root.sub(folder: "repo_50k")
+//        
+//        self.measure {
+//            LogCache(repoID: RepoID(url: big_repo.url))
+//                .fetchHEAD_Commits()
+//                .onSuccess { print("commits fetched: \($0.count)")}
+//                .shouldSucceed()
+//        }
+//    }
 }
