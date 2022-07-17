@@ -13,6 +13,7 @@
 		1D496A4225372FA800789177 /* git_strarray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D496A4125372FA800789177 /* git_strarray.swift */; };
 		1D4BCEF727440F95008831DC /* Repository+Staging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4BCEF627440F95008831DC /* Repository+Staging.swift */; };
 		1D4C9B5426AD79C600ADBBDE /* Repository+Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4C9B5326AD79C600ADBBDE /* Repository+Blob.swift */; };
+		1D5ABAE02882264200F9791C /* FileChangesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5ABADF2882264200F9791C /* FileChangesTests.swift */; };
 		1D5B38A825228C790019E593 /* Repository+Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5B38A725228C790019E593 /* Repository+Diff.swift */; };
 		1D5E1F422742A34D00498539 /* StatusEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5E1F412742A34D00498539 /* StatusEntryTests.swift */; };
 		1D5E1F452742A7DC00498539 /* EssetialTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 1D5E1F442742A7DC00498539 /* EssetialTesting */; };
@@ -162,6 +163,7 @@
 		1D496A4125372FA800789177 /* git_strarray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = git_strarray.swift; sourceTree = "<group>"; };
 		1D4BCEF627440F95008831DC /* Repository+Staging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Staging.swift"; sourceTree = "<group>"; };
 		1D4C9B5326AD79C600ADBBDE /* Repository+Blob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Blob.swift"; sourceTree = "<group>"; };
+		1D5ABADF2882264200F9791C /* FileChangesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileChangesTests.swift; sourceTree = "<group>"; };
 		1D5B38A725228C790019E593 /* Repository+Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Diff.swift"; sourceTree = "<group>"; };
 		1D5E1F412742A34D00498539 /* StatusEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryTests.swift; sourceTree = "<group>"; };
 		1D5E1F462742B31700498539 /* IEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEntry.swift; sourceTree = "<group>"; };
@@ -550,6 +552,7 @@
 				1DB6CBB52856773F00E2244A /* StatusCustomTest.swift */,
 				E6332DD0265167F0004990E7 /* Info.plist */,
 				1D914FBA28567A1300034EC1 /* Base */,
+				1D5ABADF2882264200F9791C /* FileChangesTests.swift */,
 			);
 			path = SwiftGit2Tests;
 			sourceTree = "<group>";
@@ -903,6 +906,7 @@
 				1DB4D5DD28241A0A0080BB6B /* BranchTests.swift in Sources */,
 				E67E84D727E5DAAF009E5B31 /* LogTests.swift in Sources */,
 				E6E99235268BBF5E00F8E8BD /* RevwalkTests.swift in Sources */,
+				1D5ABAE02882264200F9791C /* FileChangesTests.swift in Sources */,
 				1D6C64432837FAFA003E9072 /* GitCommit+Test.swift in Sources */,
 				E6332DCF265167F0004990E7 /* RepositoryRemoteTests.swift in Sources */,
 				1DB6CBB62856773F00E2244A /* StatusCustomTest.swift in Sources */,
