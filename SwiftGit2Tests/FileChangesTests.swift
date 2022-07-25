@@ -46,7 +46,8 @@ class FileChangesTests: XCTestCase {
     
     func test_changes2() {
         let folder = root.sub(folder: "Changes")
-        let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))).repo.shouldSucceed("repo1 clone")!
+        
+        _ = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))).repo.shouldSucceed("repo1 clone")!
         
         let filePath = "fileA.txt"
         
@@ -59,17 +60,28 @@ class FileChangesTests: XCTestCase {
             .shouldSucceed("changedsOfFileR found")!
         
         XCTAssertTrue(a.count > 0, "result history item is MORE than 0 ")
+        
+        let b = a.first!.getFileContent()
+            .shouldSucceed("changedsOfFileR found")!
+        
+        XCTAssertTrue(b.1.deltasWithHunks.count > 0, "result history item is MORE than 0 ")
     }
 }
 
 struct HistoryFileID {
-   let path: String
-   let commitOid: OID // CommitOID
+    let repoID: RepoID
+    let path: String
+    let commitOid: OID
 }
 
 extension HistoryFileID {
-    func getFileContent() -> [Diff.Delta] {
-        return .wtf("Not implemented")
+    func getFileContent() -> R<(Commit, CommitDetails)> {
+        let commit = repoID.repo
+            .flatMap{ $0.commit(oid: self.commitOid) }
+        
+        let deltas = repoID.repo.flatMap{ $0.deltas(target: .commit(self.commitOid)) }
+        
+        return combine(commit, deltas)
     }
 }
 
@@ -94,6 +106,6 @@ extension RepoID {
             }
             .map { $0.filter{ $0.1.count > 0 } }
         
-        return changedsOfFileR.map { $0.map{ HistoryFileID(path: $0.1.first?.newFile?.path ?? $0.1.first?.oldFile?.path ?? "" , commitOid: $0.0.oid ) } }
+        return changedsOfFileR.map { $0.map{ HistoryFileID(repoID: repoID, path: $0.1.first?.newFile?.path ?? $0.1.first?.oldFile?.path ?? "" , commitOid: $0.0.oid ) } }
     }
 }
