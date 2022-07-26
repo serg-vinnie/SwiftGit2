@@ -118,6 +118,7 @@
 		E6E9923A268BC1BE00F8E8BD /* Essentials in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E6E99238268BC1BE00F8E8BD /* Essentials */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */; };
 		E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */; };
+		E6EDE036289088E9008355A0 /* ReferenceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EDE035289088E9008355A0 /* ReferenceID.swift */; };
 		E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */; };
 		E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */; };
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
@@ -288,6 +289,7 @@
 		E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevwalkTests.swift; sourceTree = "<group>"; };
 		E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntry.swift; sourceTree = "<group>"; };
 		E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Discard.swift"; sourceTree = "<group>"; };
+		E6EDE035289088E9008355A0 /* ReferenceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceID.swift; sourceTree = "<group>"; };
 		E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Unborn.swift; sourceTree = "<group>"; };
 		E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder_Ext.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -669,6 +671,7 @@
 				232861421F4A3A2E00276D65 /* Diff.swift */,
 				E653907923E7328200C08416 /* Diff+Delta.swift */,
 				E6D4A91D24DEAA3000E8041E /* Reference.swift */,
+				E6EDE035289088E9008355A0 /* ReferenceID.swift */,
 				E6D4A92724DF55E400E8041E /* Reference+Write.swift */,
 				E6D4A91B24DEA9AD00E8041E /* Branch.swift */,
 				E68A3ACB2663A26300B0244C /* Branch+Repository.swift */,
@@ -891,6 +894,7 @@
 				E64F957527E8B91B00E2D5D7 /* Git.Discard.swift in Sources */,
 				E6332E082652D20E004990E7 /* GitPayload.swift in Sources */,
 				E66360DB27BEEC1C001292FB /* RepoID.swift in Sources */,
+				E6EDE036289088E9008355A0 /* ReferenceID.swift in Sources */,
 				E63EDF80265FF7E100A3D048 /* Repository+Push.swift in Sources */,
 				E6332D51264EF48B004990E7 /* Repository+Merge.swift in Sources */,
 				1DEC2913277230BF007C32FF /* UiStatusEntryX.swift in Sources */,

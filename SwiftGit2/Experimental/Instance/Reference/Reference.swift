@@ -60,7 +60,7 @@ public extension Reference {
 //                git_reference_free(resolved)
 //            }
             
-            return .wtf("This is a TaoGit bug. Must be used targetOID from Duo<Reference,Repository>. Speak with taogit support.")
+            return .wtf("Mail to support@taogit.com: targetOIDNoWarning used in wrong way")
             
 //            git_try("git_reference_name_to_id")
 //                { git_reference_resolve(&resolved, self.pointer) }
