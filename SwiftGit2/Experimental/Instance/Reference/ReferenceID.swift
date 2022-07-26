@@ -22,8 +22,8 @@ public extension ReferenceID {
     var displayName : String {
         if isBranch {
             return name.replace(of: "refs/heads/", to: "")
-        } else if isRemote {
-            return name.replace(of: "refs/remotes/", to: "")
+        } else if let remote = remote {
+            return name.replace(of: "refs/remotes/\(remote)/", to: "")
         } else if isTag {
             return name.replace(of: "refs/tags/", to: "")
         }
@@ -32,11 +32,16 @@ public extension ReferenceID {
         return name
     }
     
-//    var remote : R<String> {
-//        guard isRemote else { return .wtf("can't get remote name from reference \(name)")}
-//        let parts = name.split(separator: "/")
-//        return .notImplemented
-//    }
+    var remote : String? {
+        let parts = name.split(separator: "/")
+        if parts.count > 3 {
+            if parts[1] == "remotes" {
+                return String(parts[2])
+            }
+        }
+        
+        return nil
+    }
 }
 
 public extension RepoID {
@@ -51,6 +56,7 @@ public extension RepoID {
             return self.repo
                 .flatMap { $0.references(withPrefix: "refs/remotes/") }
                 .map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
+                .map { $0.filter { $0.displayName != "HEAD" } }
         }
     }
 }
