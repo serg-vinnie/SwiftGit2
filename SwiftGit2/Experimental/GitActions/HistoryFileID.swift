@@ -19,10 +19,16 @@ public extension HistoryFileID {
 }
 
 public extension RepoID {
-    func getHistoryOfFile(withPath filePath: String) -> R<[HistoryFileID]> {
+    func getHistoryOfFile(withPath filePath: String, getFirst10: Bool = true) -> R<[HistoryFileID]> {
         let repoID = self
         
-        let allCommitsR = repoID.repo.flatMap { $0.commitsFromHead() }
+        var allCommitsR: Result<[Commit], Error>
+        
+        if getFirst10 {
+            allCommitsR = repoID.repo.flatMap { $0.commitsFromHead(num: 100) }
+        } else {
+            allCommitsR = repoID.repo.flatMap { $0.commitsFromHead() }
+        }
         
         let diffsR = allCommitsR.flatMap { allCommits in
             allCommits.map { commit in
@@ -33,12 +39,15 @@ public extension RepoID {
         }
         .map{ $0.map{ $0.filter { $0.newFile?.path == filePath || $0.oldFile?.path == filePath  } } }
         
-        let changedsOfFileR = combine(allCommitsR, diffsR)
+        let changesOfFileR = combine(allCommitsR, diffsR)
             .map { commits, diffs -> Zip2Sequence<[Commit], [[Diff.Delta]]> in
                 zip(commits, diffs)
             }
             .map { $0.filter{ $0.1.count > 0 } }
         
-        return changedsOfFileR.map { $0.map{ HistoryFileID(repoID: repoID, path: $0.1.first?.newFile?.path ?? $0.1.first?.oldFile?.path ?? "" , commitOid: $0.0.oid ) } }
+        return changesOfFileR.map { $0.map{ HistoryFileID(repoID: repoID, path: $0.1.first?.newFile?.path ?? $0.1.first?.oldFile?.path ?? "" , commitOid: $0.0.oid ) } }
+            .map {
+                getFirst10 ? Array.init($0.first(10)) : $0
+            }
     }
 }
