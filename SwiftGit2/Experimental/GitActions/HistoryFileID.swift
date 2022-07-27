@@ -7,14 +7,27 @@ public struct HistoryFileID {
     public let commitOid: OID
 }
 
+public struct HistoryFilePair : Hashable {
+    public static func == (lhs: HistoryFilePair, rhs: HistoryFilePair) -> Bool {
+        lhs.commit.oidShort == rhs.commit.oidShort
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        return hasher.combine(self.commit.oidShort)
+    }
+    
+    public let commit: Commit
+    public let details: CommitDetails
+}
+
 public extension HistoryFileID {
-    func getFileContent() -> R<(Commit, CommitDetails)> {
+    func getFileContent() -> R<HistoryFilePair> {
         let commit = repoID.repo
             .flatMap{ $0.commit(oid: self.commitOid) }
         
         let deltas = repoID.repo.flatMap{ $0.deltas(target: .commit(self.commitOid)) }
         
-        return combine(commit, deltas)
+        return combine(commit, deltas).map{ HistoryFilePair(commit: $0.0, details: $0.1) }
     }
 }
 
