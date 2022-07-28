@@ -42,6 +42,10 @@ public extension ReferenceID {
         
         return nil
     }
+    
+    func reference() -> R<Reference> {
+        repoID.repo.flatMap{ $0.reference(name: name) }
+    }
 }
 
 public extension RepoID {
