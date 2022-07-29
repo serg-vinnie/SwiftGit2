@@ -35,6 +35,12 @@ public extension GitRemotes {
         return .wtf("remoteOf(reference: IMPOSIBRU")
     }
     
+    func fetch(name: String, options: @escaping (String)->FetchOptions) -> R<()> {
+        repoID.repo | { $0.remote(name: name)
+                    | { $0.fetch(options: options($0.url)) } }
+                    | { _ in () }
+    }
+    
     var list  : R<[Remote]> { repoID.repo | { $0.remoteList()     } }
     var names : R<[String]> { repoID.repo | { $0.remoteNameList() } }
     var urls  : R<[String:String]> { list | { $0.toDictionary(key: \.name) { $0.url } } }
