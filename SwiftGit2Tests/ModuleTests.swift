@@ -45,7 +45,7 @@ class ModuleTests: XCTestCase {
         root.sub(folder: "AddRemote")
             .with(repo: "repo", content: .empty)
             .run { $0.snapshoted(to: "0_repo") }
-            .run("createRemote") { $0.repo | { $0.createRemote(url: PublicTestRepo().urlSsh.path) } }
+            .run("createRemote") { GitRemotes(repoID: $0.repoID).add(url: PublicTestRepo().urlSsh.path, name: "origin") }
     }
     
     func test_shouldAddSubmoduleAndCommit() {

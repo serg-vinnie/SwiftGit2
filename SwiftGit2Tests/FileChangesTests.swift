@@ -64,6 +64,6 @@ class FileChangesTests: XCTestCase {
         let b = a.first!.getFileContent()
             .shouldSucceed("changedsOfFileR found")!
         
-        XCTAssertTrue(b.1.deltasWithHunks.count > 0, "result history item is MORE than 0 ")
+        XCTAssertTrue(b.details.all.count > 0, "result history item is MORE than 0 ")
     }
 }
