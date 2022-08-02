@@ -11,9 +11,11 @@ public struct GitCommit {
 
 public extension GitCommit {
     func revert(commit: Commit) -> R<()> {
-        self.repoID.repo.flatMap{ $0.commit(oid: commit.oid) }
+        let repoR = self.repoID.repo
+        
+        return repoR.flatMap{ $0.commit(oid: commit.oid) }
             .flatMap{ commitFromRepo in
-                self.repoID.repo.flatMap{ $0.revert(commit: commitFromRepo) }
+                repoR.flatMap{ $0.revert(commit: commitFromRepo) }
             }
     }
     
