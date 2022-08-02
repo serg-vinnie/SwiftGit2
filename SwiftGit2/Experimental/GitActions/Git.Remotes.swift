@@ -3,6 +3,8 @@ import Essentials
 import Clibgit2
 import OrderedCollections
 
+public typealias GitRemotesList = OrderedDictionary<String,String>
+
 public struct GitRemotes {
     public let repoID : RepoID
     public init(repoID : RepoID) { self.repoID = repoID }
@@ -42,10 +44,11 @@ public extension GitRemotes {
                     | { _ in () }
     }
     
-    var instances   : R<[Remote]>        { repoID.repo | { $0.remoteList()     } }
-    var names       : R<[String]>        { repoID.repo | { $0.remoteNameList() } }
-    var urls        : R<[String:String]> { instances | { $0.toDictionary(key: \.name) { $0.url } } }
-    var count       : R<Int>             { names | { $0.count } }
+    var list        : R<GitRemotesList> { instances | { $0.toOrderedDictionary(key: \.name) { $0.url } } }
+    var names       : R<[String]>       { repoID.repo | { $0.remoteNameList() } }
+    var count       : R<Int>            { names | { $0.count } }
+    
+    var instances   : R<[Remote]>       { repoID.repo | { $0.remoteList()     } }
 }
 
 public extension GitRemotes {
