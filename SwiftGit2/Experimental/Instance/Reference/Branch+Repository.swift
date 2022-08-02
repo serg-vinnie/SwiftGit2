@@ -15,7 +15,7 @@ public extension Duo where T1 == Branch, T2 == Repository {
 
 }
 
-extension Repository {
+public extension Repository {
     func remoteName(branch: String) -> Result<String, Error> {
         var buf = git_buf(ptr: nil, asize: 0, size: 0)
         

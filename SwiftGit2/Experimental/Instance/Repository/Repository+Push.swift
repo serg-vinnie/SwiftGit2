@@ -22,7 +22,7 @@ public extension Repository {
     }
 }
 
-extension Remote {
+public extension Remote {
     func push(branchName: String, options: PushOptions) -> Result<Void, Error> {
         print("Trying to push ''\(branchName)'' to remote ''\(name)'' with URL:''\(url)''")
 
