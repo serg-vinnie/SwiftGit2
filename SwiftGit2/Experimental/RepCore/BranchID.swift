@@ -11,22 +11,22 @@ import Essentials
 
 public struct BranchID {
     public let repoID : RepoID
-    public let reference: String
+    public let referenceName: String
     
     public init (repoID: RepoID, ref: String) {
         self.repoID = repoID
-        self.reference = ref
+        self.referenceName = ref
     }
 }
 
 public extension BranchID {
-    var isLocal: Bool { reference.starts(with: "refs/heads") }
-    var isRemote: Bool { reference.starts(with: "refs/remotes/") }
+    var isLocal: Bool { referenceName.starts(with: "refs/heads") }
+    var isRemote: Bool { referenceName.starts(with: "refs/remotes/") }
     
     var shortNameUnified: String {
         let partsToSkip = isLocal ? 2 : 3
         
-        return reference.components(separatedBy: "/")
+        return referenceName.components(separatedBy: "/")
             .dropFirst(partsToSkip)
             .joined(separator: "/")
     }
@@ -114,7 +114,7 @@ public extension BranchID {
         return self.repoID.repo
             .flatMap { repo in
                 repo
-                    .branchLookup(name: brId.reference)
+                    .branchLookup(name: brId.referenceName)
                     .flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress) }
             }
     }
@@ -122,7 +122,14 @@ public extension BranchID {
     func branch() -> R<Branch> {
         self.repoID.repo
             .flatMap { repo in
-                repo.branchLookup(name: reference)
+                repo.branchLookup(name: referenceName)
+            }
+    }
+    
+    func reference() -> R<Reference> {
+        self.repoID.repo
+            .flatMap { repo in
+                repo.reference(name: referenceName)
             }
     }
 }
@@ -133,6 +140,6 @@ public extension BranchID {
 
 extension BranchID: Identifiable {
     public var id: String {
-        self.reference
+        self.referenceName
     }
 }

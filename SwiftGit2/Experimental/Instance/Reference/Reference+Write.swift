@@ -16,6 +16,12 @@ public extension Repository {
 }
 
 public extension Reference {
+    func delete() -> Result<Void, Error> {
+        return git_try("git_reference_delete") {
+            git_reference_delete(self.pointer)
+        }
+    }
+    
     func rename(_ name: ReferenceName, force: Bool = false) -> Result<Reference, Error> {
         switch name {
         case let .full(name):
