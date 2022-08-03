@@ -16,12 +16,19 @@ public extension Duo where T1 == Branch, T2 == Repository {
 }
 
 public extension Repository {
-    func remoteName(branch: String) -> Result<String, Error> {
+    func remoteName(branch: String) -> R<String> {
         var buf = git_buf(ptr: nil, asize: 0, size: 0)
         
         return git_try("git_branch_upstream_remote") {
             git_branch_upstream_remote(&buf, self.pointer, branch)
         }.flatMap { Buffer(buf: buf).asString() }
+    }
+    
+    func remote(branch: String) -> R<Remote> {
+        let repo = self
+        
+        return repo.remoteName(branch: branch)
+            .flatMap { remoteName in repo.remote(name: remoteName) }
     }
     
     func remoteName(upstream: String) -> R<String> {
