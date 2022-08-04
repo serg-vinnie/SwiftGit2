@@ -118,6 +118,7 @@
 		E6E9923A268BC1BE00F8E8BD /* Essentials in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E6E99238268BC1BE00F8E8BD /* Essentials */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */; };
 		E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */; };
+		E6ED7AAD289B6CB50021456F /* Git.RefCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */; };
 		E6EDE036289088E9008355A0 /* ReferenceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EDE035289088E9008355A0 /* ReferenceID.swift */; };
 		E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */; };
 		E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */; };
@@ -289,6 +290,7 @@
 		E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevwalkTests.swift; sourceTree = "<group>"; };
 		E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntry.swift; sourceTree = "<group>"; };
 		E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Discard.swift"; sourceTree = "<group>"; };
+		E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.RefCache.swift; sourceTree = "<group>"; };
 		E6EDE035289088E9008355A0 /* ReferenceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceID.swift; sourceTree = "<group>"; };
 		E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Unborn.swift; sourceTree = "<group>"; };
 		E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder_Ext.swift; sourceTree = "<group>"; };
@@ -588,6 +590,7 @@
 				1DC8A54227E1247600860A0F /* Git.Conflicts.swift */,
 				E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */,
 				E6169DF528149496001EB8A6 /* Git.Remotes.swift */,
+				E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */,
 				E6C7D37A2822EAD40091D710 /* Git.Branch.swift */,
 				1D6C643528319C41003E9072 /* GitStash.swift */,
 				1D6C643F2837F64D003E9072 /* GitCommit.swift */,
@@ -817,6 +820,7 @@
 				1D0AFF642534AC440045D68D /* StatusOptions.Flags.swift in Sources */,
 				1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */,
 				E69D5CEE2573AC8E00AEBA28 /* Repository+Submodules.swift in Sources */,
+				E6ED7AAD289B6CB50021456F /* Git.RefCache.swift in Sources */,
 				1D991AE12518FA7900335255 /* Duo.swift in Sources */,
 				E60364B727DB338100E9D4D0 /* Auth.swift in Sources */,
 				1DEC291527723308007C32FF /* StatusEntryHunks.swift in Sources */,
