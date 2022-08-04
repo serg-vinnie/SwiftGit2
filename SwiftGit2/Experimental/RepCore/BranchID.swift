@@ -118,20 +118,26 @@ public extension BranchID {
                     .flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress) }
             }
     }
+
+////////////////////////
+////////////////////////
+// DO NOT CREATE SUCH METHODS! Its the reason of Bad Access Exception
     
-    func branch() -> R<Branch> {
-        self.repoID.repo
-            .flatMap { repo in
-                repo.branchLookup(name: referenceName)
-            }
-    }
+//    func branch() -> R<Branch> {
+//        self.repoID.repo
+//            .flatMap { repo in
+//                repo.branchLookup(name: referenceName)
+//            }
+//    }
     
-    func reference() -> R<Reference> {
-        self.repoID.repo
-            .flatMap { repo in
-                repo.reference(name: referenceName)
-            }
-    }
+//    func reference() -> R<Reference> {
+//        self.repoID.repo
+//            .flatMap { repo in
+//                repo.reference(name: referenceName)
+//            }
+//    }
+////////////////////////
+////////////////////////
 }
 
 //////////////////////////////////////
