@@ -16,16 +16,16 @@ struct ReferenceCache {
 public final class GitRefCache {
     let repoID : RepoID
     private(set) var local  : [ReferenceCache] = []
-    private(set) var remote : [ReferenceCache] = []
+    private(set) var remote : [String:[ReferenceCache]] = [:]
     private(set) var tags   : [ReferenceCache] = []
     
     private(set) var HEAD   : ReferenceCache?
     
     init(repoID: RepoID, local: [ReferenceID], remote: [ReferenceID], tags: [ReferenceID]) {
         self.repoID = repoID
-        self.local  = local.map { ReferenceCache($0, cache: self) }
-        self.remote = remote.map { ReferenceCache($0, cache: self) }
-        self.tags   = tags.map { ReferenceCache($0, cache: self) }
+        self.local  = local.map  { ReferenceCache($0, cache: self) }
+        self.remote = remote.asCacheDic(cache: self)
+        self.tags   = tags.map   { ReferenceCache($0, cache: self) }
         self.HEAD   = (repoID.repo | { $0.HEAD() }
                                    | { ReferenceCache(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
                        ).maybeSuccess
@@ -43,4 +43,22 @@ public final class GitRefCache {
 
 extension ReferenceCache {
     var isHead : Bool { self.cache.HEAD?.referenceID == self.referenceID }
+}
+
+extension Array where Element == ReferenceID {
+    func asCacheDic(cache: GitRefCache) -> [String:[ReferenceCache]] {
+        var dic = [String:[ReferenceCache]]()
+        
+        for ref in self {
+            guard let remote = ref.remote else { continue }
+            
+            if dic.keys.contains(remote) {
+                dic[remote]!.append(ReferenceCache(ref, cache: cache))
+            } else {
+                dic[remote] = [ReferenceCache(ref, cache: cache)]
+            }
+        }
+        
+        return dic
+    }
 }
