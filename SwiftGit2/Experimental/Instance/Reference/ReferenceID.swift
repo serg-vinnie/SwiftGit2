@@ -32,6 +32,12 @@ public extension ReferenceID {
         return name
     }
     
+    var category : String {
+        let parts = name.split(separator: "/")
+        guard parts.count > 1 else { return "" }
+        return String(parts[1])
+    }
+    
     var remote : String? {
         let parts = name.split(separator: "/")
         if parts.count > 3 {

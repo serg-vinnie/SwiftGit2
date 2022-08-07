@@ -2,7 +2,6 @@
 import Foundation
 import Essentials
 
-
 public struct ReferenceCache {
     public let referenceID: ReferenceID
     public let cache: GitRefCache
@@ -15,4 +14,66 @@ public struct ReferenceCache {
 
 public extension ReferenceCache {
     var isHead : Bool { self.cache.HEAD?.referenceID == self.referenceID }
+    var upstream : ReferenceCache? {
+        if let upstrm = self.cache.upstreams.a2b[self.referenceID.name] {
+            let refID = ReferenceID(repoID: self.referenceID.repoID, name: upstrm)
+            return ReferenceCache(refID, cache: self.cache)
+        }
+        return nil
+    }
+    var downstream : ReferenceCache? {
+        if let downstrm = self.cache.upstreams.b2a[self.referenceID.name] {
+            let refID = ReferenceID(repoID: self.referenceID.repoID, name: downstrm)
+            return ReferenceCache(refID, cache: self.cache)
+        }
+        return nil
+    }
+    
+    var counterpart : ReferenceCache? {
+        if let item = self.cache.upstreams.counterpart(self.referenceID.name) {
+            let refID = ReferenceID(repoID: self.referenceID.repoID, name: item)
+            return ReferenceCache(refID, cache: self.cache)
+        }
+        return nil
+    }
 }
+
+struct OneOnOne {
+    let a2b : [String:String]
+    let b2a : [String:String]
+    
+    init(a2b : [String:String], b2a : [String:String]) {
+        self.a2b = a2b
+        self.b2a = b2a
+    }
+    
+    init( _ map : [(String,String)]) {
+        var a2b = [String:String]()
+        var b2a = [String:String]()
+        
+        for (a,b) in map {
+            a2b[a] = b
+            b2a[b] = a
+        }
+        self.a2b = a2b
+        self.b2a = b2a
+    }
+    
+    func counterpart( _ id : String) -> String? {
+        if let b = a2b[id] {
+            return b
+        }
+        if let a = b2a[id] {
+            return a
+        }
+        
+        return nil
+    }
+    
+    static var empty : OneOnOne { OneOnOne(a2b: [:], b2a: [:]) }
+}
+
+//struct OneOnMany {
+//    let a2b : [String:[String]]
+//    let b2a : [String:String]
+//}

@@ -10,6 +10,8 @@ public final class GitRefCache {
     
     public private(set) var HEAD   : ReferenceCache?
     
+    lazy var upstreams : OneOnOne = { local.upstreams() }()
+    
     init(repoID: RepoID, local: [ReferenceID], remote: [ReferenceID], tags: [ReferenceID]) {
         self.repoID = repoID
         self.local  = local.map  { ReferenceCache($0, cache: self) }
@@ -50,5 +52,21 @@ extension Array where Element == ReferenceID {
         }
         
         return dic
+    }
+}
+
+extension Array where Element == ReferenceCache {
+    func upstreams() -> OneOnOne {
+        let arr = self.map { r in (r.referenceID.name, r.referenceID.upstream1Name) }
+            .filter { $0.1 != nil }
+            .map { ($0.0,$0.1!)}
+        return OneOnOne(arr)
+    }
+}
+
+extension ReferenceID {
+    var upstream1Name : String? {
+        return (repoID.repo.flatMap{ $0.reference(name: name) | { $0.upstreamName() } }).maybeSuccess
+        //return name.maybeSuccess
     }
 }
