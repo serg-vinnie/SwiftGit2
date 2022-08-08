@@ -24,31 +24,23 @@ struct BranchSync  {
         let repo = our.repoID.repo
         
         return combine(repo,ourOID, theirOID) | { $0.mergeBase(one: $1, two: $2) } | { BranchSync(our: our, their: their, base:$0) }
-        
-        //let push = our.repoID.repo | { $0.oids(our: our.name, their: their.name) }
-        //let pull = our.repoID.repo | { $0.oids(our: their.name, their: our.name) }
     }
     
-    func conflicted() -> R<Bool> {
-//        let ourOID   = ourLocal.targetOID
-//        let theirOID = ourLocal.upstream()       | { $0.targetOID }
-//        let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
-//
-//        let message = combine(theirReference, baseOID)
-//            | { their, base in "MERGE [\(their.nameAsReferenceCleaned)] & [\(ourLocal.nameAsReferenceCleaned)] | BASE: \(base)" }
-//
-//        let ourCommit   = ourOID   | { self.commit(oid: $0) }
-//        let theirCommit = theirOID | { self.commit(oid: $0) }
-//
-//        let parents = combine(ourCommit, theirCommit) | { [$0, $1] }
-//
-//        let branchName = ourLocal.nameAsReference
-//
-//        return [ourOID, theirOID, baseOID]
-//            .flatMap { $0.tree(self) }
-//            .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options.mergeOptions) } // -> Index
-//            .if(\.hasConflicts,
-        return .notImplemented
+    var mergeIndex : R<Index> {
+        let ourOID = our.targetOID
+        let theirOID = their.targetOID
+        let repo = our.repoID.repo
+        
+        return combine(repo, ourOID, theirOID)
+            .flatMap { repo, our, their in repo.merge(our: our, their: their, base: self.base, options: MergeOptions()) }
+    }
+}
+
+extension Repository {
+    func merge(our: OID, their: OID, base: OID, options: MergeOptions) -> R<Index> {
+        return [our, their, base]
+            .flatMap { self.commit(oid: $0) | { $0.tree() } }
+            .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options) } // -> Index
     }
 }
 
