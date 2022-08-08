@@ -23,16 +23,16 @@ class MergeAnalysisTests: XCTestCase {
         var branchSync = BranchSync.with(our: our, their: their)
             .shouldSucceed()!
         
-        XCTAssert(branchSync.pull.count == 1)
-        XCTAssert(branchSync.push.count == 0)
+        XCTAssert(branchSync.pull.maybeSuccess?.count == 1)
+        XCTAssert(branchSync.push.maybeSuccess?.count == 0)
         
         local.commit(msg: "Commit 2").shouldSucceed()
         
         branchSync = BranchSync.with(our: our, their: their)
            .shouldSucceed()!
         
-        XCTAssert(branchSync.pull.count == 1)
-        XCTAssert(branchSync.push.count == 1)
+        XCTAssert(branchSync.pull.maybeSuccess?.count == 1)
+        XCTAssert(branchSync.push.maybeSuccess?.count == 1)
     }
     
     func test_shouldMergeFastForward() {

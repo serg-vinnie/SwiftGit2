@@ -52,6 +52,10 @@ public extension ReferenceID {
     func reference() -> R<Reference> {
         repoID.repo.flatMap{ $0.reference(name: name) }
     }
+    
+    var targetOID : R<OID> {
+        repoID.repo | { r in r.reference(name: name) | { $0.with(r).targetOID() }}
+    }
 }
 
 public enum ReferenceLocation {
