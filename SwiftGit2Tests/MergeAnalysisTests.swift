@@ -14,6 +14,7 @@ class MergeAnalysisTests: XCTestCase {
         let local = folder.with(repo: "their", content: .clone(remote.url, .local)).shouldSucceed()!
         
         remote.commit(file: .fileA, with: .random, msg: "Commit 2").shouldSucceed()
+        remote.commit(file: .fileB, with: .random, msg: "Commit 3").shouldSucceed()
         
         local.fetchHead(options: .local).shouldSucceed()
         
@@ -23,16 +24,30 @@ class MergeAnalysisTests: XCTestCase {
         var branchSync = BranchSync.with(our: our, their: their)
             .shouldSucceed()!
         
-        XCTAssert(branchSync.pull.maybeSuccess?.count == 1)
+        XCTAssert(branchSync.pull.maybeSuccess?.count == 2)
         XCTAssert(branchSync.push.maybeSuccess?.count == 0)
         
-        local.commit(msg: "Commit 2").shouldSucceed()
+        local.commit(file: .fileA, with: .random, msg: "Commit 2").shouldSucceed()
+        local.commit(file: .fileC, with: .random, msg: "Commit 3").shouldSucceed()
         
         branchSync = BranchSync.with(our: our, their: their)
            .shouldSucceed()!
         
-        XCTAssert(branchSync.pull.maybeSuccess?.count == 1)
-        XCTAssert(branchSync.push.maybeSuccess?.count == 1)
+        XCTAssert(branchSync.pull.maybeSuccess?.count == 2)
+        XCTAssert(branchSync.push.maybeSuccess?.count == 2)
+        
+        let index = branchSync.mergeIndex.shouldSucceed()!
+        
+        index.conflicts()
+            .map { $0.count }
+            .assertEqual(to: 1)
+        
+        let entries = index.entries().shouldSucceed()!
+        
+        for entry in entries {
+            print(entry.path)
+        }
+        //XCTAssertEqual(index.entrycount, 3)
     }
     
     func test_shouldMergeFastForward() {
