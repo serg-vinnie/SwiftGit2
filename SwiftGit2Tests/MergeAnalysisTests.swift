@@ -7,6 +7,34 @@ import EssetialTesting
 class MergeAnalysisTests: XCTestCase {
     let root  = TestFolder.git_tests.sub(folder: "MergeAnalysisTests")
         
+    func test_branchSync() {
+        let folder = root.sub(folder: "branchSync").cleared().shouldSucceed()!
+        
+        let remote = folder.with(repo: "our", content: .commit(.fileA, .random, "Commit 1")).shouldSucceed()!
+        let local = folder.with(repo: "their", content: .clone(remote.url, .local)).shouldSucceed()!
+        
+        remote.commit(file: .fileA, with: .random, msg: "Commit 2").shouldSucceed()
+        
+        local.fetchHead(options: .local).shouldSucceed()
+        
+        let our = ReferenceID(repoID: local.repoID, name: "refs/heads/main")
+        let their = ReferenceID(repoID: local.repoID, name: "refs/remotes/origin/main")
+        
+        var branchSync = BranchSync.with(our: our, their: their)
+            .shouldSucceed()!
+        
+        XCTAssert(branchSync.pull.count == 1)
+        XCTAssert(branchSync.push.count == 0)
+        
+        local.commit(msg: "Commit 2").shouldSucceed()
+        
+        branchSync = BranchSync.with(our: our, their: their)
+           .shouldSucceed()!
+        
+        XCTAssert(branchSync.pull.count == 1)
+        XCTAssert(branchSync.push.count == 1)
+    }
+    
     func test_shouldMergeFastForward() {
         let folder = root.sub(folder: "fastForward").cleared().shouldSucceed()!
         

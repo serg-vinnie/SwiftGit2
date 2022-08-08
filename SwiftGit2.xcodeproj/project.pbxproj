@@ -121,6 +121,7 @@
 		E6ED7AAD289B6CB50021456F /* Git.RefCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */; };
 		E6EDE036289088E9008355A0 /* ReferenceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EDE035289088E9008355A0 /* ReferenceID.swift */; };
 		E6EEFC8028A0546400E60185 /* ReferenceCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */; };
+		E6EEFC8228A146CD00E60185 /* BranchSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EEFC8128A146CC00E60185 /* BranchSync.swift */; };
 		E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */; };
 		E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */; };
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
@@ -294,6 +295,7 @@
 		E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.RefCache.swift; sourceTree = "<group>"; };
 		E6EDE035289088E9008355A0 /* ReferenceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceID.swift; sourceTree = "<group>"; };
 		E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceCache.swift; sourceTree = "<group>"; };
+		E6EEFC8128A146CC00E60185 /* BranchSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BranchSync.swift; sourceTree = "<group>"; };
 		E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Unborn.swift; sourceTree = "<group>"; };
 		E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder_Ext.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -605,6 +607,7 @@
 		E66360DD27BF061F001292FB /* RepCore */ = {
 			isa = PBXGroup;
 			children = (
+				E6EEFC8128A146CC00E60185 /* BranchSync.swift */,
 				E66360DE27BF063D001292FB /* RepCore.swift */,
 				E6AA18F827AF815E002AFC33 /* GitModule.swift */,
 				E66360DA27BEEC1C001292FB /* RepoID.swift */,
@@ -843,6 +846,7 @@
 				1D7BEE7A28253D8400EC4C6F /* BranchID.swift in Sources */,
 				1D4C9B5426AD79C600ADBBDE /* Repository+Blob.swift in Sources */,
 				E63EDF76265D255500A3D048 /* Repository+HEAD.swift in Sources */,
+				E6EEFC8228A146CD00E60185 /* BranchSync.swift in Sources */,
 				BE276B291ACCD3CF00D6DAD7 /* CheckoutStrategy.swift in Sources */,
 				622726341C84E52500C53D17 /* Credentials.swift in Sources */,
 				1DC744B9289061C9000F8478 /* HistoryFileID.swift in Sources */,
