@@ -2,13 +2,13 @@
 import Foundation
 import Essentials
 
-struct BranchSync  {
-    let our : ReferenceID
-    let their : ReferenceID
-    let base  : OID
+public struct BranchSync  {
+    public let our : ReferenceID
+    public let their : ReferenceID
+    public let base  : OID
     
-    var push : R<[OID]> { our.repoID.repo | { $0.oids(our: our.name, their: their.name) } }
-    var pull : R<[OID]> { our.repoID.repo | { $0.oids(our: their.name, their: our.name) } }
+    public var push : R<[OID]> { our.repoID.repo | { $0.oids(our: our.name, their: their.name) } }
+    public var pull : R<[OID]> { our.repoID.repo | { $0.oids(our: their.name, their: our.name) } }
     
     init(our: ReferenceID, their: ReferenceID, base: OID) {
         self.our    = our
@@ -16,7 +16,7 @@ struct BranchSync  {
         self.base   = base
     }
     
-    static func with(our: ReferenceID, their: ReferenceID) -> R<BranchSync> {
+    public static func with(our: ReferenceID, their: ReferenceID) -> R<BranchSync> {
         if our.repoID != their.repoID { return .wtf("BranchSync: references from different repositories") }
         
         let ourOID = our.targetOID
@@ -26,7 +26,7 @@ struct BranchSync  {
         return combine(repo,ourOID, theirOID) | { $0.mergeBase(one: $1, two: $2) } | { BranchSync(our: our, their: their, base:$0) }
     }
     
-    var mergeIndex : R<Index> {
+    public var mergeIndex : R<Index> {
         let ourOID = our.targetOID
         let theirOID = their.targetOID
         let repo = our.repoID.repo
