@@ -44,11 +44,14 @@ public extension Duo where T1 == Branch, T2 == Remote {
     }
 }
 
-public extension Duo where T1 == BranchID, T2 == Remote {
+public extension Duo where T1 == ReferenceID, T2 == Remote {
     /// Push local branch changes to remote branch
     func push(auth: Auth) -> Result<Void, Error> {
-        let (branch, remote) = value
-        return remote.push(branchName: branch.referenceName, options: PushOptions(auth: auth))
+        let (ref, remote) = value
+        
+        guard ref.isBranch else { return .wtf("Duo.push() failed: Reference is not a branch!") }
+        
+        return remote.push(branchName: ref.name, options: PushOptions(auth: auth))
     }
 }
 

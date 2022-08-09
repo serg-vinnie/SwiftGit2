@@ -12,6 +12,11 @@ import Essentials
 public struct ReferenceID : Equatable {
     public let repoID: RepoID
     public let name: String
+    
+    public init(repoID: RepoID, name: String) {
+        self.repoID = repoID
+        self.name = name
+    }
 }
 
 public extension ReferenceID {
@@ -82,5 +87,47 @@ public extension RepoID {
                 .flatMap { $0.references(withPrefix: "refs/tags/") }
                 .map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
         }
+    }
+}
+
+
+
+public extension ReferenceID {
+    var isLocalBr: Bool { name.starts(with: "refs/heads") }
+    var isRemoteBr: Bool { name.starts(with: "refs/remotes/") }
+
+    var shortNameUnified: String {
+        let partsToSkip = isLocalBr ? 2 : 3
+
+        return name.components(separatedBy: "/")
+            .dropFirst(partsToSkip)
+            .joined(separator: "/")
+    }
+}
+
+public extension Branch {
+    func asReferenceID(repoID: RepoID) -> ReferenceID {
+        return ReferenceID(repoID: repoID, name: self.nameAsReference)
+    }
+}
+
+
+public extension ReferenceID {
+    func checkout(strategy: CheckoutStrategy = .Force, progress: CheckoutProgressBlock? = nil)  -> Result<Void, Error>  {
+        let brId = self
+        
+        
+        return self.repoID.repo
+            .flatMap { repo in
+                repo
+                    .branchLookup(name: brId.name)
+                    .flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress) }
+            }
+    }
+}
+
+extension ReferenceID: Identifiable {
+    public var id: String {
+        self.name
     }
 }

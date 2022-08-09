@@ -89,7 +89,7 @@ public extension Repository {
         case .local:
             return references(withPrefix: "refs/heads/")
                 .flatMap { $0.flatMap { $0.asBranch() } }
-
+        
         case .remote:
             return references(withPrefix: "refs/remotes/")
                 .flatMap { $0.flatMap { $0.asBranch() } }
