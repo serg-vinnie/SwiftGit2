@@ -2,7 +2,9 @@
 import Foundation
 import Essentials
 
-public struct ReferenceCache {
+public struct ReferenceCache : Identifiable {
+    public var id: String { referenceID.id }
+    
     public let referenceID: ReferenceID
     public let cache: GitRefCache
     
