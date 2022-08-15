@@ -10,6 +10,12 @@ public enum BranchBase {
 public struct GitBranches {
     public let repoID : RepoID
     public init(repoID : RepoID) { self.repoID = repoID }
+    
+    public func new(from target: BranchTarget, name: String, checkout: Bool) -> R<ReferenceID> {
+        repoID.repo
+            | { $0.createBranch(from: target, name: name, checkout: checkout) }
+            | { ReferenceID(repoID: repoID, name: $0.nameAsReference) } 
+    }
 }
 
 public extension Repository {
