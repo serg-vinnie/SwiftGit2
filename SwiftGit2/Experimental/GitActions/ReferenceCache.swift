@@ -38,6 +38,16 @@ public extension ReferenceCache {
     }
 }
 
+extension ReferenceCache : Hashable {
+    public static func == (lhs: ReferenceCache, rhs: ReferenceCache) -> Bool {
+        lhs.referenceID == rhs.referenceID
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.referenceID)
+    }
+}
+
 struct OneOnOne {
     let a2b : [String:String]
     let b2a : [String:String]

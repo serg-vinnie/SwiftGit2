@@ -73,6 +73,17 @@ public extension Reference {
 }
 
 public extension Repository {
+    var references : R<[String]> {
+        var strarray = git_strarray()
+        defer {
+            git_strarray_free(&strarray) // free results of the git_reference_list call
+        }
+        return git_try("git_reference_list") {
+            git_reference_list(&strarray, self.pointer)
+        }
+        .map { strarray.map { $0 } }
+    }
+    
     func references(withPrefix prefix: String) -> Result<[Reference], Error> {
         var strarray = git_strarray()
         defer {

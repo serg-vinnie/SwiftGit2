@@ -9,7 +9,7 @@
 import Foundation
 import Essentials
 
-public struct ReferenceID : Equatable {
+public struct ReferenceID : Equatable, Hashable {
     public let repoID: RepoID
     public let name: String
     
@@ -70,22 +70,29 @@ public enum ReferenceLocation {
 }
 
 public extension RepoID {
+    
+    var references : R<[ReferenceID]> {
+        repo | { $0.references } | { $0.map { ReferenceID(repoID: self, name: $0) } }
+    }
+
     func references(_ location: ReferenceLocation) -> R<[ReferenceID]> {
         switch location {
         case .local:
-            return self.repo
-                .flatMap { $0.references(withPrefix: "refs/heads/") }
-                .map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
+            return self.references | { $0.filter { $0.name.starts(with: "refs/heads/") } }
+                //.flatMap { $0.references(withPrefix: "refs/heads/") }
+                //.map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
 
         case .remote:
-            return self.repo
-                .flatMap { $0.references(withPrefix: "refs/remotes/") }
-                .map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
-                .map { $0.filter { $0.displayName != "HEAD" } }
+            return self.references | { $0.filter { $0.name.starts(with: "refs/remotes/") } }
+//            return self.repo
+//                .flatMap { $0.references(withPrefix: "refs/remotes/") }
+//                .map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
+//                .map { $0.filter { $0.displayName != "HEAD" } }
         case .tag:
-            return self.repo
-                .flatMap { $0.references(withPrefix: "refs/tags/") }
-                .map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
+            return self.references | { $0.filter { $0.name.starts(with: "refs/tags/") } }
+//            return self.repo
+//                .flatMap { $0.references(withPrefix: "refs/tags/") }
+//                .map { $0.map { ReferenceID(repoID: self, name: $0.nameAsReference ) } }
         }
     }
 }
