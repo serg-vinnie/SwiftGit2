@@ -25,6 +25,14 @@ public final class GitRefCache {
                        ).maybeSuccess
     }
     
+    public func find(refID: ReferenceID) -> ReferenceCache? {
+        if refID.isBranch { return local.first { $0.referenceID == refID } }
+        if refID.isRemote { return remote.values.flatMap { $0 }.first { $0.referenceID == refID }}
+        if refID.isTag    { return tags.first { $0.referenceID == refID } }
+        
+        return nil
+    }
+    
     public static func from(repoID: RepoID) -> R<GitRefCache> {
         let list    = repoID.references
         let remotes = GitRemotes(repoID: repoID).list
