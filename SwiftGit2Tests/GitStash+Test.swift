@@ -75,9 +75,13 @@ class GitStashTests: XCTestCase {
         (repoID.repo | { $0.t_write(file: .fileA, with: .content1) })
             .shouldSucceed()
         
-        // status.count == 1
+        // write fileB
+        (repoID.repo | { $0.t_write(file: .fileB, with: .content2) })
+            .shouldSucceed()
+        
+        // status.count == 2
         (repoID.repo | { $0.status() } | { $0.count })
-            .assertEqual(to: 1)
+            .assertEqual(to: 2)
         
         let stashed = stasher.push()
             .assertBlock("push") { $0.state.isStashed }
@@ -93,11 +97,18 @@ class GitStashTests: XCTestCase {
         let status = repoID.repo | { $0.status() }
         
         (status | { $0.count })
-            .assertEqual(to: 1)
+            .assertEqual(to: 2)
         
-        let url = folder.url.appendingPathComponent(TestFile.fileA.rawValue)
-        let content = try! String(contentsOf: url)
-        XCTAssertEqual(content, TestFileContent.content1.rawValue)
+        let urlA = folder.url.appendingPathComponent(TestFile.fileA.rawValue)
+        let contentA = try! String(contentsOf: urlA)
+        XCTAssertEqual(contentA, TestFileContent.content1.rawValue)
+        
+        let urlB = folder.url.appendingPathComponent(TestFile.fileB.rawValue)
+        let contentB = try! String(contentsOf: urlB)
+        XCTAssertEqual(contentB, TestFileContent.content2.rawValue)
+        
+        (GitStash(repoID: repoID).items() | { $0.count })
+            .assertEqual(to: 0)
     }
     
     //let folder = root.with(repo: "stasher", content: .commit(.fileA, .random, "comment")).shouldSucceed()!

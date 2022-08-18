@@ -45,6 +45,6 @@ private extension GitStasher {
     func stash() -> R<OID> {
         let signature = Signature(name: "GitStasher", email: "support@taogit.com")
         return GitStash(repoID: repoID)
-            .save(signature: signature, message: "atomatic stash")
+            .save(signature: signature, message: "atomatic stash", flags: .includeUntracked)
     }
 }
