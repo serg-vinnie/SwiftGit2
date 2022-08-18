@@ -10,51 +10,7 @@ import Clibgit2
 import Essentials
 import CoreMIDI
 
-public extension Repository {
-    func stashForeach() -> R<[Stash]> {
-        var cb = StashCallbacks()
-        
-        return _result( { cb.stashes } , pointOfFailure: "git_stash_foreach") {
-            git_stash_foreach(self.pointer, cb.git_stash_cb, &cb)
-        }
-    }
-    
-    func stashSave(signature: Signature, message: String?, flags: StashFlags ) -> R<OID> {
-        var oid: git_oid = git_oid() // out
-        
-        if let message = message {
-            return signature.make()
-                .flatMap { signat in
-                    git_try("git_stash_save") {
-                        message.withCString { msg in
-                            git_stash_save(&oid, self.pointer, signat.pointer, msg, flags.rawValue)
-                        }
-                    }
-                }
-                .map { _ in OID(oid) }
-        }
-        
-        return signature.make()
-            .flatMap { signat in
-                git_try("git_stash_save") {
-                    git_stash_save(&oid, self.pointer, signat.pointer, nil, flags.rawValue)
-                }
-            }
-            .map { _ in OID(oid) }
-    }
-    
-    func stashApply(stashIdx: Int) -> R<()> {
-        return _result( { () } , pointOfFailure: "git_stash_apply") {
-            git_stash_apply(self.pointer, stashIdx, nil)
-        }
-    }
-    
-    func stashDrop(stashIdx: Int) -> R<()> {
-        return _result( { () } , pointOfFailure: "git_stash_drop") {
-            git_stash_drop(self.pointer, stashIdx)
-        }
-    }
-}
+
 
 public struct StashFlags: OptionSet {
     public var rawValue: UInt32

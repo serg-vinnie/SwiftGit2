@@ -1,5 +1,6 @@
 import Foundation
 import Essentials
+import Clibgit2
 
 public struct GitStash {
     public let repoID: RepoID
@@ -17,6 +18,14 @@ public extension GitStash {
             .flatMap { $0.stashApply(stashIdx:stashIdx) }
     }
     
+    func item(oid: OID) -> R<Stash> {
+        items() | { $0.first { $0.id == oid }.asNonOptional }
+    }
+    
+    func pop(oid: OID) -> R<()> {
+        combine(repoID.repo, item(oid: oid)) | { repo, item in repo.stashPop(idx: item.index) }
+    }
+    
     func items() -> R<[Stash]> {
         return repoID.repo
             .flatMap { $0.stashForeach() }
@@ -25,5 +34,57 @@ public extension GitStash {
     func remove(stashIdx: Int) -> R<()> {
         return repoID.repo
             .flatMap { $0.stashDrop(stashIdx: stashIdx) }
+    }
+}
+
+internal extension Repository {
+    func stashForeach() -> R<[Stash]> {
+        var cb = StashCallbacks()
+        
+        return _result( { cb.stashes } , pointOfFailure: "git_stash_foreach") {
+            git_stash_foreach(self.pointer, cb.git_stash_cb, &cb)
+        }
+    }
+    
+    func stashSave(signature: Signature, message: String?, flags: StashFlags ) -> R<OID> {
+        var oid: git_oid = git_oid() // out
+        
+        if let message = message {
+            return signature.make()
+                .flatMap { signat in
+                    git_try("git_stash_save") {
+                        message.withCString { msg in
+                            git_stash_save(&oid, self.pointer, signat.pointer, msg, flags.rawValue)
+                        }
+                    }
+                }
+                .map { _ in OID(oid) }
+        }
+        
+        return signature.make()
+            .flatMap { signat in
+                git_try("git_stash_save") {
+                    git_stash_save(&oid, self.pointer, signat.pointer, nil, flags.rawValue)
+                }
+            }
+            .map { _ in OID(oid) }
+    }
+    
+    func stashApply(stashIdx: Int) -> R<()> {
+        return _result( { () } , pointOfFailure: "git_stash_apply") {
+            git_stash_apply(self.pointer, stashIdx, nil)
+        }
+    }
+    
+    func stashPop(idx: Int) -> R<()> {
+        git_try("git_stash_pop") {
+            git_stash_pop(self.pointer, idx, nil)
+        }
+    }
+    
+    func stashDrop(stashIdx: Int) -> R<()> {
+        return _result( { () } , pointOfFailure: "git_stash_drop") {
+            git_stash_drop(self.pointer, stashIdx)
+        }
     }
 }

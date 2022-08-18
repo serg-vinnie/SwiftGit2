@@ -31,6 +31,13 @@ public extension GitStasher {
             }
         }
     }
+    
+    func pop() -> R<Self> {
+        switch state {
+        case .stashed(let oid): return GitStash(repoID: repoID).pop(oid: oid) | { _ in GitStasher(repoID: repoID, state: .unstashed) }
+        default: return .success(self)
+        }
+    }
 }
 
 
