@@ -50,6 +50,19 @@ class GitStashTests: XCTestCase {
         XCTAssertEqual(items.count, 0)
         repoID.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 0)
     }
+    
+    func test_stasherEmptyRepo() {
+        let folder = root.with(repo: "stasherEmptyRepo", content: .empty).shouldSucceed()!
+        let repoID = RepoID(url: folder.url )
+        
+        let stasher = GitStasher(repoID: repoID)
+        
+        stasher.push()
+            .assertBlock { $0.state == .empty }
+        //let folder = root.with(repo: "stasher", content: .commit(.fileA, .random, "comment")).shouldSucceed()!
+    }
+    
+    //let folder = root.with(repo: "stasher", content: .commit(.fileA, .random, "comment")).shouldSucceed()!
 }
 
 ///////////////////////////////////

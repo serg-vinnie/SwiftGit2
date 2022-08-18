@@ -32,7 +32,8 @@ class BranchTests: XCTestCase {
         
         /////// Checkout "anotherBr"
         
-        let brId = BranchID(repoID: repoID, ref: "refs/heads/anotherBr")
+        let brId = ReferenceID(repoID: repoID, name: "refs/heads/anotherBr")
+        ////BranchID(repoID: repoID, ref: "refs/heads/anotherBr")
         
         brId.checkout().shouldSucceed()
         
@@ -43,7 +44,8 @@ class BranchTests: XCTestCase {
         
         //////////////// Checkout "main"
         
-        let brId2 = BranchID(repoID: repoID, ref: "refs/heads/main")
+        let brId2 = ReferenceID(repoID: repoID, name: "refs/heads/main")
+        //BranchID(repoID: repoID, ref: "refs/heads/main")
         
         brId2.checkout().shouldSucceed()
         
