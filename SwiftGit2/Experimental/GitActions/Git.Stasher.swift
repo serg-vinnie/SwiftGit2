@@ -5,8 +5,9 @@ import Essentials
 public struct GitStasher {
     public enum State : Equatable {
         case empty
-        case stashed(String)
+        case stashed(OID)
         case unstashed
+        var isStashed : Bool { guard case .stashed(_) = self else { return false }; return true }
     }
     
     public let state : State
@@ -20,15 +21,23 @@ public struct GitStasher {
 
 public extension GitStasher {
     func push() -> R<Self> {
-        let statusIsEmpty = repoID.repo | { $0.status() } | { $0.count == 0 }
-        
-        
-        return statusIsEmpty.flatMap { isEmpty in
-            if isEmpty {
+        let isEmpty = repoID.repo | { $0.status() } | { $0.count == 0 }
+        let headIsUnborn = repoID.repo  | { $0.headIsUnborn }
+        return combine(isEmpty, headIsUnborn).flatMap { isEmpty, isUnborn in
+            if isEmpty || isUnborn {
                 return .success(GitStasher(repoID: repoID, state: .empty))
             } else {
-                return .notImplemented
+                return stash().map { GitStasher(repoID: repoID, state: .stashed($0)) }
             }
         }
+    }
+}
+
+
+private extension GitStasher {
+    func stash() -> R<OID> {
+        let signature = Signature(name: "GitStasher", email: "support@taogit.com")
+        return GitStash(repoID: repoID)
+            .save(signature: signature, message: "atomatic stash")
     }
 }
