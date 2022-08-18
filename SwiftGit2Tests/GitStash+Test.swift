@@ -64,7 +64,16 @@ class GitStashTests: XCTestCase {
             .shouldSucceed()
         
         stasher.push()
-            .assertBlock("push") { $0.state == .empty }
+            .assertBlock { $0.state == .empty }
+        
+        (repoID.repo | { $0.addAllFiles() } | { $0.commit(message: "initial commit", signature: .test) })
+            .shouldSucceed()
+        
+        (repoID.repo | { $0.t_write(file: .fileA, with: .random) })
+            .shouldSucceed()
+        
+        stasher.push()
+            .assertBlock("push") { $0.state.isStashed }
     }
     
     //let folder = root.with(repo: "stasher", content: .commit(.fileA, .random, "comment")).shouldSucceed()!
