@@ -17,6 +17,16 @@ public struct GitStasher {
         self.repoID = repoID
         self.state = state
     }
+    
+    public func wrap<T>( _ block: ()-> R<T>) -> R<T> {
+        switch push() {
+        case .success(let me):
+            let result = block()
+            return result | { _ in me.pop() } | { _ in result }
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
 }
 
 public extension GitStasher {
