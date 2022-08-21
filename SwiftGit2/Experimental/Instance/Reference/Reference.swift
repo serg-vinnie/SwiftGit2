@@ -24,7 +24,7 @@ public class Reference: Branch { // Branch: InstanceProtocol
 
 public extension Reference {
     var nameAsReference: String { String(validatingUTF8: git_reference_name(pointer)) ?? "" }
-    var nameAsReferenceSymbolic: String{ String(validatingUTF8: git_reference_symbolic_target(pointer)) ?? "" }
+    var nameAsReferenceSymbolic: String? { String(validatingUTF8: git_reference_symbolic_target(pointer)) }
     
     var nameAsReferenceCleaned: String{ nameAsReference.fixNameAsReference() }
 
@@ -133,7 +133,7 @@ public extension Duo where T1 == Reference, T2 == Repository {
         let (ref, repo) = value
         
         if ref.isSymbolic {
-            return repo.referenceTarget(name: ref.nameAsReferenceSymbolic)
+            return ref.nameAsReferenceSymbolic.asNonOptional | { repo.referenceTarget(name: $0) }
         } else {
             return ref.targetOIDNoWarning
         }

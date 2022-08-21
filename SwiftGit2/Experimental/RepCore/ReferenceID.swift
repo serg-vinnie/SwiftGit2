@@ -56,9 +56,9 @@ public extension ReferenceID {
         return nil
     }
     
-    func reference() -> R<Reference> {
-        repoID.repo.flatMap{ $0.reference(name: name) }
-    }
+    private var reference : R<Reference> { repoID.repo | { $0.reference(name: name) } }
+    
+    var symbolic : R<ReferenceID> { reference | { $0.nameAsReferenceSymbolic.asNonOptional } | { ReferenceID(repoID: repoID, name: $0) } }
     
     var targetOID : R<OID> {
         repoID.repo | { r in r.reference(name: name) | { $0.with(r).targetOID() }}

@@ -11,6 +11,7 @@ public final class GitRefCache {
     
     public private(set) var HEAD   : ReferenceCache?
     public private(set) var remotes: GitRemotesList = [:]
+    public private(set) var remoteHEADs: [String:ReferenceCache?] = [:]
     
     lazy var upstreams : OneOnOne = { local.upstreams() }()
     
@@ -18,7 +19,9 @@ public final class GitRefCache {
         self.repoID = repoID
         self.remotes = remotes
         self.local  = list.filter { $0.isBranch }.map  { ReferenceCache($0, cache: self) }
-        self.remote = list.filter { $0.isRemote }.asCacheDic(cache: self)
+        let list_remotes    = list.filter { $0.isRemote }
+        self.remote         = list_remotes.asRemotesDic(cache: self)
+        self.remoteHEADs    = list_remotes.asRemoteHEADsDic(cache: self)
         self.tags   = list.filter { $0.isTag    }.map   { ReferenceCache($0, cache: self) }
         self.HEAD   = (repoID.repo | { $0.HEAD() }
                                    | { ReferenceCache(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
@@ -48,17 +51,32 @@ public final class GitRefCache {
 
 
 extension Array where Element == ReferenceID {
-    func asCacheDic(cache: GitRefCache) -> [String:[ReferenceCache]] {
+    func asRemotesDic(cache: GitRefCache) -> [String:[ReferenceCache]] {
         var dic = [String:[ReferenceCache]]()
         
         for ref in self {
             guard let remote = ref.remote else { continue }
+            guard ref.displayName != "HEAD" else { continue }
             
             if dic.keys.contains(remote) {
                 dic[remote]!.append(ReferenceCache(ref, cache: cache))
             } else {
                 dic[remote] = [ReferenceCache(ref, cache: cache)]
             }
+        }
+        
+        return dic
+    }
+    
+    func asRemoteHEADsDic(cache: GitRefCache) -> [String:ReferenceCache] {
+        var dic = [String:ReferenceCache]()
+        
+        for ref in self {
+            guard let remote = ref.remote else { continue }
+            guard ref.displayName == "HEAD" else { continue }
+            guard let symbolicRef = ref.symbolic.maybeSuccess else { continue }
+            
+            dic[remote] = ReferenceCache(symbolicRef, cache: cache)
         }
         
         return dic

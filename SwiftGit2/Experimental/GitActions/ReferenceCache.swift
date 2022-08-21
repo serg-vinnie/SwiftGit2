@@ -15,7 +15,15 @@ public struct ReferenceCache : Identifiable {
 }
 
 public extension ReferenceCache {
-    var isHead : Bool { self.cache.HEAD?.referenceID == self.referenceID }
+    var isHead : Bool {
+        if self.referenceID.isBranch {
+            return self.cache.HEAD?.referenceID == self.referenceID
+        } else {
+            return self.cache.remoteHEADs.values.contains { $0?.referenceID == self.referenceID }
+        }
+        
+    }
+    
     var upstream : ReferenceCache? {
         if let upstrm = self.cache.upstreams.a2b[self.referenceID.name] {
             let refID = ReferenceID(repoID: self.referenceID.repoID, name: upstrm)
