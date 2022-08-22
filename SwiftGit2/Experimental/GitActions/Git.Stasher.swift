@@ -11,10 +11,10 @@ public struct GitStasher {
     }
     
     public let state : State
-    public let repoID: RepoID
+    public let repo: Repository
     
-    public init(repoID: RepoID, state: State = .empty) {
-        self.repoID = repoID
+    public init(repo: Repository, state: State = .empty) {
+        self.repo = repo
         self.state = state
     }
     
@@ -34,20 +34,23 @@ public struct GitStasher {
 
 public extension GitStasher {
     func push() -> R<Self> {
-        let isEmpty = repoID.repo | { $0.status() } | { $0.count == 0 }
-        let headIsUnborn = repoID.repo  | { $0.headIsUnborn }
-        return combine(isEmpty, headIsUnborn).flatMap { isEmpty, isUnborn in
-            if isEmpty || isUnborn {
-                return .success(GitStasher(repoID: repoID, state: .empty))
+        let isEmpty = repo.status() | { $0.count == 0 }
+
+        return isEmpty.flatMap { isEmpty in
+            if isEmpty || repo.headIsUnborn {
+                return .success(GitStasher(repo: repo, state: .empty))
             } else {
-                return stash().map { GitStasher(repoID: repoID, state: .stashed($0)) }
+                return stash().map { GitStasher(repo: repo, state: .stashed($0)) }
             }
         }
     }
     
     func pop() -> R<Self> {
         switch state {
-        case .stashed(let oid): return GitStash(repoID: repoID).pop(oid: oid) | { _ in GitStasher(repoID: repoID, state: .unstashed) }
+        case .stashed(let oid):
+            return repo.repoID | { repoID in
+                GitStash(repoID: repoID).pop(oid: oid)  | { _ in GitStasher(repo: self.repo, state: .unstashed) }
+            }
         default: return .success(self)
         }
     }
@@ -57,7 +60,8 @@ public extension GitStasher {
 private extension GitStasher {
     func stash() -> R<OID> {
         let signature = Signature(name: "GitStasher", email: "support@taogit.com")
-        return GitStash(repoID: repoID)
+        return repo.repoID | { repoID in GitStash(repoID: repoID)
             .save(signature: signature, message: "atomatic stash", flags: .includeUntracked)
+        }
     }
 }
