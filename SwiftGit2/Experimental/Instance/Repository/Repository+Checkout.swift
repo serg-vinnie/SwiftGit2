@@ -26,7 +26,8 @@ public extension Repository {
         checkout(commit.oid, strategy: strategy, progress: progress, pathspec: pathspec) | { _ in () }
     }
     
-    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = []) -> Result<Repository, Error> {
+    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], staging: Bool = false) -> Result<Repository, Error> {
+        //GitStasher(repoID: <#T##RepoID#>)
         setHEAD_detached(oid)
         | { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
             | { self }

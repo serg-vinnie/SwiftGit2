@@ -44,7 +44,7 @@ public extension Repository {
             | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options) }
     }
 
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions) -> Result<MergeResult, Error> {
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         let repo = self
@@ -66,7 +66,7 @@ public extension Repository {
                 | { oid, message in ourLocal.set(target: oid, message: message) }
                 | { $0.asBranch() }
                 | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress) }
-                | { _ in .fastForward }
+                | { _ in .fastForward }    
             
         } else if anal.contains(.normal) {
             /////////////////////////////////

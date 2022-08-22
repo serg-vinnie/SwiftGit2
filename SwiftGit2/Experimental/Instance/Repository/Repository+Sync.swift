@@ -28,16 +28,14 @@ public extension Repository {
             .if(\.self, then: { _ in
                 pullAndPush(.HEAD, options: options, stashing: stashing)
             }, else: { _ in
-                createUpstream(for: branchTarget, in: remoteTarget, options: options.push, stashing: stashing)
+                createUpstream(for: branchTarget, in: remoteTarget, options: options.push)
             })
     }
     
-    func createUpstream(for branchTarget: BranchTarget, in remoteTarget: RemoteTarget, options: PushOptions, stashing: Bool) -> R<PullPushResult> {
-        return self.repoID | { GitStasher(repoID: $0) } | { $0.wrap(skip: !stashing) {
-            remoteTarget.with(self).createUpstream(for: branchTarget, force: true)
-                | { _ in push(branchTarget, options: options) }
-                | { .success }
-        } }
+    func createUpstream(for branchTarget: BranchTarget, in remoteTarget: RemoteTarget, options: PushOptions) -> R<PullPushResult> {
+        remoteTarget.with(self).createUpstream(for: branchTarget, force: true)
+            | { _ in push(branchTarget, options: options) }
+            | { .success }
     }
     
     func pullAndPush(_ target: BranchTarget, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
@@ -47,10 +45,8 @@ public extension Repository {
             case let .threeWayConflict(index):
                 return .success(.conflict(index))
             default:
-                return self.repoID | { GitStasher(repoID: $0) } | { $0.wrap(skip: !stashing) {
-                    push(target, options: options.push)
-                        .map { .success }
-                } }
+                return push(target, options: options.push)
+                    .map { .success }
             }
         case let .failure(error):
             return .failure(error)
