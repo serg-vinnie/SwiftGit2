@@ -11,27 +11,43 @@ import Essentials
 
 // SetHEAD and Checkout
 public extension Repository {
-    func checkout(branch name: String, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
-        reference(name: name)
-            .flatMap { $0.asBranch() }
-            .flatMap { self.checkout(branch: $0, strategy: strategy, progress: progress) }
+    func checkout(branch name: String, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, stashing: Bool = false) -> Result<Void, Error> {
+        GitStasher(repo: self).wrap(skip: !stashing) {
+            reference(name: name)
+                .flatMap { $0.asBranch() }
+                .flatMap { self.checkout(branch: $0, strategy: strategy, progress: progress) }
+        }
     }
 
-    func checkout(branch: Branch, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String] = []) -> Result<Void, Error> {
-        setHEAD(branch)
-            .flatMap { self.checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
+    func checkout(branch: Branch, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool = false) -> Result<Void, Error> {
+        GitStasher(repo: self).wrap(skip: !stashing) {
+            setHEAD(branch)
+                .flatMap { self.checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
+        }
     }
 
-    func checkout(commit: Commit, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Void, Error> {
-        checkout(commit.oid, strategy: strategy, progress: progress, pathspec: pathspec) | { _ in () }
+    func checkout(commit: Commit, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String], stashing: Bool = false) -> Result<Void, Error> {
+        GitStasher(repo: self).wrap(skip: !stashing) {
+            checkout(commit.oid, strategy: strategy, progress: progress, pathspec: pathspec) | { _ in () }
+        }
     }
     
-    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], staging: Bool = false) -> Result<Repository, Error> {
-        //GitStasher(repoID: <#T##RepoID#>)
-        setHEAD_detached(oid)
-        | { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
-            | { self }
+    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool = false) -> Result<Repository, Error> {
+        GitStasher(repo: self).wrap(skip: !stashing) {
+            setHEAD_detached(oid)
+                | { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
+                | { self }
+        }
     }
+    
+    func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String], stashing: Bool = false) -> Result<Reference, Error> {
+        GitStasher(repo: self).wrap(skip: !stashing) {
+            setHEAD(reference)
+                .flatMap { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
+                .map { reference }
+        }
+    }
+
 
 }
 
@@ -49,17 +65,11 @@ public extension Repository {
         }
     }
     
-    func checkoutHead(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Void, Error> {
+    internal func checkoutHead(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Void, Error> {
         return git_try("git_checkout_head") {
             CheckoutOptions(strategy: strategy, pathspec: pathspec, progress: progress)
                 .with_git_checkout_options { git_checkout_head(self.pointer, &$0) }
         }
-    }
-
-    func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Reference, Error> {
-        setHEAD(reference)
-            .flatMap { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
-            .map { reference }
     }
 
     func checkout(index: Index, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> Result<Void, Error> {
