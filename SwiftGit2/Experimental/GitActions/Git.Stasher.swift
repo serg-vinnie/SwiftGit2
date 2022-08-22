@@ -18,7 +18,10 @@ public struct GitStasher {
         self.state = state
     }
     
-    public func wrap<T>( _ block: ()-> R<T>) -> R<T> {
+    public func wrap<T>(skip: Bool = false, _ block: ()-> R<T>) -> R<T> {
+        if skip {
+            return block()
+        }
         switch push() {
         case .success(let me):
             let result = block()

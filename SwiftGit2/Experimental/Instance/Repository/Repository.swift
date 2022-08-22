@@ -31,7 +31,8 @@ extension Repository {
         
         return .failure(RepositoryError.FailedToGetRepoUrl as Error)
     }
-    
+
+    public var repoID      : R<RepoID>          { directoryPath | { RepoID(path: $0) }}
     public var directoryURL: Result<URL, Error> { directoryPath | { $0.asURL() } }
     
     public var gitDirUrl: Result<URL, Error> {
