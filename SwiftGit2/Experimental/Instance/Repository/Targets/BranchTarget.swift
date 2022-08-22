@@ -2,6 +2,47 @@ import Clibgit2
 import Foundation
 import Essentials
 
+public extension ReferenceID {
+    enum Target {
+        case HEAD
+        case reference(Reference)
+        case branch(Branch)
+        case id(ReferenceID)
+        case oid(OID)
+        
+        func reference(in repo: Repository) -> R<Reference> {
+            switch self {
+            case .HEAD:                 return repo.HEAD()
+            case let .reference(ref):   return .success(ref)
+            case let .branch(branch):   return repo.reference(name: branch.nameAsReference)
+            case .oid(_):               return .wtf("This oid possibly is not a Branch")
+            case let .id(id):           return repo.reference(name: id.id)
+            }
+        }
+        
+        public func branch(in repo: Repository) -> R<Branch> {
+            switch self {
+            case .HEAD: return repo.headBranch()
+            case let .branch(branch):   return .success(branch)
+            case let .reference(ref):   return ref.asBranch()
+            case .oid(_):               return .wtf("This oid possibly is not a Branch")
+            case let .id(id):           return repo.branchLookup(name: id.id)
+            }
+        }
+        
+        public func oid(in repo: Repository) -> R<OID> {
+            switch self {
+            case .HEAD:                 return repo.headCommit().map{ $0.oid }
+            case let .branch(branch):   return branch.targetOID
+            case let .reference(ref):   return ref.with(repo).targetOID()
+            case let .oid(oid):         return .success(oid)
+            case let .id(id):           return id.targetOID
+            }
+        }
+    }
+}
+
+
 public enum BranchTarget : DuoUser {
     case HEAD
     case branch(Branch)

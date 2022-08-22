@@ -16,6 +16,10 @@ public struct GitBranches {
             | { $0.createBranch(from: target, name: name, checkout: checkout) }
             | { ReferenceID(repoID: repoID, name: $0.nameAsReference) } 
     }
+    
+    var HEAD : R<ReferenceID> {
+        repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
+    }
 }
 
 public extension Repository {
