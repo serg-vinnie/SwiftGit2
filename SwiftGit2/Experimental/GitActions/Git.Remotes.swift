@@ -48,7 +48,8 @@ public extension GitRemotes {
     var names       : R<[String]>       { repoID.repo | { $0.remoteNameList() } }
     var count       : R<Int>            { names | { $0.count } }
     
-    var instances   : R<[Remote]>       { repoID.repo | { $0.remoteList()     } }
+    var instances   : R<[Remote]>       { repoID.repo | { $0.remoteList() } }
+    var first       : R<Remote>         { repoID.repo | { $0.remoteList() } | { $0.first.asNonOptional }}
 }
 
 public extension GitRemotes {
