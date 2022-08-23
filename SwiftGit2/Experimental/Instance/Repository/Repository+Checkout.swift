@@ -26,13 +26,13 @@ public extension Repository {
         }
     }
 
-    func checkout(commit: Commit, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String], stashing: Bool = false) -> Result<Void, Error> {
+    func checkout(commit: Commit, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String], stashing: Bool) -> Result<Void, Error> {
         GitStasher(repo: self).wrap(skip: !stashing) {
-            checkout(commit.oid, strategy: strategy, progress: progress, pathspec: pathspec) | { _ in () }
+            checkout(commit.oid, strategy: strategy, progress: progress, pathspec: pathspec, stashing: stashing) | { _ in () }
         }
     }
     
-    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool = false) -> Result<Repository, Error> {
+    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool) -> Result<Repository, Error> {
         GitStasher(repo: self).wrap(skip: !stashing) {
             setHEAD_detached(oid)
                 | { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }

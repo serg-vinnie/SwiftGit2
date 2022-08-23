@@ -150,7 +150,7 @@ fileprivate extension GitConflicts {
         
         return combine(submoduleRepo, submoduleCommit)
             .flatMap { subModRepo, commit in
-                subModRepo.checkout(commit: commit, strategy: [.Force], progress: nil, pathspec: [path])
+                subModRepo.checkout(commit: commit, strategy: [.Force], progress: nil, pathspec: [path], stashing: false)
             }
             .flatMap{ _ in repo }
             .flatMap{ $0.status() }
