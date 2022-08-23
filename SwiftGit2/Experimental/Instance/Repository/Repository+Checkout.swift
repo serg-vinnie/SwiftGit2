@@ -15,11 +15,11 @@ public extension Repository {
         GitStasher(repo: self).wrap(skip: !stashing) {
             reference(name: name)
                 .flatMap { $0.asBranch() }
-                .flatMap { self.checkout(branch: $0, strategy: strategy, progress: progress) }
+                .flatMap { self.checkout(branch: $0, strategy: strategy, progress: progress, stashing: stashing) }
         }
     }
 
-    func checkout(branch: Branch, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool = false) -> Result<Void, Error> {
+    func checkout(branch: Branch, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool) -> Result<Void, Error> {
         GitStasher(repo: self).wrap(skip: !stashing) {
             setHEAD(branch)
                 .flatMap { self.checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }

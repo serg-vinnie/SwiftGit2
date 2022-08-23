@@ -65,7 +65,7 @@ public extension Repository {
             return combine(targetOID, message)
                 | { oid, message in ourLocal.set(target: oid, message: message) }
                 | { $0.asBranch() }
-                | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress) }
+                | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
                 | { _ in .fastForward }    
             
         } else if anal.contains(.normal) {
