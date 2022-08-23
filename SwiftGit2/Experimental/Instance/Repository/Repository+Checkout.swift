@@ -40,7 +40,7 @@ public extension Repository {
         }
     }
     
-    func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String], stashing: Bool = false) -> Result<Reference, Error> {
+    func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String], stashing: Bool) -> Result<Reference, Error> {
         GitStasher(repo: self).wrap(skip: !stashing) {
             setHEAD(reference)
                 .flatMap { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
