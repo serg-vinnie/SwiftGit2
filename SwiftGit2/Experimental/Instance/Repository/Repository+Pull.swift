@@ -115,7 +115,7 @@ public extension Repository {
                     else: { index in
                         combine(message, parents)
                             | { index.commit(into: self, signature: options.signature, message: $0, parents: $1) }
-                            | { _ in self.checkout(branch: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
+                            | { _ in self.checkout(ref: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
                             | { _ in .threeWaySuccess }
                     })
         }

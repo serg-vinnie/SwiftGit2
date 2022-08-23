@@ -64,9 +64,9 @@ public extension Repository {
               let masterIdx = branches.masterIdx else { return .success(.ambiguous(branches: branches)) }
 
         if masterIdx == 0 {
-            return checkout(branch: branches[1], stashing: false).map { .fixed }
+            return checkout(ref: branches[1], stashing: false).map { .fixed }
         } else {
-            return checkout(branch: branches[0], stashing: false).map { .fixed }
+            return checkout(ref: branches[0], stashing: false).map { .fixed }
         }
     }
 }
@@ -77,7 +77,7 @@ private extension Array where Element == String {
     }
 
     func checkoutFirst(in repo: Repository) -> Result<Void, Error> {
-        first.asResult { repo.checkout(branch: $0, stashing: false) }
+        first.asResult { repo.checkout(ref: $0, stashing: false) }
     }
 }
 

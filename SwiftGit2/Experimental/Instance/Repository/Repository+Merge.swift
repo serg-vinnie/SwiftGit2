@@ -131,7 +131,7 @@ public extension Repository {
                     else: { index in
                         combine(message, parents)
                             | { index.commit(into: self, signature: signature, message: $0, parents: $1) }
-                            | { _ in self.checkout(branch: branchName, strategy: .Force, stashing: false) }
+                            | { _ in self.checkout(ref: branchName, strategy: .Force, stashing: false) }
                             | { _ in .threeWaySuccess }
                     })
             
