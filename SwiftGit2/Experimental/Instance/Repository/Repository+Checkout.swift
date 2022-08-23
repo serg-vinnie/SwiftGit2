@@ -11,7 +11,7 @@ import Essentials
 
 // SetHEAD and Checkout
 public extension Repository {
-    func checkout(branch name: String, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, stashing: Bool = false) -> Result<Void, Error> {
+    func checkout(branch name: String, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, stashing: Bool) -> Result<Void, Error> {
         GitStasher(repo: self).wrap(skip: !stashing) {
             reference(name: name)
                 .flatMap { $0.asBranch() }

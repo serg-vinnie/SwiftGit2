@@ -64,7 +64,7 @@ public extension Repository {
             | { self.mergeAndCommit(anal: $0, our: $1, their: $2, signature: signature, options: options) }
     }
     
-    func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions) -> Result<MergeResult, Error> {
+    func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         if anal.contains(.fastForward) || anal.contains(.unborn) {
@@ -79,7 +79,7 @@ public extension Repository {
             return targetOID
                 | { oid in our.set(target: oid, message: message) }
                 | { $0.asBranch() }
-                | { self.checkout(branch: $0, strategy: .Force) }
+                | { self.checkout(branch: $0, strategy: .Force, stashing: stashing) }
                 | { _ in .fastForward }
             
         } else if anal.contains(.normal) {
@@ -131,7 +131,7 @@ public extension Repository {
                     else: { index in
                         combine(message, parents)
                             | { index.commit(into: self, signature: signature, message: $0, parents: $1) }
-                            | { _ in self.checkout(branch: branchName, strategy: .Force) }
+                            | { _ in self.checkout(branch: branchName, strategy: .Force, stashing: false) }
                             | { _ in .threeWaySuccess }
                     })
             
