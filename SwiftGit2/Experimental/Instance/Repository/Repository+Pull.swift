@@ -108,8 +108,6 @@ public extension Repository {
     private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> R<MergeResult> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
-        let repo = self
-        
         let theirReference = ourLocal
             .upstream()
         
@@ -122,53 +120,9 @@ public extension Repository {
         } else if anal.contains(.normal) {
             /////////////////////////////////
             // THREE-WAY MERGE
-            /////////////////////////////////
             
-            let ourOID   = ourLocal.targetOID
-            let theirOID = ourLocal.upstream()       | { $0.targetOID }
-            let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
-            
-            let message = combine(theirReference, baseOID)
-                | { their, base in "MERGE [\(their.nameAsReferenceCleaned)] & [\(ourLocal.nameAsReferenceCleaned)] | BASE: \(base)" }
-            
-            let ourCommit   = ourOID   | { self.commit(oid: $0) }
-            let theirCommit = theirOID | { self.commit(oid: $0) }
-            
-            let parents = combine(ourCommit, theirCommit) | { [$0, $1] }
-            
-            let branchName = ourLocal.nameAsReference
-            
-            return [ourOID, theirOID, baseOID]
-                .flatMap { $0.tree(self) }
-                .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options.mergeOptions) } // -> Index
-                .if(\.hasConflicts,
-                    then: { index in
-                        parents
-                            .map {
-                                // MERGE_HEAD creation
-                                let _ = RevFile( repo: repo, type: .PullMsg)?
-                                    .generatePullMsg(from: index)
-                                    .save()
-                                
-                                // MERGE_MODE creation
-                                let _ = RevFile(repo: repo, type: .MergeMode )?
-                                    .save()
-                                
-                                // MERGE_HEAD creation
-                                OidRevFile( repo: repo, type: .MergeHead)?
-                                    .setOid(from: $0[1] )
-                                    .save()
-                            } | { _ in
-                                repo.checkout(index: index, strategy: checkoutStrategyMerge , progress: options.checkoutProgress)
-                                    | { _ in .success(.threeWayConflict(index)) }
-                            }
-                    },
-                    else: { index in
-                        combine(message, parents)
-                            | { index.commit(into: self, signature: options.signature, message: $0, parents: $1) }
-                            | { _ in self.checkout(ref: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
-                            | { _ in .threeWaySuccess }
-                    })
+            return theirReference | { mergeThreeWay(our: ourLocal, their: $0, options: options,
+                                                    stashing: stashing) }
         }
 
         return .failure(WTF("pull: unexpected MergeAnalysis value: \(anal.rawValue)"))
