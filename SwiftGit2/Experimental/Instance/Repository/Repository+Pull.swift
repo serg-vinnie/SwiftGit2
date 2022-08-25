@@ -43,6 +43,29 @@ public extension Repository {
         return combine(fetch(target, options: options.fetch), mergeAnalysisUpstream(target))
             | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options) }
     }
+    
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> R<MergeResult> {
+        guard !anal.contains(.upToDate) else { return .success(.upToDate) }
+        
+        let theirReference = ourLocal
+            .upstream()
+        
+        if anal.contains(.fastForward) || anal.contains(.unborn) {
+            /////////////////////////////////////
+            // FAST-FORWARD MERGE
+            
+            return theirReference | { self.mergeFastForward(our: ourLocal, their: $0, options: options,
+                                                            stashing: stashing) }
+        } else if anal.contains(.normal) {
+            /////////////////////////////////
+            // THREE-WAY MERGE
+            
+            return theirReference | { mergeThreeWay(our: ourLocal, their: $0, options: options,
+                                                    stashing: stashing) }
+        }
+
+        return .failure(WTF("pull: unexpected MergeAnalysis value: \(anal.rawValue)"))
+    }
 
     private func mergeFastForward(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
         let targetOID = their.targetOID
@@ -92,10 +115,11 @@ public extension Repository {
                             OidRevFile( repo: repo, type: .MergeHead)?
                                 .setOid(from: $0[1] )
                                 .save()
-                        } | { _ in
-                            self.checkout(index: index, strategy: checkoutStrategyMerge , progress: options.checkoutProgress)
-                                | { _ in .success(.threeWayConflict(index)) }
-                        }
+                            
+                            return
+                        }.flatMap { _ in GitStasher(repo: self, state: .tag("merge")).push() }
+                         .flatMap { _ in self.checkout(index: index, strategy: checkoutStrategyMerge , progress: options.checkoutProgress) }
+                         .map { _ in .threeWayConflict(index) }
                 },
                 else: { index in
                     combine(message, parents)
@@ -103,29 +127,6 @@ public extension Repository {
                         | { _ in self.checkout(ref: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
                         | { _ in .threeWaySuccess }
                 })
-    }
-    
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> R<MergeResult> {
-        guard !anal.contains(.upToDate) else { return .success(.upToDate) }
-        
-        let theirReference = ourLocal
-            .upstream()
-        
-        if anal.contains(.fastForward) || anal.contains(.unborn) {
-            /////////////////////////////////////
-            // FAST-FORWARD MERGE
-            
-            return theirReference | { self.mergeFastForward(our: ourLocal, their: $0, options: options,
-                                                            stashing: stashing) }
-        } else if anal.contains(.normal) {
-            /////////////////////////////////
-            // THREE-WAY MERGE
-            
-            return theirReference | { mergeThreeWay(our: ourLocal, their: $0, options: options,
-                                                    stashing: stashing) }
-        }
-
-        return .failure(WTF("pull: unexpected MergeAnalysis value: \(anal.rawValue)"))
     }
 }
 
