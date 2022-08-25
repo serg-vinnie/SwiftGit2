@@ -39,12 +39,12 @@ public struct PullOptions {
 }
 
 public extension Repository {    
-    func pull(_ target: BranchTarget, options: PullOptions) -> Result<MergeResult, Error> {
+    func pull(_ target: BranchTarget, options: PullOptions, stashing: Bool) -> Result<MergeResult, Error> {
         return combine(fetch(target, options: options.fetch), mergeAnalysisUpstream(target))
-            | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options) }
+        | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options, stashing: stashing) }
     }
     
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> R<MergeResult> {
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         let theirReference = ourLocal

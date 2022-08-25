@@ -39,7 +39,7 @@ public extension Repository {
     }
     
     func pullAndPush(_ target: BranchTarget, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
-        switch pull(target, options: options.pull) {
+        switch pull(target, options: options.pull, stashing: stashing) {
         case let .success(result):
             switch result {
             case let .threeWayConflict(index):
