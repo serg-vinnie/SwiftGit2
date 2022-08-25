@@ -13,9 +13,16 @@ public extension GitStash {
             .flatMap { $0.stashSave(signature: signature, message: message, flags: flags) }
     }
     
-    func apply(stashIdx: Int) -> R<()> {
+    func apply(stashIdx: Int, options: StashApplyOptions = StashApplyOptions()) -> R<()> {
         repoID.repo
-            .flatMap { $0.stashApply(stashIdx:stashIdx) }
+            .flatMap { $0.stashApply(stashIdx:stashIdx, options: options) }
+            .flatMapError { err in
+                if err.isGit2(func: "git_stash_apply", code: -22) {
+                    return repoID.repo | { repo in repo.unStage(.all) | { _ in repo.stashApply(stashIdx: stashIdx, options: options) } }
+                } else {
+                    return .failure(err)
+                }
+            }
     }
     
     func item(oid: OID) -> R<Stash> {
@@ -70,9 +77,12 @@ internal extension Repository {
             .map { _ in OID(oid) }
     }
     
-    func stashApply(stashIdx: Int) -> R<()> {
-        return _result( { () } , pointOfFailure: "git_stash_apply") {
-            git_stash_apply(self.pointer, stashIdx, nil)
+    func stashApply(stashIdx: Int, options: StashApplyOptions) -> R<()> {
+        git_try("git_stash_apply") {
+            options.with_git_stash_apply_options { opt in
+                git_stash_apply(self.pointer, stashIdx, &opt)
+            }
+            
         }
     }
     
