@@ -51,67 +51,96 @@ class GitStashTests: XCTestCase {
         repoID.repo.flatMap { $0.status() }.map{ $0.count }.assertEqual(to: 0)
     }
     
+    /*
+     
+     func test_shouldCloneWithSubmodule() {
+         let folder = root.sub(folder: "Clone").cleared().shouldSucceed()!
+
+         folder   .with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
+             .with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
+             .shouldSucceed("addSub")
+         
+         let source = folder.sub(folder: "main_repo").url
+         
+         folder.with(repo: "clone", content: .clone(source, .defaultSSH))
+             .flatMap { $0.repo | { $0.asModule } | { $0.updateSubModules(options: .local, init: true) } }
+             .shouldSucceed("clone")
+     }
+     
+     */
+    
     func test_stasherEmptyRepo() {
-        let folder = root.with(repo: "stasherEmptyRepo", content: .empty).shouldSucceed()!
-        let repoID = RepoID(url: folder.url )
+        //let folder = root.with(repo: "stasherEmptyRepo", content: .empty).shouldSucceed()!
+        let folder = root.sub(folder: "stasherEmptyRepo").cleared().shouldSucceed()!
         
+        
+        folder   .with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
+            .with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
+            .shouldSucceed("addSub")
+        
+        let repoID = RepoID(url: folder.sub(folder: "main_repo").url )
+        let subRepoID = RepoID(url: folder.sub(folder: "main_repo/sub_repo").url )
+
         let stasher = (repoID.repo | { GitStasher(repo: $0) }).maybeSuccess!
         
         stasher.push()
-            .assertBlock { $0.state == .empty }
-        
+            .assertBlock("push") { $0.state == .empty }
+
         // write fileA
-        (repoID.repo | { $0.t_write(file: .fileA, with: .random) })
-            .shouldSucceed()
-        
+        (subRepoID.repo | { $0.t_write(file: .fileA, with: .random) })
+            .shouldSucceed("t_write")
+
         stasher.push()
-            .assertBlock { $0.state == .empty }
-        
-        // commit
-        (repoID.repo | { $0.addAllFiles() } | { $0.commit(message: "initial commit", signature: .test) })
-            .shouldSucceed()
-        
+            .assertBlock("push2") { $0.state == .empty }
+
+
+//
+//        // commit
+//        (repoID.repo | { $0.addAllFiles() } | { $0.commit(message: "initial commit", signature: .test) })
+//            .shouldSucceed()
+//
         // write fileA
         (repoID.repo | { $0.t_write(file: .fileA, with: .content1) })
             .shouldSucceed()
-        
+
         // write fileB
         (repoID.repo | { $0.t_write(file: .fileB, with: .content2) })
             .shouldSucceed()
-        
-        // status.count == 2
+
+        // status.count == 3
         (repoID.repo | { $0.status() } | { $0.count })
-            .assertEqual(to: 2)
-        
+            .assertEqual(to: 3)
+//
+//
+//
         let stashed = stasher.push()
             .assertBlock("push") { $0.state.isStashed }
-        
-        // status.count == 0
+//
+        // status.count == 1
         (repoID.repo | { $0.status() } | { $0.count })
-            .assertEqual(to: 0)
-        
+            .assertEqual(to: 1)
+
         stashed!.pop()
             .map { $0.state }
             .assertEqual(to: .unstashed)
-        
+
         let status = repoID.repo | { $0.status() }
-        
+
         (status | { $0.count })
-            .assertEqual(to: 2)
-        
-        let urlA = folder.url.appendingPathComponent(TestFile.fileA.rawValue)
+            .assertEqual(to: 3)
+
+        let urlA = repoID.url.appendingPathComponent(TestFile.fileA.rawValue)
         let contentA = try! String(contentsOf: urlA)
         XCTAssertEqual(contentA, TestFileContent.content1.rawValue)
-        
-        let urlB = folder.url.appendingPathComponent(TestFile.fileB.rawValue)
+
+        let urlB = repoID.url.appendingPathComponent(TestFile.fileB.rawValue)
         let contentB = try! String(contentsOf: urlB)
         XCTAssertEqual(contentB, TestFileContent.content2.rawValue)
-        
+
         (GitStash(repoID: repoID).items() | { $0.count })
             .assertEqual(to: 0)
     }
-    
-    //let folder = root.with(repo: "stasher", content: .commit(.fileA, .random, "comment")).shouldSucceed()!
+
 }
 
 ///////////////////////////////////

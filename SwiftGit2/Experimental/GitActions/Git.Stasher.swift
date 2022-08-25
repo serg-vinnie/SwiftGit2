@@ -40,7 +40,15 @@ public extension GitStasher {
             if isEmpty || repo.headIsUnborn {
                 return .success(GitStasher(repo: repo, state: .empty))
             } else {
-                return stash().map { GitStasher(repo: repo, state: .stashed($0)) }
+                return stash()
+                    .map { GitStasher(repo: repo, state: .stashed($0)) }
+                    .flatMapError { err in
+                        if err.isGit2(func: "git_stash_save", code: -3) {
+                            return .success(GitStasher(repo: repo, state: .empty))
+                        } else {
+                            return .failure(err)
+                        }
+                    }
             }
         }
     }
