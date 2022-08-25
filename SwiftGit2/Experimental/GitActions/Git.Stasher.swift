@@ -5,6 +5,7 @@ import Essentials
 public struct GitStasher {
     public enum State : Equatable {
         case empty
+        case tag(String)
         case stashed(OID)
         case unstashed
         var isStashed : Bool { guard case .stashed(_) = self else { return false }; return true }
@@ -34,22 +35,18 @@ public struct GitStasher {
 
 public extension GitStasher {
     func push() -> R<Self> {
-        let isEmpty = repo.status() | { $0.count == 0 }
-
-        return isEmpty.flatMap { isEmpty in
-            if isEmpty || repo.headIsUnborn {
-                return .success(GitStasher(repo: repo, state: .empty))
-            } else {
-                return stash()
-                    .map { GitStasher(repo: repo, state: .stashed($0)) }
-                    .flatMapError { err in
-                        if err.isGit2(func: "git_stash_save", code: -3) {
-                            return .success(GitStasher(repo: repo, state: .empty))
-                        } else {
-                            return .failure(err)
-                        }
+        if repo.headIsUnborn {
+            return .success(GitStasher(repo: repo, state: .empty))
+        } else {
+            return stash()
+                .map { GitStasher(repo: repo, state: .stashed($0)) }
+                .flatMapError { err in
+                    if err.isGit2(func: "git_stash_save", code: -3) {
+                        return .success(GitStasher(repo: repo, state: .empty))
+                    } else {
+                        return .failure(err)
                     }
-            }
+                }
         }
     }
     
@@ -67,9 +64,17 @@ public extension GitStasher {
 
 private extension GitStasher {
     func stash() -> R<OID> {
+        let tag : String
+        if case .tag(let t) = self.state {
+            tag = " " + t
+        } else {
+            tag = ""
+        }
+        
+        
         let signature = Signature(name: "GitStasher", email: "support@taogit.com")
         return repo.repoID | { repoID in GitStash(repoID: repoID)
-            .save(signature: signature, message: "atomatic stash", flags: .includeUntracked)
+            .save(signature: signature, message: "auto stash\(tag)", flags: .includeUntracked)
         }
     }
 }
