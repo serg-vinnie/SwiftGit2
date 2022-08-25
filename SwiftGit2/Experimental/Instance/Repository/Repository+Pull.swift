@@ -44,7 +44,19 @@ public extension Repository {
             | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options) }
     }
 
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
+    private func mergeFastForward(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
+        let targetOID = their.targetOID
+        
+        let message = "Fast Forward MERGE \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned)"
+        
+        return targetOID
+            | { oid in our.set(target: oid, message: message) }
+            | { $0.asBranch() }
+            | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
+            | { _ in .fastForward }
+    }
+    
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> R<MergeResult> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         let repo = self
@@ -55,19 +67,8 @@ public extension Repository {
         if anal.contains(.fastForward) || anal.contains(.unborn) {
             /////////////////////////////////////
             // FAST-FORWARD MERGE
-            /////////////////////////////////////
             
-            let targetOID = theirReference
-                .flatMap { $0.targetOID }
-            
-            let message = theirReference.map { their in "Fast Forward MERGE \(their.nameAsReferenceCleaned) -> \(ourLocal.nameAsReferenceCleaned)" }
-            
-            return combine(targetOID, message)
-                | { oid, message in ourLocal.set(target: oid, message: message) }
-                | { $0.asBranch() }
-                | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
-                | { _ in .fastForward }    
-            
+            return theirReference | { self.mergeFastForward(our: ourLocal, their: $0, options: options, stashing: stashing) }
         } else if anal.contains(.normal) {
             /////////////////////////////////
             // THREE-WAY MERGE
