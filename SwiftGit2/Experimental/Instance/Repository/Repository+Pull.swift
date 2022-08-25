@@ -56,6 +56,55 @@ public extension Repository {
             | { _ in .fastForward }
     }
     
+    private func mergeThreeWay(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
+        let repo = self
+        let ourOID   = our.targetOID
+        let theirOID = our.upstream()            | { $0.targetOID }
+        let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
+        
+        let message = baseOID
+            | { base in "MERGE [\(their.nameAsReferenceCleaned)] & [\(our.nameAsReferenceCleaned)] | BASE: \(base)" }
+        
+        let ourCommit   = ourOID   | { self.commit(oid: $0) }
+        let theirCommit = theirOID | { self.commit(oid: $0) }
+        
+        let parents = combine(ourCommit, theirCommit) | { [$0, $1] }
+        
+        let branchName = our.nameAsReference
+        
+        return [ourOID, theirOID, baseOID]
+            .flatMap { $0.tree(self) }
+            .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options.mergeOptions) } // -> Index
+            .if(\.hasConflicts,
+                then: { index in
+                    parents
+                        .map {
+                            // MERGE_HEAD creation
+                            let _ = RevFile( repo: repo, type: .PullMsg)?
+                                .generatePullMsg(from: index)
+                                .save()
+
+                            // MERGE_MODE creation
+                            let _ = RevFile(repo: repo, type: .MergeMode )?
+                                .save()
+
+                            // MERGE_HEAD creation
+                            OidRevFile( repo: repo, type: .MergeHead)?
+                                .setOid(from: $0[1] )
+                                .save()
+                        } | { _ in
+                            self.checkout(index: index, strategy: checkoutStrategyMerge , progress: options.checkoutProgress)
+                                | { _ in .success(.threeWayConflict(index)) }
+                        }
+                },
+                else: { index in
+                    combine(message, parents)
+                        | { index.commit(into: self, signature: options.signature, message: $0, parents: $1) }
+                        | { _ in self.checkout(ref: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
+                        | { _ in .threeWaySuccess }
+                })
+    }
+    
     private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool = false) -> R<MergeResult> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
@@ -68,7 +117,8 @@ public extension Repository {
             /////////////////////////////////////
             // FAST-FORWARD MERGE
             
-            return theirReference | { self.mergeFastForward(our: ourLocal, their: $0, options: options, stashing: stashing) }
+            return theirReference | { self.mergeFastForward(our: ourLocal, their: $0, options: options,
+                                                            stashing: stashing) }
         } else if anal.contains(.normal) {
             /////////////////////////////////
             // THREE-WAY MERGE
