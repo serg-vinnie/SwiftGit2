@@ -55,7 +55,7 @@ class GitStashTests: XCTestCase {
         let folder = root.with(repo: "stasherEmptyRepo", content: .empty).shouldSucceed()!
         let repoID = RepoID(url: folder.url )
         
-        let stasher = GitStasher(repoID: repoID)
+        let stasher = (repoID.repo | { GitStasher(repo: $0) }).maybeSuccess!
         
         stasher.push()
             .assertBlock { $0.state == .empty }
