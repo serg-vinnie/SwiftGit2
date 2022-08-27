@@ -51,10 +51,12 @@ public extension GitStasher {
     }
     
     func pop() -> R<Self> {
+        let opt = StashApplyOptions(flags: .reinstateIndex)
+        
         switch state {
         case .stashed(let oid):
             return repo.repoID | { repoID in
-                GitStash(repoID: repoID).pop(oid: oid)  | { _ in GitStasher(repo: self.repo, state: .unstashed) }
+                GitStash(repoID: repoID).pop(oid: oid, options: opt)  | { _ in GitStasher(repo: self.repo, state: .unstashed) }
             }
         default: return .success(self)
         }

@@ -29,8 +29,8 @@ public extension GitStash {
         items() | { $0.first { $0.id == oid }.asNonOptional }
     }
     
-    func pop(oid: OID) -> R<()> {
-        combine(repoID.repo, item(oid: oid)) | { repo, item in repo.stashPop(idx: item.index) }
+    func pop(oid: OID, options: StashApplyOptions = StashApplyOptions()) -> R<()> {
+        combine(repoID.repo, item(oid: oid)) | { repo, item in repo.stashPop(idx: item.index, options: options) }
     }
     
     func items() -> R<[Stash]> {
@@ -86,9 +86,11 @@ internal extension Repository {
         }
     }
     
-    func stashPop(idx: Int) -> R<()> {
+    func stashPop(idx: Int, options: StashApplyOptions) -> R<()> {
         git_try("git_stash_pop") {
-            git_stash_pop(self.pointer, idx, nil)
+            options.with_git_stash_apply_options { opt in
+                git_stash_pop(self.pointer, idx, &opt)
+            }
         }
     }
     
