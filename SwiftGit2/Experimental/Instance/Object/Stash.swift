@@ -29,6 +29,7 @@ public struct Stash {
     public let index: Int
     public let id: OID?
     public var commitOIDofStash: OID? { id }
+    public let time: Date?
 }
 
 extension Stash: Identifiable { }
@@ -40,10 +41,15 @@ extension Stash: Hashable { }
 ////////////////////////////////
 
 public class StashCallbacks {
+    let repo : Repository
     var stashes: [Stash] = []
     
+    init(repo: Repository) {
+        self.repo = repo
+    }
+    
     let git_stash_cb: git_stash_cb = { index, message, id, payload in
-        let stashCallbacksInstance = payload.unsafelyUnwrapped
+        let me = payload.unsafelyUnwrapped
             .bindMemory(to: StashCallbacks.self, capacity: 1)
             .pointee
         
@@ -53,11 +59,17 @@ public class StashCallbacks {
             { msg = String(cString:msgCCchar) }
             else { msg = nil }
         
-        let sth = Stash(message: msg, index: index, id: (id?.pointee)?.asOID() )
+        let oid = (id?.pointee)?.asOID()
         
-        stashCallbacksInstance.stashes.append( sth )
+        let sth = Stash(message: msg, index: index, id: oid, time: me.date(oid: oid).maybeSuccess)
+        
+        me.stashes.append( sth )
         
         return 0
+    }
+    
+    func date(oid: OID?) -> R<Date> {
+        oid.asNonOptional | { repo.commit(oid: $0) } | { $0.time }
     }
 }
 

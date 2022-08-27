@@ -46,7 +46,7 @@ public extension GitStash {
 
 internal extension Repository {
     func stashForeach() -> R<[Stash]> {
-        var cb = StashCallbacks()
+        var cb = StashCallbacks(repo: self)
         
         return _result( { cb.stashes } , pointOfFailure: "git_stash_foreach") {
             git_stash_foreach(self.pointer, cb.git_stash_cb, &cb)
