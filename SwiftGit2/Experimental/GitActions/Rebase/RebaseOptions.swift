@@ -7,12 +7,13 @@ public class RebaseOptions {
     let merge       : MergeOptions
     let checkout    : CheckoutOptions
     
-    init(merge: MergeOptions, checkout: CheckoutOptions) {
+    public init(merge: MergeOptions = MergeOptions(), checkout: CheckoutOptions = CheckoutOptions()) {
         self.merge = merge
         self.checkout = checkout
         git_rebase_options_init(&options, UInt32(GIT_REBASE_OPTIONS_VERSION))
         
         options.merge_options = merge.merge_options // merge options can be copied as is
+                                                    // checkout options should be used through a wrapper
     }
 }
 

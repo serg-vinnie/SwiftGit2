@@ -3,11 +3,9 @@ import Clibgit2
 import Essentials
 
 public extension Repository {
-    func HEAD() -> Result<Reference, Error> {
-        var pointer: OpaquePointer?
-        
-        return _result({ Reference(pointer!) }, pointOfFailure: "git_repository_head") {
-            git_repository_head(&pointer, self.pointer)
+    func HEAD() -> R<Reference> {
+        git_instance(of: Reference.self, "git_repository_head") { p in
+            git_repository_head(&p, self.pointer)
         }
     }
 

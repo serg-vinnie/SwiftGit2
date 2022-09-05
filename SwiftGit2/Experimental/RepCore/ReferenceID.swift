@@ -63,6 +63,10 @@ public extension ReferenceID {
     var targetOID : R<OID> {
         repoID.repo | { r in r.reference(name: name) | { $0.with(r).targetOID() }}
     }
+    
+    var annotatedCommit : R<AnnotatedCommit> {
+        combine(repoID.repo, targetOID) | { repo, oid in repo.annotatedCommit(oid: oid) }
+    }
 }
 
 public enum ReferenceLocation {
