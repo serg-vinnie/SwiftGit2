@@ -13,16 +13,16 @@ public struct GitRebase {
 
 public extension GitRebase {
     // naming of functions rely on usage GitRebase(repoID).head(from: ref)
-    func head(from ref: ReferenceID) -> R<()> {
+    func head(from ref: ReferenceID, sigature: Signature) -> R<()> {
         repoID.repo | { $0.HEAD() }
                     | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
-                    | { self.from(ref, onto: $0) }
+                    | { self.from(ref, onto: $0, sigature: sigature) }
     }
     
-    func from( _ ref: ReferenceID, onto: ReferenceID, options: RebaseOptions = RebaseOptions()) -> R<()> {
+    func from( _ ref: ReferenceID, onto: ReferenceID, options: RebaseOptions = RebaseOptions(), sigature: Signature) -> R<()> {
         combine(repoID.repo, ref.annotatedCommit, onto.annotatedCommit)
             | { repo, branch, onto in repo.rebase(branch: branch, upstream: nil, onto: onto, options: options) }
-            | { $0.iterate() }
+            | { $0.iterate(sigature: sigature) }
     }
 }
 

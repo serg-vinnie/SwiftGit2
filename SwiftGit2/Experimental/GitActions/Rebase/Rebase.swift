@@ -23,24 +23,20 @@ internal extension Rebase {
             git_rebase_next(&operation, self.pointer)
         }
     }
-}
-
-internal class RebaseIterator : ResultIterator {
-    typealias Success = Void
     
-    let rebase : Rebase
-    var operation : UnsafeMutablePointer<git_rebase_operation>?
-    
-    init(rebase: Rebase) { self.rebase = rebase }
-    
-    func next() -> R<Void?> {   // return nil to complete
-        rebase.next(operation: &operation) | { () }
+    func commit(signature: Signature) -> R<OID> {
+        var oid = git_oid()
+        return signature.make() | { signature in
+            git_try("git_rebase_commit") {
+                git_rebase_commit(&oid, self.pointer,
+                                  nil /* author */,
+                                  signature.pointer /*committer*/,
+                                  nil /* message_encoding */,
+                                  nil /* message */)
+            }
+        } | { OID(oid) }
     }
 }
 
-extension Rebase {
-    
-    func iterate() -> R<Void> {
-        RebaseIterator(rebase: self).all().asVoid
-    }
-}
+
+
