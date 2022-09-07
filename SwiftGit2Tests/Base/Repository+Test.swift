@@ -92,19 +92,20 @@ enum TestFileContent: String {
     06
     07
     08
-    09  << LINE INSERTION >>
+    09
+    10 << LINE INSERTION >>
     """
     
     case content3 = """
-    01 UKS IS THE BEST MAN IN THE WORLD
-    02 Glory to Ukraine
+    01
+    02
     03
-    04 Slava Ukraini
-    05 Heroyam Slava
+    04
+    05
     06
     07
     08
-    09  << LINE INSERTION >>
+    09
     """
 }
 
