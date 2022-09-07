@@ -129,6 +129,7 @@
 		E6EEFC8228A146CD00E60185 /* BranchSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EEFC8128A146CC00E60185 /* BranchSync.swift */; };
 		E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */; };
 		E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */; };
+		E6F7D81128C8F1EC00C56452 /* GitRebaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F7D81028C8F1EC00C56452 /* GitRebaseTests.swift */; };
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
 /* End PBXBuildFile section */
 
@@ -308,6 +309,7 @@
 		E6EEFC8128A146CC00E60185 /* BranchSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BranchSync.swift; sourceTree = "<group>"; };
 		E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Unborn.swift; sourceTree = "<group>"; };
 		E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder_Ext.swift; sourceTree = "<group>"; };
+		E6F7D81028C8F1EC00C56452 /* GitRebaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitRebaseTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -558,6 +560,7 @@
 		E6332DCD265167F0004990E7 /* SwiftGit2Tests */ = {
 			isa = PBXGroup;
 			children = (
+				E6F7D81028C8F1EC00C56452 /* GitRebaseTests.swift */,
 				E66360E027BF1403001292FB /* RepCoreTests.swift */,
 				E6AA18FA27AF825C002AFC33 /* ModuleTests.swift */,
 				1DD99228276A24530088848F /* StatusDiffTests.swift */,
@@ -957,6 +960,7 @@
 				1D5ABAE02882264200F9791C /* FileChangesTests.swift in Sources */,
 				1D6C64432837FAFA003E9072 /* GitCommit+Test.swift in Sources */,
 				E6332DCF265167F0004990E7 /* RepositoryRemoteTests.swift in Sources */,
+				E6F7D81128C8F1EC00C56452 /* GitRebaseTests.swift in Sources */,
 				1DB6CBB62856773F00E2244A /* StatusCustomTest.swift in Sources */,
 				E63EDF74265C0A6B00A3D048 /* RepositoryLocalTests.swift in Sources */,
 				E63EDF6E265BC30800A3D048 /* GitTest.swift in Sources */,

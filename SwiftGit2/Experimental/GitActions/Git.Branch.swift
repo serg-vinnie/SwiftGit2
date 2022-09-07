@@ -9,7 +9,7 @@ public enum BranchBase {
 
 public struct GitBranches {
     public let repoID : RepoID
-    public init(repoID : RepoID) { self.repoID = repoID }
+    public init(_ repoID : RepoID) { self.repoID = repoID }
     
     public func new(from target: BranchTarget, name: String, checkout: Bool, stashing: Bool = false) -> R<ReferenceID> {
         repoID.repo
@@ -17,7 +17,7 @@ public struct GitBranches {
             | { ReferenceID(repoID: repoID, name: $0.nameAsReference) } 
     }
     
-    var HEAD : R<ReferenceID> {
+    public var HEAD : R<ReferenceID> {
         repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
     }
 }

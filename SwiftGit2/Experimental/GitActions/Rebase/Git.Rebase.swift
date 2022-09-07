@@ -27,6 +27,9 @@ public extension GitRebase {
 }
 
 extension Repository {
+    //
+    // https://libgit2.org/libgit2/#HEAD/group/rebase/git_rebase_init
+    //
     func rebase(branch: AnnotatedCommit?, upstream: AnnotatedCommit?, onto: AnnotatedCommit?, options: RebaseOptions) -> R<Rebase> {
         git_instance(of: Rebase.self, "git_rebase_init") { pointer in
             options.with_git_rebase_options { opt in

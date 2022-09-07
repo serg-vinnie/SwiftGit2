@@ -126,14 +126,11 @@ public extension Branch {
 
 
 public extension ReferenceID {
-    func checkout(strategy: CheckoutStrategy = .Force, progress: CheckoutProgressBlock? = nil, stashing: Bool)  -> Result<Void, Error>  {
-        let brId = self
-        
-        
-        return self.repoID.repo
+    func checkout(strategy: CheckoutStrategy = .Force, progress: CheckoutProgressBlock? = nil, stashing: Bool = false)  -> Result<Void, Error>  {
+        repoID.repo
             .flatMap { repo in
                 repo
-                    .branchLookup(name: brId.name)
+                    .branchLookup(name: self.name)
                     .flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress, stashing: stashing) }
             }
     }
