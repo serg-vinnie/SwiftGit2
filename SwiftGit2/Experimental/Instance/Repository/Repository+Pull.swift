@@ -72,11 +72,13 @@ public extension Repository {
         
         let message = "Fast Forward MERGE \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned)"
         
-        return targetOID
-            | { oid in our.set(target: oid, message: message) }
-            | { $0.asBranch() }
-            | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
-            | { _ in .fastForward }
+        return GitStasher(repo: self).wrap(skip: !stashing) {
+            targetOID
+                | { oid in our.set(target: oid, message: message) }
+                | { $0.asBranch() }
+                | { self.checkout(branch: $0, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: false) }
+                | { _ in MergeResult.fastForward }
+        }
     }
     
     private func mergeThreeWay(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
