@@ -38,15 +38,32 @@ public extension GitStasher {
         if repo.headIsUnborn {
             return .success(GitStasher(repo: repo, state: .empty))
         } else {
-            return stash()
-                .map { GitStasher(repo: repo, state: .stashed($0)) }
-                .flatMapError { err in
-                    if err.isGit2(func: "git_stash_save", code: -3) {
-                        return .success(GitStasher(repo: repo, state: .empty))
-                    } else {
-                        return .failure(err)
-                    }
-                }
+            return repo
+                .status()
+                //.map { !$0.isEmpty }
+                .if(\.isEmpty,
+                     then: { _ in .success(GitStasher(repo: repo, state: .empty))},
+                     else: { _ in
+                    stash()
+                        .map { GitStasher(repo: repo, state: .stashed($0)) }
+                        .flatMapError { err in
+                            if err.isGit2(func: "git_stash_save", code: -3) {
+                                return .success(GitStasher(repo: repo, state: .empty))
+                            } else {
+                                return .failure(err)
+                            }
+                        }
+                })
+            
+//            return stash()
+//                .map { GitStasher(repo: repo, state: .stashed($0)) }
+//                .flatMapError { err in
+//                    if err.isGit2(func: "git_stash_save", code: -3) {
+//                        return .success(GitStasher(repo: repo, state: .empty))
+//                    } else {
+//                        return .failure(err)
+//                    }
+//                }
         }
     }
     
