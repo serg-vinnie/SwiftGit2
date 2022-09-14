@@ -15,6 +15,17 @@ class LogTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "LogTests")
     //lazy var big_repo : TestFolder = { root.sub }()
     
+    func test_refLogCache() {
+        let repo = root.with(repo: "refLogCache", content: .log(500)).shouldSucceed()!
+        let repoID = RepoID(url: repo.url)
+        let head = GitBranches(repoID).HEAD.shouldSucceed()!
+        
+        let cache = RefLogCache(ref: head, prefetch: 50)
+        
+        XCTAssert( cache.deque.count == 50)
+    }
+    
+    
     override func setUp() {
         let repo_10k = root.sub(folder: "repo_10k")
         if !Repository.exists(at: repo_10k.url) {

@@ -82,6 +82,12 @@ public class Revwalk : InstanceProtocol, ResultIterator {
     //        git_revwalk_sorting(pointer, GIT_SORT_TOPOLOGICAL.rawValue)
     //        git_revwalk_sorting(pointer, GIT_SORT_TIME.rawValue)
     //        git_revwalk_push(pointer, &oid)
+    
+    public func push(oid: OID) -> R<Revwalk> {
+        var oid = oid.oid
+        return git_try("git_revwalk_push") { git_revwalk_push(pointer, &oid) } | { self }
+    }
+    
     public func sorting(_ mode: UInt32) -> R<Revwalk> {
         git_try("git_revwalk_sorting") { git_revwalk_sorting(pointer, mode) } | { self }
     }
@@ -97,6 +103,43 @@ public class Revwalk : InstanceProtocol, ResultIterator {
             return .success(OID(oid))
         default:
             return .failure(NSError(gitError: GIT_ERROR.rawValue, pointOfFailure: "git_revwalk_next"))
+        }
+    }
+}
+
+public extension ResultIterator {
+    func next(count: Int) -> Result<[Success],Error> {
+        var c = [Success]()
+        c.reserveCapacity(count)
+        
+        var result = next()
+        
+        while c.insert(next: result) {
+          result = next()
+            if c.count == count {
+                break
+            }
+        }
+        
+        if let error = result.maybeFailure {
+            return .failure(error)
+        }
+        
+        return .success(c)
+    }
+}
+
+extension Array {
+    mutating func insert(next: Result<Element?, Error>) -> Bool {
+        switch next {
+        case let .success(item):
+            if let item = item {
+                self.append(item)
+                return true
+            }
+            return false
+        default:
+            return false
         }
     }
 }

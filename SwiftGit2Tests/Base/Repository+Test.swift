@@ -6,6 +6,7 @@ import XCTest
 
 enum RepositoryContent {
     case empty
+    case log(Int)
     case file(TestFile, TestFileContent)
     case commit(TestFile, TestFileContent, String)
     case clone(URL, CloneOptions)
@@ -18,6 +19,15 @@ extension Repository {
         case let .file  (file, content):        return t_with(file: file, with: content)
         case let .commit(file, content, msg):   return t_commit(file: file, with: content, msg: msg) | { _ in self }
         case .clone: fatalError("you shouldn't initiate clone from this place")
+        case let .log(count):
+            for i in 1...count {
+                t_commit(file: .fileA, with: .random, msg: "commit \(i)")
+                    .shouldSucceed()
+                if i % 1000 == 0 {
+                    print("\(i) commits generated")
+                }
+            }
+            return .success(self)
         }
     }
 
