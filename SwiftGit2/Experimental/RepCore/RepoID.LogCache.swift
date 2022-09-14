@@ -28,7 +28,7 @@ public class RefLogCache {
     
     func next(_ count: Int) -> R<[OID]> {
         if let oid = deque.last {
-            return ref.repoID.repo | { $0.log(oid: oid, count: count) }
+            return ref.repoID.repo | { $0.log(oid: oid, count: count + 1) } | { Array($0.dropFirst()) }
         } else {
             return ref.repoID.repo | { $0.log(ref: ref.name, count: count) }
         }

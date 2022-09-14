@@ -16,13 +16,23 @@ class LogTests: XCTestCase {
     //lazy var big_repo : TestFolder = { root.sub }()
     
     func test_refLogCache() {
-        let repo = root.with(repo: "refLogCache", content: .log(500)).shouldSucceed()!
-        let repoID = RepoID(url: repo.url)
+        let repo = root.with(repo: "refLogCache", content: .log(10)).shouldSucceed()!
+        let repoID = repo.repoID
         let head = GitBranches(repoID).HEAD.shouldSucceed()!
         
-        let cache = RefLogCache(ref: head, prefetch: 50)
+        let cache = RefLogCache(ref: head, prefetch: 2)
+        XCTAssert( cache.deque.count == 2)
+        cache.load(2).shouldSucceed()
         
-        XCTAssert( cache.deque.count == 50)
+        let commits = Array(cache.deque).flatMap { oid in
+            repoID.repo | { $0.commit(oid: oid) } | { $0.description }
+        }.shouldSucceed()!
+        
+        XCTAssertEqual(commits, ["commit 10", "commit 9", "commit 8", "commit 7"])
+        
+        for c in commits { print(c)}
+        
+        
     }
     
     
