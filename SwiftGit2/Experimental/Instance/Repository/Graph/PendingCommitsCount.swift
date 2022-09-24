@@ -18,9 +18,21 @@ public enum PendingCommitsCount {
 
 public extension Repository {
     func pendingCommitsCount(_ target: BranchTarget) -> R<PendingCommitsCount> {
+        self.remoteNameList()
+            .map { $0.isEmpty }
+            .if(\.self, then: { _ in
+                .success(.undefined)
+            }, else: { _ in
+                self._pendingCommitsCount(target)
+            })
+    }
+    
+    private func _pendingCommitsCount(_ target: BranchTarget) -> R<PendingCommitsCount> {
         if headIsDetached {
             return .success(.undefined)
         }
+         
+        //if self.remoteNameList()
         
         return upstreamExistsFor(target)
             .if(\.self, then: { _ in
