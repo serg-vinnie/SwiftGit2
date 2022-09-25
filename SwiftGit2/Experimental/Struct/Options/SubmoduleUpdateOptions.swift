@@ -14,7 +14,7 @@ public class SubmoduleUpdateOptions {
     private let fetch: FetchOptions
     private let checkout: CheckoutOptions
 
-    public init(fetch: FetchOptions, checkout: CheckoutOptions) {
+    public init(fetch: FetchOptions, checkout: CheckoutOptions = CheckoutOptions()) {
         self.fetch = fetch
         self.checkout = checkout
         git_submodule_update_options_init(&options, UInt32(GIT_SUBMODULE_UPDATE_OPTIONS_VERSION))

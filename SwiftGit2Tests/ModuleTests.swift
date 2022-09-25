@@ -6,6 +6,21 @@ import EssetialTesting
 
 class ModuleTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "ModuleTests")
+    
+    func test_bla() {
+        let url = URL(string: "git@github.com:serg-vinnie/SwiftGit2.git")!
+        let repo = root.with(repo: "cloneNext", content: .clone(url, .ssh), cleared: false)
+            .shouldSucceed()!
+        
+        (repo.repoID.module | { $0.subModulesRecursive2 })
+            .shouldSucceed("submodules")
+        
+        
+        let tao = RepoID(path: "/Users/loki/dev/taogit")
+        (tao.module | { $0.subModulesRecursive2 })
+            .shouldSucceed("tao")
+        
+    }
 
     func test_submodules() {
         let url = URL.userHome.appendingPathComponent("dev/taogit")

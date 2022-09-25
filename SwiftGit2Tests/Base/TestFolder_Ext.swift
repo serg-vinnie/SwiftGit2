@@ -45,8 +45,16 @@ extension TestFolder {
 }
 
 extension TestFolder {
-    func with(repo name: String, content: RepositoryContent) -> R<TestFolder> {
-        let subFolder = sub(folder: name).cleared().shouldSucceed()!
+    func with(repo name: String, content: RepositoryContent, cleared: Bool = true) -> R<TestFolder> {
+        let subFolder : TestFolder
+        if cleared {
+            subFolder = sub(folder: name).cleared().shouldSucceed()!
+        } else {
+            subFolder = sub(folder: name)
+            if subFolder.repoID.exists {
+                return .success(subFolder)
+            }
+        }
         
         print("USED_PATH: \(subFolder.url.path)")
         

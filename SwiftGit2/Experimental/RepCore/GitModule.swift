@@ -3,12 +3,24 @@ import Foundation
 import Essentials
 import OrderedCollections
 
+public extension GitModule {
+    struct Progress {
+        let total : Int
+        let exist : Int
+    }
+}
 
 // TODO: fix detached head
 public struct GitModule : CustomStringConvertible {
     public var repoID : RepoID { RepoID(url: url) }
     public let url : URL
     public let exists : Bool
+    
+    var progress : Progress {
+        let all = subModulesRecursive
+        return Progress(total: all.count, exist: all.values.compactMap { $0 }.count )
+    }
+    
     public var recurse : OrderedDictionary<String,GitModule?> {
         var result = OrderedDictionary<String,GitModule?>()
         result[self.url.lastPathComponent] = self
@@ -26,6 +38,21 @@ public struct GitModule : CustomStringConvertible {
             if let module = item.value {
                 for item in module.subModulesRecursive {
                     results[item.key] = item.value
+                }
+            }
+        }
+        
+        return results
+    }
+    public var subModulesRecursive2 : OrderedDictionary<RepoID,GitModule?> {
+        var results = OrderedDictionary<RepoID,GitModule?>()
+        
+        for item in subModules {
+            let itemRepoID = RepoID(url: repoID.url.appendingPathComponent(item.key))
+            results[itemRepoID] = item.value
+            if let module = item.value {
+                for item in module.subModulesRecursive2 {
+                    results[itemRepoID] = item.value
                 }
             }
         }

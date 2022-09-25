@@ -17,6 +17,18 @@ public struct Unborn {
 }
 
 public extension Unborn {
+    func cloneNext(auth: Auth) -> R<Void> {
+        let options = SubmoduleUpdateOptions(fetch: FetchOptions(auth: auth))
+        // let = nextSubmodule
+        //let ret = self.update(auth: auth)
+        return .notImplemented
+    }
+    
+    func clone(from remoteURL: String, auth: Auth) -> R<Repository> {
+        let options = CloneOptions(fetch: FetchOptions(auth: auth))
+        return clone(from: remoteURL, options: options)
+    }
+    
     func clone(from remoteURL: String, options: CloneOptions) -> R<Repository> {
         git_instance(of: Repository.self, "git_clone") { pointer in
             options.with_git_clone_options { clone_options in
