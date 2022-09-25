@@ -44,14 +44,14 @@ public struct GitModule : CustomStringConvertible {
         
         return results
     }
-    public var subModulesRecursive2 : OrderedDictionary<RepoID,GitModule?> {
-        var results = OrderedDictionary<RepoID,GitModule?>()
+    public var idsRecursive : OrderedDictionary<SubmoduleID,GitModule?> {
+        var results = OrderedDictionary<SubmoduleID,GitModule?>()
         
         for item in subModules {
-            let itemRepoID = RepoID(url: repoID.url.appendingPathComponent(item.key))
-            results[itemRepoID] = item.value
+            let subID = SubmoduleID(repoID: self.repoID, name: item.key)
+            results[subID] = item.value
             if let module = item.value {
-                for item in module.subModulesRecursive2 {
+                for item in module.idsRecursive {
                     results[item.key] = item.value
                 }
             }
