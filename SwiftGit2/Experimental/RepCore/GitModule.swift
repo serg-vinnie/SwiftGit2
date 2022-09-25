@@ -52,7 +52,7 @@ public struct GitModule : CustomStringConvertible {
             results[itemRepoID] = item.value
             if let module = item.value {
                 for item in module.subModulesRecursive2 {
-                    results[itemRepoID] = item.value
+                    results[item.key] = item.value
                 }
             }
         }

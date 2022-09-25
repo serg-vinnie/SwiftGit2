@@ -17,8 +17,11 @@ class ModuleTests: XCTestCase {
         
         
         let tao = RepoID(path: "/Users/loki/dev/taogit")
+        (tao.module | { $0.subModulesRecursive })
+            .shouldSucceed("tao1")
+        
         (tao.module | { $0.subModulesRecursive2 })
-            .shouldSucceed("tao")
+            .shouldSucceed("tao2")
         
     }
 
