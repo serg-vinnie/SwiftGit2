@@ -3,20 +3,13 @@ import Foundation
 import Essentials
 import OrderedCollections
 
-public extension GitModule {
-    struct Progress {
-        let total : Int
-        let exist : Int
-    }
-}
-
 // TODO: fix detached head
 public struct GitModule : CustomStringConvertible {
     public var repoID : RepoID { RepoID(url: url) }
     public let url : URL
     public let exists : Bool
     
-    var progress : Progress {
+    public var progress : Progress {
         let all = subModulesRecursive
         return Progress(total: all.count, exist: all.values.compactMap { $0 }.count )
     }
@@ -44,32 +37,7 @@ public struct GitModule : CustomStringConvertible {
         
         return results
     }
-    
-    public var firstUnInited : SubmoduleID? {
-        for (key,value) in idsRecursive {
-            if value == nil {
-                return key
-            }
-        }
-        return nil
-    }
-    
-    public var idsRecursive : OrderedDictionary<SubmoduleID,GitModule?> {
-        var results = OrderedDictionary<SubmoduleID,GitModule?>()
         
-        for item in subModules {
-            let subID = SubmoduleID(repoID: self.repoID, name: item.key)
-            results[subID] = item.value
-            if let module = item.value {
-                for item in module.idsRecursive {
-                    results[item.key] = item.value
-                }
-            }
-        }
-        
-        return results
-    }
-    
     public var description: String { "| M(\(exists)): " + url.lastPathComponent + " \(subModulesRecursive.count)" + " \(subModulesRecursive.map { "\(($0.value == nil) ? "." : "" )" + $0.key }) |" }
     
     public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions, signature: Signature) -> R<Void> {

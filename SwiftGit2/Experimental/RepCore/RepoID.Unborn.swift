@@ -17,11 +17,9 @@ public struct Unborn {
 }
 
 public extension Unborn {
-    func cloneNext(auth: Auth) -> R<Void> {
+    func cloneNext(auth: Auth) -> R<GitModule.Progress> {
         let options = SubmoduleUpdateOptions(fetch: FetchOptions(auth: auth))
-        // let = nextSubmodule
-        //let ret = self.update(auth: auth)
-        return .notImplemented
+        return repoID.module | { $0.next(options: options) }
     }
     
     func clone(from remoteURL: String, auth: Auth) -> R<Repository> {
