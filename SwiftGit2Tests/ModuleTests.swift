@@ -12,16 +12,24 @@ class ModuleTests: XCTestCase {
         let repo = root.with(repo: "cloneNext", content: .clone(url, .ssh), cleared: false)
             .shouldSucceed()!
         
-        (repo.repoID.module | { $0.subModulesRecursive2 })
+        let options = SubmoduleUpdateOptions(auth: .defaultSSH) { progs in
+            print("progress",progs)
+            return true
+        }
+        
+        (repo.repoID.module | { $0.next(options: options) })
+            .shouldSucceed("submodules")
+        
+        (repo.repoID.module | { $0.idsRecursive })
             .shouldSucceed("submodules")
         
         
-        let tao = RepoID(path: "/Users/loki/dev/taogit")
-        (tao.module | { $0.subModulesRecursive })
-            .shouldSucceed("tao1")
-        
-        (tao.module | { $0.subModulesRecursive2 })
-            .shouldSucceed("tao2")
+//        let tao = RepoID(path: "/Users/loki/dev/taogit")
+//        (tao.module | { $0.subModulesRecursive })
+//            .shouldSucceed("tao1")
+//
+//        (tao.module | { $0.idsRecursive })
+//            .shouldSucceed("tao2")
         
     }
 

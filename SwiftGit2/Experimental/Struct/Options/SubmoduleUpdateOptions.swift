@@ -14,6 +14,12 @@ public class SubmoduleUpdateOptions {
     private let fetch: FetchOptions
     private let checkout: CheckoutOptions
 
+    public init(auth: Auth, block: @escaping TransferProgressCB) {
+        self.fetch = FetchOptions(callbacks: RemoteCallbacks(auth: auth, transfer: block))
+        self.checkout = CheckoutOptions()
+        git_submodule_update_options_init(&options, UInt32(GIT_SUBMODULE_UPDATE_OPTIONS_VERSION))
+    }
+    
     public init(fetch: FetchOptions, checkout: CheckoutOptions = CheckoutOptions()) {
         self.fetch = fetch
         self.checkout = checkout

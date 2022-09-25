@@ -19,7 +19,8 @@ public class RemoteCallbacks: GitPayload {
     private var remote_callbacks = git_remote_callbacks()
     public var transferProgress: TransferProgressCB?
 
-    public init(auth: Auth) {
+    public init(auth: Auth, transfer: TransferProgressCB? = nil) {
+        self.transferProgress = transfer
         switch auth {
         case .match(let callback):
             self.callback = callback

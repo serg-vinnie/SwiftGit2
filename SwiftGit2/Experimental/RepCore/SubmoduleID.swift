@@ -9,16 +9,18 @@ public struct SubmoduleID : Hashable {
 }
 
 public extension SubmoduleID {
-    var submodule : R<Submodule> {
-        repoID.repo | { $0.submoduleLookup(named: name) }
-    }
+//    var submodule : R<Submodule> {
+//        repoID.repo | { $0.submoduleLookup(named: name) }
+//    }
     
     func update(auth: Auth) -> R<Void> {
         update(options: SubmoduleUpdateOptions(fetch: FetchOptions(auth: auth)))
     }
     
     func update(options: SubmoduleUpdateOptions) -> R<Void> {
-        submodule | { $0.update(options: options) }
+        repoID.repo | {
+            $0.submoduleLookup(named: name) | { $0.update(options: options, init: true) }
+        }
     }
 }
 public extension GitModule {
