@@ -44,6 +44,16 @@ public struct GitModule : CustomStringConvertible {
         
         return results
     }
+    
+    public var firstUnInited : SubmoduleID? {
+        for (key,value) in idsRecursive {
+            if value == nil {
+                return key
+            }
+        }
+        return nil
+    }
+    
     public var idsRecursive : OrderedDictionary<SubmoduleID,GitModule?> {
         var results = OrderedDictionary<SubmoduleID,GitModule?>()
         
