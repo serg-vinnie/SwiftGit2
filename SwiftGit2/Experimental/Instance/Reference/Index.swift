@@ -37,6 +37,8 @@ public extension Repository {
     }
 }
 
+
+
 public extension Index {
     var entrycount: Int { git_index_entrycount(pointer) }
 
@@ -77,72 +79,7 @@ public extension Index {
         }
     }
     
-    func add(_ entry: Index.Entry, inMemory: Bool = false) -> R<Index> {
-        var entry1 = entry.wrappedEntry
-        
-        let action = _result((), pointOfFailure: "git_index_add") {
-            git_index_add(self.pointer, &entry1 )
-        }
-        
-        if inMemory {
-            return action
-                | { self }
-        } else {
-            return action
-                | { self.write() }
-                | { self }
-        }
-    }
-    
-    func addBy(relPath: String, inMemory: Bool = false) -> R<Index> {
-        let action = git_try("git_index_add_bypath") {
-            relPath.withCString { path in
-                git_index_add_bypath(self.pointer, path)
-            }
-        }
-        
-        if inMemory {
-            return action
-                | { self }
-        } else {
-            return action
-                | { self.write() }
-                | { self }
-        }
-    }
-    
-    func addAll(pathPatterns: [String] = ["*"], inMemory: Bool = false) -> R<Index> {
-        let action = git_try("git_index_add_all") {
-             pathPatterns.with_git_strarray { strarray in
-                 git_index_add_all(pointer, &strarray, 0, nil, nil)
-             }
-         }
-        
-        if inMemory {
-            return action
-                | { self }
-        } else {
-            return action
-                | { self.write() }
-                | { self }
-        }
-    }
-    
-    func removeBy(relPath: String) -> R<Index> {
-        return git_try("git_index_remove_bypath") {
-            relPath.withCString { path in
-                git_index_remove_bypath(self.pointer, path)
-            }
-        } | { self.write() }
-        | { .success(self) }
-    }
-    
-    func removeAll(pathPatterns: [String] = ["*"]) -> R<Index> {
-        git_try("git_index_remove_all") {
-            pathPatterns.with_git_strarray { strarray in
-                git_index_remove_all(pointer, &strarray, nil, nil) }
-        } | { self.write() } | { self }
-    }
+
     
     func conflictRemove(relPath: String) -> R<Index> {
         return _result({ () }, pointOfFailure: "git_index_conflict_remove") {
