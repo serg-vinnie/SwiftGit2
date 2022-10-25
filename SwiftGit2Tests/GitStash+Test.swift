@@ -88,9 +88,26 @@ class GitStashTests: XCTestCase {
         //XCTAssert(stash.message == "auto stash tag")
     }
     
-    func test_stasher() {
+    func test_stasherPull() {
+        let folder = root.sub(folder: "stasherPull").cleared().shouldSucceed()!
+        
+        let originID = folder.with(repo: "origin", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!.repoID
+        let repoID = folder.with(repo: "repo", content: .clone(originID.url, .local)).shouldSucceed()!.repoID
+        
+        (originID.repo | { $0.t_commit(file: .fileB, msg: "B") })
+            .shouldSucceed()
+        
+//        (repoID.repo | { $0.t_commit(file: .fileC, msg: "C") })
+//            .shouldSucceed()
+        
+        
+        repoID
+        
+    }
+    
+    func test_stasherWithSubmodule() {
         //let folder = root.with(repo: "stasherEmptyRepo", content: .empty).shouldSucceed()!
-        let folder = root.sub(folder: "stasher").cleared().shouldSucceed()!
+        let folder = root.sub(folder: "stasherWithSubmodule").cleared().shouldSucceed()!
         
         
         folder   .with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
