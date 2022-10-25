@@ -58,6 +58,10 @@ public extension Credentials {
 //        let c2 = Credentials.ssh(publicKey: "/Users/loki/.ssh/bla.pub", privateKey: "/Users/loki/.ssh/bla", passphrase: "")
 //        return .success([c2, c1])
         
+        guard sshDir.exists else {
+            return .success([])
+        }
+        
         let path = sshDir.path + "/"
         let files = sshDir.files
         let pubs  = files | { $0.filter { $0.hasSuffix(".pub") } }
