@@ -84,8 +84,6 @@ class GitStashTests: XCTestCase {
         (GitStash(repoID: repoID).items() | { $0.first! })
             .map { $0.message! }
             .assertEqual(to: "On main: auto stash tag")
-        
-        //XCTAssert(stash.message == "auto stash tag")
     }
     
     func test_stasherPull() {
