@@ -97,6 +97,17 @@ public extension Repository {
         
         let branchName = our.nameAsReference
         
+        let stasher: R<GitStasher>
+        if stashing {
+            stasher = GitStasher.init(repo: self, state: .tag("pull-merge")).push()
+        } else {
+            stasher = .success(.init(repo: self, state: .empty))
+        }
+        
+        if case .failure(let error) = stasher {
+            return .failure(error)
+        }
+        
         return [ourOID, theirOID, baseOID]
             .flatMap { $0.tree(self) }
             .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options.mergeOptions) } // -> Index
@@ -119,14 +130,15 @@ public extension Repository {
                                 .save()
                             
                             return
-                        }.flatMap { _ in GitStasher(repo: self, state: .tag("merge")).push() }
+                        }//.flatMap { _ in GitStasher(repo: self, state: .tag("merge")).push() }
                          .flatMap { _ in self.checkout(index: index, strategy: checkoutStrategyMerge , progress: options.checkoutProgress) }
                          .map { _ in .threeWayConflict(index) }
                 },
                 else: { index in
                     combine(message, parents)
                         | { index.commit(into: self, signature: options.signature, message: $0, parents: $1) }
-                        | { _ in self.checkout(ref: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: stashing) }
+                        | { _ in self.checkout(ref: branchName, strategy: checkoutStrategy, progress: options.checkoutProgress, stashing: false) }
+                        | { _ in stasher | { $0.pop() } }
                         | { _ in .threeWaySuccess }
                 })
     }

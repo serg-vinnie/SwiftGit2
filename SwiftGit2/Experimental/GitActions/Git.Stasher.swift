@@ -68,7 +68,7 @@ public extension GitStasher {
     }
     
     func pop() -> R<Self> {
-        let opt = StashApplyOptions(flags: .default)
+        let opt = StashApplyOptions(flags: .reinstateIndex)
         
         switch state {
         case .stashed(let oid):

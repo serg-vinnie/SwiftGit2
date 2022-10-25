@@ -97,12 +97,17 @@ class GitStashTests: XCTestCase {
         (originID.repo | { $0.t_commit(file: .fileB, msg: "B") })
             .shouldSucceed()
         
-//        (repoID.repo | { $0.t_commit(file: .fileC, msg: "C") })
-//            .shouldSucceed()
+        (repoID.repo | { $0.t_commit(file: .fileC, msg: "C") })
+            .shouldSucceed()
         
+        (repoID.repo | { $0.t_write(file: .fileA, with: .random) })
+            .shouldSucceed()
+
+        GitSync(repoID: repoID).pull(.HEAD, options: .local, stashing: true)
+            .shouldSucceed()
         
-        repoID
-        
+        (repoID.repo | { $0.status() } | { $0.count })
+            .assertEqual(to: 1)
     }
     
     func test_stasherWithSubmodule() {
