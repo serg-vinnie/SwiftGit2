@@ -42,17 +42,17 @@ public extension GitStasher {
                 .status()
                 //.map { !$0.isEmpty }
                 .if(\.isEmpty,
-                     then: { _ in .success(GitStasher(repo: repo, state: .empty))},
+                     then: { _ in   .success(GitStasher(repo: repo, state: .empty)) },
                      else: { _ in
-                    stash()
-                        .map { GitStasher(repo: repo, state: .stashed($0)) }
-                        .flatMapError { err in
-                            if err.isGit2(func: "git_stash_save", code: -3) {
-                                return .success(GitStasher(repo: repo, state: .empty))
-                            } else {
-                                return .failure(err)
-                            }
-                        }
+                                    stash()
+                                        .map { GitStasher(repo: repo, state: .stashed($0)) }
+                                        .flatMapError { err in
+                                            if err.isGit2(func: "git_stash_save", code: -3) {
+                                                return .success(GitStasher(repo: repo, state: .empty))
+                                            } else {
+                                                return .failure(err)
+                                            }
+                                        }
                 })
             
 //            return stash()
@@ -68,7 +68,7 @@ public extension GitStasher {
     }
     
     func pop() -> R<Self> {
-        let opt = StashApplyOptions(flags: .reinstateIndex)
+        let opt = StashApplyOptions(flags: .default)
         
         switch state {
         case .stashed(let oid):
