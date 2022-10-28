@@ -29,9 +29,9 @@ extension Repository {
 }
 
 public extension Repository {
-    func deltas(target: CommitTarget, findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<CommitDetails> {
+    func deltas(target: CommitTarget, findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<CommitDeltas> {
         if headIsUnborn {
-            return .success(CommitDetails(parents: [], deltasWithHunks: [], all: [:], desc: ""))
+            return .success(CommitDeltas(parents: [], deltasWithHunks: [], all: [:], desc: ""))
         }
         
         let commit      = target.commit(in: self)
@@ -43,7 +43,7 @@ public extension Repository {
             if parents.isEmpty {
                 let deltas = commitTree | { self.diffTreeToTree(oldTree: nil, newTree: $0) } | { $0.asDeltasWithHunks() }
                 
-                return combine(deltas, desc) | { CommitDetails(parents: [], deltasWithHunks: $0, all: [:], desc: $1) }
+                return combine(deltas, desc) | { CommitDeltas(parents: [], deltasWithHunks: $0, all: [:], desc: $1) }
             }
         }
         
@@ -57,7 +57,7 @@ public extension Repository {
         return combine(parentOIDs, deltas, desc) | { commitDetails(parents: $0, deltas: $1, desc: $2) }
     }
     
-    func commitDetails(parents: [OID], deltas:[[Diff.Delta]], desc: String) -> R<CommitDetails> {
+    func commitDetails(parents: [OID], deltas:[[Diff.Delta]], desc: String) -> R<CommitDeltas> {
         guard parents.count == deltas.count else {
             return .failure(WTF("commitDetails: parents.count == deltas.count"))
         }
@@ -68,10 +68,10 @@ public extension Repository {
         let filteredAll     = filteredParents.asDictionary(other: filetredDeltas)
         
         if let firstDelta = filetredDeltas.first {
-            return filteredAll | { CommitDetails(parents: filteredParents, deltasWithHunks: firstDelta, all: $0, desc: desc) }
+            return filteredAll | { CommitDeltas(parents: filteredParents, deltasWithHunks: firstDelta, all: $0, desc: desc) }
         }
         
-        return .success(CommitDetails(parents: [], deltasWithHunks: [], all: [:], desc: desc))
+        return .success(CommitDeltas(parents: [], deltasWithHunks: [], all: [:], desc: desc))
         
     }
 
@@ -89,22 +89,22 @@ extension Array where Element : Hashable {
 }
 
 
-public struct CommitDetails {
+public struct CommitDeltas {
     public let parents         : [OID]
     public let deltasWithHunks : [Diff.Delta]
     public let all             : [OID:[Diff.Delta]]
     public let desc            : String
     
-    public static var emtpy : CommitDetails { CommitDetails(parents: [], deltasWithHunks: [], all: [:], desc: "")  }
+    public static var emtpy : CommitDeltas { CommitDeltas(parents: [], deltasWithHunks: [], all: [:], desc: "")  }
     
-    public func with(parent: Int) -> CommitDetails {
+    public func with(parent: Int) -> CommitDeltas {
         guard parents.count > 0 else { return self }
         guard parent < parents.count else {
-            return CommitDetails(parents: parents, deltasWithHunks: all.first!.value, all: all, desc: desc)
+            return CommitDeltas(parents: parents, deltasWithHunks: all.first!.value, all: all, desc: desc)
         }
         
         if let element = all[parents[parent]] {
-            return CommitDetails(parents: parents, deltasWithHunks: element, all: all, desc: desc)
+            return CommitDeltas(parents: parents, deltasWithHunks: element, all: all, desc: desc)
         }
         return self
     }
@@ -127,7 +127,7 @@ public enum CommitTarget {
 
 public enum Entries {
     case status(StatusIterator)
-    case commit(CommitDetails)
+    case commit(CommitDeltas)
     case headIsUnborn
 }
 
@@ -166,7 +166,7 @@ public extension Entries {
         }
     }
     
-    var asCommitDetails : CommitDetails? {
+    var asCommitDetails : CommitDeltas? {
         switch self {
         case let .commit(deltas): return deltas
         default:

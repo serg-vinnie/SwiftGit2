@@ -17,7 +17,7 @@ public struct HistoryFilePair : Hashable {
     }
     
     public let commit: Commit
-    public let details: CommitDetails
+    public let details: CommitDeltas
 }
 
 public extension HistoryFileID {
