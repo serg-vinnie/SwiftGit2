@@ -627,6 +627,7 @@
 		E64F957627E8CD4600E2D5D7 /* GitActions */ = {
 			isa = PBXGroup;
 			children = (
+				E6F0B9362910287D008E2176 /* Git.Log */,
 				E63965FB2908179F00BD4E6F /* Git.Sync */,
 				E644ACD428C6983300BF27A7 /* Git.Rebase */,
 				1DC8A54227E1247600860A0F /* Git.Conflicts.swift */,
@@ -639,9 +640,6 @@
 				E6C7D37A2822EAD40091D710 /* Git.Branch.swift */,
 				1D4BCEF627440F95008831DC /* Git.Index.swift */,
 				1D6C643F2837F64D003E9072 /* Git.Commit.swift */,
-				E61C06E3290C47660047D243 /* CommitID.swift */,
-				E61C06E1290C409E0047D243 /* Git.CommitCache.swift */,
-				1DC744B8289061C9000F8478 /* HistoryFileID.swift */,
 			);
 			path = GitActions;
 			sourceTree = "<group>";
@@ -743,6 +741,16 @@
 				1D6C643928319FE1003E9072 /* Stash.swift */,
 			);
 			path = Object;
+			sourceTree = "<group>";
+		};
+		E6F0B9362910287D008E2176 /* Git.Log */ = {
+			isa = PBXGroup;
+			children = (
+				E61C06E3290C47660047D243 /* CommitID.swift */,
+				E61C06E1290C409E0047D243 /* Git.CommitCache.swift */,
+				1DC744B8289061C9000F8478 /* HistoryFileID.swift */,
+			);
+			path = Git.Log;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
