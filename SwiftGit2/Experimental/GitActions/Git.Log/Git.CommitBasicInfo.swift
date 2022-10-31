@@ -25,9 +25,14 @@ public struct GitCommitBasicInfo {
 
 public extension CommitID {
     var basicInfo : R<GitCommitBasicInfo> {
-        let parents = commit | { $0.parents() } | { $0.map { $0.oid } }
-        return combine(commit,parents)
-            | { GitCommitBasicInfo(id: self, commit: $0, parents: $1) }
+        withCommit { c in
+            c.parents()
+            | { $0.map { $0.oid } }
+            | { GitCommitBasicInfo(id: self, commit: c, parents: $0) }
+        }
+        //commit | { $0.parents() } | { $0.map { $0.oid } }
+        //return combine(commit,parents)
+            //| {  }
     }
 }
 
