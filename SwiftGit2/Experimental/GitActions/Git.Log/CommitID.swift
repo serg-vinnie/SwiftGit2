@@ -14,6 +14,8 @@ public struct CommitID {
 
 extension CommitID {
     var info : R<GitCommitInfo> {
-        return .success(GitCommitInfo(id: self))
+        repoID.repo
+            | { $0.deltas(target: .commit(oid)) }
+            | { GitCommitInfo(id: self, deltas: $0) }
     }
 }

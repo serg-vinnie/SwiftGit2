@@ -2,14 +2,7 @@ import Essentials
 import Foundation
 import OrderedCollections
 
-
-/// WIP concept
-
-public struct GitCommitInfo {
-    let id : CommitID
-}
-
-public class GitCommitCache {
+public class GitLogCache {
     let repoID: RepoID
     var cache = [OID:GitCommitInfo]()
     
@@ -22,7 +15,8 @@ public class GitCommitCache {
             return .success(inf)
         }
         
-        return CommitID(repoID: repoID, oid: oid).info
+        return CommitID(repoID: repoID, oid: oid)
+            .info
             .onSuccess { self.cache[oid] = $0 }
     }
 }
