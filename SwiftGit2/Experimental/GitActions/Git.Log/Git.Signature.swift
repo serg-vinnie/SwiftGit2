@@ -2,9 +2,9 @@ import Foundation
 import Clibgit2
 
 public struct GitSignature {
-    let name    : String
-    let email   : String
-    let when    : Date
+    public let name    : String
+    public let email   : String
+    public let when    : Date
     
     init(_ signature: git_signature) {
         self.name = signature.name.asString()

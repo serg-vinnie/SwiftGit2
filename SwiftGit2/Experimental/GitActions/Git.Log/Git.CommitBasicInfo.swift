@@ -27,12 +27,16 @@ public extension CommitID {
     var basicInfo : R<GitCommitBasicInfo> {
         withCommit { c in
             c.parents()
-            | { $0.map { $0.oid } }
-            | { GitCommitBasicInfo(id: self, commit: c, parents: $0) }
+                | { $0.map { $0.oid } }
+                | { GitCommitBasicInfo(id: self, commit: c, parents: $0) }
         }
-        //commit | { $0.parents() } | { $0.map { $0.oid } }
-        //return combine(commit,parents)
-            //| {  }
     }
 }
 
+public extension GitCommitBasicInfo {
+    var isAuthorEqualsCommitter : Bool {
+        author.name == commiter.name &&
+        author.email == commiter.email &&
+        author.when == commiter.when
+    }
+}
