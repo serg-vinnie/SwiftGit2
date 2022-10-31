@@ -7,6 +7,7 @@
 //
 
 import Clibgit2
+import Essentials
 
 public class Commit: Object {
     public var pointer: OpaquePointer
@@ -54,6 +55,11 @@ public extension Commit {
         }
         
         return .success(result)
+    }
+    
+    var treeOID : OID {
+        let oid = git_commit_tree_id(self.pointer).pointee
+        return OID(oid)
     }
     
     func tree() -> Result<Tree, Error> {
