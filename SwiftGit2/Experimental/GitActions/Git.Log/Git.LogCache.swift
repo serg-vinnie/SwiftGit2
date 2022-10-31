@@ -3,21 +3,12 @@ import Foundation
 import OrderedCollections
 
 public class GitLogCache {
-    let repoID: RepoID
-    var cache = [OID:GitCommitInfo]()
+    public let repoID: RepoID
+    public var basicInfo = [OID:GitCommitBasicInfo]()
+    public var deltas = [OID:CommitDeltas]()
     
     init(repoID: RepoID) {
         self.repoID = repoID
-    }
-    
-    func info(oid: OID) -> R<GitCommitInfo> {
-        if let inf = cache[oid] {
-            return .success(inf)
-        }
-        
-        return CommitID(repoID: repoID, oid: oid)
-            .info
-            .onSuccess { self.cache[oid] = $0 }
     }
 }
 

@@ -13,11 +13,3 @@ public struct CommitID {
         self.oid = oid
     }
 }
-
-extension CommitID {
-    var info : R<GitCommitInfo> {
-        repoID.repo
-            | { $0.deltas(target: .commit(oid)) }
-            | { GitCommitInfo(id: self, deltas: $0) }
-    }
-}
