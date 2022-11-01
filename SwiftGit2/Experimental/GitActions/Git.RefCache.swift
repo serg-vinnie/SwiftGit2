@@ -13,6 +13,8 @@ public final class GitRefCache {
     public private(set) var remotes: GitRemotesList = [:]
     public private(set) var remoteHEADs: [String:ReferenceCache?] = [:]
     
+    public private(set) var oids: [OID: Set<ReferenceID>] = [:]
+    
     lazy var upstreams : OneOnOne = { local.upstreams() }()
     
     init(repoID: RepoID, list: [ReferenceID], remotes: GitRemotesList) {
@@ -26,6 +28,16 @@ public final class GitRefCache {
         self.HEAD   = (repoID.repo | { $0.HEAD() }
                                    | { ReferenceCache(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
                        ).maybeSuccess
+        
+        for ref in list {
+            if let oid = ref.targetOID.maybeSuccess {
+                if oids.keys.contains(oid) {
+                    oids[oid]?.insert(ref)
+                } else {
+                    oids[oid] = [ref]
+                }
+            }
+        }
     }
     
     public func find(refID: ReferenceID) -> ReferenceCache? {

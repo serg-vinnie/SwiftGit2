@@ -62,6 +62,11 @@ public extension Commit {
         return OID(oid)
     }
     
+    var oid : OID {
+        let oid = git_commit_id(self.pointer).pointee
+        return OID(oid)
+    }
+    
     func tree() -> Result<Tree, Error> {
         git_instance(of: Tree.self, "git_commit_tree") { pointer in
             git_commit_tree(&pointer, self.pointer)
