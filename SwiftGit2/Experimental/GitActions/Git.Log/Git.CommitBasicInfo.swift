@@ -11,6 +11,7 @@ public struct GitCommitBasicInfo {
     
     public let summary     : String
     public let description : String
+    public let time        : Date
     
     init(id: CommitID, commit: Commit, parents: [OID]) {
         self.id             = id
@@ -20,6 +21,7 @@ public struct GitCommitBasicInfo {
         self.parents        = parents
         self.summary        = commit.summary
         self.description    = commit.description
+        self.time           = commit.time
     }
 }
 
