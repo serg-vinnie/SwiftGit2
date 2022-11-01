@@ -9,13 +9,17 @@
 import Foundation
 import Essentials
 
-public struct ReferenceID : Equatable, Hashable {
+public struct ReferenceID : Equatable, Hashable, Comparable {
     public let repoID: RepoID
     public let name: String
     
     public init(repoID: RepoID, name: String) {
         self.repoID = repoID
         self.name = name
+    }
+    
+    public static func < (lhs: ReferenceID, rhs: ReferenceID) -> Bool {
+        lhs.name < rhs.name
     }
 }
 
