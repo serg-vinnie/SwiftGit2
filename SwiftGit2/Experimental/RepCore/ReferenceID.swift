@@ -65,7 +65,11 @@ public extension ReferenceID {
     var symbolic : R<ReferenceID> { reference | { $0.nameAsReferenceSymbolic.asNonOptional } | { ReferenceID(repoID: repoID, name: $0) } }
     
     var targetOID : R<OID> {
-        repoID.repo | { r in r.reference(name: name) | { $0.with(r).targetOID() }}
+        if self.isTag {
+            return repoID.repo | { r in r.reference(name: name) | { $0.with(r).getTagOid() }}
+        } else {
+            return repoID.repo | { r in r.reference(name: name) | { $0.with(r).targetOID() }}
+        }
     }
     
     var annotatedCommit : R<AnnotatedCommit> {
