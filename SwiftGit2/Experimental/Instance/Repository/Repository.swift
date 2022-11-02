@@ -81,18 +81,7 @@ public extension Repository {
 
     
     
-    /// Looks like works with advanced tags only
-    func tagLookup(oid: OID) -> R<Tag> {
-        var tagPointer: OpaquePointer? = nil
-        var oidNeeded = oid.oid
-        
-        return git_try("git_tag_lookup_prefix") {
-            git_tag_lookup_prefix(&tagPointer, self.pointer, &oidNeeded, 40);
-        }
-        .map {
-            Tag(tagPointer!)
-        }
-    }
+
     
 // Use commit(oid) instead
 //    func commitLookup(oid: OID) -> R<Commit?> {
@@ -107,17 +96,7 @@ public extension Repository {
     
 
     
-    func createTag(from commitOid: OID, tag: String, message: String, signature: Signature) -> Result<OID, Error> {
-        var oid = git_oid()
-        
-        return combine( signature.make(), self.commit(oid: commitOid) )
-            .flatMap { signtr, commit in
-                git_try("git_tag_create") {
-                    git_tag_create(&oid, self.pointer, tag, commit.pointer, signtr.pointer, message, 0 )
-                }
-                .map { OID(oid) }
-            }
-    }
+
     
     func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         return index()

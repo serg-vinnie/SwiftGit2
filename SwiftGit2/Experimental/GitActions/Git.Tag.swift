@@ -1,17 +1,46 @@
-//
-//  TagNew.swift
-//  SwiftGit2-OSX
-//
-//  Created by UKS on 06.02.2022.
-//  Copyright © 2022 GitHub, Inc. All rights reserved.
-//
 
-import Clibgit2
 import Foundation
+import Essentials
+import Clibgit2
 
-///////////////////////////////////////////
-// Must be child or reference??? but it is not
-///////////////////////////////////////////
+public struct GitTag {
+    public let repoID: RepoID
+    
+    public init(repoID: RepoID) {
+        self.repoID = repoID
+    }
+}
+
+public extension GitTag {
+    
+}
+
+public extension Repository {
+    /// Looks like works with advanced tags only
+    func tagLookup(oid: OID) -> R<Tag> {
+        var tagPointer: OpaquePointer? = nil
+        var oidNeeded = oid.oid
+        
+        return git_try("git_tag_lookup_prefix") {
+            git_tag_lookup_prefix(&tagPointer, self.pointer, &oidNeeded, 40);
+        }
+        .map {
+            Tag(tagPointer!)
+        }
+    }
+    
+    func createTag(from commitOid: OID, tag: String, message: String, signature: Signature) -> Result<OID, Error> {
+        var oid = git_oid()
+        
+        return combine( signature.make(), self.commit(oid: commitOid) )
+            .flatMap { signtr, commit in
+                git_try("git_tag_create") {
+                    git_tag_create(&oid, self.pointer, tag, commit.pointer, signtr.pointer, message, 0 )
+                }
+                .map { OID(oid) }
+            }
+    }
+}
 
 /// An annotated git tag.
 public struct Tag: InstanceProtocol, ObjectType, Hashable  {
