@@ -12,7 +12,9 @@ public struct GitTag {
 }
 
 public extension GitTag {
-    
+    func create(at oid: OID, name: String, message: String, signature: Signature) -> R<OID> {
+        self.repoID.repo | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
+    }
 }
 
 public extension Repository {
