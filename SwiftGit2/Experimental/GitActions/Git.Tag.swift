@@ -31,7 +31,7 @@ public extension Repository {
         }
     }
     
-    func createTag(from commitOid: OID, tag: String, message: String, signature: Signature) -> Result<OID, Error> {
+    fileprivate func createTag(from commitOid: OID, tag: String, message: String, signature: Signature) -> Result<OID, Error> {
         var oid = git_oid()
         
         return combine( signature.make(), self.commit(oid: commitOid) )

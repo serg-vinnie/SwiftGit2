@@ -11,14 +11,13 @@ final class GitTagTests: XCTestCase {
         let repoID = folder.repoID
         
         let oid = (GitRefCache.from(repoID: repoID) | { $0.HEAD.asNonOptional } | { $0.referenceID.targetOID })
-            .shouldSucceed("oid")!
+            .shouldSucceed()!
         
         GitTag(repoID: repoID).create(at: oid, name: "1.2.3", message: "", signature: .test)
-            .shouldSucceed("create")
-        
-            
+            .shouldSucceed()
+
         (GitRefCache.from(repoID: repoID) | { $0.tags.map { $0.referenceID } } )
-            .shouldSucceed("tag")
+            .shouldSucceed()
     }
 
 }
