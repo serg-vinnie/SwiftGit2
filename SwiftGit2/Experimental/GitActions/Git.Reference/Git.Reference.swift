@@ -13,6 +13,16 @@ public struct GitReference {
 
 public extension GitReference {
     
+    func new(branch: String) -> R<ReferenceID> {
+        
+        return .notImplemented
+    }
+    
+    func new(tag: String) -> R<ReferenceID> {
+        
+        return .notImplemented
+    }
+    
     enum Target {
         case HEAD
         case id(ReferenceID)
@@ -26,7 +36,7 @@ public extension GitReference {
             }
         }
         
-        public func branch(in repo: Repository) -> R<Branch> {
+        func branch(in repo: Repository) -> R<Branch> {
             switch self {
             case .HEAD: return repo.headBranch()
             case .oid(_):               return .wtf("This oid possibly is not a Branch")
@@ -34,7 +44,7 @@ public extension GitReference {
             }
         }
         
-        public func oid(in repo: Repository) -> R<OID> {
+        func oid(in repo: Repository) -> R<OID> {
             switch self {
             case .HEAD:                 return repo.headCommit().map{ $0.oid }
             case let .oid(oid):         return .success(oid)
@@ -44,13 +54,5 @@ public extension GitReference {
     }
     
     
-    func new(branch: String) -> R<ReferenceID> {
-        
-        return .notImplemented
-    }
-    
-    func new(tag: String) -> R<ReferenceID> {
-        
-        return .notImplemented
-    }
+
 }
