@@ -6,16 +6,19 @@ import Clibgit2
 public struct GitReference {
     let repoID: RepoID
     
-    init(_ repoID: RepoID) {
+    public init(_ repoID: RepoID) {
         self.repoID = repoID
     }
 }
 
 public extension GitReference {
-    
-    func new(branch: String) -> R<ReferenceID> {
+    var HEAD : R<ReferenceID> {
+        repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
+    }
         
-        return .notImplemented
+    func new(branch: String, from src: Source, checkout: Bool, stashing: Bool = false) -> R<ReferenceID> {
+        GitBranches(repoID)
+            .new(from: src.asBranchTarget, name: branch, checkout: checkout, stashing: stashing)
     }
     
     func new(tag: String) -> R<ReferenceID> {
@@ -23,32 +26,16 @@ public extension GitReference {
         return .notImplemented
     }
     
-    enum Target {
+    enum Source {
         case HEAD
         case id(ReferenceID)
         case oid(OID)
         
-        func reference(in repo: Repository) -> R<Reference> {
+        var asBranchTarget : BranchTarget {
             switch self {
-            case .HEAD:                 return repo.HEAD()
-            case .oid(_):               return .wtf("This oid possibly is not a Branch")
-            case let .id(id):           return repo.reference(name: id.id)
-            }
-        }
-        
-        func branch(in repo: Repository) -> R<Branch> {
-            switch self {
-            case .HEAD: return repo.headBranch()
-            case .oid(_):               return .wtf("This oid possibly is not a Branch")
-            case let .id(id):           return repo.branchLookup(name: id.id)
-            }
-        }
-        
-        func oid(in repo: Repository) -> R<OID> {
-            switch self {
-            case .HEAD:                 return repo.headCommit().map{ $0.oid }
-            case let .oid(oid):         return .success(oid)
-            case let .id(id):           return id.targetOID
+            case .HEAD: return .HEAD
+            case .oid(let oid): return .oid(oid)
+            case .id(let id): return .branchShortName(id.displayName)
             }
         }
     }
