@@ -11,16 +11,30 @@ public struct GitReference {
     }
 }
 
-//extension RepoID {
-//    enum HeadType {
-//        case attached(ReferenceID)
-//        case detached(OID)
-//    }
-//
+extension RepoID {
+    enum HeadType {
+        case attached(ReferenceID)
+        case detached(OID)
+        
+        var asReference : R<ReferenceID> {
+            switch self {
+            case .attached(let ref): return .success(ref)
+            case .detached(_): return .wtf("head is detacched")
+            }
+        }
+        
+        var asOID : R<OID> {
+            switch self {
+            case .attached(let ref): return ref.targetOID
+            case .detached(let oid): return .success(oid)
+            }
+        }
+    }
+
 //    var HEAD : HeadType {
 //        self.repo.if(\.headIsDetached, then: {})
 //    }
-//}
+}
 
 public extension GitReference {
     var HEAD : R<ReferenceID> {
