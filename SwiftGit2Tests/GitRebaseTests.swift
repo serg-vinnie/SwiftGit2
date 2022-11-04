@@ -16,13 +16,14 @@ class GitRebaseTests: XCTestCase {
         let src = root.with(repo: "fastForward", content: .commit(.fileA, .content1, "1")).shouldSucceed()!
         let repoID = RepoID(url: src.url)
         
-        let branch = GitBranches(repoID).new(from: .HEAD, name: "branch", checkout: false)
+        
+        let branch = GitReference(repoID).new(branch: "branch", from: .HEAD, checkout: false)
             .shouldSucceed()!
         
         (repoID.repo | { $0.t_commit(file: .fileA, with: .content2, msg: "2", signature: .test) } )
             .shouldSucceed()
         
-        let main = GitBranches(repoID).HEAD
+        let main = GitReference(repoID).HEAD
             .shouldSucceed()!
         
         branch.checkout()
@@ -43,14 +44,14 @@ class GitRebaseTests: XCTestCase {
         let src = root.with(repo: "normal", content: .commit(.fileA, .content1, "main 1")).shouldSucceed()!
         let repoID = RepoID(url: src.url)
         
-        let branch = GitBranches(repoID).new(from: .HEAD, name: "branch", checkout: false)
+        let branch = GitReference(repoID).new(branch: "branch", from: .HEAD, checkout: false)
             .shouldSucceed()!
         
         // commit 2 into main
         (repoID.repo | { $0.t_commit(file: .fileA, with: .random, msg: "main 2", signature: .test) })
             .shouldSucceed()
         
-        let main = GitBranches(repoID).HEAD
+        let main = GitReference(repoID).HEAD
             .shouldSucceed()!
         
         branch.checkout()
@@ -75,14 +76,14 @@ class GitRebaseTests: XCTestCase {
         let src = root.with(repo: "normal", content: .commit(.fileA, .random, "main 1")).shouldSucceed()!
         let repoID = RepoID(url: src.url)
         
-        let branch = GitBranches(repoID).new(from: .HEAD, name: "branch", checkout: false)
+        let branch = GitReference(repoID).new(branch: "branch", from: .HEAD, checkout: false)
             .shouldSucceed()!
         
         // commit 2 into main | FileA
         (repoID.repo | { $0.t_commit(file: .fileA, with: .random, msg: "main 2", signature: .test) })
             .shouldSucceed()
         
-        let main = GitBranches(repoID).HEAD
+        let main = GitReference(repoID).HEAD
             .shouldSucceed()!
         
         branch.checkout()

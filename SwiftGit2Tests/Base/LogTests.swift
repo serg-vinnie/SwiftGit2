@@ -18,7 +18,7 @@ class LogTests: XCTestCase {
     func test_refLogCache() {
         let repo = root.with(repo: "refLogCache", content: .log(10)).shouldSucceed()!
         let repoID = repo.repoID
-        let head = GitBranches(repoID).HEAD.shouldSucceed()!
+        let head = GitReference(repoID).HEAD.shouldSucceed()!
         
         let cache = RefLogCache(ref: head, prefetch: 2)
         XCTAssert( cache.deque.count == 2)
