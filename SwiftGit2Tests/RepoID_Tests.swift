@@ -6,6 +6,13 @@ import EssetialTesting
 final class RepoID_Tests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "RepoID_Tests")
     
+    func test_HEADisDetached() {
+        let repoID = root.with(repo: "head_is_detached", content: .file(.fileA, .content1)).shouldSucceed()!.repoID
+        
+        repoID.HEAD
+            .shouldFail("detached head failure")
+    }
+    
     func test_HEAD() {
         let repoID = root.with(repo: "head", content: .commit(.fileA, .content1, "1")).shouldSucceed()!.repoID
         
