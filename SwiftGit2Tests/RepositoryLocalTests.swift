@@ -52,10 +52,8 @@ class RepositoryLocalTests: XCTestCase {
 }
 
 extension Repository {
-    func detachHEAD() -> Result<Void, Error> {
-        HEAD()
-            .flatMap { $0.targetOID }
-            .flatMap { self.setHEAD_detached($0) }
+    func detachHEAD() -> R<Void> {
+        repoID | { $0.HEAD } | { $0.detach() }
     }
 }
 

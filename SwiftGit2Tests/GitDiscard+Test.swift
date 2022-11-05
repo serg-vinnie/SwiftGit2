@@ -21,8 +21,8 @@ class GitDiscardTests: XCTestCase {
             .assertEqual(to: 0, "status count is correct")
     }
     
-    func test_shouldDicardSingle_oneOfLot() {
-        let src = root.with(repo: "dicardSingle_oneOfLot", content: .file(.fileA, .content1)).shouldSucceed()!
+    func test_shouldDicardSingle_oneOfMany() {
+        let src = root.with(repo: "dicardSingle_oneOfMany", content: .file(.fileA, .content1)).shouldSucceed()!
         
         let repoID = RepoID(url: src.url )
         
@@ -40,7 +40,31 @@ class GitDiscardTests: XCTestCase {
         GitDiscard(repoID: repoID).path(TestFile.fileA.rawValue).shouldSucceed()
         
         src.statusCount.assertEqual(to: 1, "status count is correct")
+    }
+    
+    func test_shouldDicardSingle_oneOfMany_detachedHead() {
+        let src = root.with(repo: "dicardSingle_oneOfMany_detachedHead", content: .file(.fileA, .content1)).shouldSucceed()!
         
+        let repoID = RepoID(url: src.url )
+        
+        GitDiscard(repoID: repoID).path( TestFile.fileA.rawValue )
+            .shouldSucceed()
+        
+        ( repoID.repo
+            | { $0.t_with(file: .fileA, with: .content3) }
+            | { $0.t_with(file: .fileB, with: .content2) }
+        )
+        .shouldSucceed()
+        
+        src.statusCount.assertEqual(to: 2, "status count is correct")
+        
+        repoID.HEAD.shouldSucceed("WTF")
+        (repoID.HEAD | { $0.detach() } ).shouldSucceed("detach1")
+        (repoID.repo | { $0.detachHEAD() }).shouldSucceed("detach2")
+        
+        GitDiscard(repoID: repoID).path(TestFile.fileA.rawValue).shouldSucceed()
+        
+        src.statusCount.assertEqual(to: 1, "status count is correct")
     }
     
     func test_shouldDicardAll_headIsUnborn() {
@@ -74,6 +98,26 @@ class GitDiscardTests: XCTestCase {
         .shouldSucceed()
         
         src.statusCount.assertEqual(to: 2, "status count is correct")
+        
+        GitDiscard(repoID: repoID).all().shouldSucceed()
+        
+        src.statusCount.assertEqual(to: 0, "status count is correct")
+    }
+    
+    func test_shouldDicardAll_headIsDetached() {
+        let src = root.with(repo: "DicardAll_headIsDetached", content: .commit(.fileA, .content1, "asdf")).shouldSucceed()!
+        
+        let repoID = RepoID(path: src.url.path )
+        
+        ( repoID.repo
+            | { $0.t_with(file: .fileB, with: .content2) }
+            | { $0.t_with(file: .fileC, with: .content3) }
+        )
+        .shouldSucceed()
+        
+        src.statusCount.assertEqual(to: 2, "status count is correct")
+        
+        (repoID.repo | { $0.detachHEAD() }).shouldSucceed()
         
         GitDiscard(repoID: repoID).all().shouldSucceed()
         
