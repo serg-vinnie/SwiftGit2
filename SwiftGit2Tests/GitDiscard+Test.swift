@@ -43,12 +43,8 @@ class GitDiscardTests: XCTestCase {
     }
     
     func test_shouldDicardSingle_oneOfMany_detachedHead() {
-        let src = root.with(repo: "dicardSingle_oneOfMany_detachedHead", content: .file(.fileA, .content1)).shouldSucceed()!
-        
-        let repoID = RepoID(url: src.url )
-        
-        GitDiscard(repoID: repoID).path( TestFile.fileA.rawValue )
-            .shouldSucceed()
+        let src = root.with(repo: "dicardSingle_oneOfMany_detachedHead", content: .commit(.fileA, .random, "")).shouldSucceed()!
+        let repoID = src.repoID
         
         ( repoID.repo
             | { $0.t_with(file: .fileA, with: .content3) }
@@ -58,10 +54,8 @@ class GitDiscardTests: XCTestCase {
         
         src.statusCount.assertEqual(to: 2, "status count is correct")
         
-        repoID.HEAD.shouldSucceed("WTF")
         (repoID.HEAD | { $0.detach() } ).shouldSucceed("detach1")
-        (repoID.repo | { $0.detachHEAD() }).shouldSucceed("detach2")
-        
+
         GitDiscard(repoID: repoID).path(TestFile.fileA.rawValue).shouldSucceed()
         
         src.statusCount.assertEqual(to: 1, "status count is correct")
@@ -115,11 +109,13 @@ class GitDiscardTests: XCTestCase {
         )
         .shouldSucceed()
         
-        src.statusCount.assertEqual(to: 2, "status count is correct")
+        src.statusCount.assertEqual(to: 2)
         
-        (repoID.repo | { $0.detachHEAD() }).shouldSucceed()
+        (repoID.repo | { $0.detachHEAD() })
+            .shouldSucceed()
         
-        GitDiscard(repoID: repoID).all().shouldSucceed()
+        GitDiscard(repoID: repoID).all()
+            .shouldSucceed("discard all")
         
         src.statusCount.assertEqual(to: 0, "status count is correct")
     }

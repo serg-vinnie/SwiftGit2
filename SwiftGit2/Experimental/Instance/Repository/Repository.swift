@@ -198,7 +198,7 @@ public extension Repository {
     }
     
     func reset(_ resetType: ResetType, paths: [String] = []) -> R<Void> {
-        BranchTarget.HEAD.with(self).commit | { self.reset(resetType, commit: $0, paths: paths) }
+        self.headCommit() | { self.reset(resetType, commit: $0, paths: paths) }
     }
     
     func reset(_ resetType: ResetType, commit: Commit, paths: [String], options: CheckoutOptions = CheckoutOptions()) -> R<Void> {
