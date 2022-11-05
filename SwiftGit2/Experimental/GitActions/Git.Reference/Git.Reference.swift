@@ -40,9 +40,9 @@ public extension RepoID {
 }
 
 public extension GitReference {
-    var HEAD : R<ReferenceID> {
-        repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
-    }
+//    var HEAD : R<ReferenceID> {
+//        repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
+//    }
         
     func new(branch: String, from src: Source, checkout: Bool, stashing: Bool = false) -> R<ReferenceID> {
         GitBranches(repoID)
