@@ -23,8 +23,8 @@ class GitRebaseTests: XCTestCase {
         (repoID.repo | { $0.t_commit(file: .fileA, with: .content2, msg: "2", signature: .test) } )
             .shouldSucceed()
         
-        let main = GitReference(repoID).HEAD
-            .shouldSucceed()!
+        let main = repoID.HEAD
+            .shouldSucceed()!.asReference
         
         branch.checkout()
             .shouldSucceed()
@@ -51,8 +51,8 @@ class GitRebaseTests: XCTestCase {
         (repoID.repo | { $0.t_commit(file: .fileA, with: .random, msg: "main 2", signature: .test) })
             .shouldSucceed()
         
-        let main = GitReference(repoID).HEAD
-            .shouldSucceed()!
+        let main = repoID.HEAD
+            .shouldSucceed()!.asReference
         
         branch.checkout()
             .shouldSucceed()
@@ -83,8 +83,8 @@ class GitRebaseTests: XCTestCase {
         (repoID.repo | { $0.t_commit(file: .fileA, with: .random, msg: "main 2", signature: .test) })
             .shouldSucceed()
         
-        let main = GitReference(repoID).HEAD
-            .shouldSucceed()!
+        let main = repoID.HEAD
+            .shouldSucceed()!.asReference
         
         branch.checkout()
             .shouldSucceed()
