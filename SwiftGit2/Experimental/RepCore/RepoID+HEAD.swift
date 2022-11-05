@@ -4,20 +4,29 @@ import Essentials
 import Clibgit2
 
 public extension RepoID {
-    enum HeadType {
+    enum HeadType : Equatable {
         case unborn
         case attached(ReferenceID)
         case detached(OID, RepoID)
     }
 
     var HEAD : R<HeadType> {
-        self.repo.if(\.headIsDetached,
-                      then: { repo in repo.HEAD() | { Duo($0, repo).targetOID() } | { HeadType.detached($0, self)} },
-                      else: { repo in repo.HEAD() | { HeadType.attached(ReferenceID(repoID: self, name: $0.nameAsReference))} }
-        )
+        repo
+            .if(\.headIsUnborn,
+                 then: { _ in .success(.unborn) },
+                 else: { _ in self._HEAD }
+            )
+            
+    }
+    
+    private var _HEAD : R<HeadType> {
+        self.repo
+            .if(\.headIsDetached,
+                 then: { repo in repo.HEAD() | { Duo($0, repo).targetOID() } | { HeadType.detached($0, self)} },
+                 else: { repo in repo.HEAD() | { HeadType.attached(ReferenceID(repoID: self, name: $0.nameAsReference))} }
+            )
     }
 }
-
 
 public extension RepoID.HeadType {
     var asReference : R<ReferenceID> {

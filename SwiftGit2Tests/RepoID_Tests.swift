@@ -6,11 +6,11 @@ import EssetialTesting
 final class RepoID_Tests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "RepoID_Tests")
     
-    func test_HEADisDetached() {
-        let repoID = root.with(repo: "head_is_detached", content: .file(.fileA, .content1)).shouldSucceed()!.repoID
+    func test_HEADisUnborn() {
+        let repoID = root.with(repo: "head_is_unborn", content: .file(.fileA, .content1)).shouldSucceed()!.repoID
         
         repoID.HEAD
-            .shouldFail("detached head failure")
+            .assertEqual(to: .unborn)
     }
     
     func test_HEAD() {
