@@ -31,9 +31,12 @@ extension RepoID {
         }
     }
 
-//    var HEAD : HeadType {
-//        self.repo.if(\.headIsDetached, then: {})
-//    }
+    var HEAD : R<HeadType> {
+        self.repo.if(\.headIsDetached,
+                      then: { repo in repo.HEAD() | { Duo($0, repo).targetOID() } | { HeadType.detached($0)} },
+                      else: { repo in repo.HEAD() | { HeadType.attached(ReferenceID(repoID: self, name: $0.nameAsReference))} }
+        )
+    }
 }
 
 public extension GitReference {
