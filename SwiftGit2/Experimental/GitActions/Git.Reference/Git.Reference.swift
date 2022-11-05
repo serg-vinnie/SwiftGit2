@@ -11,39 +11,8 @@ public struct GitReference {
     }
 }
 
-public extension RepoID {
-    enum HeadType {
-        case attached(ReferenceID)
-        case detached(OID, RepoID)
-        
-        public var asReference : ReferenceID {
-            switch self {
-            case .attached(let ref):        return ref
-            case .detached(_, let repoID):  return ReferenceID(repoID: repoID, name: "HEAD")
-            }
-        }
-        
-        public var asOID : R<OID> {
-            switch self {
-            case .attached(let ref): return ref.targetOID
-            case .detached(let oid, _): return .success(oid)
-            }
-        }
-    }
 
-    var HEAD : R<HeadType> {
-        self.repo.if(\.headIsDetached,
-                      then: { repo in repo.HEAD() | { Duo($0, repo).targetOID() } | { HeadType.detached($0, self)} },
-                      else: { repo in repo.HEAD() | { HeadType.attached(ReferenceID(repoID: self, name: $0.nameAsReference))} }
-        )
-    }
-}
-
-public extension GitReference {
-//    var HEAD : R<ReferenceID> {
-//        repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
-//    }
-        
+public extension GitReference {        
     func new(branch: String, from src: Source, checkout: Bool, stashing: Bool = false) -> R<ReferenceID> {
         GitBranches(repoID)
             .new(from: src.asBranchTarget, name: branch, checkout: checkout, stashing: stashing)
