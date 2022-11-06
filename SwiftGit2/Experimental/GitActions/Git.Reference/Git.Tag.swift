@@ -12,8 +12,19 @@ public struct GitTag {
 }
 
 public extension GitTag {
-    func create(at oid: OID, name: String, message: String, signature: Signature) -> R<OID> {
-        self.repoID.repo | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
+    func create(at oid: OID, name: String, message: String, signature: Signature, auth: Auth) -> R<OID> {
+        self.repoID.repo
+            | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
+            | { oid in self.pushToFirstRemote(auth: auth) | { _ in oid } }
+    }
+    
+    func pushToFirstRemote(auth: Auth) -> R<Void> {
+        (repoID.repo | { $0.remoteList() })
+            .if(\.isEmpty,
+                 then: { _ in .success(()) },
+                 else: { list in list.first!.push(refspec: "refs/tags/*:refs/tags/*", options: PushOptions(auth: auth)) }
+            )
+                .flatMapError { _ in .success(()) }
     }
     
     internal var versions : R<[ReferenceID]> {

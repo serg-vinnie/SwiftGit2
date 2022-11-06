@@ -10,25 +10,28 @@ import Clibgit2
 import Essentials
 
 public extension Repository {
-    func push(_ target: BranchTarget, options: PushOptions) -> Result<Void, Error> {
+    func push(_ target: BranchTarget, options: PushOptions) -> R<Void> {
         let branch = target.with(self).branchInstance
         let remote = target.with(self).remote
 
-        return combine(remote, branch) | { $0.push(branchName: $1.nameAsReference, options: options) }
+        return combine(remote, branch) | { $0.push(refspec: $1.nameAsReference, options: options) }
     }
 
     func push(remoteName: String, branchName: String, options: PushOptions) -> Result<Void, Error> {
-        remote(name: remoteName) | { $0.push(branchName: branchName, options: options) }
+        remote(name: remoteName) | { $0.push(refspec: branchName, options: options) }
     }
 }
 
 public extension Remote {
-    func push(branchName: String, options: PushOptions) -> Result<Void, Error> {
-        print("Trying to push ''\(branchName)'' to remote ''\(name)'' with URL:''\(url)''")
+    func push(refspec: String, options: PushOptions) -> R<Void> {
+        push(refspec: [refspec], options: options)
+    }
+    func push(refspec: [String], options: PushOptions) -> R<Void> {
+        print("Trying to push ''\(refspec)'' to remote ''\(name)'' with URL:''\(url)''")
 
         return git_try("git_remote_push") {
             options.with_git_push_options { push_options in
-                [branchName].with_git_strarray { strarray in
+                refspec.with_git_strarray { strarray in
                     git_remote_push(self.pointer, &strarray, &push_options)
                 }
             }
@@ -38,20 +41,20 @@ public extension Remote {
 
 public extension Duo where T1 == Branch, T2 == Remote {
     /// Push local branch changes to remote branch
-    func push(auth: Auth) -> Result<Void, Error> {
+    func push(auth: Auth) -> R<Void> {
         let (branch, remote) = value
-        return remote.push(branchName: branch.nameAsReference, options: PushOptions(auth: auth))
+        return remote.push(refspec: branch.nameAsReference, options: PushOptions(auth: auth))
     }
 }
 
 public extension Duo where T1 == ReferenceID, T2 == Remote {
     /// Push local branch changes to remote branch
-    func push(auth: Auth) -> Result<Void, Error> {
+    func push(auth: Auth) -> R<Void> {
         let (ref, remote) = value
         
         guard ref.isBranch else { return .wtf("Duo.push() failed: Reference is not a branch!") }
         
-        return remote.push(branchName: ref.name, options: PushOptions(auth: auth))
+        return remote.push(refspec: ref.name, options: PushOptions(auth: auth))
     }
 }
 
