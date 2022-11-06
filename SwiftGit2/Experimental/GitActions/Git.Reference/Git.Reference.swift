@@ -41,16 +41,12 @@ public extension GitReference {
 fileprivate struct GitBranches {
     public let repoID : RepoID
     public init(_ repoID : RepoID) { self.repoID = repoID }
-//
+
     func new(from target: BranchTarget, name: String, checkout: Bool, stashing: Bool = false) -> R<ReferenceID> {
         repoID.repo
             | { $0.createBranch(from: target, name: name, checkout: checkout, stashing: stashing) }
             | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
     }
-//
-//    public var HEAD : R<ReferenceID> {
-//        repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
-//    }
 }
 
 public extension Repository {

@@ -732,11 +732,11 @@
 			isa = PBXGroup;
 			children = (
 				E6BC32412914008100E342E2 /* OG */,
+				E6D0AC4F291310C20087399F /* Git.Tag.swift */,
 				E6BC323E2913FCBB00E342E2 /* Git.Reference.swift */,
 				E6DEC670291581F40076684B /* ReferenceID+.swift */,
 				E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */,
 				E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */,
-				E6D0AC4F291310C20087399F /* Git.Tag.swift */,
 			);
 			path = Git.Reference;
 			sourceTree = "<group>";

@@ -3,10 +3,12 @@ import Foundation
 import Essentials
 import Clibgit2
 
-// TODO: 
+// TODO: custom name
+// TODO: auto rename, probably name_remote
+
 public extension ReferenceID {
     func startTracking() -> R<()> {
-        guard self.isRemote else { return .wtf("")}
+        guard self.isRemote else { return .wtf("can't start tracking: reference is not remote: \(self)")}
 
         let upstreamName = name.split(separator: "/").dropFirst(2).joined(separator: "/")
         let newBranchName = name.split(separator: "/").dropFirst(3).joined(separator: "/")
