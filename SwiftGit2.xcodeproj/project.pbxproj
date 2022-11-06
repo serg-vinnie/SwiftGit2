@@ -649,13 +649,10 @@
 				1DC8A54227E1247600860A0F /* Git.Conflicts.swift */,
 				E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */,
 				E6169DF528149496001EB8A6 /* Git.Remotes.swift */,
-				E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */,
-				E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */,
 				1D6C643528319C41003E9072 /* Git.Stash.swift */,
 				E67F462928AEE5EE0055BA99 /* Git.Stasher.swift */,
 				1D4BCEF627440F95008831DC /* Git.Index.swift */,
 				1D6C643F2837F64D003E9072 /* Git.Commit.swift */,
-				E6D0AC4F291310C20087399F /* Git.Tag.swift */,
 			);
 			path = GitActions;
 			sourceTree = "<group>";
@@ -737,6 +734,9 @@
 				E6BC32412914008100E342E2 /* OG */,
 				E6BC323E2913FCBB00E342E2 /* Git.Reference.swift */,
 				E6DEC670291581F40076684B /* ReferenceID+.swift */,
+				E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */,
+				E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */,
+				E6D0AC4F291310C20087399F /* Git.Tag.swift */,
 			);
 			path = Git.Reference;
 			sourceTree = "<group>";
