@@ -15,14 +15,16 @@ public extension GitTag {
     func create(at oid: OID, name: String, message: String, signature: Signature, auth: Auth) -> R<OID> {
         self.repoID.repo
             | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
-            | { oid in self.pushToFirstRemote(auth: auth) | { _ in oid } }
+        | { oid in self.pushToFirstRemote(tag: name, auth: auth) | { _ in oid } }
     }
     
-    func pushToFirstRemote(auth: Auth) -> R<Void> {
-        (repoID.repo | { $0.remoteList() })
+    func pushToFirstRemote(tag: String, auth: Auth) -> R<Void> {
+        let repo = repoID.repo
+        return (repo | { $0.remoteList() })
             .if(\.isEmpty,
                  then: { _ in .success(()) },
-                 else: { list in list.first!.push(refspec: "refs/tags/*:refs/tags/*", options: PushOptions(auth: auth)) }
+                 else: { list in list.first.asNonOptional
+                     | { $0.push(refspec: "refs/tags/\(tag):refs/tags/\(tag)", options: PushOptions(auth: auth)) } }
             )
                 .flatMapError { _ in .success(()) }
     }

@@ -23,6 +23,20 @@ public extension Repository {
 }
 
 public extension Remote {
+    var push_refspec : R<[String]> {
+        var strarray = git_strarray()
+        return git_try("git_remote_get_fetch_refspecs") {
+            git_remote_get_push_refspecs(&strarray, self.pointer)
+        } | { _ in strarray.map { $0 } }
+    }
+    
+    var fetch_refspec : R<[String]> {
+        var strarray = git_strarray()
+        return git_try("git_remote_get_fetch_refspecs") {
+            git_remote_get_fetch_refspecs(&strarray, self.pointer)
+        } | { _ in strarray.map { $0 } }
+    }
+    
     func push(refspec: String, options: PushOptions) -> R<Void> {
         push(refspec: [refspec], options: options)
     }
