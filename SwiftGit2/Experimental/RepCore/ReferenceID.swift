@@ -43,6 +43,19 @@ public extension ReferenceID {
         return name
     }
     
+    var displayNameEx : String {
+        if isBranch {
+            return name.replace(of: "refs/heads/", to: "")
+        } else if isRemote {
+            return name.replace(of: "refs/remotes/", to: "")
+        } else if isTag {
+            return name.replace(of: "refs/tags/", to: "")
+        }
+        
+        assert(false)
+        return name
+    }
+    
     var category : String {
         let parts = name.split(separator: "/")
         guard parts.count > 1 else { return "" }
