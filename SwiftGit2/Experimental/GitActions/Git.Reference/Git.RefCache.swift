@@ -38,6 +38,15 @@ public final class GitRefCache {
                 }
             }
         }
+        
+        let head = ReferenceID(repoID: repoID, name: "HEAD")
+        if let oid = head.targetOID.maybeSuccess {
+            if oids.keys.contains(oid) {
+                oids[oid]?.insert(head)
+            } else {
+                oids[oid] = [head]
+            }
+        }
     }
     
     public func find(refID: ReferenceID) -> ReferenceCache? {

@@ -37,6 +37,8 @@ public extension ReferenceID {
             return name.replace(of: "refs/remotes/\(remote)/", to: "")
         } else if isTag {
             return name.replace(of: "refs/tags/", to: "")
+        } else if name.hasSuffix("HEAD") {
+            return name
         }
         
         assert(false)
@@ -50,6 +52,8 @@ public extension ReferenceID {
             return name.replace(of: "refs/remotes/", to: "")
         } else if isTag {
             return name.replace(of: "refs/tags/", to: "")
+        } else if name == "HEAD" {
+            return "HEAD"
         }
         
         assert(false)
