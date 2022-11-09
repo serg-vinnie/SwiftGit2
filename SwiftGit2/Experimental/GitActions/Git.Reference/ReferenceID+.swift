@@ -7,6 +7,15 @@ import Clibgit2
 // TODO: auto rename, probably name_remote
 
 public extension ReferenceID {
+    var tagInfo : R<Tag> {
+        guard isTag else { return .wtf("reference shoud be tag: \(self.name)")}
+        let repo = repoID.repo
+        let ref = repo | { $0.reference(name: self.name) }
+        let oid = combine(ref, repo) | { ref, repo in ref.with(repo).targetOID() }
+        
+        return combine(repo, oid) | { repo, oid in repo.tagLookup(oid: oid) }
+    }
+    
     func startTracking() -> R<()> {
         guard self.isRemote else { return .wtf("can't start tracking: reference is not remote: \(self)")}
 
