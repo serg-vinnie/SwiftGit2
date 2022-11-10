@@ -40,10 +40,10 @@ extension Array where Element : Hashable {
 
 extension Commit {
     public var description : String {
-        let subject = self.summary.trimmingCharacters(in: .whitespacesAndNewlines)
+        let summary = self.summary.trimmingCharacters(in: .whitespacesAndNewlines)
         let descr = self.body.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        return descr.count == 0 ? "\(subject)" :"\(subject)\r\n\(descr)"
+        return descr.count == 0 ? "\(summary)" :"\(summary)\n\n\(descr)"
     }
 }
 
