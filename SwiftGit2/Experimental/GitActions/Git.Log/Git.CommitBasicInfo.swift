@@ -10,6 +10,7 @@ public struct GitCommitBasicInfo {
     public let parents : [OID]
     
     public let summary     : String
+    public let body        : String
     public let description : String
     public let time        : Date
     
@@ -20,6 +21,7 @@ public struct GitCommitBasicInfo {
         self.tree           = commit.treeOID
         self.parents        = parents
         self.summary        = commit.summary
+        self.body           = commit.body
         self.description    = commit.description
         self.time           = commit.time
     }
