@@ -29,6 +29,7 @@ public extension ReferenceID {
     var isTag     : Bool { name.hasPrefix("refs/tags/") }
     
     var prefix      : String { name.replace(of: displayName, to: "")}
+    var prefixEx      : String { name.replace(of: displayNameEx, to: "")}
     
     var displayName : String {
         if isBranch {
