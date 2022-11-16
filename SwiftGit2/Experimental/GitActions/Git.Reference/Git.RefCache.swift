@@ -10,6 +10,7 @@ public final class GitRefCache {
     public private(set) var tags   : [ReferenceCache] = []
     
     public private(set) var HEAD   : ReferenceCache?
+    public              var HEAD_OID : OID? { HEAD?.referenceID.targetOID.maybeSuccess }
     public private(set) var remotes: GitRemotesList = [:]
     public private(set) var remoteHEADs: [String:ReferenceCache?] = [:]
     

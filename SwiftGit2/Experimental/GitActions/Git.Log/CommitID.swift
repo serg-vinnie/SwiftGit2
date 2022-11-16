@@ -20,9 +20,8 @@ public struct CommitID {
 
 public extension CommitID {
     func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool) -> R<Void> {
-        repoID.repo | {
-            $0.checkout(oid, strategy: strategy, progress: progress, pathspec: pathspec, stashing: stashing)
-                .asVoid
-        }
+        repoID.repo
+        | { $0.checkout(oid, strategy: strategy, progress: progress, pathspec: pathspec, stashing: stashing) }
+        | { $0.detachedHeadFix().asVoid }
     }
 }
