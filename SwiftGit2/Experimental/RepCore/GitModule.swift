@@ -9,7 +9,12 @@ public struct GitModule : CustomStringConvertible {
     public let url : URL
     public let exists : Bool
     
-    var children_OIDs : R<[RepoID: OID]> { repoID.repo | { $0.children_URLs_OIDs() | { $0.compactMapValues { $0 } } } }
+    public var childrenTargets : R<[CommitID]> {
+        repoID.repo
+        | { $0.children_URLs_OIDs() }
+        | { $0.compactMapValues { $0 } }
+        | { $0.map { CommitID(repoID: $0.key, oid: $0.value) } }
+    }
     
     public var progress : Progress {
         let all = subModulesRecursive
