@@ -20,37 +20,28 @@ class ReferenceTests: XCTestCase {
     }
     
     func test_branchCheckout() {
-        let folder = root.sub(folder: "createBranch").cleared().shouldSucceed()!
-        let src = folder.with(repo: "createBr", content: .commit(.fileA, .random, "Commit 1")).shouldSucceed()!
+        let folder = root.with(repo: "checkout", content: .commit(.fileA, .random, "Commit 1")).shouldSucceed()!
+        let repoID = folder.repoID
         
-        let repoID = RepoID(url: folder.url.appendingPathComponent("createBr") )
-        
-        src.repo
-            .flatMap {  $0.createBranch(from: .HEAD, name: "anotherBr", checkout: false) }
+        GitReference(repoID).new(branch: "branch", from: .HEAD, checkout: false)
             .shouldSucceed()
         
-        /////// Checkout "anotherBr"
+        let refID = ReferenceID(repoID: repoID, name: "refs/heads/branch")
+
         
-        let brId = ReferenceID(repoID: repoID, name: "refs/heads/anotherBr")
-        ////BranchID(repoID: repoID, ref: "refs/heads/anotherBr")
+        refID.checkout(stashing: false)
+            .shouldSucceed()
         
-        brId.checkout(stashing: false).shouldSucceed()
+        (repoID.HEAD | { $0.asReference } | { $0.name })
+            .assertEqual(to: "refs/heads/branch")
         
-        repoID.repo
-            .flatMap { $0.headBranch() }
-            .map { $0.nameAsReference }
-            .assertEqual(to: "refs/heads/anotherBr")
+
+        let mainID = ReferenceID(repoID: repoID, name: "refs/heads/main")
         
-        //////////////// Checkout "main"
+        mainID.checkout(stashing: false)
+            .shouldSucceed()
         
-        let brId2 = ReferenceID(repoID: repoID, name: "refs/heads/main")
-        //BranchID(repoID: repoID, ref: "refs/heads/main")
-        
-        brId2.checkout(stashing: false).shouldSucceed()
-        
-        repoID.repo
-            .flatMap { $0.headBranch() }
-            .map { $0.nameAsReference }
+        (repoID.HEAD | { $0.asReference } | { $0.name })
             .assertEqual(to: "refs/heads/main")
     }
 }
