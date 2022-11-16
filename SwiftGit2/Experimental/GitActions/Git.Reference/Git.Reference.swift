@@ -12,7 +12,11 @@ public struct GitReference {
 }
 
 
-public extension GitReference {        
+public extension GitReference {
+    func list(_ type: ReferenceType) -> R<[ReferenceID]> {
+        repoID.references(type)
+    }
+    
     func new(branch: String, from src: Source, checkout: Bool, stashing: Bool = false) -> R<ReferenceID> {
         GitBranches(repoID)
             .new(from: src.asBranchTarget, name: branch, checkout: checkout, stashing: stashing)

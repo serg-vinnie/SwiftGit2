@@ -4,20 +4,19 @@ import Essentials
 import EssetialTesting
 
 class ReferenceTests: XCTestCase {
-    let root = TestFolder.git_tests.sub(folder: "BranchTests")
+    let root = TestFolder.git_tests.sub(folder: "Reference")
     
     func test_createBranch() {
-        let folder = root.sub(folder: "createBranch").cleared().shouldSucceed()!
-        let src = folder.with(repo: "createBr", content: .commit(.fileA, .random, "Commit 1")).shouldSucceed()!
+        let folder = root.with(repo: "new", content: .commit(.fileA, .random, "")).shouldSucceed()!
+        let repoID = folder.repoID
         
-        src.repo
-            .flatMap { $0.createBranch(from: .HEAD, name: "anotherBr", checkout: false) }
+        GitReference(repoID).new(branch: "branch", from: .HEAD, checkout: false)
             .shouldSucceed()
         
-        src.repo
-            .flatMap { $0.branches(.local) }
+        GitReference(repoID).list(.local)
             .map{ $0.count }
             .assertEqual(to: 2)
+
     }
     
     func test_branchCheckout() {
