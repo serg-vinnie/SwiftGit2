@@ -3,7 +3,7 @@ import SwiftGit2
 import Essentials
 import EssetialTesting
 
-class BranchTests: XCTestCase {
+class ReferenceTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "BranchTests")
     
     func test_createBranch() {
