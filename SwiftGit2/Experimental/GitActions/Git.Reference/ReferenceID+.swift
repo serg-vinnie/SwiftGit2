@@ -38,6 +38,10 @@ public extension ReferenceID {
         }
     }
     
+    func deleteAsLocal() -> R<()> {
+        repoID.repo | { $0.reference(name: name) } | { $0.delete() }
+    }
+    
     // WIP
     // TODO: get refspec from upstream
     fileprivate func deleteRemote(auth: Auth) -> R<()> {
