@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public struct CommitID {
+public struct CommitID : CustomStringConvertible {
     public let repoID: RepoID
     public let oid   : OID
     
@@ -16,6 +16,8 @@ public struct CommitID {
             repo.commit(oid: self.oid) | { block($0) }
         }
     }
+    
+    public var description: String { "\(repoID):\(oid)" }
 }
 
 public extension CommitID {
