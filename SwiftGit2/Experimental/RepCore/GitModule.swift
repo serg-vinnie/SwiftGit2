@@ -9,6 +9,8 @@ public struct GitModule : CustomStringConvertible {
     public let url : URL
     public let exists : Bool
     
+    var children_OIDs : R<[RepoID: OID]> { repoID.repo | { $0.children_URLs_OIDs() | { $0.compactMapValues { $0 } } } }
+    
     public var progress : Progress {
         let all = subModulesRecursive
         return Progress(total: all.count, exist: all.values.compactMap { $0 }.count )
@@ -99,6 +101,14 @@ public extension Repository {
             return Repository.at(url: url) | { $0.asModule }
         }
         return .success(GitModule(url: url, exists: false, subModules: [:]))
+    }
+    
+    internal func children_URLs_OIDs() -> R<[RepoID: OID?]> {
+        let children = self.submodules() | { $0.map { ($0.path,$0.headOID) } }
+        
+        return combine(directoryURL, children)
+            | { url, children in children.map { (RepoID(url: url.appendingPathComponent($0)),$1) } }
+            | { $0.toDictionary(key: \.0) { $0.1 } }
     }
 }
 
