@@ -27,7 +27,33 @@ public struct GitCommitBasicInfo {
     }
 }
 
+var commitInfo = [RepoID:[OID:GitCommitBasicInfo]]()
+internal extension CommitID {
+    func saveCache(info: GitCommitBasicInfo) {
+        if !commitInfo.keys.contains(repoID) {
+            commitInfo[repoID] = [OID:GitCommitBasicInfo]()
+            commitInfo[repoID]?.reserveCapacity(1000)
+        }
+        
+        if let info = self.basicInfo.maybeSuccess {
+            commitInfo[repoID]?[oid] = info
+        }
+    }
+}
+
+
 public extension CommitID {
+    var basicInfoCache : GitCommitBasicInfo? {
+        if let info = commitInfo[repoID]?[oid] {
+            return info
+        }
+        if let info = self.basicInfo.maybeSuccess {
+            saveCache(info: info)
+            return info
+        }
+        return nil
+    }
+    
     var basicInfo : R<GitCommitBasicInfo> {
         withCommit { c in
             c.parents()

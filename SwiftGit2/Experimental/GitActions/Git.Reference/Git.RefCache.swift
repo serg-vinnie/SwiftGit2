@@ -21,7 +21,7 @@ public final class GitRefCache {
     init(repoID: RepoID, list: [ReferenceID], remotes: GitRemotesList) {
         self.repoID = repoID
         self.remotes = remotes
-        self.local  = list.filter { $0.isBranch }.map  { ReferenceCache($0, cache: self) }
+        self.local  = list.filter { $0.isBranch }.map  { ReferenceCache($0, cache: self) }.sorted()
         let list_remotes    = list.filter { $0.isRemote }
         self.remote         = list_remotes.asRemotesDic(cache: self)
         self.remoteHEADs    = list_remotes.asRemoteHEADsDic(cache: self)
@@ -103,7 +103,7 @@ extension Array where Element == ReferenceID {
             }
         }
         
-        return dic
+        return dic.mapValues { $0.sorted() }
     }
     
     func asRemoteHEADsDic(cache: GitRefCache) -> [String:ReferenceCache] {

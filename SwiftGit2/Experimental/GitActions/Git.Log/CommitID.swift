@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public struct CommitID : CustomStringConvertible {
+public struct CommitID : CustomStringConvertible, Hashable {
     public let repoID: RepoID
     public let oid   : OID
     

@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public struct ReferenceCache : Identifiable {
+public struct ReferenceCache : Identifiable, Equatable, Comparable {
     public var id: String { referenceID.id }
     
     public let referenceID: ReferenceID
@@ -12,9 +12,18 @@ public struct ReferenceCache : Identifiable {
         self.referenceID = ref
         self.cache  = cache
     }
+    
+    public static func < (lhs: ReferenceCache, rhs: ReferenceCache) -> Bool {
+        guard let l = lhs.commitID?.basicInfoCache,
+              let r = rhs.commitID?.basicInfoCache else { return false }
+        
+        return l.time > r.time
+    }
 }
 
 public extension ReferenceCache {
+    var commitID : CommitID? { cache.commit(for: referenceID) }
+    
     var isHead : Bool {
         if self.referenceID.isBranch {
             return self.cache.HEAD?.referenceID == self.referenceID
