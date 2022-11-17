@@ -69,6 +69,22 @@ public final class GitRefCache {
     public static func empty(_ repoID: RepoID?) -> GitRefCache {
         GitRefCache(repoID: repoID ?? RepoID(path: ""), list: [], remotes: [:])
     }
+    
+    var commits = [ReferenceID:CommitID]()
+    
+    public func commit(for ref : ReferenceID) -> CommitID? {
+        if let c = commits[ref] {
+            return c
+        }
+        
+        if let oid = ref.targetOID.maybeSuccess {
+            let c = CommitID(repoID: repoID, oid: oid)
+            commits[ref] = c
+            return c
+        }
+        
+        return nil
+    }
 }
 
 
