@@ -12,9 +12,11 @@ import SwiftGit2
 
 public class TestContainer {
     static var counter = 0
+    static var total = 0
     let repoID: RepoID
     init(repoID: RepoID) {
         TestContainer.counter += 1
+        TestContainer.total += 1
         self.repoID = repoID
         print("INIT.TestContainer \(repoID)")
     }
