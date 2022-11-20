@@ -10,7 +10,7 @@ import XCTest
 import EssetialTesting
 import SwiftGit2
 
-class TestContainer {
+public class TestContainer {
     static var counter = 0
     let repoID: RepoID
     init(repoID: RepoID) {

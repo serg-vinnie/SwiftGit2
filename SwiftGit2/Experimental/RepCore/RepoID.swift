@@ -22,6 +22,15 @@ public struct RepoID : Hashable {
     public var repo            : R<Repository>     { Repository.at(url: self.path.asURL(), fixDetachedHead: false)           }
 }
 
+public extension RepoID {
+    var flatTree: [RepoID] {
+        (module
+                | { $0.recurse }
+                | { $0.filter { $0.value?.exists ?? false }.asRepoIDs }
+        ).maybeSuccess ?? []
+    }
+}
+
 extension RepoID : CustomStringConvertible {
     #if DEBUG
     public var description: String { "RepoID " + path.replace(of: "/Users/loki/dev", to: "􀋀").replace(of: "Carthage/Checkouts", to: "􀋀") }

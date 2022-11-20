@@ -4,11 +4,19 @@ import SwiftGit2
 import Essentials
 import EssetialTesting
 
-final class GitCacheTests: XCTestCase {
+extension RepoID : CacheStorageAgent {
+    public var storage: TestContainer { TestContainer(repoID: self) }
+    public var rootStorage: TestContainer { TestContainer(repoID: self) }
+    
+
+}
+
+final class CacheStorageTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "CacheTests")
     
     func test_simple() {
-        let folder = root.sub(folder: "simple").cleared().shouldSucceed()!
+        let folder = root.with(repo: "simple", content: .empty)
+        
     }
     
 //    func test_repo_sub() {
