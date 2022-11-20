@@ -92,6 +92,9 @@
 		E66360DB27BEEC1C001292FB /* RepoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DA27BEEC1C001292FB /* RepoID.swift */; };
 		E66360DF27BF063D001292FB /* RepCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DE27BF063D001292FB /* RepCore.swift */; };
 		E66360E127BF1403001292FB /* RepCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360E027BF1403001292FB /* RepCoreTests.swift */; };
+		E6731226292AA0A200606E91 /* GitCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6731223292AA0A100606E91 /* GitCache.swift */; };
+		E6731227292AA0A200606E91 /* RepoCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6731224292AA0A200606E91 /* RepoCache.swift */; };
+		E6731228292AA0A200606E91 /* RootRepoCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6731225292AA0A200606E91 /* RootRepoCache.swift */; };
 		E678EFF62916C5A000B7591C /* RepoID_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E678EFF52916C5A000B7591C /* RepoID_Tests.swift */; };
 		E678EFF82916F6B300B7591C /* RepoID+HEAD.swift in Sources */ = {isa = PBXBuildFile; fileRef = E678EFF72916F6B300B7591C /* RepoID+HEAD.swift */; };
 		E6799C9E28FF51DE003B81AC /* EssetialTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E6799C9D28FF51DE003B81AC /* EssetialTesting */; };
@@ -283,6 +286,9 @@
 		E66360DA27BEEC1C001292FB /* RepoID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.swift; sourceTree = "<group>"; };
 		E66360DE27BF063D001292FB /* RepCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCore.swift; sourceTree = "<group>"; };
 		E66360E027BF1403001292FB /* RepCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCoreTests.swift; sourceTree = "<group>"; };
+		E6731223292AA0A100606E91 /* GitCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GitCache.swift; sourceTree = "<group>"; };
+		E6731224292AA0A200606E91 /* RepoCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoCache.swift; sourceTree = "<group>"; };
+		E6731225292AA0A200606E91 /* RootRepoCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootRepoCache.swift; sourceTree = "<group>"; };
 		E678EFF52916C5A000B7591C /* RepoID_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID_Tests.swift; sourceTree = "<group>"; };
 		E678EFF72916F6B300B7591C /* RepoID+HEAD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepoID+HEAD.swift"; sourceTree = "<group>"; };
 		E67D157124EF24A500DA3542 /* Repository+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Status.swift"; sourceTree = "<group>"; };
@@ -628,6 +634,7 @@
 		E64A9DB124D78BF8005B643E /* Experimental */ = {
 			isa = PBXGroup;
 			children = (
+				E6731222292AA03C00606E91 /* GitCache */,
 				E64F957627E8CD4600E2D5D7 /* GitActions */,
 				E66360DD27BF061F001292FB /* RepCore */,
 				E69D5D102573B21400AEBA28 /* Instance */,
@@ -672,6 +679,16 @@
 				E6EDE035289088E9008355A0 /* ReferenceID.swift */,
 			);
 			path = RepCore;
+			sourceTree = "<group>";
+		};
+		E6731222292AA03C00606E91 /* GitCache */ = {
+			isa = PBXGroup;
+			children = (
+				E6731223292AA0A100606E91 /* GitCache.swift */,
+				E6731224292AA0A200606E91 /* RepoCache.swift */,
+				E6731225292AA0A200606E91 /* RootRepoCache.swift */,
+			);
+			path = GitCache;
 			sourceTree = "<group>";
 		};
 		E68A3ACD2665346800B0244C /* User */ = {
@@ -946,9 +963,12 @@
 				E68A3AEA2669056300B0244C /* Index+Iterator.swift in Sources */,
 				E678EFF82916F6B300B7591C /* RepoID+HEAD.swift in Sources */,
 				E644ACD828C6987C00BF27A7 /* Rebase.swift in Sources */,
+				E6731228292AA0A200606E91 /* RootRepoCache.swift in Sources */,
 				1D4BCEF727440F95008831DC /* Git.Index.swift in Sources */,
 				1D914FB92856799D00034EC1 /* URL_ext.swift in Sources */,
 				E63EDF7C265DBAE500A3D048 /* ProxyOptions.swift in Sources */,
+				E6731226292AA0A200606E91 /* GitCache.swift in Sources */,
+				E6731227292AA0A200606E91 /* RepoCache.swift in Sources */,
 				E6D4A92024DEACC000E8041E /* Repository.swift in Sources */,
 				E60B86C928E0FEA4001D6150 /* SubmoduleID.swift in Sources */,
 				E6AF628D26938457007D0585 /* Repository+Sync.swift in Sources */,
