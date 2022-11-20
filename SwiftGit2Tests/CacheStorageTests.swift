@@ -15,8 +15,12 @@ final class CacheStorageTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "CacheTests")
     
     func test_simple() {
-        let folder = root.with(repo: "simple", content: .empty)
+        let folder = root.with(repo: "simple", content: .empty).shouldSucceed()!
+        let repoID = folder.repoID
+        let storage = CacheStorage<RepoID>()
+        storage.add(root: repoID)
         
+        XCTAssert(TestContainer.counter == 2)
     }
     
 //    func test_repo_sub() {

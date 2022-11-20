@@ -12,6 +12,8 @@ public class CacheStorage<Agent: CacheStorageAgent> {
     public private(set) var roots = [Agent : Agent.RootStorage]()
     public private(set) var items = [Agent : Agent.Storage]()
     
+    public init() {}
+    
     public func add(root: Agent) {
         roots[root] = root.rootStorage
         
