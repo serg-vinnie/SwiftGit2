@@ -21,14 +21,17 @@ final class CacheStorageTests: XCTestCase {
         storage.add(root: repoID)
         XCTAssertEqual(storage.roots.count, 1)
         XCTAssertEqual(storage.items.count, 1)
-        XCTAssert(TestContainer.counter == 2)
+        XCTAssertEqual(TestContainer.counter, 2)
+        XCTAssertEqual(TestContainer.deinits, 0)
         
         folder.with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
             .shouldSucceed()
         storage.add(root: repoID)
+        
         XCTAssertEqual(storage.roots.count, 1)
         XCTAssertEqual(storage.items.count, 2)
-        XCTAssert(TestContainer.counter == 3)
+        XCTAssertEqual(TestContainer.counter, 3)
+        XCTAssertEqual(TestContainer.deinits, 0)
     }
     
 //    func test_repo_sub() {

@@ -12,16 +12,18 @@ import SwiftGit2
 
 public class TestContainer {
     static var counter = 0
-    static var total = 0
+    static var inits = 0
+    static var deinits = 0
     let repoID: RepoID
     init(repoID: RepoID) {
         TestContainer.counter += 1
-        TestContainer.total += 1
+        TestContainer.inits += 1
         self.repoID = repoID
         print("INIT.TestContainer \(repoID)")
     }
     deinit {
         TestContainer.counter -= 1
+        TestContainer.deinits += 1
         print("DE-INIT.TestContainer \(repoID)")
     }
 }
