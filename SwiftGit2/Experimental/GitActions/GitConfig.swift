@@ -6,11 +6,11 @@ import Essentials
 public struct GitConfig {
     let repoID : RepoID
     
-    public init(repoID: RepoID) {
+    public init(_ repoID: RepoID) {
         self.repoID = repoID
     }
     
-    var entries : R<[ConfigEntry]> {
+    public var entries : R<[ConfigEntry]> {
         let repo = repoID.repo
         let config = repo | { $0.config }
         return config | { $0.iterator } | { $0.entries }
@@ -29,8 +29,8 @@ extension Config {
     var iterator : R<ConfigIterator> {
         var iterator : UnsafeMutablePointer<git_config_iterator>?
         
-        return git_try("git_config_multivar_iterator_new") {
-            git_config_multivar_iterator_new(&iterator, self.pointer, "", "")
+        return git_try("git_config_iterator_new") {
+            git_config_iterator_new(&iterator, self.pointer) //, "submodule \"sub_repo\".url", nil /* "regex.*" */)
         } | { _ in iterator.asNonOptional } | { ConfigIterator($0) }
     }
 }

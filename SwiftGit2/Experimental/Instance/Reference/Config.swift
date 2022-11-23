@@ -27,10 +27,11 @@ internal class ConfigIterator {
 }
 
 public struct ConfigEntry {
+    let level   : Level /**< Which config file this was found in */
+    let depth   : Int /**< Depth of includes where this variable was found */
+    
     let name    : String
     let value   : String
-    let depth   : Int /**< Depth of includes where this variable was found */
-    let level   : Level /**< Which config file this was found in */
     
     init?(_ entry: git_config_entry) {
         self.name = String(cString: entry.name)
@@ -51,5 +52,19 @@ public struct ConfigEntry {
         case local       = 5 // Repository specific configuration file; $WORK_DIR/.git/config on non-bare repos GIT_CONFIG_LEVEL_LOCAL = 5,
         case app         = 6 // Application specific configuration file; freely defined by applications     GIT_CONFIG_LEVEL_APP = 6,
         case highest     = -1 // Represents the highest level available config file (i.e. the most specific config file available that actually is loaded)     GIT_CONFIG_HIGHEST_LEVEL = -1,
+    }
+}
+
+extension ConfigEntry.Level : CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .programdata:  return  ".programdata"
+        case .system:       return  ".system     "
+        case .xdg:          return  ".xdg        "
+        case .global:       return  ".global     "
+        case .local:        return  ".local      "
+        case .app:          return  ".app        "
+        case .highest:      return  ".highest    "
+        }
     }
 }

@@ -32,6 +32,10 @@ final class CacheStorageTests: XCTestCase {
         XCTAssertEqual(storage.items.count, 2)
         XCTAssertEqual(TestContainer.counter, 3)
         XCTAssertEqual(TestContainer.deinits, 0)
+        
+        GitConfig(repoID).entries
+            .map { $0.map { String(describing: $0) }.joined(separator: "\n") }
+            .shouldSucceed("entries")
     }
     
 //    func test_repo_sub() {
