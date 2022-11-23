@@ -9,6 +9,12 @@ public struct GitConfig {
     public init(repoID: RepoID) {
         self.repoID = repoID
     }
+    
+    var entries : R<[ConfigEntry]> {
+        let repo = repoID.repo
+        let config = repo | { $0.config }
+        return config | { $0.iterator } | { $0.entries }
+    }
 }
 
 extension Repository {
@@ -27,19 +33,6 @@ extension Config {
             git_config_multivar_iterator_new(&iterator, self.pointer, "", "")
         } | { _ in iterator.asNonOptional } | { ConfigIterator($0) }
     }
-    
-    var entries : R<[String]> {
-//        git_config_iterator *iter;
-//        git_config_entry *entry;
-//
-//        int error = git_config_multivar_iterator_new(&iter, cfg,
-//            "core.gitProxy", "regex.*");
-//        while (git_config_next(&entry, iter) == 0) {
-//          /* … */
-//        }
-//        git_config_iterator_free(iter);
-        return .notImplemented
-    }
 }
 
 extension ConfigIterator {
@@ -52,11 +45,13 @@ extension ConfigIterator {
         }
     }
     
-    var entries : [String] {
-        var result = [String]()
+    var entries : [ConfigEntry] {
+        var result = [ConfigEntry]()
         
         forEach { entry in
-            result.append(String(cString: entry.name))
+            if let c = ConfigEntry(entry) {
+                result.append(c)
+            }
         }
         
         return result
