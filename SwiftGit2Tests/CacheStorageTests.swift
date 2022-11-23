@@ -18,7 +18,7 @@ final class CacheStorageTests: XCTestCase {
         let folder = root.with(repo: "simple", content: .empty).shouldSucceed()!
         let repoID = folder.repoID
         let storage = CacheStorage<RepoID>()
-        storage.add(root: repoID)
+        storage.update(root: repoID)
         XCTAssertEqual(storage.roots.count, 1)
         XCTAssertEqual(storage.items.count, 1)
         XCTAssertEqual(TestContainer.counter, 2)
@@ -26,7 +26,7 @@ final class CacheStorageTests: XCTestCase {
         
         folder.with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
             .shouldSucceed()
-        storage.add(root: repoID)
+        storage.update(root: repoID)
         
         XCTAssertEqual(storage.roots.count, 1)
         XCTAssertEqual(storage.items.count, 2)

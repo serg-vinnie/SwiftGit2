@@ -14,11 +14,15 @@ public class CacheStorage<Agent: CacheStorageAgent> {
     
     public init() {}
     
-    public func add(root: Agent) {
-        roots[root] = root.rootStorage
+    public func update(root: Agent) {
+        if !roots.keys.contains(root) {
+            roots[root] = root.rootStorage
+        }
         
         for item in root.flatTree {
-            items[item] = item.storage
+            if !items.keys.contains(item) {
+                items[item] = item.storage
+            }
         }
     }
 }
