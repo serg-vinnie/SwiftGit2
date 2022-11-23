@@ -47,6 +47,23 @@ public struct GitModule : CustomStringConvertible {
         
     public var description: String { "| M(\(exists)): " + url.lastPathComponent + " \(subModulesRecursive.count)" + " \(subModulesRecursive.map { "\(($0.value == nil) ? "." : "" )" + $0.key }) |" }
     
+    public func removeSub(module: String) {
+        _ = repoID.repo | { $0.submoduleLookup(named: module) } //| {  }
+        
+        /*
+         
+         # Remove the submodule entry from .git/config
+         git submodule deinit -f path/to/submodule
+
+         # Remove the submodule directory from the superproject's .git/modules directory
+         rm -rf .git/modules/path/to/submodule
+
+         # Remove the entry in .gitmodules and remove the submodule directory located at path/to/submodule
+         git rm -f path/to/submodule
+         
+         */
+    }
+    
     public func addSub(module: String, remote: String, gitlink: Bool = true, options: SubmoduleUpdateOptions, signature: Signature) -> R<Void> {
         let canCommit = Repository.at(url: url) | { $0.status() } | { $0.count == 0 }
         

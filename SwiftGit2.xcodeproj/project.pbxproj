@@ -142,6 +142,8 @@
 		E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */; };
 		E6F7D81128C8F1EC00C56452 /* GitRebaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F7D81028C8F1EC00C56452 /* GitRebaseTests.swift */; };
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
+		E6FF8346292E5BB3007CC5B4 /* GitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */; };
+		E6FF8348292E613C007CC5B4 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8347292E613C007CC5B4 /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -333,6 +335,8 @@
 		E6F1FCFC27D76DA200BE8697 /* RepoID.Unborn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Unborn.swift; sourceTree = "<group>"; };
 		E6F29EFF27B58ADD00F473A1 /* TestFolder_Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFolder_Ext.swift; sourceTree = "<group>"; };
 		E6F7D81028C8F1EC00C56452 /* GitRebaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitRebaseTests.swift; sourceTree = "<group>"; };
+		E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitConfig.swift; sourceTree = "<group>"; };
+		E6FF8347292E613C007CC5B4 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -659,6 +663,7 @@
 				E67F462928AEE5EE0055BA99 /* Git.Stasher.swift */,
 				1D4BCEF627440F95008831DC /* Git.Index.swift */,
 				1D6C643F2837F64D003E9072 /* Git.Commit.swift */,
+				E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */,
 			);
 			path = GitActions;
 			sourceTree = "<group>";
@@ -775,6 +780,7 @@
 				E653907923E7328200C08416 /* Diff+Delta.swift */,
 				1D991AE2251934FF00335255 /* Remote.swift */,
 				1D764BD7252CD148008417A7 /* Submodule.swift */,
+				E6FF8347292E613C007CC5B4 /* Config.swift */,
 			);
 			path = Reference;
 			sourceTree = "<group>";
@@ -977,6 +983,7 @@
 				E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */,
 				1DA3413D26B964FC0097E488 /* RevFile.swift in Sources */,
 				1D5B38A825228C790019E593 /* Repository+Diff.swift in Sources */,
+				E6FF8348292E613C007CC5B4 /* Config.swift in Sources */,
 				E6F0B93C29105995008E2176 /* Git.Signature.swift in Sources */,
 				E6D4A91A24DEA93E00E8041E /* Commit.swift in Sources */,
 				1D764BD8252CD148008417A7 /* Submodule.swift in Sources */,
@@ -988,6 +995,7 @@
 				232861431F4A3A2E00276D65 /* Diff.swift in Sources */,
 				E6332D07264EA35D004990E7 /* IndexEntry.swift in Sources */,
 				E6AF628B26925C6D007D0585 /* PendingCommitsCount.swift in Sources */,
+				E6FF8346292E5BB3007CC5B4 /* GitConfig.swift in Sources */,
 				E6332E0D265302AD004990E7 /* PushOptions.swift in Sources */,
 				BE36354C1A632C9700D37EC8 /* Libgit2.swift in Sources */,
 				1D6C64412837F72A003E9072 /* Git.Commit.swift in Sources */,
