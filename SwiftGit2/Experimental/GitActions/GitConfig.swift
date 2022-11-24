@@ -11,10 +11,13 @@ public struct GitConfig {
     }
     
     public var entries : R<[ConfigEntry]> {
-        let repo = repoID.repo
-        let config = repo | { $0.config }
-        return config | { $0.iterator } | { $0.entries }
+        repoID.repo | { repo in repo.config | { config in config.iterator | { $0.entries } } }
     }
+    
+    func delete(entry name: String) -> R<Void> {
+        repoID.repo | { repo in repo.config | { config in config.delete(entry: name) } }
+    }
+    
 }
 
 extension Repository {
@@ -32,6 +35,12 @@ extension Config {
         return git_try("git_config_iterator_new") {
             git_config_iterator_new(&iterator, self.pointer) //, "submodule \"sub_repo\".url", nil /* "regex.*" */)
         } | { _ in iterator.asNonOptional } | { ConfigIterator($0) }
+    }
+    
+    func delete(entry name: String) -> R<Void> {
+        git_try("git_config_delete_entry") {
+            git_config_delete_entry(self.pointer, name)
+        }
     }
 }
 
