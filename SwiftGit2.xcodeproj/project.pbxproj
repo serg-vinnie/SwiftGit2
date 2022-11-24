@@ -144,6 +144,7 @@
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
 		E6FF8346292E5BB3007CC5B4 /* GitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */; };
 		E6FF8348292E613C007CC5B4 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8347292E613C007CC5B4 /* Config.swift */; };
+		E6FF834A292F9672007CC5B4 /* IniFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8349292F9672007CC5B4 /* IniFile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -337,6 +338,7 @@
 		E6F7D81028C8F1EC00C56452 /* GitRebaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitRebaseTests.swift; sourceTree = "<group>"; };
 		E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitConfig.swift; sourceTree = "<group>"; };
 		E6FF8347292E613C007CC5B4 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		E6FF8349292F9672007CC5B4 /* IniFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IniFile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -664,6 +666,7 @@
 				1D4BCEF627440F95008831DC /* Git.Index.swift */,
 				1D6C643F2837F64D003E9072 /* Git.Commit.swift */,
 				E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */,
+				E6FF8349292F9672007CC5B4 /* IniFile.swift */,
 			);
 			path = GitActions;
 			sourceTree = "<group>";
@@ -964,6 +967,7 @@
 				1D496A4225372FA800789177 /* git_strarray.swift in Sources */,
 				E623A31F2634885800484E11 /* CheckoutOptions.swift in Sources */,
 				E68A3AEA2669056300B0244C /* Index+Iterator.swift in Sources */,
+				E6FF834A292F9672007CC5B4 /* IniFile.swift in Sources */,
 				E678EFF82916F6B300B7591C /* RepoID+HEAD.swift in Sources */,
 				E644ACD828C6987C00BF27A7 /* Rebase.swift in Sources */,
 				1D4BCEF727440F95008831DC /* Git.Index.swift in Sources */,
