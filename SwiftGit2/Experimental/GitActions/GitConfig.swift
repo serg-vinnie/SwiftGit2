@@ -14,7 +14,7 @@ public struct GitConfig {
         repoID.repo | { repo in repo.config | { config in config.iterator | { $0.entries } } }
     }
     
-    func delete(entry name: String) -> R<Void> {
+    public func delete(entry name: String) -> R<Void> {
         repoID.repo | { repo in repo.config | { config in config.delete(entry: name) } }
     }
     

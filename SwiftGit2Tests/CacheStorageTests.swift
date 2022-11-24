@@ -33,9 +33,20 @@ final class CacheStorageTests: XCTestCase {
         XCTAssertEqual(TestContainer.counter, 3)
         XCTAssertEqual(TestContainer.deinits, 0)
         
+        (GitConfig(repoID).entries | { $0.filter { $0.name.starts(with: "submodule") } })
+            //.map { $0.map { String(describing: $0) }.joined(separator: "\n") }
+            .shouldSucceed("entries")
+        
+        GitConfig(repoID).delete(entry: "submodule.sub_repo.url")
+            .shouldSucceed("delete")
+        
+        GitConfig(repoID).delete(entry: "submodule.sub_repo")
+            .shouldSucceed("delete")
+
         GitConfig(repoID).entries
             .map { $0.map { String(describing: $0) }.joined(separator: "\n") }
             .shouldSucceed("entries")
+
     }
     
 //    func test_repo_sub() {

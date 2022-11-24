@@ -27,11 +27,11 @@ internal class ConfigIterator {
 }
 
 public struct ConfigEntry {
-    let level   : Level /**< Which config file this was found in */
-    let depth   : Int /**< Depth of includes where this variable was found */
+    public let level   : Level /**< Which config file this was found in */
+    public let depth   : Int /**< Depth of includes where this variable was found */
     
-    let name    : String
-    let value   : String
+    public let name    : String
+    public let value   : String
     
     init?(_ entry: git_config_entry) {
         self.name = String(cString: entry.name)
