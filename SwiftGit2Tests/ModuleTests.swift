@@ -63,6 +63,7 @@ class ModuleTests: XCTestCase {
             [submodule "AsyncNinja"]
                     url = git@github.com:serg-vinnie/AsyncNinja.git
             [submodule "SwiftGit2"]
+                    active = yes
                     url = git@github.com:serg-vinnie/SwiftGit2.git
             [branch "new_repo"]
             [submodule "AppCore"]
@@ -78,10 +79,8 @@ class ModuleTests: XCTestCase {
         
         let ini = [core, sub1, sub2, rest].joined(separator: "\n")
         
-        
-        let submodules = INI.Parser(ini).sections | { $0.filter { $0.isSubmodule } | { $0 } }
-
-        print(submodules)
+        INI.Parser(ini).deleting(submodule: "sub_0002")
+            .assertEqual(to: [core, sub1, rest].joined(separator: "\n"))
     }
     
     func test_submodules() {

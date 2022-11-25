@@ -15,33 +15,17 @@ public struct INI {
     }
     
     public struct Submodule {
+        public let text : Substring
         public let name : Substring
         public let body : Substring
-    }
-}
-
-
-var subParser = Parse {
-    let quotedField = Parse {
-      "\""
-      Prefix { $0 != "\"" }
-      "\""
-    }
-    
-    return Parse {
-        StartsWith("[submodule")
-        Whitespace(.all)
-        quotedField
-        "]"
-        Rest()
     }
 }
 
 public extension INI.Section {
     var submodule : R<INI.Submodule> {
         do {
-            let (name,body) = try subParser.parse(text)
-            return .success(INI.Submodule(name: name, body: body))
+            let (name,body) = try submoduleParser.parse(text)
+            return .success(INI.Submodule(text: text, name: name, body: body))
         } catch {
             return .failure(error)
         }
@@ -52,26 +36,30 @@ public extension INI.Section {
     }
 }
 
-public extension INI.Parser {    
+extension StringProtocol {
+    func removing(submodule: INI.Submodule) -> String {
+        var result = String(self)
+        result.removeSubrange(submodule.text.startIndex..<submodule.text.endIndex)
+        return result
+    }
+}
+
+public extension INI.Parser {
+    var submodules : R<[INI.Submodule]> {
+        sections | { $0.filter { $0.isSubmodule } }
+                 | { $0 | { $0.submodule } }
+    }
+    
+    func deleting(submodule: String) -> R<String> {
+        submodules | { $0.first { $0.name == submodule }.asNonOptional }
+                   | { self.text.removing(submodule: $0) }
+    }
+    
     var sections : R<[INI.Section]> {
-        let endOfSection = OneOf {
-            Prefix { $0 != "[" }
-            Rest()
-        }
-        
-        let section = Parse {
-            StartsWith("[")
-            endOfSection
-        }
-        
-        let list = Many {
-            section
-        }
-        
         do {
             var result = [Substring]()
             
-            for item in try list.parse(text) {
+            for item in try sectionsParser.parse(text) {
                 let start = text.index(before: item.startIndex)
                 let newsub : Substring = text[start..<item.endIndex]
                 
@@ -85,19 +73,30 @@ public extension INI.Parser {
     }
 }
 
+extension INI.Submodule : CustomStringConvertible {
+    public var description: String { String(text) }
+}
 
-struct IniFile {
-    let url : URL
+var submoduleParser = Parse {
+    StartsWith("[submodule")
+    Whitespace(.all)
+    Parse {
+        "\""
+        Prefix { $0 != "\"" }
+        "\""
+    }
+    "]"
+    Rest()
 }
 
 
 
-
-public extension XR {
-    struct Parser {
-        public let text : String
-        public init(text: String) {
-            self.text = text
-        }
+var sectionsParser = Many {
+    Parse {
+        StartsWith("[")
+        OneOf {
+           Prefix { $0 != "[" }
+           Rest()
+       }
     }
 }
