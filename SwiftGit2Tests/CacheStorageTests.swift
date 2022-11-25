@@ -41,6 +41,8 @@ final class CacheStorageTests: XCTestCase {
         storage.update(root: repoID)
         XCTAssertEqual(storage.roots.count, 1)
         XCTAssertEqual(storage.items.count, 1)
+        XCTAssertEqual(TestContainer.counter, 2)
+        XCTAssertEqual(TestContainer.deinits, 1)
     }
     
 //    func test_repo_sub() {

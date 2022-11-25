@@ -20,7 +20,17 @@ public class CacheStorage<Agent: CacheStorageAgent> {
             roots[root] = root.rootStorage
         }
         
-        for item in root.flatTree {
+        let newList = root.flatTree
+        let new = Set(newList)
+        
+        if let old = flatTrees[root] {
+            for item in old.subtracting(new) {
+                items[item] = nil
+            }
+        }
+        flatTrees[root] = new
+        
+        for item in newList {
             if !items.keys.contains(item) {
                 items[item] = item.storage
             }
