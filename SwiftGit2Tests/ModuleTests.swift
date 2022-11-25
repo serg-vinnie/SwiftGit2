@@ -33,6 +33,25 @@ class ModuleTests: XCTestCase {
         
     }
 
+    func test_shouldReturn_SubmoduleDbPath() {
+        let folder = root.sub(folder: "submoduleDbPath").cleared().shouldSucceed()!
+
+        let main = folder.with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
+            .shouldSucceed()!
+            
+        main
+            .with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
+            .shouldSucceed()
+        
+        
+        let subID = (main.repoID.module | { $0.submoduleIDs.first.asNonOptional })
+            .shouldSucceed()!
+        
+        subID.dbPath
+            .shouldSucceed("dbPath")
+        
+    }
+    
     func test_ini_parser() {
         let core = """
             [core]

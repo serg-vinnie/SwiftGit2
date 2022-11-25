@@ -2,13 +2,47 @@
 import Foundation
 import Essentials
 import OrderedCollections
+import Parsing
 
 public struct SubmoduleID : Hashable {
     let repoID : RepoID
     let name: String
+    
+    var url : URL { repoID.url.appendingPathComponent(name) }
 }
 
+let gitdirFileParser = Parse {
+    StartsWith("gitdir:")
+    Whitespace(.all)
+    Rest()
+}
+
+extension String {
+    var parseGitDir : R<String> {
+        do {
+            let content = try gitdirFileParser.parse(self)
+            return .success(String(content))
+        } catch {
+            return .failure(error)
+        }
+    }
+}
+
+
 public extension SubmoduleID {
+    var dbPath : R<String> {
+        let fullURL = url.appendingPathComponent(".git")
+        guard fullURL.exists else { return .wtf("not exist: \(fullURL.path)") }
+        
+        if fullURL.isDirectory {
+            return .success(fullURL.path)
+        } else {
+            return fullURL.readToString
+                | { $0.parseGitDir }
+                | { URL(string: $0, relativeTo: url)?.path  }
+                | { $0.asNonOptional }
+        }
+    }
 //    var submodule : R<Submodule> {
 //        repoID.repo | { $0.submoduleLookup(named: name) }
 //    }

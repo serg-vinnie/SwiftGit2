@@ -29,6 +29,11 @@ public struct GitModule : CustomStringConvertible {
         }
         return result //.merging(subModulesRecursive) { a, b in a }
     }
+    public var submoduleIDs : [SubmoduleID] {
+        subModules.compactMapValues { $0 }.map { key,value in
+            SubmoduleID(repoID: self.repoID, name: key)
+        }
+    }
     public let subModules : OrderedDictionary<String,GitModule?>
     public var subModulesRecursive : OrderedDictionary<String,GitModule?> {
         var results = OrderedDictionary<String,GitModule?>()
