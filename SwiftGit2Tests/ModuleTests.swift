@@ -33,6 +33,57 @@ class ModuleTests: XCTestCase {
         
     }
 
+    func test_ini_parser() {
+        let core = """
+            [core]
+                    bare = false
+                    repositoryformatversion = 0
+                    filemode = true
+                    ignorecase = true
+                    precomposeunicode = true
+                    logallrefupdates = true
+            """
+        let sub1 = """
+            [submodule "sub_0001"]
+                    url = /Users/loki/.git_tests/CacheTests/sub_repo
+            """
+        let sub2 = """
+            [submodule "sub_0002"]
+                    url = https://github.com/pointfreeco/swift-parsing.git
+            """
+        let rest = """
+            [submodule]
+                    active = .
+            [remote "origin"]
+                    url = git@gitlab.com:sergiy.vynnychenko/taogit.git
+                    fetch = +refs/heads/*:refs/remotes/origin/*
+            [branch "master"]
+                    remote = origin
+                    merge = refs/heads/master
+            [submodule "AsyncNinja"]
+                    url = git@github.com:serg-vinnie/AsyncNinja.git
+            [submodule "SwiftGit2"]
+                    url = git@github.com:serg-vinnie/SwiftGit2.git
+            [branch "new_repo"]
+            [submodule "AppCore"]
+                    url = git@gitlab.com:sergiy.vynnychenko/AppCore.git
+            [branch "repo_state2"]
+            [branch "AssignRemote_Plate_fix"]
+                    remote = origin
+                    merge = refs/heads/AssignRemote_Plate_fix
+            [branch "remote_info_fix"]
+                    remote = origin
+                    merge = refs/heads/remote_info_fix
+            """
+        
+        let ini = [core, sub1, sub2, rest].joined(separator: "\n")
+        
+        
+        let submodules = INI.Parser(ini).sections | { $0.filter { $0.isSubmodule } | { $0 } }
+
+        print(submodules)
+    }
+    
     func test_submodules() {
         let url = URL.userHome.appendingPathComponent("dev/taogit")
         Repository.module(at: url)

@@ -55,6 +55,7 @@
 		DA5914761A94579000AED74C /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5914751A94579000AED74C /* Errors.swift */; };
 		E60364B727DB338100E9D4D0 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60364B627DB338100E9D4D0 /* Auth.swift */; };
 		E60B86C928E0FEA4001D6150 /* SubmoduleID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60B86C828E0FEA4001D6150 /* SubmoduleID.swift */; };
+		E60BB75D29302A40006EE309 /* Parsing in Frameworks */ = {isa = PBXBuildFile; productRef = E60BB75C29302A40006EE309 /* Parsing */; };
 		E6169DF628149496001EB8A6 /* Git.Remotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6169DF528149496001EB8A6 /* Git.Remotes.swift */; };
 		E61C06E2290C409E0047D243 /* Git.LogCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61C06E1290C409E0047D243 /* Git.LogCache.swift */; };
 		E61C06E4290C47660047D243 /* CommitID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61C06E3290C47660047D243 /* CommitID.swift */; };
@@ -144,7 +145,7 @@
 		E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6FC107527BD94CE002C9CEE /* OrderedCollections */; };
 		E6FF8346292E5BB3007CC5B4 /* GitConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */; };
 		E6FF8348292E613C007CC5B4 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8347292E613C007CC5B4 /* Config.swift */; };
-		E6FF834A292F9672007CC5B4 /* IniFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8349292F9672007CC5B4 /* IniFile.swift */; };
+		E6FF834A292F9672007CC5B4 /* INI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FF8349292F9672007CC5B4 /* INI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -338,7 +339,7 @@
 		E6F7D81028C8F1EC00C56452 /* GitRebaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitRebaseTests.swift; sourceTree = "<group>"; };
 		E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitConfig.swift; sourceTree = "<group>"; };
 		E6FF8347292E613C007CC5B4 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
-		E6FF8349292F9672007CC5B4 /* IniFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IniFile.swift; sourceTree = "<group>"; };
+		E6FF8349292F9672007CC5B4 /* INI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = INI.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -349,6 +350,7 @@
 				BEB31FA01A0E595600F525B9 /* libz.dylib in Frameworks */,
 				E67E84D327E53C00009E5B31 /* DequeModule in Frameworks */,
 				1DCAAB7F28E50B3F00084C99 /* Essentials in Frameworks */,
+				E60BB75D29302A40006EE309 /* Parsing in Frameworks */,
 				E6FC107627BD94CE002C9CEE /* OrderedCollections in Frameworks */,
 				BEB31F9E1A0E595100F525B9 /* libiconv.dylib in Frameworks */,
 			);
@@ -666,7 +668,7 @@
 				1D4BCEF627440F95008831DC /* Git.Index.swift */,
 				1D6C643F2837F64D003E9072 /* Git.Commit.swift */,
 				E6FF8345292E5BB3007CC5B4 /* GitConfig.swift */,
-				E6FF8349292F9672007CC5B4 /* IniFile.swift */,
+				E6FF8349292F9672007CC5B4 /* INI.swift */,
 			);
 			path = GitActions;
 			sourceTree = "<group>";
@@ -845,6 +847,7 @@
 				E6FC107527BD94CE002C9CEE /* OrderedCollections */,
 				E67E84D227E53C00009E5B31 /* DequeModule */,
 				1DCAAB7E28E50B3F00084C99 /* Essentials */,
+				E60BB75C29302A40006EE309 /* Parsing */,
 			);
 			productName = "SwiftGit2-OSX";
 			productReference = BEB31F231A0D6F7A00F525B9 /* SwiftGit2.framework */;
@@ -905,6 +908,7 @@
 				E6FC107427BD94CE002C9CEE /* XCRemoteSwiftPackageReference "swift-collections" */,
 				1DCAAB7D28E50B3F00084C99 /* XCRemoteSwiftPackageReference "essentials" */,
 				1DCAAB8028E50B5B00084C99 /* XCRemoteSwiftPackageReference "essential_tests" */,
+				E60BB75B2930283A006EE309 /* XCRemoteSwiftPackageReference "swift-parsing" */,
 			);
 			productRefGroup = BEB31F241A0D6F7A00F525B9 /* Products */;
 			projectDirPath = "";
@@ -967,7 +971,7 @@
 				1D496A4225372FA800789177 /* git_strarray.swift in Sources */,
 				E623A31F2634885800484E11 /* CheckoutOptions.swift in Sources */,
 				E68A3AEA2669056300B0244C /* Index+Iterator.swift in Sources */,
-				E6FF834A292F9672007CC5B4 /* IniFile.swift in Sources */,
+				E6FF834A292F9672007CC5B4 /* INI.swift in Sources */,
 				E678EFF82916F6B300B7591C /* RepoID+HEAD.swift in Sources */,
 				E644ACD828C6987C00BF27A7 /* Rebase.swift in Sources */,
 				1D4BCEF727440F95008831DC /* Git.Index.swift in Sources */,
@@ -1374,6 +1378,14 @@
 				kind = branch;
 			};
 		};
+		E60BB75B2930283A006EE309 /* XCRemoteSwiftPackageReference "swift-parsing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-parsing.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.10.0;
+			};
+		};
 		E6FC107427BD94CE002C9CEE /* XCRemoteSwiftPackageReference "swift-collections" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-collections.git";
@@ -1389,6 +1401,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1DCAAB7D28E50B3F00084C99 /* XCRemoteSwiftPackageReference "essentials" */;
 			productName = Essentials;
+		};
+		E60BB75C29302A40006EE309 /* Parsing */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E60BB75B2930283A006EE309 /* XCRemoteSwiftPackageReference "swift-parsing" */;
+			productName = Parsing;
 		};
 		E6799C9D28FF51DE003B81AC /* EssetialTesting */ = {
 			isa = XCSwiftPackageProductDependency;

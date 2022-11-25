@@ -69,18 +69,18 @@ internal extension Array where Element == Branch {
     func findMainBranch() -> R<Branch> {
         for item in self {
             if item.nameAsBranch == "origin/main" {
-                print("findMainBranch(): main")
+                Swift.print("findMainBranch(): main")
                 return .success(item)
             }
             
             if item.nameAsBranch == "origin/master" {
-                print("findMainBranch(): master")
+                Swift.print("findMainBranch(): master")
                 return .success(item)
             }
         }
         
         if let item = self.first {
-            print("findMainBranch(): \(item.nameAsBranch ?? "error")")
+            Swift.print("findMainBranch(): \(item.nameAsBranch ?? "error")")
             return .success(item)
         }
         return .failure(WTF("findMainBranch(): array is empty"))
