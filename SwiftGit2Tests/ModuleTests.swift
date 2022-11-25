@@ -79,7 +79,7 @@ class ModuleTests: XCTestCase {
         
         let ini = [core, sub1, sub2, rest].joined(separator: "\n")
         
-        INI.Parser(ini).deleting(submodule: "sub_0002")
+        INI.Parser(ini).removing(submodule: "sub_0002")
             .assertEqual(to: [core, sub1, rest].joined(separator: "\n"))
     }
     

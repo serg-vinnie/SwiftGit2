@@ -50,7 +50,7 @@ public extension INI.Parser {
                  | { $0 | { $0.submodule } }
     }
     
-    func deleting(submodule: String) -> R<String> {
+    func removing(submodule: String) -> R<String> {
         submodules | { $0.first { $0.name == submodule }.asNonOptional }
                    | { self.text.removing(submodule: $0) }
     }
