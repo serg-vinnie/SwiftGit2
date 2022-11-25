@@ -9,8 +9,9 @@ extension RepoID {
 }
 
 public class CacheStorage<Agent: CacheStorageAgent> {
-    public private(set) var roots = [Agent : Agent.RootStorage]()
-    public private(set) var items = [Agent : Agent.Storage]()
+    public private(set) var roots     = [Agent : Agent.RootStorage]()
+    public private(set) var items     = [Agent : Agent.Storage]()
+    public private(set) var flatTrees = [Agent : Set<Agent>]()
     
     public init() {}
     
