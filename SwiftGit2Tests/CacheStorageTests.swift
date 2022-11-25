@@ -24,8 +24,9 @@ final class CacheStorageTests: XCTestCase {
         XCTAssertEqual(TestContainer.counter, 2)
         XCTAssertEqual(TestContainer.deinits, 0)
         
-        folder.with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
-            .shouldSucceed()
+        let sub = folder.with(submodule: "sub_repo",  content: .commit(.fileB, .random, "initial commit"))
+            .shouldSucceed()!
+        
         storage.update(root: repoID)
         
         XCTAssertEqual(storage.roots.count, 1)
@@ -33,20 +34,13 @@ final class CacheStorageTests: XCTestCase {
         XCTAssertEqual(TestContainer.counter, 3)
         XCTAssertEqual(TestContainer.deinits, 0)
         
-        (GitConfig(repoID).entries | { $0.filter { $0.name.starts(with: "submodule") } })
-            //.map { $0.map { String(describing: $0) }.joined(separator: "\n") }
-            .shouldSucceed("entries")
         
-//        GitConfig(repoID).delete(entry: "submodule.sub_repo.url")
-//            .shouldSucceed("delete")
+        (sub.repoID.module | { $0.submoduleIDs.first } | { $0.asNonOptional } | { $0.remove() })
+            .shouldSucceed()
         
-//        GitConfig(repoID).delete(entry: "submodule.sub_repo")
-//            .shouldSucceed("delete")
-
-//        GitConfig(repoID).entries
-//            .map { $0.map { String(describing: $0) }.joined(separator: "\n") }
-//            .shouldSucceed("entries")
-    
+        storage.update(root: repoID)
+        XCTAssertEqual(storage.roots.count, 1)
+        XCTAssertEqual(storage.items.count, 1)
     }
     
 //    func test_repo_sub() {

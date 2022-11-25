@@ -33,8 +33,8 @@ class ModuleTests: XCTestCase {
         
     }
 
-    func test_shouldReturn_SubmoduleDbPath() {
-        let folder = root.sub(folder: "submoduleDbPath").cleared().shouldSucceed()!
+    func test_shouldRemoveSubmodule() {
+        let folder = root.sub(folder: "removeSubmodule").cleared().shouldSucceed()!
 
         let main = folder.with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()!
@@ -48,10 +48,10 @@ class ModuleTests: XCTestCase {
             .shouldSucceed()!
         
         subID.remove()
-            .shouldSucceed("dbURL")
+            .shouldSucceed()
         
         (main.repoID.module | { $0.submoduleIDs })
-            .shouldSucceed("subs")
+            .assertEqual(to: [])
     }
     
     func test_ini_parser() {
