@@ -4,6 +4,11 @@ import Essentials
 import Parsing
 
 public struct INI {
+    public struct File {
+        public let url : URL
+        public init(url: URL) { self.url = url }
+    }
+    
     public struct Parser<T:StringProtocol> where T.SubSequence == Substring {
         public let text : T
         public init(_ text: T) { self.text = text }
@@ -21,8 +26,32 @@ public struct INI {
     }
 }
 
+public extension URL {
+    func updatingContent( _ block: (String)->(R<String>)) -> R<Void> {
+        readToString | { block($0) } | { self.write(string: $0) }
+    }
+    
+    func write(string: String) -> R<Void> {
+        do {
+            try string.write(to: self, atomically: true, encoding: .utf8)
+            return .success(())
+        } catch {
+            return .failure(error)
+        }
+        
+    }
+}
+
+public extension INI.File {
+    func removing(submodule: String) -> R<()> {
+        url.updatingContent {
+            INI.Parser($0).removing(submodule: submodule)
+        }
+    }
+}
+
 public extension INI.Section {
-    var submodule : R<INI.Submodule> {
+    var asSubmodule : R<INI.Submodule> {
         do {
             let (name,body) = try submoduleParser.parse(text)
             return .success(INI.Submodule(text: text, name: name, body: body))
@@ -32,7 +61,7 @@ public extension INI.Section {
     }
     
     var isSubmodule : Bool {
-        submodule.maybeSuccess != nil
+        asSubmodule.maybeSuccess != nil
     }
 }
 
@@ -47,7 +76,7 @@ extension StringProtocol {
 public extension INI.Parser {
     var submodules : R<[INI.Submodule]> {
         sections | { $0.filter { $0.isSubmodule } }
-                 | { $0 | { $0.submodule } }
+                 | { $0 | { $0.asSubmodule } }
     }
     
     func removing(submodule: String) -> R<String> {
