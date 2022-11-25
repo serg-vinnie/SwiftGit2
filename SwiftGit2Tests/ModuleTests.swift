@@ -47,9 +47,11 @@ class ModuleTests: XCTestCase {
         let subID = (main.repoID.module | { $0.submoduleIDs.first.asNonOptional })
             .shouldSucceed()!
         
-        subID.dbPath
-            .shouldSucceed("dbPath")
+        subID.remove()
+            .shouldSucceed("dbURL")
         
+        (main.repoID.module | { $0.submoduleIDs })
+            .shouldSucceed("subs")
     }
     
     func test_ini_parser() {

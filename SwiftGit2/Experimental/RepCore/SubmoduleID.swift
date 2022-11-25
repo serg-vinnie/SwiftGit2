@@ -30,22 +30,27 @@ extension String {
 
 
 public extension SubmoduleID {
-    var dbPath : R<String> {
+    var dbURL : R<URL> {
         let fullURL = url.appendingPathComponent(".git")
         guard fullURL.exists else { return .wtf("not exist: \(fullURL.path)") }
         
         if fullURL.isDirectory {
-            return .success(fullURL.path)
+            return .success(fullURL)
         } else {
             return fullURL.readToString
                 | { $0.parseGitDir }
-                | { URL(string: $0, relativeTo: url)?.path  }
+                | { URL(string: $0, relativeTo: url)  }
                 | { $0.asNonOptional }
         }
     }
-//    var submodule : R<Submodule> {
-//        repoID.repo | { $0.submoduleLookup(named: name) }
-//    }
+
+    func remove() -> R<Void> {
+        let db = dbURL | { $0.rm() }
+        let main = url.rm()
+        let config = INI.File(url: repoID.url.appendingPathComponent(".git/config")).removing(submodule: name)
+        
+        return combine(db, main, config).asVoid
+    }
     
     func update(auth: Auth) -> R<Void> {
         update(options: SubmoduleUpdateOptions(fetch: FetchOptions(auth: auth)))
