@@ -28,6 +28,7 @@ final class CacheStorageTests: XCTestCase {
             .shouldSucceed()!
         
         storage.update(root: repoID)
+        storage.update(root: repoID)
         
         XCTAssertEqual(storage.roots.count, 1)
         XCTAssertEqual(storage.items.count, 2)
@@ -38,6 +39,7 @@ final class CacheStorageTests: XCTestCase {
         (sub.repoID.module | { $0.submoduleIDs.first } | { $0.asNonOptional } | { $0.remove() })
             .shouldSucceed()
         
+        storage.update(root: repoID)
         storage.update(root: repoID)
         XCTAssertEqual(storage.roots.count, 1)
         XCTAssertEqual(storage.items.count, 1)
