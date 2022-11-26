@@ -25,10 +25,9 @@ extension RepoID.Tree {
     mutating func add(children: [Agent], parent: Agent) {
         self.items.insert(parent)
         
-        var parents = [parent] + (parentsOf[parent] ?? [])
-        
         guard children.isEmpty else { return }
         
+        let parents = [parent] + (parentsOf[parent] ?? [])
         childrenOf[parent] = Set(children)
         
         for item in children {
