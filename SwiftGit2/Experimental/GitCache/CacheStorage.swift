@@ -2,15 +2,6 @@
 import Foundation
 import Essentials
 
-extension RepoID {
-    struct Tree {
-        public private(set) var items        = Swift.Set<String>()
-        public private(set) var childrenOf   = [String:Swift.Set<String>]()
-        public private(set) var parentOf     = [String:String]()
-
-    }
-}
-
 public class CacheStorage<Agent: CacheStorageAgent> {
     public private(set) var roots     = [Agent : Agent.RootStorage]()
     public private(set) var items     = [Agent : Agent.Storage]()
