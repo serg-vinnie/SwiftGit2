@@ -8,6 +8,7 @@ public struct SubmoduleID : Hashable {
     let repoID : RepoID
     let name: String
     
+    var subRepoID : RepoID { RepoID(url: repoID.url.appendingPathComponent(name)) }
     var url : URL { repoID.url.appendingPathComponent(name) }
 }
 
@@ -28,25 +29,10 @@ extension String {
     }
 }
 
-
 public extension SubmoduleID {
-    var dbURL : R<URL> {
-        let fullURL = url.appendingPathComponent(".git")
-        guard fullURL.exists else { return .wtf("not exist: \(fullURL.path)") }
-        
-        if fullURL.isDirectory {
-            return .success(fullURL)
-        } else {
-            return fullURL.readToString
-                | { $0.parseGitDir }
-                | { URL(string: $0, relativeTo: url)  }
-                | { $0.asNonOptional }
-        }
-    }
-
     func remove() -> R<Void> {
-        let db = dbURL | { $0.rm() }
-        let main = url.rm()
+        let db = subRepoID.dbURL | { $0.rm() }
+        let main = subRepoID.url.rm()
         let config = INI.File(url: repoID.url.appendingPathComponent(".git/config")).removing(submodule: name)
         
         return combine(db, main, config).asVoid
@@ -103,4 +89,21 @@ public extension GitModule {
         return results
     }
 
+}
+
+
+public extension RepoID {
+    var dbURL : R< URL> {
+        let fullURL = url.appendingPathComponent(".git")
+        guard fullURL.exists else { return .wtf("not exist: \(fullURL.path)") }
+        
+        if fullURL.isDirectory {
+            return .success(fullURL)
+        } else {
+            return fullURL.readToString
+                | { $0.parseGitDir }
+                | { URL(string: $0, relativeTo: url)  }
+                | { $0.asNonOptional }
+        }
+    }
 }
