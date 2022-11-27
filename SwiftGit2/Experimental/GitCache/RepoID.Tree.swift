@@ -9,6 +9,10 @@ public extension RepoID {
         public private(set) var allChildrenOf = [Agent:Swift.Set<Agent>]()
         public private(set) var parentOf      = [Agent:Agent]()
         public private(set) var parentsOf     = [Agent:[Agent]]()
+        
+        public init( _ agent : Agent) {
+            self.add(agent)
+        }
     }
 }
 
