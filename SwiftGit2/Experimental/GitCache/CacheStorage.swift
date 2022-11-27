@@ -42,6 +42,20 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         }
     }
     
+    public func rootOf(_ agent: Agent) -> Agent {
+        if roots.keys.contains(agent) {
+            return agent
+        }
+        
+        for (root, children) in flatTrees {
+            if children.contains(agent) {
+                return root
+            }
+        }
+
+        return agent
+    }
+    
     public struct Update {
         public let inserted : Set<Agent>
         public let removed : Set<Agent>
