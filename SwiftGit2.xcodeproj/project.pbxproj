@@ -695,8 +695,10 @@
 		E6731222292AA03C00606E91 /* GitCache */ = {
 			isa = PBXGroup;
 			children = (
-				E6731223292AA0A100606E91 /* CacheStorage.swift */,
 				E60BB75E293259D1006EE309 /* RepoID.Tree.swift */,
+				E6731223292AA0A100606E91 /* CacheStorage.swift */,
+				E61C06E1290C409E0047D243 /* Git.LogCache.swift */,
+				E6F0B9392910318C008E2176 /* Git.CommitBasicInfo.swift */,
 			);
 			path = GitCache;
 			sourceTree = "<group>";
@@ -809,8 +811,6 @@
 			isa = PBXGroup;
 			children = (
 				E61C06E3290C47660047D243 /* CommitID.swift */,
-				E61C06E1290C409E0047D243 /* Git.LogCache.swift */,
-				E6F0B9392910318C008E2176 /* Git.CommitBasicInfo.swift */,
 				E6F0B93B29105995008E2176 /* Git.Signature.swift */,
 				1DC744B8289061C9000F8478 /* HistoryFileID.swift */,
 				E6F0B93729102D19008E2176 /* CommitDeltas.swift */,
