@@ -56,6 +56,34 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         return agent
     }
     
+    public func storage(for agent: Agent) -> Agent.Storage {
+        if let stor = items[agent] {
+            return stor
+        }
+        update(root: agent)
+        if let stor = items[agent] {
+            return stor
+        } else {
+            let stor = agent.storageFactory
+            items[agent] = stor
+            return stor
+        }
+    }
+    
+    public func rootStorage(for agent: Agent) -> Agent.RootStorage {
+        if let root = roots[agent] {
+            return root
+        }
+        update(root: agent)
+        if let root = roots[agent] {
+            return root
+        } else {
+            let stor = agent.rootStorageFactory
+            roots[agent] = stor
+            return stor
+        }
+    }
+    
     public struct Update {
         public let inserted : Set<Agent>
         public let removed : Set<Agent>
