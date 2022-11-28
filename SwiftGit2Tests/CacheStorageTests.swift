@@ -5,8 +5,8 @@ import Essentials
 import EssetialTesting
 
 extension RepoID : CacheStorageAgent {
-    public var storage: TestContainer { TestContainer(repoID: self) }
-    public var rootStorage: TestContainer { TestContainer(repoID: self) }
+    public var storageFactory: TestContainer { TestContainer(repoID: self) }
+    public var rootStorageFactory: TestContainer { TestContainer(repoID: self) }
 }
 
 final class CacheStorageTests: XCTestCase {

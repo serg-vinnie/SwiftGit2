@@ -12,7 +12,7 @@ public class CacheStorage<Agent: CacheStorageAgent> {
     @discardableResult
     public func update(root: Agent) -> Update {
         if !roots.keys.contains(root) {
-            roots[root] = root.rootStorage
+            roots[root] = root.rootStorageFactory
         }
         
         let newList = root.flatTree
@@ -29,13 +29,13 @@ public class CacheStorage<Agent: CacheStorageAgent> {
             }
             
             for item in upd.inserted {
-                items[item] = item.storage
+                items[item] = item.storageFactory
             }
             
             return upd
         } else {
             for item in newList {
-                items[item] = item.storage
+                items[item] = item.storageFactory
             }
             
             return Update(old: [], new: new)
@@ -73,6 +73,6 @@ public protocol CacheStorageAgent : Hashable {
     
     var flatTree    : [Self]        { get }
     
-    var rootStorage : RootStorage   { get }
-    var storage     : Storage       { get }
+    var rootStorageFactory : RootStorage   { get }
+    var storageFactory     : Storage       { get }
 }
