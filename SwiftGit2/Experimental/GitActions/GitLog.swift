@@ -50,11 +50,13 @@ public class RefLogCache {
 
 fileprivate extension Repository {
     func log(ref: String) -> R<[OID]> {
-        Revwalk.new(in: self) | { $0.push(ref: ref) } | { $0.all() }
+        guard !headIsUnborn else { return .success([]) }
+        return Revwalk.new(in: self) | { $0.push(ref: ref) } | { $0.all() }
     }
     
     func log(ref: String, count: Int) -> R<[OID]> {
-        Revwalk.new(in: self) | { $0.push(ref: ref) } | { $0.next(count: count) }
+        guard !headIsUnborn else { return .success([]) }
+        return Revwalk.new(in: self) | { $0.push(ref: ref) } | { $0.next(count: count) }
     }
     
     func log(oid: OID, count: Int) -> R<[OID]> {
@@ -66,6 +68,8 @@ fileprivate extension Repository {
     }
     
     func logHEAD(count: Int = 0) -> R<[OID]> {
+        guard !headIsUnborn else { return .success([]) }
+
         if count > 0 {
             return log(range: "HEAD~\(count)..HEAD")
         } else {
