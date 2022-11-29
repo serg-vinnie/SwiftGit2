@@ -5,8 +5,12 @@ import Clibgit2
 import DequeModule
 
 public struct GitLog {
-    public let repoID : RepoID
-    init(repoID: RepoID) { self.repoID = repoID }
+    public let refID : ReferenceID
+    public init(refID: ReferenceID) { self.refID = refID }
+    
+    public func oids(count: Int) -> R<[OID]> { refID.repoID.repo | { $0.log(ref: refID.name, count: count) } }
+    public var  oids              : R<[OID]> { refID.repoID.repo | { $0.log(ref: refID.name) } }
+
 }
 
 public class RefLogCache {
@@ -44,7 +48,11 @@ public class RefLogCache {
 //    }
 }
 
-extension Repository {
+fileprivate extension Repository {
+    func log(ref: String) -> R<[OID]> {
+        Revwalk.new(in: self) | { $0.push(ref: ref) } | { $0.all() }
+    }
+    
     func log(ref: String, count: Int) -> R<[OID]> {
         Revwalk.new(in: self) | { $0.push(ref: ref) } | { $0.next(count: count) }
     }
