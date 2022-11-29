@@ -13,6 +13,8 @@ public struct GitReference {
 
 
 public extension GitReference {
+    var defaultHEAD : ReferenceID { ReferenceID(repoID: repoID, name: "HEAD") }
+    var HEAD : R<ReferenceID> { repoID.repo | { $0.HEAD() } | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }}
     func list(_ type: ReferenceType) -> R<[ReferenceID]> {
         repoID.references(type)
     }
