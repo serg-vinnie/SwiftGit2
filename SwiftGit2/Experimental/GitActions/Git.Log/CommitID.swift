@@ -10,6 +10,8 @@ public struct CommitID : CustomStringConvertible, Hashable {
         self.repoID = repoID
         self.oid = oid
     }
+
+    public var commit: R<Commit> { self.repoID.repo | { repo in repo.commit(oid: self.oid) } }
     
     public func withCommit<T>(_ block: (Commit)->R<T>) -> R<T> {
         self.repoID.repo | { repo in
