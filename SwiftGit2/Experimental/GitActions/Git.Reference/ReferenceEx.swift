@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public struct ReferenceCache : Identifiable, Equatable, Comparable {
+public struct ReferenceEx : Identifiable, Equatable, Comparable {
     public var id: String { referenceID.id }
     
     public let referenceID: ReferenceID
@@ -13,7 +13,7 @@ public struct ReferenceCache : Identifiable, Equatable, Comparable {
         self.cache  = cache
     }
     
-    public static func < (lhs: ReferenceCache, rhs: ReferenceCache) -> Bool {
+    public static func < (lhs: ReferenceEx, rhs: ReferenceEx) -> Bool {
         guard let l = lhs.commitID?.basicInfoCache,
               let r = rhs.commitID?.basicInfoCache else { return false }
         
@@ -21,7 +21,7 @@ public struct ReferenceCache : Identifiable, Equatable, Comparable {
     }
 }
 
-public extension ReferenceCache {
+public extension ReferenceEx {
     var commitID : CommitID? { cache.commit(for: referenceID) }
     
     var isHead : Bool {
@@ -33,32 +33,32 @@ public extension ReferenceCache {
         
     }
     
-    var upstream : ReferenceCache? {
+    var upstream : ReferenceEx? {
         if let upstrm = self.cache.upstreams.a2b[self.referenceID.name] {
             let refID = ReferenceID(repoID: self.referenceID.repoID, name: upstrm)
-            return ReferenceCache(refID, cache: self.cache)
+            return ReferenceEx(refID, cache: self.cache)
         }
         return nil
     }
-    var downstream : ReferenceCache? {
+    var downstream : ReferenceEx? {
         if let downstrm = self.cache.upstreams.b2a[self.referenceID.name] {
             let refID = ReferenceID(repoID: self.referenceID.repoID, name: downstrm)
-            return ReferenceCache(refID, cache: self.cache)
+            return ReferenceEx(refID, cache: self.cache)
         }
         return nil
     }
     
-    var counterpart : ReferenceCache? {
+    var counterpart : ReferenceEx? {
         if let item = self.cache.upstreams.counterpart(self.referenceID.name) {
             let refID = ReferenceID(repoID: self.referenceID.repoID, name: item)
-            return ReferenceCache(refID, cache: self.cache)
+            return ReferenceEx(refID, cache: self.cache)
         }
         return nil
     }
 }
 
-extension ReferenceCache : Hashable {
-    public static func == (lhs: ReferenceCache, rhs: ReferenceCache) -> Bool {
+extension ReferenceEx : Hashable {
+    public static func == (lhs: ReferenceEx, rhs: ReferenceEx) -> Bool {
         lhs.referenceID == rhs.referenceID
     }
     

@@ -135,7 +135,7 @@
 		E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */; };
 		E6ED7AAD289B6CB50021456F /* Git.RefCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */; };
 		E6EDE036289088E9008355A0 /* ReferenceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EDE035289088E9008355A0 /* ReferenceID.swift */; };
-		E6EEFC8028A0546400E60185 /* ReferenceCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */; };
+		E6EEFC8028A0546400E60185 /* ReferenceEx.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EEFC7F28A0546400E60185 /* ReferenceEx.swift */; };
 		E6EEFC8228A146CD00E60185 /* BranchSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EEFC8128A146CC00E60185 /* BranchSync.swift */; };
 		E6F0B93829102D19008E2176 /* CommitDeltas.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F0B93729102D19008E2176 /* CommitDeltas.swift */; };
 		E6F0B93A2910318C008E2176 /* Git.CommitBasicInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F0B9392910318C008E2176 /* Git.CommitBasicInfo.swift */; };
@@ -331,7 +331,7 @@
 		E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Discard.swift"; sourceTree = "<group>"; };
 		E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.RefCache.swift; sourceTree = "<group>"; };
 		E6EDE035289088E9008355A0 /* ReferenceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceID.swift; sourceTree = "<group>"; };
-		E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceCache.swift; sourceTree = "<group>"; };
+		E6EEFC7F28A0546400E60185 /* ReferenceEx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceEx.swift; sourceTree = "<group>"; };
 		E6EEFC8128A146CC00E60185 /* BranchSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BranchSync.swift; sourceTree = "<group>"; };
 		E6F0B93729102D19008E2176 /* CommitDeltas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommitDeltas.swift; sourceTree = "<group>"; };
 		E6F0B9392910318C008E2176 /* Git.CommitBasicInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.CommitBasicInfo.swift; sourceTree = "<group>"; };
@@ -765,7 +765,7 @@
 				E6BC323E2913FCBB00E342E2 /* Git.Reference.swift */,
 				E6DEC670291581F40076684B /* ReferenceID+.swift */,
 				E6ED7AAC289B6CB50021456F /* Git.RefCache.swift */,
-				E6EEFC7F28A0546400E60185 /* ReferenceCache.swift */,
+				E6EEFC7F28A0546400E60185 /* ReferenceEx.swift */,
 			);
 			path = Git.Reference;
 			sourceTree = "<group>";
@@ -1013,7 +1013,7 @@
 				1D6C64412837F72A003E9072 /* Git.Commit.swift in Sources */,
 				E653907C23E73CDE00C08416 /* Patch.swift in Sources */,
 				1DEC291127722FB8007C32FF /* StatusEntry.Status.swift in Sources */,
-				E6EEFC8028A0546400E60185 /* ReferenceCache.swift in Sources */,
+				E6EEFC8028A0546400E60185 /* ReferenceEx.swift in Sources */,
 				E61C06E4290C47660047D243 /* CommitID.swift in Sources */,
 				E6F1FCFD27D76DA300BE8697 /* RepoID.Unborn.swift in Sources */,
 				E6D0AC50291310C20087399F /* Git.Tag.swift in Sources */,

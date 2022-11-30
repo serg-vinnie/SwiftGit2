@@ -5,14 +5,14 @@ import SwiftUI
 
 public final class GitRefCache {
     let repoID : RepoID
-    public private(set) var local  : [ReferenceCache] = []
-    public private(set) var remote : [String:[ReferenceCache]] = [:]
-    public private(set) var tags   : [ReferenceCache] = []
+    public private(set) var local  : [ReferenceEx] = []
+    public private(set) var remote : [String:[ReferenceEx]] = [:]
+    public private(set) var tags   : [ReferenceEx] = []
     
-    public private(set) var HEAD   : ReferenceCache?
+    public private(set) var HEAD   : ReferenceEx?
     public              var HEAD_OID : OID? { HEAD?.referenceID.targetOID.maybeSuccess }
     public private(set) var remotes: GitRemotesList = [:]
-    public private(set) var remoteHEADs: [String:ReferenceCache?] = [:]
+    public private(set) var remoteHEADs: [String:ReferenceEx?] = [:]
     
     public private(set) var oids: [OID: Set<ReferenceID>] = [:]
     
@@ -21,13 +21,13 @@ public final class GitRefCache {
     init(repoID: RepoID, list: [ReferenceID], remotes: GitRemotesList) {
         self.repoID = repoID
         self.remotes = remotes
-        self.local  = list.filter { $0.isBranch }.map  { ReferenceCache($0, cache: self) }.sorted()
+        self.local  = list.filter { $0.isBranch }.map  { ReferenceEx($0, cache: self) }.sorted()
         let list_remotes    = list.filter { $0.isRemote }
         self.remote         = list_remotes.asRemotesDic(cache: self)
         self.remoteHEADs    = list_remotes.asRemoteHEADsDic(cache: self)
-        self.tags   = list.filter { $0.isTag    }.map   { ReferenceCache($0, cache: self) }
+        self.tags   = list.filter { $0.isTag    }.map   { ReferenceEx($0, cache: self) }
         self.HEAD   = (repoID.repo | { $0.HEAD() }
-                                   | { ReferenceCache(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
+                                   | { ReferenceEx(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
                        ).maybeSuccess
         
         for ref in list {
@@ -50,7 +50,7 @@ public final class GitRefCache {
         }
     }
     
-    public func find(refID: ReferenceID) -> ReferenceCache? {
+    public func find(refID: ReferenceID) -> ReferenceEx? {
         if refID.isBranch { return local.first { $0.referenceID == refID } }
         if refID.isRemote { return remote.values.flatMap { $0 }.first { $0.referenceID == refID }}
         if refID.isTag    { return tags.first { $0.referenceID == refID } }
@@ -89,39 +89,39 @@ public final class GitRefCache {
 
 
 extension Array where Element == ReferenceID {
-    func asRemotesDic(cache: GitRefCache) -> [String:[ReferenceCache]] {
-        var dic = [String:[ReferenceCache]]()
+    func asRemotesDic(cache: GitRefCache) -> [String:[ReferenceEx]] {
+        var dic = [String:[ReferenceEx]]()
         
         for ref in self {
             guard let remote = ref.remote else { continue }
             guard ref.displayName != "HEAD" else { continue }
             
             if dic.keys.contains(remote) {
-                dic[remote]!.append(ReferenceCache(ref, cache: cache))
+                dic[remote]!.append(ReferenceEx(ref, cache: cache))
             } else {
-                dic[remote] = [ReferenceCache(ref, cache: cache)]
+                dic[remote] = [ReferenceEx(ref, cache: cache)]
             }
         }
         
         return dic.mapValues { $0.sorted() }
     }
     
-    func asRemoteHEADsDic(cache: GitRefCache) -> [String:ReferenceCache] {
-        var dic = [String:ReferenceCache]()
+    func asRemoteHEADsDic(cache: GitRefCache) -> [String:ReferenceEx] {
+        var dic = [String:ReferenceEx]()
         
         for ref in self {
             guard let remote = ref.remote else { continue }
             guard ref.displayName == "HEAD" else { continue }
             guard let symbolicRef = ref.symbolic.maybeSuccess else { continue }
             
-            dic[remote] = ReferenceCache(symbolicRef, cache: cache)
+            dic[remote] = ReferenceEx(symbolicRef, cache: cache)
         }
         
         return dic
     }
 }
 
-extension Array where Element == ReferenceCache {
+extension Array where Element == ReferenceEx {
     func upstreams() -> OneOnOne {
         let arr = self.map { r in (r.referenceID.name, r.referenceID.upstream1Name) }
             .filter { $0.1 != nil }
@@ -137,8 +137,8 @@ extension ReferenceID {
     }
 }
 
-public extension Dictionary where Key == String, Value == ReferenceCache {
-    var asList : [ReferenceCache] {
+public extension Dictionary where Key == String, Value == ReferenceEx {
+    var asList : [ReferenceEx] {
         compactMap { $0.value }
     }
 }
