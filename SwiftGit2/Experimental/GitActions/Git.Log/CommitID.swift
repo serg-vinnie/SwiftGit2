@@ -12,6 +12,7 @@ public struct CommitID : CustomStringConvertible, Hashable {
     }
 
     public var commit: R<Commit> { self.repoID.repo | { repo in repo.commit(oid: self.oid) } }
+    public var deltas: R<CommitDeltas> { self.repoID.repo | { repo in repo.deltas(target: .commit(oid)) } }
     
     public func withCommit<T>(_ block: (Commit)->R<T>) -> R<T> {
         self.repoID.repo | { repo in
