@@ -52,7 +52,7 @@ public extension Diff {
         public static let delta = BinaryType(rawValue: GIT_DIFF_BINARY_DELTA.rawValue)
     }
 
-    struct Flags: OptionSet {
+    struct Flags: OptionSet, CustomStringConvertible {
         // This appears to be necessary due to bug in Swift
         // https://bugs.swift.org/browse/SR-3003
         public init(rawValue: UInt32) {
@@ -65,6 +65,13 @@ public extension Diff {
         public static let notBinary = Flags(rawValue: GIT_DIFF_FLAG_NOT_BINARY.rawValue)
         public static let validId = Flags(rawValue: GIT_DIFF_FLAG_VALID_ID.rawValue)
         public static let exists = Flags(rawValue: GIT_DIFF_FLAG_EXISTS.rawValue)
+        
+        public var description: String {
+            return "Diff.Flags: \(rawValue) [binary = \(contains(.binary) ? 1 : 0), "
+            + "notBinary = \(contains(.notBinary) ? 1 : 0), "
+            + "validId = \(contains(.validId) ? 1 : 0), "
+            + "exists = \(contains(.exists) ? 1 : 0)]"
+        }
     }
 
     struct FindOptions: OptionSet {
