@@ -70,6 +70,8 @@ public extension Reference {
             return .success(OID(git_reference_target(pointer).pointee))
         }
     }
+    
+    internal var target : OID { OID(git_reference_target(pointer).pointee) }
 }
 
 public extension Repository {
@@ -145,7 +147,7 @@ public extension Duo where T1 == Reference, T2 == Repository {
         
         return self.targetOID()
             .flatMap { oid -> R<OID> in
-                if repo.commitExist(oid: oid) {
+                if repo.commitExists(oid: oid) {
                     // this is lightWeight Tag
                     return .success(oid)
                 } else {
@@ -167,8 +169,8 @@ fileprivate extension String {
     }
 }
 
-fileprivate extension Repository {
-    func commitExist(oid: OID) -> Bool {
+internal extension Repository {
+    func commitExists(oid: OID) -> Bool {
         var oidInternal = oid.oid
         var resPointer: OpaquePointer?
         
@@ -179,5 +181,9 @@ fileprivate extension Repository {
         }
         
         return false
+    }
+    
+    func tagExists(oid: OID) -> Bool {
+        tagLookup(oid: oid).maybeSuccess != nil
     }
 }

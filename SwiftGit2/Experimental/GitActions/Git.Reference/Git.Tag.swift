@@ -37,7 +37,7 @@ public extension GitTag {
 
 public extension Repository {
     /// Looks like works with advanced tags only
-    func tagLookup(oid: OID) -> R<Tag> {
+    internal func tagLookup(oid: OID) -> R<Tag> {
         var tagPointer: OpaquePointer? = nil
         var oidNeeded = oid.oid
         

@@ -8,6 +8,7 @@
 
 import Foundation
 import Essentials
+import Clibgit2
 
 public struct ReferenceID : Equatable, Hashable, Comparable {
     public let repoID: RepoID
@@ -80,6 +81,8 @@ public extension ReferenceID {
     
     private var reference : R<Reference> { repoID.repo | { $0.reference(name: name) } }
     
+    var isSymbolic : R<Bool> { reference | { $0.isSymbolic } }
+    var isDirect : R<Bool> { reference | { $0.isDirect } }
     var symbolic : R<ReferenceID> { reference | { $0.nameAsReferenceSymbolic.asNonOptional } | { ReferenceID(repoID: repoID, name: $0) } }
     
     var targetOID : R<OID> {
@@ -89,6 +92,54 @@ public extension ReferenceID {
             return repoID.repo | { r in r.reference(name: name) | { $0.with(r).targetOID() }}
         }
     }
+    
+    enum TagType : String {
+        case lightweight
+        case annotated
+    }
+    
+    var tagType : R<TagType> {
+        guard isTag else { return .wtf("not a tag") }
+        
+        let repo = repoID.repo
+        let oid = repo | { $0.reference(name: name) } | { $0.target }
+        let exists = combine(repo, oid) | { $0.tagExists(oid: $1) }
+        
+        return exists | { $0 ? .annotated : .lightweight  }
+    }
+    
+    /*
+     
+     // Getting oid for Advanced or LightWeight tag
+     func getTagOid() -> R<OID> {
+         let repo = value.1
+         
+         return self.targetOID()
+             .flatMap { oid -> R<OID> in
+                 if repo.commitExists(oid: oid) {
+                     // this is lightWeight Tag
+                     return .success(oid)
+                 } else {
+                     // this is Advanced Tag
+                     return repo.tagLookup(oid: oid).map{ $0.targetOid }
+                 }
+             }
+     }
+     */
+    
+    /*
+     
+     func targetOID() -> R<OID> {
+         let (ref, repo) = value
+         
+         if ref.isSymbolic {
+             return ref.nameAsReferenceSymbolic.asNonOptional | { repo.referenceTarget(name: $0) }
+         } else {
+             return ref.targetOIDNoWarning
+         }
+     }
+
+     */
     
     var annotatedCommit : R<AnnotatedCommit> {
         combine(repoID.repo, targetOID) | { repo, oid in repo.annotatedCommit(oid: oid) }
@@ -157,5 +208,20 @@ public extension ReferenceID {
 extension ReferenceID: Identifiable {
     public var id: String {
         self.name
+    }
+}
+
+extension Repository {
+    func referenceNameToId(name: String) -> R<OID> {
+        var oid = git_oid() // out
+        
+        return git_try("git_reference_name_to_id") {
+                name.withCString { name in
+                    git_reference_name_to_id(&oid, self.pointer, name)
+                }
+            }
+            .map {
+                OID(oid)
+            }
     }
 }
