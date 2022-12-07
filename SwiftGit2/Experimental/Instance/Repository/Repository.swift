@@ -100,7 +100,7 @@ public extension Repository {
     
     func commit(message: String, signature: Signature) -> Result<Commit, Error> {
         return index()
-            .flatMap { index in Duo(index, self).commit(message: message, signature: signature) }
+            .flatMap { index in Duo(index, self).commit(message: message.trimStart(" "), signature: signature) }
     }
     
     func remoteRepo(named name: String) -> Result<Remote, Error> {
