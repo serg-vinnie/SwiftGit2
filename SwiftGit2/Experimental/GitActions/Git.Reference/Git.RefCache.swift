@@ -25,7 +25,7 @@ public final class GitRefCache {
         let list_remotes    = list.filter { $0.isRemote }
         self.remote         = list_remotes.asRemotesDic(cache: self)
         self.remoteHEADs    = list_remotes.asRemoteHEADsDic(cache: self)
-        self.tags   = list.filter { $0.isTag    }.map   { ReferenceEx($0, cache: self) }
+        self.tags   = list.filter { $0.isTag    }.sorted().map   { ReferenceEx($0, cache: self) }
         self.HEAD   = (repoID.repo | { $0.HEAD() }
                                    | { ReferenceEx(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
                        ).maybeSuccess
