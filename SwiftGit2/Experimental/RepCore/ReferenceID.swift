@@ -93,9 +93,9 @@ public extension ReferenceID {
         }
     }
     
-    enum TagType : String {
-        case lightweight
-        case annotated
+    enum TagType {
+        case lightweight(OID)
+        case annotated(Tag)
     }
     
     var tagType : R<TagType> {
@@ -103,9 +103,10 @@ public extension ReferenceID {
         
         let repo = repoID.repo
         let oid = repo | { $0.reference(name: name) } | { $0.target }
-        let exists = combine(repo, oid) | { $0.tagExists(oid: $1) }
+        let tag = combine(repo, oid) | { $0.tagLookup(oid: $1) }
         
-        return exists | { $0 ? .annotated : .lightweight  }
+        return tag.map { .annotated($0) }
+            .flatMapError { _ in oid | { .lightweight($0) } }
     }
     
     /*
