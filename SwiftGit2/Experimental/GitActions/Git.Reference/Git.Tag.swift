@@ -12,10 +12,20 @@ public struct GitTag {
 }
 
 public extension GitTag {
-    func create(at oid: OID, name: String, message: String, signature: Signature, auth: Auth) -> R<OID> {
+    func createOld(at oid: OID, name: String, message: String, signature: Signature, auth: Auth) -> R<OID> {
         self.repoID.repo
             | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
         | { oid in self.pushToFirstRemote(tag: name, auth: auth) | { _ in oid } }
+    }
+    
+    func delete(tag: String) -> R<Void> {
+        repoID.repo | { $0.delete(tag: tag) }
+    }
+    
+    func pushToRemote(tag: String, remote: String, auth: Auth) -> R<Void> {
+        repoID.repo
+        | { $0.remote(name: remote) }
+        | { $0.push(refspec: "refs/tags/\(tag):refs/tags/\(tag)", options: PushOptions(auth: auth)) }
     }
     
     func pushToFirstRemote(tag: String, auth: Auth) -> R<Void> {
@@ -46,6 +56,22 @@ public extension Repository {
         }
         .map {
             Tag(tagPointer!)
+        }
+    }
+    
+    func delete(tag: String) -> R<Void> {
+        git_try("git_tag_delete") {
+            git_tag_delete(self.pointer, tag)
+        }
+    }
+    
+    func createLightTag(from commitOid: OID, name: String, force: Bool = false) -> R<Void> {
+        var oid = git_oid()
+        
+        return self.commit(oid: commitOid) | { commit in
+            git_try("git_tag_create") {
+                git_tag_create_lightweight(&oid, self.pointer, "name", commit.pointer, force ? 1 : 0)
+            }
         }
     }
     
