@@ -3,7 +3,21 @@ import Essentials
 import Clibgit2
 import OrderedCollections
 
-public typealias GitRemotesList = OrderedDictionary<String,String>
+public struct RemoteInfo : Hashable, Identifiable {
+    public let repoID  : RepoID
+    public let name    : String
+    public let url     : String
+    
+    public init(repoID: RepoID, name: String, url: String) {
+        self.repoID = repoID
+        self.name = name
+        self.url = url
+    }
+    
+    public var id: String { repoID.path + "." + name }
+}
+
+public typealias GitRemotesList = OrderedDictionary<String,RemoteInfo>
 
 public struct GitRemotes {
     public let repoID : RepoID
@@ -44,7 +58,7 @@ public extension GitRemotes {
                     | { _ in () }
     }
     
-    var list        : R<GitRemotesList> { instances | { $0.toOrderedDictionary(key: \.name) { $0.url } } }
+    var list        : R<GitRemotesList> { instances | { $0.toOrderedDictionary(key: \.name) { RemoteInfo(repoID: repoID, name: $0.name, url: $0.url) } } }
     var names       : R<[String]>       { repoID.repo | { $0.remoteNameList() } }
     var count       : R<Int>            { names | { $0.count } }
     
