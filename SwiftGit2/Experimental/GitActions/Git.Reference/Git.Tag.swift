@@ -23,9 +23,10 @@ public extension GitTag {
     }
     
     func pushToRemote(tag: String, remote: String, auth: Auth) -> R<Void> {
-        repoID.repo
+        let repo = repoID.repo
+        return repo
         | { $0.remote(name: remote) }
-        | { $0.push(refspec: "refs/tags/\(tag):refs/tags/\(tag)", options: PushOptions(auth: auth)) }
+        | { $0.push(refspec: ":refs/tags/\(tag)", options: PushOptions(auth: auth)) }
     }
     
     func pushToFirstRemote(tag: String, auth: Auth) -> R<Void> {
@@ -34,7 +35,7 @@ public extension GitTag {
             .if(\.isEmpty,
                  then: { _ in .success(()) },
                  else: { list in list.first.asNonOptional
-                     | { $0.push(refspec: "refs/tags/\(tag):refs/tags/\(tag)", options: PushOptions(auth: auth)) } }
+                     | { $0.push(refspec: ":refs/tags/\(tag)", options: PushOptions(auth: auth)) } }
             )
                 .flatMapError { _ in .success(()) }
     }
