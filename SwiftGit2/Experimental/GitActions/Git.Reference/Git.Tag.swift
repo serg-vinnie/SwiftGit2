@@ -6,7 +6,7 @@ import Clibgit2
 public struct GitTag {
     public let repoID: RepoID
     
-    public init(repoID: RepoID) {
+    public init(_ repoID: RepoID) {
         self.repoID = repoID
     }
 }
@@ -59,7 +59,7 @@ public extension Repository {
         }
     }
     
-    func delete(tag: String) -> R<Void> {
+    internal func delete(tag: String) -> R<Void> {
         git_try("git_tag_delete") {
             git_tag_delete(self.pointer, tag)
         }
