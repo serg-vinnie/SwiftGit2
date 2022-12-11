@@ -20,7 +20,14 @@ public struct ReferenceID : Equatable, Hashable, Comparable {
     }
     
     public static func < (lhs: ReferenceID, rhs: ReferenceID) -> Bool {
-        lhs.name < rhs.name
+        if lhs.name == "HEAD" { return true }
+        if rhs.name == "HEAD" { return false }
+        
+        if lhs.displayName == "HEAD" { return true }
+        if rhs.displayName == "HEAD" { return false }
+        
+        
+        return lhs.name < rhs.name
     }
 }
 
@@ -39,11 +46,8 @@ public extension ReferenceID {
             return name.replace(of: "refs/remotes/\(remote)/", to: "")
         } else if isTag {
             return name.replace(of: "refs/tags/", to: "")
-        } else if name.hasSuffix("HEAD") {
-            return name
         }
         
-        assert(false)
         return name
     }
     
@@ -54,11 +58,8 @@ public extension ReferenceID {
             return name.replace(of: "refs/remotes/", to: "")
         } else if isTag {
             return name.replace(of: "refs/tags/", to: "")
-        } else if name == "HEAD" {
-            return "HEAD"
         }
-        
-        assert(false)
+
         return name
     }
     
