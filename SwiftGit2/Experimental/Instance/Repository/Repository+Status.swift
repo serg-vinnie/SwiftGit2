@@ -41,6 +41,44 @@ extension StatusIterator: RandomAccessCollection {
     public func index(after i: Int) -> Int { return i + 1 }
 }
 
+public struct ExtendedStatus {
+    public enum HEAD {
+        case isUnborn
+        case reference(ReferenceID)
+        case dettached(OID)
+    }
+    public let status : StatusIterator
+    public let head: HEAD
+}
+
+extension Repository {
+    func extendedStatus(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
+        if headIsUnborn {
+            return .success(ExtendedStatus(status: StatusIterator(nil), head: .isUnborn))
+        }
+        
+        if headIsDetached {
+            let headOID = HEAD().flatMap{ Duo($0, self).targetOID() }
+            return combine(statusConflictSafe(options: options),headOID)
+                    | { ExtendedStatus(status: $0, head: .dettached($1)) }
+        }
+        
+        let ref = self.repoID | { $0.HEAD } | { $0.asReference }
+        return combine(statusConflictSafe(options: options),ref) | { ExtendedStatus(status: $0, head: .reference($1)) }
+    }
+}
+
+
+public extension RepoID {
+    func status(options: StatusOptions = StatusOptions()) -> R<StatusIterator> {
+        self.repo | { $0.statusConflictSafe(options: options) }
+    }
+    
+    func statusEx(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
+        self.repo | { $0.extendedStatus(options: options) }
+    }
+}
+
 public extension Repository {
     // CheckThatRepoIsEmpty
     var repoIsBare: Bool {
@@ -48,7 +86,7 @@ public extension Repository {
     }
     
     
-    func statusConflictSafe(options: StatusOptions = StatusOptions()) -> Result<StatusIterator, Error> {
+    internal func statusConflictSafe(options: StatusOptions = StatusOptions()) -> R<StatusIterator> {
         var newFlags = options.flags
         newFlags.remove(.includeUntracked)
         let conflictOptions = StatusOptions(flags: newFlags, show: options.show, pathspec: options.pathspec)
@@ -61,7 +99,7 @@ public extension Repository {
             }
     }
     
-    func status(options: StatusOptions = StatusOptions()) -> Result<StatusIterator, Error> {
+    internal func status(options: StatusOptions = StatusOptions()) -> R<StatusIterator> {
         var pointer: OpaquePointer?
         
         if repoIsBare {
