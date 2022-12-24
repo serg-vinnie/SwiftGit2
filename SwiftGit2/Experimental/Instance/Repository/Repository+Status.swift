@@ -45,10 +45,20 @@ public struct ExtendedStatus {
     public enum HEAD {
         case isUnborn
         case reference(ReferenceID)
-        case dettached(OID)
+        case dettached(CommitID)
     }
     public let status : StatusIterator
     public let head: HEAD
+}
+
+public extension ExtendedStatus.HEAD {
+    var headCommmit : R<CommitID> {
+        switch self {
+        case .isUnborn: return .wtf("head is unborn")
+        case .reference(let ref): return ref.targetOID | { CommitID(repoID: ref.repoID, oid: $0) }
+        case .dettached(let com): return .success(com)
+        }
+    }
 }
 
 extension Repository {
@@ -59,8 +69,8 @@ extension Repository {
         
         if headIsDetached {
             let headOID = HEAD().flatMap{ Duo($0, self).targetOID() }
-            return combine(statusConflictSafe(options: options),headOID)
-                    | { ExtendedStatus(status: $0, head: .dettached($1)) }
+            return combine(statusConflictSafe(options: options),self.repoID,headOID)
+                    | { ExtendedStatus(status: $0, head: .dettached(CommitID(repoID: $1, oid: $2))) }
         }
         
         let ref = self.repoID | { $0.HEAD } | { $0.asReference }
