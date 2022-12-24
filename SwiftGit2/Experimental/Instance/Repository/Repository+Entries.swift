@@ -56,6 +56,7 @@ public enum CommitTarget {
 public enum Entries {
     case status(StatusIterator)
     case commit(CommitDeltas)
+    case commitID(CommitID)
     case headIsUnborn
 }
 
@@ -67,6 +68,8 @@ public extension Entries {
             return statusIterator.count
         case .commit(let commit):
             return commit.deltasWithHunks.count
+        case .commitID(_):
+            return 0
         case .headIsUnborn:
             return 0
         }
