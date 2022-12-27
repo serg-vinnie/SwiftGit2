@@ -45,6 +45,14 @@ final class CacheStorageTests: XCTestCase {
         XCTAssertEqual(TestContainer.deinits, 1)
     }
     
+    func test_refCache() {
+        let repoID = RepoID(path: "/Users/loki/dev/taogit")
+        _ = GitRefCache.from(repoID: repoID)
+        measure {
+            _ = GitRefCache.from(repoID: repoID)
+        }
+    }
+    
 //    func test_repo_sub() {
 //        let folder = root.sub(folder: "Clone").cleared().shouldSucceed()!
 //        folder   .with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))

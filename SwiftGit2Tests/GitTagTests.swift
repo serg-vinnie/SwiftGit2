@@ -13,7 +13,7 @@ final class GitTagTests: XCTestCase {
         let oid = (GitRefCache.from(repoID: repoID) | { $0.HEAD.asNonOptional } | { $0.referenceID.targetOID })
             .shouldSucceed()!
         
-        GitTag(repoID: repoID).createOld(at: oid, name: "1.2.3", message: "", signature: .test, auth: .credentials(.none))
+        GitTag(repoID).createOld(at: oid, name: "1.2.3", message: "", signature: .test, auth: .credentials(.none))
             .shouldSucceed()
 
         (GitRefCache.from(repoID: repoID) | { $0.tags.map { $0.referenceID } } )

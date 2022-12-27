@@ -1,6 +1,6 @@
 
 import XCTest
-import SwiftGit2
+@testable import SwiftGit2
 import Essentials
 import EssetialTesting
 

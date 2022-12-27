@@ -1,7 +1,7 @@
 
 import Foundation
 import Essentials
-import SwiftGit2
+@testable import SwiftGit2
 import EssetialTesting
 
 extension TestFolder {
