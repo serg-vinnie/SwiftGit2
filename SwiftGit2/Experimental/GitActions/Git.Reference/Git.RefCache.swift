@@ -21,11 +21,11 @@ public final class GitRefCache {
     init(repoID: RepoID, list: [ReferenceID], remotes: GitRemotesList) {
         self.repoID = repoID
         self.remotes = remotes
-        self.local  = list.filter { $0.isBranch }.map  { ReferenceEx($0, cache: self) }.sorted()
+        self.local  = list.filter { $0.isBranch }.map  { ReferenceEx($0, cache: self) }//.sorted()
         let list_remotes    = list.filter { $0.isRemote }
         self.remote         = list_remotes.asRemotesDic(cache: self)
         self.remoteHEADs    = list_remotes.asRemoteHEADsDic(cache: self)
-        self.tags   = list.filter { $0.isTag    }.map   { ReferenceEx($0, cache: self) }.sorted()
+        self.tags   = list.filter { $0.isTag    }.map   { ReferenceEx($0, cache: self) }//.sorted()
         self.HEAD   = (repoID.repo | { $0.HEAD() }
                                    | { ReferenceEx(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
                        ).maybeSuccess
@@ -103,7 +103,7 @@ extension Array where Element == ReferenceID {
             }
         }
         
-        return dic.mapValues { $0.sorted() }
+        return dic//.mapValues { $0.sorted() }
     }
     
     func asRemoteHEADsDic(cache: GitRefCache) -> [String:ReferenceEx] {
