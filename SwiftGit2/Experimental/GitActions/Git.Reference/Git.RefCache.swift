@@ -4,7 +4,7 @@ import Essentials
 import SwiftUI
 
 public final class GitRefCache {
-    let repoID : RepoID
+    public let repoID : RepoID
     public private(set) var local  : [ReferenceEx] = []
     public private(set) var remote : [String:[ReferenceEx]] = [:]
     public private(set) var tags   : [ReferenceEx] = []
