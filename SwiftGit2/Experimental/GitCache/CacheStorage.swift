@@ -17,9 +17,9 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         
         let newList = root.flatTree
         let new = Set(newList)
-        defer {
-            flatTrees[root] = new
-        }
+        //defer {
+            
+        //}
         
         if let old = flatTrees[root] {
             let upd = Update(old: old, new: new)
@@ -28,12 +28,14 @@ public class CacheStorage<Agent: CacheStorageAgent> {
                 items[item] = nil
             }
             
+            flatTrees[root] = new
+            
             for item in upd.inserted {
                 items[item] = item.storageFactory
             }
-            
             return upd
         } else {
+            flatTrees[root] = new
             for item in newList {
                 items[item] = item.storageFactory
             }
