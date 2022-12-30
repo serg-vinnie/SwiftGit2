@@ -6,11 +6,57 @@ import EssetialTesting
 
 extension RepoID : CacheStorageAgent {
     public var storageFactory: TestContainer { TestContainer(repoID: self) }
-    public var rootStorageFactory: TestContainer { TestContainer(repoID: self) }
+    public var rootStorageFactory: TestContainer { TestContainer(repoID: self, id: "_root") }
 }
 
 final class CacheStorageTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "CacheTests")
+    
+    func test_taogit() {
+        let repoID = RepoID(path: "/Users/loki/dev/taogit")
+        let storage = CacheStorage<RepoID>()
+        storage.update(root: repoID)
+        XCTAssertEqual(storage.roots.count, 1)
+        XCTAssertEqual(storage.items.count, 9)
+        
+        let tree = storage.roots.first!.value.tree
+        
+        let all = tree.items.sorted { $0.url.pathComponents.count < $1.url.pathComponents.count }
+        for item in all {
+            let children = tree.childrenOf[item] ?? []
+            let allChildren = tree.allChildrenOf[item] ?? []
+            let parents = tree.parentsOf[item] ?? []
+            //let allParents = tree.
+            print("- [\(children.count) - \(allChildren.count)] [\(parents.count)] - \(item)")
+        }
+        
+        do {
+            let sub = RepoID(path: repoID.path + "/SwiftGit2/Carthage/Checkouts/Quick/Externals/Nimble")
+            let parents = tree.parentsOf[sub] ?? []
+            print("\n* parents of \(sub)")
+            for item in parents {
+                print("** \(item)")
+            }
+        }
+        
+        do {
+            let sub = RepoID(path: repoID.path + "/AppCore")
+            let parents = tree.parentsOf[sub] ?? []
+            print("\n# parents of \(sub)")
+            for item in parents {
+                print("## \(item)")
+            }
+        }
+        
+//        do {
+//            print("all chlidren of \(repoID)")
+//            for item in tree.allChildrenOf[repoID]! {
+//                print("* \(item)")
+//            }
+//        }
+        
+        //rootStorage.
+    }
     
     func test_simple() {
         let folder = root.with(repo: "simple", content: .empty).shouldSucceed()!

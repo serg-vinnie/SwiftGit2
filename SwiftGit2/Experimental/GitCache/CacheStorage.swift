@@ -74,6 +74,15 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         if let root = roots[agent] {
             return root
         }
+        
+        for (key,tree) in flatTrees {
+            if tree.contains(agent) {
+                if let root = roots[key] {
+                    return root
+                }
+            }
+        }
+        
         update(root: agent)
         if let root = roots[agent] {
             return root

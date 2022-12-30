@@ -15,16 +15,20 @@ public class TestContainer {
     static var inits = 0
     static var deinits = 0
     let repoID: RepoID
-    init(repoID: RepoID) {
+    let id: String?
+    let tree  : RepoID.Tree<RepoID>
+    init(repoID: RepoID, id: String? = nil) {
+        self.repoID = repoID
+        self.id = id
+        self.tree = .init(repoID)
         TestContainer.counter += 1
         TestContainer.inits += 1
-        self.repoID = repoID
-        print("INIT.TestContainer \(repoID)")
+        print("INIT.TestContainer\(id ?? "") \(repoID)")
     }
     deinit {
         TestContainer.counter -= 1
         TestContainer.deinits += 1
-        print("DE-INIT.TestContainer \(repoID)")
+        //print("DE-INIT.TestContainer\(id ?? "") \(repoID)")
     }
 }
 
