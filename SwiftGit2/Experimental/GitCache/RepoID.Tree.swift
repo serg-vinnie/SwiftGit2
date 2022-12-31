@@ -18,9 +18,12 @@ public extension RepoID {
 
 extension RepoID.Tree {
     mutating func add( _ agent: Agent) {
+        guard agent.exists else { return }
+        
         let children = agent.treeChildren
         add(children: children, parent: agent)
         allChildrenOf[agent] = Set(agent.treeAllChildren)
+        
         for ch in children {
             add(ch)
         }
@@ -42,6 +45,7 @@ extension RepoID.Tree {
 }
 
 public protocol TreeAgent : Hashable {
+    var exists       : Bool { get }
     var treeChildren : [Self] { get }
     var treeAllChildren : [Self] { get }
 }
