@@ -42,30 +42,12 @@ public extension ReferenceID {
         repoID.repo | { $0.reference(name: name) } | { $0.delete() }
     }
     
-    // WIP
-    // TODO: get refspec from upstream
-    fileprivate func deleteRemote(auth: Auth) -> R<()> {
+    func pushAsBranch(auth: Auth) -> R<Void> {
+        guard let remote = self.remote else { return .wtf("not a remote") }
         let repo = repoID.repo
-        let refspec = ":refs/heads/" + name.split(separator: "/").dropFirst(3).joined(separator: "/")
-        
-        if isBranch {
-            let remote = repo | { $0.remote(localBr: self.name) }
-            
-            let upstream = remote.flatMap { _ in repo.flatMap{ $0.reference(name: self.name).flatMap{ $0.delete() } } }
-            
-            return upstream.flatMap { _ in remote }
-                .flatMap { remote in remote.push(refspec: refspec, options: PushOptions(auth: auth))}
-        }
-        
-        // is Remote branch
-        
-        let remoteR2 = repo
-            .flatMap { $0.remote(upstream: name) }
-        
-        let brUpstreamR2 = remoteR2.flatMap { _ in repo.flatMap{ $0.reference(name: name).flatMap{ $0.delete() } } }
-        
-        return brUpstreamR2.flatMap { _ in remoteR2 }
-            .flatMap { remote in remote.push(refspec: refspec, options: PushOptions(auth: auth))}
+        return repo
+        | { $0.remote(name: remote) }
+        | { $0.push(refspec: ":refs/heads/\(self.displayName)", options: PushOptions(auth: auth)) }
     }
 
 }
