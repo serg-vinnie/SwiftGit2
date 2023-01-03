@@ -38,7 +38,7 @@ public extension ReferenceID {
         }
     }
     
-    func deleteAsLocal() -> R<()> {
+    func delete() -> R<()> {
         repoID.repo | { $0.reference(name: name) } | { $0.delete() }
     }
     

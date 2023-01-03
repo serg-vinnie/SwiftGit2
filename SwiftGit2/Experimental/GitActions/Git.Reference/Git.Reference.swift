@@ -56,7 +56,7 @@ fileprivate struct GitBranches {
 }
 
 public extension Repository {
-    func createBranch(from target: BranchTarget, name: String, checkout: Bool, stashing: Bool = false) -> R<Reference> {
+    internal func createBranch(from target: BranchTarget, name: String, checkout: Bool, stashing: Bool = false) -> R<Reference> {
         let repo = self
         
         return target.oid(in: self)
