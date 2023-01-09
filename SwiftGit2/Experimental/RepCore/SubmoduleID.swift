@@ -8,7 +8,7 @@ public struct SubmoduleID : Hashable {
     let repoID : RepoID
     let name: String
     
-    var subRepoID : RepoID { RepoID(url: repoID.url.appendingPathComponent(name)) }
+    var subRepoID : RepoID { RepoID(url: url) }
     var url : URL { repoID.url.appendingPathComponent(name) }
 }
 

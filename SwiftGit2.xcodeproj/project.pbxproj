@@ -130,6 +130,7 @@
 		E6D4A92424DF40CA00E8041E /* Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D4A92324DF40CA00E8041E /* Index.swift */; };
 		E6D4A92824DF55E400E8041E /* Reference+Write.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D4A92724DF55E400E8041E /* Reference+Write.swift */; };
 		E6DEC671291581F40076684B /* ReferenceID+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DEC670291581F40076684B /* ReferenceID+.swift */; };
+		E6E76D69296A0BB2009E745E /* SubmoduleID+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E76D68296A0BB2009E745E /* SubmoduleID+Status.swift */; };
 		E6E99235268BBF5E00F8E8BD /* RevwalkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */; };
 		E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */; };
 		E6EAA4AF269F8B9800D86506 /* Repository+Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */; };
@@ -326,6 +327,7 @@
 		E6D4A92324DF40CA00E8041E /* Index.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Index.swift; sourceTree = "<group>"; };
 		E6D4A92724DF55E400E8041E /* Reference+Write.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reference+Write.swift"; sourceTree = "<group>"; };
 		E6DEC670291581F40076684B /* ReferenceID+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReferenceID+.swift"; sourceTree = "<group>"; };
+		E6E76D68296A0BB2009E745E /* SubmoduleID+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubmoduleID+Status.swift"; sourceTree = "<group>"; };
 		E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevwalkTests.swift; sourceTree = "<group>"; };
 		E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntry.swift; sourceTree = "<group>"; };
 		E6EAA4AE269F8B9800D86506 /* Repository+Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Repository+Discard.swift"; sourceTree = "<group>"; };
@@ -683,6 +685,7 @@
 				E66360DE27BF063D001292FB /* RepCore.swift */,
 				E6AA18F827AF815E002AFC33 /* GitModule.swift */,
 				E60B86C828E0FEA4001D6150 /* SubmoduleID.swift */,
+				E6E76D68296A0BB2009E745E /* SubmoduleID+Status.swift */,
 				E66360DA27BEEC1C001292FB /* RepoID.swift */,
 				E678EFF72916F6B300B7591C /* RepoID+HEAD.swift */,
 				E63EDF75265D255500A3D048 /* Repository+HEAD.swift */,
@@ -987,6 +990,7 @@
 				E6AF628D26938457007D0585 /* Repository+Sync.swift in Sources */,
 				E6DEC671291581F40076684B /* ReferenceID+.swift in Sources */,
 				E644ACD628C6984C00BF27A7 /* RebaseOptions.swift in Sources */,
+				E6E76D69296A0BB2009E745E /* SubmoduleID+Status.swift in Sources */,
 				E6169DF628149496001EB8A6 /* Git.Remotes.swift in Sources */,
 				E6AF6288269256CD007D0585 /* Repository+Graph.swift in Sources */,
 				E67F462A28AEE5EE0055BA99 /* Git.Stasher.swift in Sources */,
