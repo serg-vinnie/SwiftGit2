@@ -9,15 +9,15 @@ public extension SubmoduleID {
     }
     
     struct Cursor {
-        let list : OrderedDictionary<RepoID, Status>
-        let pending : [SubmoduleID]
+        public let list : OrderedDictionary<RepoID, Status>
+        public let pending : [SubmoduleID]
         
-        init(repoID: RepoID) {
+        public init(repoID: RepoID) {
             self.list = [repoID : .inited]
             self.pending = []
         }
         
-        init(list: OrderedDictionary<RepoID, Status>, pending: [SubmoduleID]) {
+        public init(list: OrderedDictionary<RepoID, Status>, pending: [SubmoduleID]) {
             self.list = list
             self.pending = pending
         }
