@@ -19,6 +19,10 @@ public class FetchOptions {
         let result = git_fetch_options_init(&fetch_options, UInt32(GIT_FETCH_OPTIONS_VERSION))
         assert(result == GIT_OK.rawValue)
     }
+    
+    public init(auth: Auth, _ block: @escaping TransferProgressCB) {
+        self.callbacks = RemoteCallbacks(auth: auth, transfer: block)
+    }
 
     public convenience init(auth: Auth) {
         self.init(callbacks: RemoteCallbacks(auth: auth))

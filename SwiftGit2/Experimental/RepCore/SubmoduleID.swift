@@ -5,11 +5,15 @@ import OrderedCollections
 import Parsing
 
 public struct SubmoduleID : Hashable {
-    let repoID : RepoID
-    let name: String
+    public let repoID : RepoID
+    public let name: String
     
-    var subRepoID : RepoID { RepoID(url: url) }
-    var url : URL { repoID.url.appendingPathComponent(name) }
+    public var subRepoID : RepoID { RepoID(url: url) }
+    
+    public var remoteURL : R<String> { submodule | { $0.url } }
+    
+    internal var url : URL { repoID.url.appendingPathComponent(name) }
+    internal var submodule : R<Submodule> { repoID.repo | { $0.submoduleLookup(named: self.name) } }
 }
 
 let gitdirFileParser = Parse {
@@ -38,11 +42,11 @@ public extension SubmoduleID {
         return combine(db, main, config).asVoid
     }
     
-    func update(auth: Auth) -> R<Void> {
-        update(options: SubmoduleUpdateOptions(fetch: FetchOptions(auth: auth)))
+    func update(auth: Auth, init: Bool) -> R<Void> {
+        update(options: SubmoduleUpdateOptions(fetch: FetchOptions(auth: auth)), init: `init`)
     }
     
-    func update(options: SubmoduleUpdateOptions) -> R<Void> {
+    func update(options: SubmoduleUpdateOptions, init: Bool) -> R<Void> {
         repoID.repo | {
             $0.submoduleLookup(named: name) | { $0.update(options: options, init: true) }
         }
@@ -58,9 +62,9 @@ public extension GitModule {
 public extension GitModule {
     func next(options: SubmoduleUpdateOptions) -> R<Progress> {
         if let submodule = firstUnInited {
-            return submodule.update(options: options) | { repoID.module } | { $0.progress }
+            return submodule.update(options: options, init: true) | { repoID.module } | { $0.progress }
         } else {
-            return                                        repoID.module   | { $0.progress }
+            return                                                    repoID.module   | { $0.progress }
         }
     }
     
