@@ -30,7 +30,12 @@ public extension Submodule {
         self.repo() | { $0.directoryURL }
     }
     /// Url to remote repo (https or ssh)
-    var url: String { String(cString: git_submodule_url(pointer)) }
+    var url: String? {
+        if let str = git_submodule_url(pointer) {
+            return String(cString: str)
+        }
+        return nil
+    }
 
     /// Get the OID for the submodule in the current working directory.
     var Oid: OID? {
@@ -124,19 +129,19 @@ public extension Duo where T1 == Submodule, T2 == Repository {
     //            .url -> "git@gitlab.com:sergiy.vynnychenko/AppCore.git"
     //
     // Resolve a submodule url relative to the given repository.
-    func resolveUrl() -> Result<String, Error> {
-        let (submodule, repo) = value
-
-        // let buf_ptr = UnsafeMutablePointer<git_buf>.allocate(capacity: 1)
-        var buf = git_buf(ptr: nil, asize: 0, size: 0)
-
-        return _result({ Buffer(buf: buf) }, pointOfFailure: "git_submodule_resolve_url") {
-            submodule.url.withCString { relativeUrl in
-                git_submodule_resolve_url(&buf, repo.pointer, relativeUrl)
-            }
-        }
-        .flatMap { $0.asString() }
-    }
+//    func resolveUrl() -> Result<String, Error> {
+//        let (submodule, repo) = value
+//
+//        // let buf_ptr = UnsafeMutablePointer<git_buf>.allocate(capacity: 1)
+//        var buf = git_buf(ptr: nil, asize: 0, size: 0)
+//
+//        return _result({ Buffer(buf: buf) }, pointOfFailure: "git_submodule_resolve_url") {
+//            submodule.url.withCString { relativeUrl in
+//                git_submodule_resolve_url(&buf, repo.pointer, relativeUrl)
+//            }
+//        }
+//        .flatMap { $0.asString() }
+//    }
 
     // TODO: Test Me
     /// Set the URL for the submodule in the configuration

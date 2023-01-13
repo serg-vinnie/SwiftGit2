@@ -17,6 +17,7 @@ public class SubmoduleUpdateOptions {
     public init(auth: Auth, block: @escaping TransferProgressCB) {
         self.fetch = FetchOptions(callbacks: RemoteCallbacks(auth: auth, transfer: block))
         self.checkout = CheckoutOptions()
+
         git_submodule_update_options_init(&options, UInt32(GIT_SUBMODULE_UPDATE_OPTIONS_VERSION))
     }
     
@@ -35,9 +36,9 @@ extension SubmoduleUpdateOptions {
     func with_git_submodule_update_options<T>(_ body: (inout git_submodule_update_options) -> T) -> T {
         fetch.with_git_fetch_options { fetch_options in
             checkout.with_git_checkout_options { checkout_options in
-            options.fetch_opts = fetch_options
-            options.checkout_opts = checkout_options
-            return body(&options)
+                options.fetch_opts = fetch_options
+                options.checkout_opts = checkout_options
+                return body(&options)
             }
         }
     }

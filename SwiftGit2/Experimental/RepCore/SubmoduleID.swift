@@ -10,10 +10,12 @@ public struct SubmoduleID : Hashable {
     
     public var subRepoID : RepoID { RepoID(url: url) }
     
-    public var remoteURL : R<String> { submodule | { $0.url } }
+    public var remoteURL : R<String> { repoID.repo
+        | { repo in repo.submoduleLookup(named: self.name) | { $0.url.asNonOptional("url") } }
+    }
     
     internal var url : URL { repoID.url.appendingPathComponent(name) }
-    internal var submodule : R<Submodule> { repoID.repo | { $0.submoduleLookup(named: self.name) } }
+    //internal var submodule : R<Submodule> {  }
 }
 
 let gitdirFileParser = Parse {
@@ -47,8 +49,8 @@ public extension SubmoduleID {
     }
     
     func update(options: SubmoduleUpdateOptions, init: Bool) -> R<Void> {
-        repoID.repo | {
-            $0.submoduleLookup(named: name) | { $0.update(options: options, init: true) }
+        repoID.repo | { repo in
+            repo.submoduleLookup(named: name) | { $0.update(options: options, init: `init`) }
         }
     }
 }

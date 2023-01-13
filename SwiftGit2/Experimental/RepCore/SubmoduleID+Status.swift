@@ -24,12 +24,20 @@ public extension SubmoduleID {
     }
 }
 
+fileprivate extension RepoID {
+    var allSubmoduleIDs : R<[SubmoduleID]> {
+        self.repo | { repo in
+            repo.submodules() | { $0.map { SubmoduleID(repoID: self, name: $0.name) } }
+        }
+    }
+}
+
 extension SubmoduleID.Cursor : ResultIterator {
     public func next() -> R<Self?> {
         guard list.count > 0 else { return .wtf("SubmoduleID.Cursor.list.count == 0")}
         if list.count == 1 && pending == [] {
             let repoID = list.keys[0]
-            return repoID.module | { $0.submoduleIDs } | { .init(list: self.list, pending: $0) }
+            return repoID.allSubmoduleIDs  | { .init(list: self.list, pending: $0) }
         }
         
         if pending.isEmpty {
@@ -42,7 +50,7 @@ extension SubmoduleID.Cursor : ResultIterator {
         pending.forEach { id in
             copy[id.subRepoID] = id.status
             
-            (id.subRepoID.module | { $0.submoduleIDs })
+            id.subRepoID.allSubmoduleIDs
                 .onSuccess {
                     _pending.append(contentsOf: $0)
                 }
