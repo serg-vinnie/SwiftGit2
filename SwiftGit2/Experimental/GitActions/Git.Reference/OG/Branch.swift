@@ -57,11 +57,10 @@ public extension Branch {
     }
 
     /// Can be used only on local branch
-    func upstream() -> Result<Branch, Error> {
-        var resolved: OpaquePointer?
-
-        return git_try("git_branch_upstream") { git_branch_upstream(&resolved, self.pointer) }
-            .flatMap { Reference(resolved!).asBranch() }
+    func upstream() -> Result<Reference, Error> {
+        git_instance(of: Reference.self, "git_branch_upstream") { pointer in
+            git_branch_upstream(&pointer, self.pointer)
+        }
     }
 
     /// can be called only for local branch;
