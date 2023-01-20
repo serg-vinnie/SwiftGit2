@@ -31,6 +31,11 @@ public extension RepoID {
     }
 }
 
+
+extension RepoID : Identifiable {
+    public var id: String { self.path }
+}
+
 extension RepoID : CustomStringConvertible {
     #if DEBUG
     public var description: String { "RepoID " + path.replace(of: "/Users/loki/dev", to: "􀋀").replace(of: "Carthage/Checkouts", to: "􀋀") }
