@@ -167,6 +167,16 @@ public extension Sequence {
         }
         return dic
     }
+    
+    func toOrderedDictionary<Key: Hashable, Value>(key: KeyPath<Element, Key?>, block: (Element)->(Value)) -> OrderedDictionary<Key,Value> {
+        var dic: OrderedDictionary<Key,Value> = [:]
+        for element in self {
+            if let _key = element[keyPath: key] {
+                dic[_key] = block(element)
+            }
+        }
+        return dic
+    }
 
 }
 

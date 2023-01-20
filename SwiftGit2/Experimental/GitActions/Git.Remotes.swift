@@ -53,12 +53,15 @@ public extension GitRemotes {
     }
     
     func fetch(name: String, options: @escaping (String)->FetchOptions) -> R<()> {
-        repoID.repo | { $0.remote(name: name)
-                    | { $0.fetch(options: options($0.url)) } }
+        let remote = repoID.repo | { $0.remote(name: name) }
+        let url = remote | { $0.url.asNonOptional("remote url") }
+        
+        return combine(remote, url)
+                    | { $0.fetch(options: options($1)) }
                     | { _ in () }
     }
     
-    var list        : R<GitRemotesList> { instances | { $0.toOrderedDictionary(key: \.name) { RemoteInfo(repoID: repoID, name: $0.name, url: $0.url) } } }
+    var list        : R<GitRemotesList> { instances | { $0.toOrderedDictionary(key: \.name) { $0.asRemoteInfo(repoID: repoID) } } }
     var names       : R<[String]>       { repoID.repo | { $0.remoteNameList() } }
     var count       : R<Int>            { names | { $0.count } }
     
@@ -66,9 +69,17 @@ public extension GitRemotes {
     var first       : R<Remote>         { repoID.repo | { $0.remoteList() } | { $0.first.asNonOptional }}
 }
 
+extension Remote {
+    func asRemoteInfo(repoID: RepoID) -> RemoteInfo {
+        RemoteInfo(repoID: repoID, name: self.name ?? "", url: self.url ?? "")
+    }
+}
+
 public extension GitRemotes {
     func fetchAll(options: @escaping (String)->FetchOptions) -> R<()> {
-        (repoID.repo | { $0.remoteList() | { $0 | { $0.fetch(options: options($0.url)) } } } )
+        (repoID.repo | { $0.remoteList() | { $0 | { r in
+            r.url.asNonOptional("remote url") | { r.fetch(options: options($0)) }
+        } } } )
             .map { _ in () }
     }
 }

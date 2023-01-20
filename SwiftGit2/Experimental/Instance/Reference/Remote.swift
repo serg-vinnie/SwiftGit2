@@ -24,8 +24,8 @@ public class Remote: InstanceProtocol {
 
 public extension Remote {
     /// The name of the remote repo
-    var name        : String    { String(validatingUTF8: git_remote_name(pointer))! }
-    var url         : String    { String(validatingUTF8: git_remote_url(pointer))! }
+    var name        : String?    { String(validatingUTF8: git_remote_name(pointer)) }
+    var url         : String?   { String(validatingUTF8: git_remote_url(pointer)) }
     var connected   : Bool      { git_remote_connected(pointer) == 1 }
     
     // tries different credentials sequentially: last item will be tried first
@@ -49,13 +49,14 @@ public extension Remote {
                     git_remote_connect(pointer, git_direction(UInt32(direction.rawValue)), &cb, &options, nil)
                 }
             }
-        }.map { (self.url, callbacks.recentCredentials) }
+        }.map { (self.url ?? "no url", callbacks.recentCredentials) }
     }
 }
 
 
 public extension Remote {
     var urlForBrowser: String {
+        guard let url = url else { return "" }
         if url.hasPrefix("git@") {
             return "https://" + url.replace(of: "git@", to: "").replace(of: ":", to: "/")
         }
