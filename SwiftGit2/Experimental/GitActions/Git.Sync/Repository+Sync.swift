@@ -18,11 +18,6 @@ public struct SyncOptions {
 
 public extension Repository {
     
-    func sync(msg: String, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
-        commit(message: msg, signature: options.pull.signature)
-            .flatMap { _ in sync(.firstRemote, .HEAD, options: options, stashing: stashing)}
-    }
-    
     func sync(_ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
         return upstreamExistsFor(.HEAD)
             .if(\.self, then: { _ in
