@@ -10,7 +10,7 @@ public final class GitRefCache {
     public private(set) var tags   : [ReferenceEx] = []
     
     public private(set) var HEAD   : ReferenceEx?
-    public              var HEAD_OID : OID? { HEAD?.referenceID.targetOID.maybeSuccess }
+    public              let HEAD_OID : OID?
     public private(set) var remotes: GitRemotesList = [:]
     public private(set) var remoteHEADs: [String:ReferenceEx?] = [:]
     
@@ -19,6 +19,13 @@ public final class GitRefCache {
     lazy var upstreams : OneOnOne = { local.upstreams() }()
     
     init(repoID: RepoID, list: [ReferenceID], remotes: GitRemotesList) {
+        let head = ReferenceID(repoID: repoID, name: "HEAD")
+        if let oid = head.targetOID.maybeSuccess {
+            HEAD_OID = oid
+        } else {
+            HEAD_OID = nil
+        }
+        
         self.repoID = repoID
         self.remotes = remotes
         self.local  = list.filter { $0.isBranch }.map  { ReferenceEx($0, cache: self) }//.sorted()
@@ -40,7 +47,7 @@ public final class GitRefCache {
             }
         }
         
-        let head = ReferenceID(repoID: repoID, name: "HEAD")
+        
         if let oid = head.targetOID.maybeSuccess {
             if oids.keys.contains(oid) {
                 oids[oid]?.insert(head)
