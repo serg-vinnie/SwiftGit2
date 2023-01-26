@@ -21,7 +21,7 @@ public extension Repository {
 
     func checkout(branch: Branch, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool) -> Result<Void, Error> {
         GitStasher(repo: self).wrap(skip: !stashing) {
-            setHEAD(branch)
+            setHEAD(branch.nameAsReference)
                 .flatMap { self.checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
         }
     }
@@ -42,7 +42,7 @@ public extension Repository {
     
     func checkout(reference: Reference, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String], stashing: Bool) -> Result<Reference, Error> {
         GitStasher(repo: self).wrap(skip: !stashing) {
-            setHEAD(reference)
+            setHEAD(reference.nameAsReference)
                 .flatMap { checkoutHead(strategy: strategy, progress: progress, pathspec: pathspec) }
                 .map { reference }
         }
@@ -59,9 +59,9 @@ public extension Repository {
         }
     }
 
-    func setHEAD(_ reference: Branch) -> Result<Void, Error> {
+    func setHEAD(_ reference: String) -> Result<Void, Error> {
         return _result((), pointOfFailure: "git_repository_set_head") {
-            return git_repository_set_head(self.pointer, reference.nameAsReference)
+            return git_repository_set_head(self.pointer, reference)
         }
     }
     
