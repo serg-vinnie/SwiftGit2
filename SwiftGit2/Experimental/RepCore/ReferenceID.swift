@@ -197,12 +197,13 @@ public extension Branch {
 
 
 public extension ReferenceID {
-    func checkout(strategy: CheckoutStrategy = .Force, progress: CheckoutProgressBlock? = nil, stashing: Bool = false)  -> Result<Void, Error>  {
+    func checkout(options: CheckoutOptions, stashing: Bool = false)  -> Result<Void, Error>  {
         repoID.repo
             .flatMap { repo in
-                repo
-                    .branchLookup(name: self.name)
-                    .flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress, stashing: stashing) }
+                repo.setHEAD(self.name) | { repo.checkoutHead(options: options) }
+                    
+                    //.branchLookup(name: self.name)
+                    //.flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress, stashing: stashing) }
             }
     }
 }

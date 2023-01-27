@@ -65,6 +65,20 @@ public extension Repository {
         }
     }
     
+    internal func checkoutHead(options: CheckoutOptions, stashing: Bool) -> Result<Void, Error> {
+        GitStasher(repo: self).wrap(skip: !stashing) {
+            self.checkoutHead(options: options)
+        }
+    }
+    
+    internal func checkoutHead(options: CheckoutOptions) -> Result<Void, Error> {
+        git_try("git_checkout_head") {
+            options.with_git_checkout_options {
+                git_checkout_head(self.pointer, &$0)
+            }
+        }
+    }
+    
     internal func checkoutHead(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String]) -> Result<Void, Error> {
         return git_try("git_checkout_head") {
             CheckoutOptions(strategy: strategy, pathspec: pathspec, progress: progress)
