@@ -64,7 +64,7 @@ public extension ExtendedStatus.HEAD {
 extension Repository {
     func extendedStatus(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
         if headIsUnborn {
-            return .success(ExtendedStatus(status: StatusIterator(nil), head: .isUnborn))
+            return statusConflictSafe(options: options) | { ExtendedStatus(status: $0, head: .isUnborn) }
         }
         
         if headIsDetached {
