@@ -140,16 +140,16 @@ public extension Repository {
         return .failure(WTF("pull: unexpected MergeAnalysis value: \(anal.rawValue)"))
     }
 
-    func mergeAnalysisUpstream(_ target: BranchTarget) -> Result<MergeAnalysis, Error> {
-        return target.branch(in: self)
+    func mergeAnalysisUpstream(_ target: BranchTarget) -> R<MergeAnalysis> {
+        target.branch(in: self)
             | { $0.upstream() }
             | { $0.targetOID }
             | { self.annotatedCommit(oid: $0) }
             | { self.mergeAnalysis(their_head: $0) }
     }
     
-    func mergeAnalysis(branch: Branch) -> Result<MergeAnalysis, Error> {
-        return branch.targetOID
+    func mergeAnalysis(branch: Branch) -> R<MergeAnalysis> {
+        branch.targetOID
             | { self.annotatedCommit(oid: $0) }
             | { self.mergeAnalysis(their_head: $0) }
     }
