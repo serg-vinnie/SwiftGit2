@@ -48,7 +48,7 @@ public final class GitRefCache {
         }
         
         
-        if let oid = head.targetOID.maybeSuccess {
+        if let oid = HEAD_OID {
             if oids.keys.contains(oid) {
                 oids[oid]?.insert(head)
             } else {
