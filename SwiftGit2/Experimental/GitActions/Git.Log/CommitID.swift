@@ -24,7 +24,7 @@ public struct CommitID : CustomStringConvertible, Hashable {
 }
 
 public extension CommitID {
-    func checkout(_ oid: OID, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool) -> R<DetachedHeadFix> {
+    func checkout(strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil, pathspec: [String] = [], stashing: Bool) -> R<DetachedHeadFix> {
         repoID.repo
         | { $0.checkout(oid, strategy: strategy, progress: progress, pathspec: pathspec, stashing: stashing) }
         | { $0.detachedHeadFix() }
