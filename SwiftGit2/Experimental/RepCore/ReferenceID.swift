@@ -197,14 +197,17 @@ public extension Branch {
 
 
 public extension ReferenceID {
-    func checkout(options: CheckoutOptions, stashing: Bool = false)  -> Result<Void, Error>  {
-        repoID.repo
-            .flatMap { repo in
+    func checkout(options: CheckoutOptions, stashing: Bool)  -> Result<Void, Error>  {
+        repoID.repo | { repo in
+            GitStasher(repo: repo).wrap(skip: !stashing) {
                 repo.setHEAD(self.name) | { repo.checkoutHead(options: options) }
-                    
-                    //.branchLookup(name: self.name)
-                    //.flatMap { branch in repo.checkout(branch: branch, strategy: strategy, progress: progress, stashing: stashing) }
             }
+        }
+    }
+    func checkout(options: CheckoutOptions)  -> Result<Void, Error>  {
+        repoID.repo | { repo in
+            repo.setHEAD(self.name) | { repo.checkoutHead(options: options) }
+        }
     }
 }
 

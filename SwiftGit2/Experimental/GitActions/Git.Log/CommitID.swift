@@ -29,4 +29,25 @@ public extension CommitID {
         | { $0.checkout(oid, strategy: strategy, progress: progress, pathspec: pathspec, stashing: stashing) }
         | { $0.detachedHeadFix() }
     }
+    
+    func checkout(_ oid: OID, options: CheckoutOptions, fixDetachedHead: Bool, stashing: Bool) -> R<Void> {
+        if fixDetachedHead {
+            return repoID.repo | { repo in
+                repo.checkout(oid, options: options, stashing: stashing) | { _ in repo.detachedHeadFix().asVoid }
+            }
+        } else {
+            return repoID.repo | { $0.checkout(oid, options: options, stashing: stashing) }
+        }
+    }
+}
+
+extension Repository {
+    internal func checkout(_ oid: OID, options: CheckoutOptions, stashing: Bool) -> R<Void> {
+        GitStasher(repo: self).wrap(skip: !stashing) {
+            checkout(oid, options: options)
+        }
+    }
+    internal func checkout(_ oid: OID, options: CheckoutOptions) -> R<Void> {
+        setHEAD_detached(oid) | { checkoutHead(options: options) }
+    }
 }
