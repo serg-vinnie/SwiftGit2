@@ -30,7 +30,7 @@ public extension CommitID {
         | { $0.detachedHeadFix() }
     }
     
-    func checkout(_ oid: OID, options: CheckoutOptions, fixDetachedHead: Bool, stashing: Bool) -> R<Void> {
+    func checkout(options: CheckoutOptions, fixDetachedHead: Bool, stashing: Bool) -> R<Void> {
         if fixDetachedHead {
             return repoID.repo | { repo in
                 repo.checkout(oid, options: options, stashing: stashing) | { _ in repo.detachedHeadFix().asVoid }
