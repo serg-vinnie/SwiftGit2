@@ -43,6 +43,8 @@ public extension URL {
 }
 
 public extension INI.File {
+    var parser : R<INI.Parser<String>> { self.url.readToString | { INI.Parser($0) } }
+    
     func removing(submodule: String) -> R<()> {
         url.updatingContent {
             INI.Parser($0).removing(submodule: submodule)
