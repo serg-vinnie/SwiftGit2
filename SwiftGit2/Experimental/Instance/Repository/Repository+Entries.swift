@@ -9,24 +9,24 @@
 import Foundation
 import Essentials
 
-extension Repository {
-   public func entries(target: CommitTarget, statusOptions: StatusOptions = StatusOptions(), findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<Entries> {
-       return self.statusConflictSafe(options: statusOptions)
-           .flatMap { status -> R<Entries> in
-               if status.isEmpty == false {
-                   return .success(.status(status))
-               }
-               
-               if self.headIsUnborn {
-                   return .success(.headIsUnborn)
-               }
-               
-               // self.headIsUnborn == false
-               return self.deltas(target: target, findOptions: findOptions)
-                  .map { .commit($0) } as R<Entries>
-            }
-        }
-}
+//extension Repository {
+//   private func entries(target: CommitTarget, statusOptions: StatusOptions = StatusOptions(), findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<Entries> {
+//       return self.statusConflictSafe(options: statusOptions)
+//           .flatMap { status -> R<Entries> in
+//               if status.isEmpty == false {
+//                   return .success(.status(status))
+//               }
+//               
+//               if self.headIsUnborn {
+//                   return .success(.headIsUnborn)
+//               }
+//               
+//               // self.headIsUnborn == false
+//               return self.deltas(target: target, findOptions: findOptions)
+//                  .map { .commit($0) } as R<Entries>
+//            }
+//        }
+//}
 
 extension Array where Element : Hashable {
     func asDictionary<Other>(other: Array<Other>) -> R<[Element:Other]> {

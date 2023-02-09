@@ -25,6 +25,7 @@ public struct CommitDeltas {
 }
 
 public extension Repository {
+    
     func deltas(target: CommitTarget, findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<CommitDeltas> {
         if headIsUnborn {
             return .success(.emtpy)
