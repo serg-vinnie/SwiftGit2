@@ -1,21 +1,37 @@
-//
-//  Diff+Delta.swift
-//  SwiftGit2-OSX
-//
-//  Created by Loki on 02.02.2020.
-//  Copyright © 2020 GitHub, Inc. All rights reserved.
-//
 
 import Clibgit2
 import Foundation
+import Essentials
 
 public extension Diff {
-    func asDeltasWithHunks() -> Result<[Delta], Error> {
+    func asDeltasWithHunks() -> R<[Delta]> {
         var cb = DiffEachCallbacks()
 
         return _result({ cb.deltas }, pointOfFailure: "git_diff_foreach") {
             git_diff_foreach(self.pointer, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
         }
+    }
+    
+    var numDeltas : Int { git_diff_num_deltas(self.pointer) }
+    
+    func asDeltas() -> [Delta] {
+        var deltas = [Delta]()
+        deltas.reserveCapacity(numDeltas)
+        
+        for i in 0..<numDeltas {
+            if let d = delta(idx: i) {
+                deltas.append(d)
+            }
+        }
+        
+        return deltas
+    }
+    
+    func delta(idx: Int) -> Diff.Delta? {
+        if let delta = git_diff_get_delta(self.pointer, idx).optional {
+            return Diff.Delta(delta.pointee)
+        }
+        return nil
     }
 }
 

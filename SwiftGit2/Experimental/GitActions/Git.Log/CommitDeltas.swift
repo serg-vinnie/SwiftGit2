@@ -50,7 +50,7 @@ public extension Repository {
         let deltas      = combine(commitTree, parentTrees) | { tree, parents in parents | {
             self.diffTreeToTree(oldTree: $0, newTree: tree)
                 | { $0.findSimilar(options: findOptions) }
-                | { $0.asDeltasWithHunks() } } }
+                | { $0.asDeltas() } } }
         
         return combine(parentOIDs, deltas, desc, commitID) | { commitDetails(commitID: $3, parents: $0, deltas: $1, desc: $2) }
     }
