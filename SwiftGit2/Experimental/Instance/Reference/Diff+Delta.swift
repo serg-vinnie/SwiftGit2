@@ -48,7 +48,7 @@ public extension Diff {
         /// DELETE ME.
         /// SOMETIMES THIS HUNKS IS EMPTY
         /// USE repo.hunksFrom(delta....)
-        public var hunks = [Hunk]()
+        internal var hunks = [Hunk]()
 
         public init(_ delta: git_diff_delta) {
             status = Diff.Delta.Status(rawValue: delta.status.rawValue) ?? .unmodified
