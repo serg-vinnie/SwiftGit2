@@ -41,15 +41,6 @@ extension StatusIterator: RandomAccessCollection {
     public func index(after i: Int) -> Int { return i + 1 }
 }
 
-public struct ExtendedStatus {
-    public enum HEAD {
-        case isUnborn
-        case reference(ReferenceID)
-        case dettached(CommitID)
-    }
-    public let status : StatusIterator
-    public let head: HEAD
-}
 
 public extension ExtendedStatus.HEAD {
     var headCommmit : R<CommitID> {
@@ -64,17 +55,17 @@ public extension ExtendedStatus.HEAD {
 extension Repository {
     func extendedStatus(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
         if headIsUnborn {
-            return statusConflictSafe(options: options) | { ExtendedStatus(status: $0, head: .isUnborn) }
+            return statusConflictSafe(options: options) | { ExtendedStatus(status: $0, head: .isUnborn, hunks: [:]) }
         }
         
         if headIsDetached {
             let headOID = HEAD().flatMap{ Duo($0, self).targetOID() }
             return combine(statusConflictSafe(options: options),self.repoID,headOID)
-                    | { ExtendedStatus(status: $0, head: .dettached(CommitID(repoID: $1, oid: $2))) }
+            | { ExtendedStatus(status: $0, head: .dettached(CommitID(repoID: $1, oid: $2)), hunks: [:]) }
         }
         
         let ref = self.repoID | { $0.HEAD } | { $0.asReference }
-        return combine(statusConflictSafe(options: options),ref) | { ExtendedStatus(status: $0, head: .reference($1)) }
+        return combine(statusConflictSafe(options: options),ref) | { ExtendedStatus(status: $0, head: .reference($1), hunks: [:]) }
     }
 }
 
