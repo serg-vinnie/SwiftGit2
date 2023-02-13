@@ -4,8 +4,8 @@ import Foundation
 import Essentials
 
 public extension Diff {
-    func asDeltasWithHunks() -> R<[Delta]> {
-        var cb = DiffEachCallbacks()
+    func asDeltasWithHunks(options: DiffOptions = DiffOptions()) -> R<[Delta]> {
+        var cb = options.callbacks
 
         return _result({ cb.deltas }, pointOfFailure: "git_diff_foreach") {
             git_diff_foreach(self.pointer, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
@@ -180,73 +180,3 @@ extension Diff.Hunk: Equatable {
     }
 }
 
-public typealias LineFilterCB = (Diff.Line) -> (Int32)
-
-class DiffEachCallbacks {
-    let lineFilterCB : LineFilterCB?
-    var deltas       = [Diff.Delta]()
-    
-    init() {
-        self.lineFilterCB = nil
-    }
-    
-    init(lineFilter: @escaping LineFilterCB) {
-        self.lineFilterCB = lineFilter
-    }
-    
-
-    let each_file_cb: git_diff_file_cb = { delta, progress, callbacks in
-        callbacks.unsafelyUnwrapped
-            .bindMemory(to: DiffEachCallbacks.self, capacity: 1)
-            .pointee
-            .file(delta: Diff.Delta(delta.unsafelyUnwrapped.pointee), progress: progress)
-
-        return 0
-    }
-
-    let each_line_cb: git_diff_line_cb = { _, _, line, callbacks in
-        let _line = Diff.Line(line.unsafelyUnwrapped.pointee)
-        let _cb = callbacks.unsafelyUnwrapped
-            .bindMemory(to: DiffEachCallbacks.self, capacity: 1)
-            .pointee
-
-        _cb.line(line: _line)
-
-        if let lineFilter = _cb.lineFilterCB {
-            return lineFilter(_line)
-        }
-        
-        return 0
-    }
-
-    let each_hunk_cb: git_diff_hunk_cb = { _, hunk, callbacks in
-        callbacks.unsafelyUnwrapped
-            .bindMemory(to: DiffEachCallbacks.self, capacity: 1)
-            .pointee
-            .hunk(hunk: Diff.Hunk(hunk.unsafelyUnwrapped.pointee))
-
-        return 0
-    }
-
-    private func file(delta: Diff.Delta, progress _: Float32) {
-        deltas.append(delta)
-    }
-
-    private func hunk(hunk: Diff.Hunk) {
-        guard let _ = deltas.last else { assert(false, "can't add hunk before adding delta"); return }
-
-        deltas[deltas.count - 1].hunks.append(hunk)
-    }
-
-    private func line(line: Diff.Line) {
-        guard let _ = deltas.last else { assert(false, "can't add line before adding delta"); return }
-        guard let _ = deltas.last?.hunks.last else { assert(false, "can't add line before adding hunk"); return }
-
-        print(line)
-        
-        let deltaIdx = deltas.count - 1
-        let hunkIdx = deltas[deltaIdx].hunks.count - 1
-
-        deltas[deltaIdx].hunks[hunkIdx].lines.append(line)
-    }
-}

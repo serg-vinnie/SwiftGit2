@@ -9,8 +9,9 @@ import Foundation
 import Clibgit2
 
 public struct StatusEntryHunks {
-    public let staged   : [Diff.Hunk] //dir
-    public let unstaged : [Diff.Hunk] //dir
+    public let staged       : [Diff.Hunk]
+    public let unstaged     : [Diff.Hunk]
+    public let incomplete   : Bool
 }
 
 extension StatusEntryHunks {
@@ -20,7 +21,7 @@ extension StatusEntryHunks {
     }
     
     public static func empty() -> StatusEntryHunks {
-        return StatusEntryHunks(staged: [], unstaged: [])
+        return StatusEntryHunks(staged: [], unstaged: [], incomplete: false)
     }
 }
 

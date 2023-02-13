@@ -19,7 +19,7 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         let (entry, repo) = self.value
         if entry.statuses.contains(.untracked) {
             return repo.hunkFrom(relPath: entry.stagePath)
-                .map { StatusEntryHunks(staged: [], unstaged: [$0]) }
+                .map { StatusEntryHunks(staged: [], unstaged: [$0], incomplete: false) }
         }
         
         let stagedHunks : R<[Diff.Hunk]>
@@ -30,19 +30,6 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
             stagedHunks = .success([])
         }
         
-// 1
-//        let sizeIsSmall = indexToWorkDirNewFileURL
-//            .map { $0.fileSize2() < 1024 * 500 } // 500 kb +-
-//
-//        let entryNotExistInIndex = repo.index().map{ $0.entry(relPath: entry.stagePath) == nil }
-//
-//        let temp = combine(sizeIsSmall, entryNotExistInIndex)
-//            .flatMap { sizeIsSmall, entryNotExistInIndex -> R<()> in
-//                if sizeIsSmall && entryNotExistInIndex {
-//                    return repo.index().flatMap{ $0.addBy(relPath: entry.stagePath) }.map { _ in () }
-//                }
-//                return .success(())
-//            }
         
         var unStagedHunks : R<[Diff.Hunk]>
         
@@ -55,7 +42,7 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         }
         
         return combine(stagedHunks, unStagedHunks)
-            .map{ StatusEntryHunks(staged: $0, unstaged: $1) }
+            .map{ StatusEntryHunks(staged: $0, unstaged: $1, incomplete: false) }
     }
 }
 
