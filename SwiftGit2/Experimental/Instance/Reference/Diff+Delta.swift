@@ -180,8 +180,20 @@ extension Diff.Hunk: Equatable {
     }
 }
 
+public typealias LineFilterCB = (Diff.Line) -> (Int32)
+
 class DiffEachCallbacks {
-    var deltas = [Diff.Delta]()
+    let lineFilterCB : LineFilterCB?
+    var deltas       = [Diff.Delta]()
+    
+    init() {
+        self.lineFilterCB = nil
+    }
+    
+    init(lineFilter: @escaping LineFilterCB) {
+        self.lineFilterCB = lineFilter
+    }
+    
 
     let each_file_cb: git_diff_file_cb = { delta, progress, callbacks in
         callbacks.unsafelyUnwrapped
@@ -193,11 +205,17 @@ class DiffEachCallbacks {
     }
 
     let each_line_cb: git_diff_line_cb = { _, _, line, callbacks in
-        callbacks.unsafelyUnwrapped
+        let _line = Diff.Line(line.unsafelyUnwrapped.pointee)
+        let _cb = callbacks.unsafelyUnwrapped
             .bindMemory(to: DiffEachCallbacks.self, capacity: 1)
             .pointee
-            .line(line: Diff.Line(line.unsafelyUnwrapped.pointee))
 
+        _cb.line(line: _line)
+
+        if let lineFilter = _cb.lineFilterCB {
+            return lineFilter(_line)
+        }
+        
         return 0
     }
 
@@ -224,6 +242,8 @@ class DiffEachCallbacks {
         guard let _ = deltas.last else { assert(false, "can't add line before adding delta"); return }
         guard let _ = deltas.last?.hunks.last else { assert(false, "can't add line before adding hunk"); return }
 
+        print(line)
+        
         let deltaIdx = deltas.count - 1
         let hunkIdx = deltas[deltaIdx].hunks.count - 1
 
