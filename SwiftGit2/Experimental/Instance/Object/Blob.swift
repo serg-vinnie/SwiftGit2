@@ -46,11 +46,20 @@ public extension Repository {
         }
     }
     
-    func hunksBetweenBlobs(old: Blob?, new: Blob?, options: DiffOptions = DiffOptions()) -> Result<[Diff.Hunk], Error> {
+    func hunksBetweenBlobs(old: Blob?, new: Blob?, options: DiffOptions = DiffOptions()) -> Result<HunksResult, Error> {
         var cb = options.callbacks
         
-        return _result({ cb.deltas.first?.hunks ?? [] }, pointOfFailure: "git_diff_blobs") {
+        return git_try("git_diff_blobs") {
             git_diff_blobs(old?.pointer, nil, new?.pointer, nil, &options.diff_options, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
-        }
+        }.map { HunksResult(hunks: cb.deltas.first?.hunks ?? [], incomplete: false) }
+            .flatMapError { error in
+                if error.isGit2(func: "git_diff_blobs", code: Int((GIT2_HUNK_LINE_LIMIT_REACHED))) {
+                    return .success(HunksResult(hunks: cb.deltas.first?.hunks ?? [], incomplete: true))
+                }
+                return .failure(error)
+            }
+//        return _result({ cb.deltas.first?.hunks ?? [] }, pointOfFailure: "git_diff_blobs") {
+//            git_diff_blobs(old?.pointer, nil, new?.pointer, nil, &options.diff_options, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
+//        }
     }
 }

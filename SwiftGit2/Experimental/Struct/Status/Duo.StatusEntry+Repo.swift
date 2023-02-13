@@ -25,7 +25,7 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         let stagedHunks : R<[Diff.Hunk]>
         
         if let staged = entry.stagedDeltas {
-            stagedHunks = repo.hunksFrom(delta: staged )
+            stagedHunks = repo.hunksFrom(delta: staged ) | { $0.hunks }
         } else {
             stagedHunks = .success([])
         }
@@ -36,7 +36,7 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         if let unStaged = entry.unStagedDeltas {
 // 1
 //            unStagedHunks = temp.flatMap{ repo.hunksFrom(delta: unStaged ) }
-            unStagedHunks = repo.hunksFrom(delta: unStaged )
+            unStagedHunks = repo.hunksFrom(delta: unStaged ) | { $0.hunks }
         } else {
             unStagedHunks = .success([])
         }

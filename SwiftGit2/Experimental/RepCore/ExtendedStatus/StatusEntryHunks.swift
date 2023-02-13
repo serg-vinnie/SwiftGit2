@@ -8,6 +8,11 @@
 import Foundation
 import Clibgit2
 
+public struct HunksResult {
+    public let hunks        : [Diff.Hunk]
+    public let incomplete   : Bool
+}
+
 public struct StatusEntryHunks {
     public let staged       : [Diff.Hunk]
     public let unstaged     : [Diff.Hunk]
