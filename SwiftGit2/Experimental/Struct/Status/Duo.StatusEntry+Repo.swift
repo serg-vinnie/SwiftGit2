@@ -18,8 +18,8 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
     func hunks(options: DiffOptions) -> R<StatusEntryHunks> {
         let (entry, repo) = self.value
         if entry.statuses.contains(.untracked) {
-            return repo.hunkFrom(relPath: entry.stagePath, options: options)
-                .map { StatusEntryHunks(staged: [], unstaged: [$0], incomplete: false) }
+            return repo.hunksFrom(relPath: entry.stagePath, options: options)
+                .map { StatusEntryHunks(staged: [], unstaged: $0.hunks, incomplete: false) }
         }
         
         let stagedHunks : R<[Diff.Hunk]>
