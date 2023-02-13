@@ -11,22 +11,22 @@ import Clibgit2
 public struct HunksResult {
     public let hunks        : [Diff.Hunk]
     public let incomplete   : Bool
+    static var empty : HunksResult { HunksResult(hunks: [], incomplete: false) }
 }
 
 public struct StatusEntryHunks {
-    public let staged       : [Diff.Hunk]
-    public let unstaged     : [Diff.Hunk]
-    public let incomplete   : Bool
+    public let staged       : HunksResult
+    public let unstaged     : HunksResult
 }
 
 extension StatusEntryHunks {
     var all : [Diff.Hunk] {
-        staged.appending(contentsOf: unstaged)
+        staged.hunks.appending(contentsOf: unstaged.hunks)
             .sorted{ $0.newStart < $1.newStart }
     }
     
     public static func empty() -> StatusEntryHunks {
-        return StatusEntryHunks(staged: [], unstaged: [], incomplete: false)
+        return StatusEntryHunks(staged: .empty, unstaged: .empty)
     }
 }
 

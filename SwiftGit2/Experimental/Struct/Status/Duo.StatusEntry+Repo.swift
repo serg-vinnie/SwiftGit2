@@ -19,30 +19,30 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         let (entry, repo) = self.value
         if entry.statuses.contains(.untracked) {
             return repo.hunksFrom(relPath: entry.stagePath, options: options)
-                .map { StatusEntryHunks(staged: [], unstaged: $0.hunks, incomplete: false) }
+                .map { StatusEntryHunks(staged: .empty, unstaged: $0) }
         }
         
-        let stagedHunks : R<[Diff.Hunk]>
+        let stagedHunks : R<HunksResult>
         
         if let staged = entry.stagedDeltas {
-            stagedHunks = repo.hunksFrom(delta: staged ) | { $0.hunks }
+            stagedHunks = repo.hunksFrom(delta: staged )
         } else {
-            stagedHunks = .success([])
+            stagedHunks = .success(.empty)
         }
         
         
-        var unStagedHunks : R<[Diff.Hunk]>
+        var unStagedHunks : R<HunksResult>
         
         if let unStaged = entry.unStagedDeltas {
 // 1
 //            unStagedHunks = temp.flatMap{ repo.hunksFrom(delta: unStaged ) }
-            unStagedHunks = repo.hunksFrom(delta: unStaged ) | { $0.hunks }
+            unStagedHunks = repo.hunksFrom(delta: unStaged )
         } else {
-            unStagedHunks = .success([])
+            unStagedHunks = .success(.empty)
         }
         
         return combine(stagedHunks, unStagedHunks)
-            .map{ StatusEntryHunks(staged: $0, unstaged: $1, incomplete: false) }
+            .map{ StatusEntryHunks(staged: $0, unstaged: $1) }
     }
 }
 
