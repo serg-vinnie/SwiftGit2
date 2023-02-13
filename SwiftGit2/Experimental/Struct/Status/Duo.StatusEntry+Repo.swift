@@ -15,10 +15,10 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         return combine(repo.directoryURL, path) | { $0.appendingPathComponent($1) }
     }
     
-    var hunks : R<StatusEntryHunks> {
+    func hunks(options: DiffOptions) -> R<StatusEntryHunks> {
         let (entry, repo) = self.value
         if entry.statuses.contains(.untracked) {
-            return repo.hunkFrom(relPath: entry.stagePath)
+            return repo.hunkFrom(relPath: entry.stagePath, options: options)
                 .map { StatusEntryHunks(staged: [], unstaged: [$0], incomplete: false) }
         }
         

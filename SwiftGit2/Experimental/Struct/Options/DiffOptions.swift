@@ -16,9 +16,9 @@ public class DiffOptions {
     
     var callbacks : DiffEachCallbacks { DiffEachCallbacks(linesPerHunkLimit: linesPerHunkLimit) }
 
-    public init(pathspec: [String] = [], linesMax: Int = -1) {
+    public init(pathspec: [String] = [], linesPerHunkLimit: Int = -1) {
         self.pathspec = pathspec
-        self.linesPerHunkLimit = linesMax
+        self.linesPerHunkLimit = linesPerHunkLimit
         
         let result = git_diff_options_init(&diff_options, UInt32(GIT_DIFF_OPTIONS_VERSION))
         assert(result == GIT_OK.rawValue)
@@ -88,15 +88,25 @@ class DiffEachCallbacks {
         deltas[deltas.count - 1].hunks.append(hunk)
     }
 
-    private func line(line: Diff.Line) {
-        guard let _ = deltas.last else { assert(false, "can't add line before adding delta"); return }
-        guard let _ = deltas.last?.hunks.last else { assert(false, "can't add line before adding hunk"); return }
+    private func line(line: Diff.Line) -> Int32 {
+        guard let _ = deltas.last else { assert(false, "can't add line before adding delta"); return -1}
+        guard let _ = deltas.last?.hunks.last else { assert(false, "can't add line before adding hunk"); return -1}
 
         print(line)
         
         let deltaIdx = deltas.count - 1
         let hunkIdx = deltas[deltaIdx].hunks.count - 1
-
+        
+        if self.linesPerHunkLimit > 0 {
+            if self.linesPerHunkLimit >= deltas[deltaIdx].hunks[hunkIdx].lines.count {
+                return GIT2_HUNK_LINE_LIMIT_REACHED
+            }
+        }
+        
         deltas[deltaIdx].hunks[hunkIdx].lines.append(line)
+        
+        return 0
     }
 }
+
+let GIT2_HUNK_LINE_LIMIT_REACHED : Int32 = 10000420

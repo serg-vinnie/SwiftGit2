@@ -61,12 +61,12 @@ public extension Repository {
 }
 
 public extension Repository {
-    func hunkFrom(relPath: String) -> R<Diff.Hunk> {
+    func hunkFrom(relPath: String, options: DiffOptions) -> R<Diff.Hunk> {
         self.directoryURL
             .map{ $0.appendingPathComponent(relPath).path }
             .flatMap { self.blobCreateFromDisk(path: $0 )}
             .flatMap { self.blob(oid: $0) }
-            .flatMap { self.diffBlobs(old: nil, new: $0) }
+            .flatMap { self.diffBlobs(old: nil, new: $0, options: options) }
             .flatMap { $0.first.asNonOptional }
             .flatMap { $0.hunks.first.asNonOptional }
     }
