@@ -66,6 +66,6 @@ public extension Repository {
             .map{ $0.appendingPathComponent(relPath).path }
             .flatMap { self.blobCreateFromDisk(path: $0 )}
             .flatMap { self.blob(oid: $0) }
-            .flatMap { self.hunksBetweenBlobs(old: nil, new: $0) }
+            .flatMap { self.hunksBetweenBlobs(old: nil, new: $0, options: options) }
     }
 }

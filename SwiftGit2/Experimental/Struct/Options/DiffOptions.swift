@@ -62,11 +62,8 @@ class DiffEachCallbacks {
         let _cb = callbacks.unsafelyUnwrapped
             .bindMemory(to: DiffEachCallbacks.self, capacity: 1)
             .pointee
-
-        _cb.line(line: _line)
-
         
-        return 0
+        return _cb.line(line: _line)
     }
 
     let each_hunk_cb: git_diff_hunk_cb = { _, hunk, callbacks in
@@ -91,14 +88,12 @@ class DiffEachCallbacks {
     private func line(line: Diff.Line) -> Int32 {
         guard let _ = deltas.last else { assert(false, "can't add line before adding delta"); return -1}
         guard let _ = deltas.last?.hunks.last else { assert(false, "can't add line before adding hunk"); return -1}
-
-        print(line)
         
         let deltaIdx = deltas.count - 1
         let hunkIdx = deltas[deltaIdx].hunks.count - 1
         
         if self.linesPerHunkLimit > 0 {
-            if self.linesPerHunkLimit >= deltas[deltaIdx].hunks[hunkIdx].lines.count {
+            if  deltas[deltaIdx].hunks[hunkIdx].lines.count >=  self.linesPerHunkLimit {
                 return GIT2_HUNK_LINE_LIMIT_REACHED
             }
         }
@@ -109,4 +104,4 @@ class DiffEachCallbacks {
     }
 }
 
-let GIT2_HUNK_LINE_LIMIT_REACHED : Int32 = 10000420
+let GIT2_HUNK_LINE_LIMIT_REACHED : Int32 = -10000420
