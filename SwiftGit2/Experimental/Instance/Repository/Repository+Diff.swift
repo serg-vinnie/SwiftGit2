@@ -11,9 +11,9 @@ import Essentials
 import Dispatch
 
 public extension Repository {
-    func hunksFrom(delta: Diff.Delta, options: DiffOptions = DiffOptions()) -> Result<HunksResult, Error> {
+    func hunksFrom(delta: Diff.Delta, new: Blob? = nil, options: DiffOptions = DiffOptions()) -> Result<HunksResult, Error> {
         let old = delta.oldFile != nil ? (try? blob(oid: delta.oldFile!.oid).get()) : nil
-        let new = delta.newFile != nil ? (try? blob(oid: delta.newFile!.oid).get()) : nil
+        let new = new ?? (delta.newFile != nil ? (try? blob(oid: delta.newFile!.oid).get()) : nil)
         
         return hunksBetweenBlobs(old: old, new: new, options: options)
     }

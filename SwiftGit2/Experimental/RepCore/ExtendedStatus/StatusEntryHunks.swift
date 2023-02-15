@@ -11,16 +11,20 @@ import Clibgit2
 public struct HunksResult {
     public let hunks        : [Diff.Hunk]
     public let incomplete   : Bool
-    static var empty : HunksResult { HunksResult(hunks: [], incomplete: false) }
+    public let IsBinary       : Bool
+    static var empty : HunksResult { HunksResult(hunks: [], incomplete: false, IsBinary: false) }
+    static var binary : HunksResult { HunksResult(hunks: [], incomplete: false, IsBinary: true)}
 }
 
 public struct StatusEntryHunks {
     public let staged       : HunksResult
     public let unstaged     : HunksResult
+    
+    public var isBinary : Bool { staged.IsBinary || unstaged.IsBinary }
 }
 
 extension StatusEntryHunks {
-    var all : [Diff.Hunk] {
+    public var all : [Diff.Hunk] {
         staged.hunks.appending(contentsOf: unstaged.hunks)
             .sorted{ $0.newStart < $1.newStart }
     }

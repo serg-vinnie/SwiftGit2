@@ -22,6 +22,8 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
                 .map { StatusEntryHunks(staged: .empty, unstaged: $0) }
         }
         
+        
+        
         let stagedHunks : R<HunksResult>
         
         if let staged = entry.stagedDeltas {
@@ -34,15 +36,24 @@ public extension Duo where T1 == StatusEntry, T2 == Repository {
         var unStagedHunks : R<HunksResult>
         
         if let unStaged = entry.unStagedDeltas {
+            
+            let wdBlob = repo.directoryPath | { repo.blobCreateFromDisk(path: $0.appending(entry.stagePath) ) } | { repo.blob(oid: $0) }
 // 1
 //            unStagedHunks = temp.flatMap{ repo.hunksFrom(delta: unStaged ) }
-            unStagedHunks = repo.hunksFrom(delta: unStaged, options: options )
+            unStagedHunks = wdBlob | { repo.hunksFrom(delta: unStaged, new: $0, options: options ) }
         } else {
             unStagedHunks = .success(.empty)
         }
         
         return combine(stagedHunks, unStagedHunks)
             .map{ StatusEntryHunks(staged: $0, unstaged: $1) }
+            .flatMapError { error in
+                if error.isGit2(func: "git_blob_create_from_disk", code: -23) { //isDirectory
+                    return .success(.empty())
+                }
+                
+                return .failure(error)
+            }
     }
 }
 

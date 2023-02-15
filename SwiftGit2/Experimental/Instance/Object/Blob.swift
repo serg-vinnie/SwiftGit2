@@ -49,12 +49,24 @@ public extension Repository {
     func hunksBetweenBlobs(old: Blob?, new: Blob?, options: DiffOptions = DiffOptions()) -> Result<HunksResult, Error> {
         var cb = options.callbacks
         
+        if let old = old {
+            if old.isBinary {
+                return .success(.binary)
+            }
+        }
+        
+        if let new = new {
+            if new.isBinary {
+                return .success(.binary)
+            }
+        }
+        
         return git_try("git_diff_blobs") {
             git_diff_blobs(old?.pointer, nil, new?.pointer, nil, &options.diff_options, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
-        }.map { HunksResult(hunks: cb.deltas.first?.hunks ?? [], incomplete: false) }
+        }.map { HunksResult(hunks: cb.deltas.first?.hunks ?? [], incomplete: false, IsBinary: false) }
             .flatMapError { error in
                 if error.isGit2(func: "git_diff_blobs", code: Int((GIT2_HUNK_LINE_LIMIT_REACHED))) {
-                    return .success(HunksResult(hunks: cb.deltas.first?.hunks ?? [], incomplete: true))
+                    return .success(HunksResult(hunks: cb.deltas.first?.hunks ?? [], incomplete: true, IsBinary: false))
                 }
                 return .failure(error)
             }
