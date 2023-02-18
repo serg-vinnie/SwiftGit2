@@ -9,6 +9,15 @@ public class CacheStorage<Agent: CacheStorageAgent> {
     
     public init() {}
     
+    public func remove(root: Agent) {
+        guard let tree = flatTrees[root] else { return }
+        flatTrees[root] = nil
+        for item in tree {
+            self.items[item] = nil
+        }
+        roots[root] = nil
+    }
+    
     @discardableResult
     public func update(root: Agent) -> Update {
         if !roots.keys.contains(root) {
