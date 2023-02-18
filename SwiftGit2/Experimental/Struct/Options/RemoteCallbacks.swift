@@ -8,6 +8,7 @@
 
 import Clibgit2
 import Foundation
+import Essentials
 
 public typealias TransferProgressCB = (git_indexer_progress) -> (Bool) // return false to cancel progree
 
@@ -51,6 +52,8 @@ public class RemoteCallbacks: GitPayload {
     #endif
 }
 
+let connectionLocking = UnfairLock()
+
 extension RemoteCallbacks {
     func with_git_remote_callbacks<T>(_ body: (inout git_remote_callbacks) -> T) -> T {
         remote_callbacks.payload = toRetainedPointer()
@@ -62,7 +65,9 @@ extension RemoteCallbacks {
             RemoteCallbacks.release(pointer: remote_callbacks.payload)
         }
 
-        return body(&remote_callbacks)
+        return connectionLocking.locked {
+            body(&remote_callbacks)
+        }
     }
 }
 
