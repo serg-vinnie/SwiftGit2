@@ -19,6 +19,8 @@ public class RemoteCallbacks: GitPayload {
     var recentCredentials = Credentials.default
     private var remote_callbacks = git_remote_callbacks()
     public var transferProgress: TransferProgressCB?
+    public var onStart : ()->() = { }
+    public var onStop  : ()->() = { }
 
     public init(auth: Auth, transfer: TransferProgressCB? = nil) {
         self.transferProgress = transfer
@@ -61,7 +63,9 @@ extension RemoteCallbacks {
         remote_callbacks.credentials = credentialsCallback
         remote_callbacks.transfer_progress = transferCallback
 
+        onStart()
         defer {
+            onStop()
             RemoteCallbacks.release(pointer: remote_callbacks.payload)
         }
 
