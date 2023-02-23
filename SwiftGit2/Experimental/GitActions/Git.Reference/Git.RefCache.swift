@@ -32,6 +32,10 @@ public final class GitRefCache {
     
     lazy var upstreams : OneOnOne = { local.upstreams() }()
     
+    public func update(refs: Refs) {
+        self.refs = refs
+    }
+    
     init(repoID: RepoID, list: [ReferenceID], remotes: GitRemotesList) {
         let head = ReferenceID(repoID: repoID, name: "HEAD")
         if let oid = head.targetOID.maybeSuccess {
