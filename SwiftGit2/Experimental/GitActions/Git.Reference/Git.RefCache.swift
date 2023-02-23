@@ -3,11 +3,25 @@ import Foundation
 import Essentials
 import SwiftUI
 
+public struct Refs {
+    public let local  : [ReferenceEx]
+    public let remote : [String:[ReferenceEx]]
+    public let tags   : [ReferenceEx]
+    
+    public init(local: [ReferenceEx], remote: [String : [ReferenceEx]], tags: [ReferenceEx]) {
+        self.local = local
+        self.remote = remote
+        self.tags = tags
+    }
+}
+
 public final class GitRefCache {
     public let repoID : RepoID
-    public private(set) var local  : [ReferenceEx] = []
-    public private(set) var remote : [String:[ReferenceEx]] = [:]
-    public private(set) var tags   : [ReferenceEx] = []
+    public var local  : [ReferenceEx]          { refs.local }
+    public var remote : [String:[ReferenceEx]] { refs.remote }
+    public var tags   : [ReferenceEx]          { refs.tags }
+    
+    public private(set) var refs : Refs = Refs(local: [], remote: [:], tags: [])
     
     public private(set) var HEAD   : ReferenceEx?
     public              let HEAD_OID : OID?
@@ -28,11 +42,12 @@ public final class GitRefCache {
         
         self.repoID = repoID
         self.remotes = remotes
-        self.local  = list.filter { $0.isBranch }.map  { ReferenceEx($0, cache: self) }//.sorted()
+        let _local  = list.filter { $0.isBranch }.map  { ReferenceEx($0, cache: self) }//.sorted()
         let list_remotes    = list.filter { $0.isRemote }
-        self.remote         = list_remotes.asRemotesDic(cache: self)
+        let _remote         = list_remotes.asRemotesDic(cache: self)
         self.remoteHEADs    = list_remotes.asRemoteHEADsDic(cache: self)
-        self.tags   = list.filter { $0.isTag    }.map   { ReferenceEx($0, cache: self) }//.sorted()
+        let _tags   = list.filter { $0.isTag    }.map   { ReferenceEx($0, cache: self) }//.sorted()
+        self.refs = Refs(local: _local, remote: _remote, tags: _tags)
         self.HEAD   = (repoID.repo | { $0.HEAD() }
                                    | { ReferenceEx(ReferenceID(repoID: repoID, name: $0.nameAsReference), cache: self) }
                        ).maybeSuccess
