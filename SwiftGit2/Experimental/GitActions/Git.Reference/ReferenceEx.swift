@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public struct ReferenceEx : Identifiable, Equatable, Comparable {
+public struct ReferenceEx : Identifiable, Equatable {
     public var id: String { referenceID.id }
     
     public let referenceID: ReferenceID
@@ -13,12 +13,6 @@ public struct ReferenceEx : Identifiable, Equatable, Comparable {
         self.cache  = cache
     }
     
-    public static func < (lhs: ReferenceEx, rhs: ReferenceEx) -> Bool {
-        guard let l = lhs.commitID?.basicInfoCache,
-              let r = rhs.commitID?.basicInfoCache else { return false }
-        
-        return l.time > r.time
-    }
 }
 
 public extension ReferenceEx {
@@ -109,52 +103,3 @@ struct OneOnOne {
 
 //--------------
 
-let cacheLock = UnfairLock()
-var commitInfo = [RepoID:[OID:GitCommitBasicInfo]]()
-internal extension CommitID {
-    func saveCache(info: GitCommitBasicInfo) {
-        cacheLock.locked {
-            if !commitInfo.keys.contains(repoID) {
-                commitInfo[repoID] = [OID:GitCommitBasicInfo]()
-                commitInfo[repoID]?.reserveCapacity(1000)
-            }
-            
-            if let info = self.basicInfo.maybeSuccess {
-                commitInfo[repoID]?[oid] = info
-            }
-        }
-    }
-}
-
-
-public extension CommitID {
-    var basicInfoCache : GitCommitBasicInfo? {
-        if let info = commitInfo[repoID]?[oid] {
-            return info
-        }
-        if let info = self.basicInfo.maybeSuccess {
-            saveCache(info: info)
-            return info
-        }
-        return nil
-    }
-}
-
-final class UnfairLock {
-    private var _lock: UnsafeMutablePointer<os_unfair_lock>
-
-    init() {
-        _lock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
-        _lock.initialize(to: os_unfair_lock())
-    }
-
-    deinit {
-        _lock.deallocate()
-    }
-
-    func locked<ReturnValue>(_ f: () throws -> ReturnValue) rethrows -> ReturnValue {
-        os_unfair_lock_lock(_lock)
-        defer { os_unfair_lock_unlock(_lock) }
-        return try f()
-    }
-}
