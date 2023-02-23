@@ -19,14 +19,17 @@ public struct ExtendedStatus {
         case dettached(CommitID)
     }
     public let status : StatusIterator
+    public let isConflicted : Bool
     public let head: HEAD
     public let hunks: [Int:StatusEntryHunks]
+    
+    public static var empty : ExtendedStatus { ExtendedStatus(status: StatusIterator(nil), isConflicted: false, head: .isUnborn, hunks: [:]) }
 }
 
 public extension ExtendedStatus {
     func appending(hunks: StatusEntryHunks, at idx: Int) -> ExtendedStatus {
         var newHunks = self.hunks
         newHunks[idx] = hunks
-        return ExtendedStatus(status: status, head: head, hunks: newHunks)
+        return ExtendedStatus(status: status, isConflicted: isConflicted, head: head, hunks: newHunks)
     }
 }
