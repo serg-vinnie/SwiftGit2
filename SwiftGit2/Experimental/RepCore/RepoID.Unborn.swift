@@ -28,11 +28,14 @@ public extension Unborn {
     }
     
     func clone(from remoteURL: String, options: CloneOptions) -> R<Repository> {
-        git_instance(of: Repository.self, "git_clone") { pointer in
+        print("clone started")
+        let t = git_instance(of: Repository.self, "git_clone") { pointer in
             options.with_git_clone_options { clone_options in
                 git_clone(&pointer, remoteURL, repoID.path, &clone_options)
             }
         }
+        print("clone ended")
+        return t
     }
     
     func clone(from remoteURL: URL, options: CloneOptions) -> R<Repository> {

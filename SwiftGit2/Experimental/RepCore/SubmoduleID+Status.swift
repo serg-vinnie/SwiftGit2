@@ -37,7 +37,12 @@ extension SubmoduleID.Cursor : ResultIterator {
         guard list.count > 0 else { return .wtf("SubmoduleID.Cursor.list.count == 0")}
         if list.count == 1 && pending == [] {
             let repoID = list.keys[0]
-            return repoID.allSubmoduleIDs  | { .init(list: self.list, pending: $0) }
+            return repoID.allSubmoduleIDs  | {
+                if $0.isEmpty {
+                    return nil
+                }
+                return .init(list: self.list, pending: $0)
+            }
         }
         
         if pending.isEmpty {
