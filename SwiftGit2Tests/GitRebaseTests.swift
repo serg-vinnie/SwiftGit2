@@ -26,7 +26,7 @@ class GitRebaseTests: XCTestCase {
         let main = (repoID.HEAD | { $0.asReference })
             .shouldSucceed()!
         
-        branch.checkout()
+        branch.checkout(options: CheckoutOptions())
             .shouldSucceed()
         
         GitRebase(repoID).head(from: main, sigature: .test)
@@ -54,7 +54,7 @@ class GitRebaseTests: XCTestCase {
         let main = (repoID.HEAD | { $0.asReference })
             .shouldSucceed()!
         
-        branch.checkout()
+        branch.checkout(options: CheckoutOptions())
             .shouldSucceed()
         
         // commit into branch | FileB
@@ -86,7 +86,7 @@ class GitRebaseTests: XCTestCase {
         let main = (repoID.HEAD | { $0.asReference })
             .shouldSucceed()!
         
-        branch.checkout()
+        branch.checkout(options: CheckoutOptions())
             .shouldSucceed()
         
         // commit into branch | FileA

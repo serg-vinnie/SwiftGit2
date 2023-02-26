@@ -29,7 +29,7 @@ class ReferenceTests: XCTestCase {
         let refID = ReferenceID(repoID: repoID, name: "refs/heads/branch")
 
         
-        refID.checkout(stashing: false)
+        refID.checkout(options: CheckoutOptions(), stashing: false)
             .shouldSucceed()
         
         (repoID.HEAD | { $0.asReference } | { $0.name })
@@ -38,7 +38,7 @@ class ReferenceTests: XCTestCase {
 
         let mainID = ReferenceID(repoID: repoID, name: "refs/heads/main")
         
-        mainID.checkout(stashing: false)
+        mainID.checkout(options: CheckoutOptions(), stashing: false)
             .shouldSucceed()
         
         (repoID.HEAD | { $0.asReference } | { $0.name })

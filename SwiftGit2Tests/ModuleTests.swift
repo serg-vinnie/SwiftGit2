@@ -54,6 +54,28 @@ class ModuleTests: XCTestCase {
             .assertEqual(to: [])
     }
     
+    func test_ini_gitconfig() {
+        GitConfigDefault().entries
+            .onSuccess {
+                for item in $0 {
+                    print(item.name, item.value)
+                }
+                
+            }
+//        let url = URL.userHome.appendingPathComponent(".gitconfig")
+//        (INI.File(url: url).parser | { $0.sections } | { $0 | { $0.parse } })
+//            .onSuccess {
+//                for item in $0 {
+//                    print(item)
+//                }
+//                print("bla")
+//            }
+//            .onFailure { error in
+//                print(error)
+//            }
+        //GitConfig(<#T##repoID: RepoID##RepoID#>)
+    }
+    
     func test_ini_parser() {
         let core = """
             [core]

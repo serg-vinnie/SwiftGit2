@@ -53,6 +53,27 @@ public extension INI.File {
 }
 
 public extension INI.Section {
+    var title : R<String> {
+        do {
+            let b = try titleParser.parse(text)
+            return .success(String(b))
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    var parse : R<[Substring]> {
+        do {
+            let b = try sectionParser.parse(text)
+            return .success(b)
+        } catch {
+            return .failure(error)
+        }
+        
+    }
+    
+    //func body :
+    
     var asSubmodule : R<INI.Submodule> {
         do {
             let (name,body) = try submoduleParser.parse(text)
@@ -108,6 +129,28 @@ extension INI.Submodule : CustomStringConvertible {
     public var description: String { String(text) }
 }
 
+var sectionParser = Parse {
+    Skip {
+        Prefix { $0 != "\n" }
+    }
+    Many {
+        Whitespace(.all)
+        Prefix { $0 != "\n" }
+    } separator: {
+      "\n"
+    }
+    
+}
+
+
+var titleParser = Parse {
+    "["
+    Prefix { $0 != "]" }
+    Skip {
+        Rest()
+    }
+}
+
 var submoduleParser = Parse {
     StartsWith("[submodule")
     Whitespace(.all)
@@ -119,8 +162,6 @@ var submoduleParser = Parse {
     "]"
     Rest()
 }
-
-
 
 var sectionsParser = Many {
     Parse {

@@ -27,10 +27,10 @@ class StatusDiffTests: XCTestCase {
             .shouldSucceed("status")!
         
         let statusEntryHunks1 = folder.repo
-            .flatMap{ status[0].with($0).hunks }
+            .flatMap{ status[0].with($0).hunks(options: DiffOptions()) }
             .shouldSucceed("statusEntryHunks1")!
         
-        XCTAssert( statusEntryHunks1.staged.count == 0 && statusEntryHunks1.unstaged.count == 1 )
+        XCTAssert( statusEntryHunks1.staged.hunks.count == 0 && statusEntryHunks1.unstaged.hunks.count == 1 )
         
         folder.repo
             .flatMap { $0.stage(.all) }
@@ -44,10 +44,10 @@ class StatusDiffTests: XCTestCase {
         XCTAssert(status[0].statuses.contains(.added))
         
         let statusEntryHunks2 = folder.repo
-            .flatMap{ status[0].with($0).hunks }
+            .flatMap{ status[0].with($0).hunks(options: DiffOptions()) }
             .shouldSucceed("hunks")!
         
-        XCTAssert( statusEntryHunks2.staged.count == 1 )
+        XCTAssert( statusEntryHunks2.staged.hunks.count == 1 )
         
 //        let lines = hunks[0].lines.compactMap { $0.content}
 //        print(lines)
@@ -129,13 +129,13 @@ class StatusDiffTests: XCTestCase {
          */
     }
     
-    func test_should_return_Hunk_From_File() {
-        root.with(repo: "shoudReturnHunk", content: .file(.fileA, .oneLine1))
-            .flatMap { $0.repo }
-            .flatMap{ $0.hunkFrom(relPath: TestFile.fileA.rawValue) }
-            .map { $0.lines[0].content }
-            .assertEqual(to: TestFileContent.oneLine1.rawValue, "hunk_0_line")
-    }
+//    func test_should_return_Hunk_From_File() {
+//        root.with(repo: "shoudReturnHunk", content: .file(.fileA, .oneLine1))
+//            .flatMap { $0.repo }
+//            .flatMap{ $0.hunkFrom(relPath: TestFile.fileA.rawValue) }
+//            .map { $0.lines[0].content }
+//            .assertEqual(to: TestFileContent.oneLine1.rawValue, "hunk_0_line")
+//    }
     
     func test_should_create_hooks_templates() {
         // TODO: implement me

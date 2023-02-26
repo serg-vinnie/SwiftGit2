@@ -3,6 +3,18 @@ import Foundation
 import Clibgit2
 import Essentials
 
+public struct GitConfigDefault {
+    public var entries : R<[ConfigEntry]> {
+        config | { config in config.iterator | { $0.entries } } 
+    }
+    
+    var config : R<Config> {
+        git_instance(of: Config.self, "git_config_open_default") { pointer in
+            git_config_open_default(&pointer)
+        }
+    }
+}
+
 public struct GitConfig {
     let repoID : RepoID
     
