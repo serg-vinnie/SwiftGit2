@@ -4,8 +4,14 @@ import Clibgit2
 import Essentials
 
 public struct GitConfigDefault {
+    public init() { }
+    
     public var entries : R<[ConfigEntry]> {
-        config | { config in config.iterator | { $0.entries } } 
+        config | { config in config.iterator | { $0.entries } }
+    }
+    
+    public func entry(name: String) -> R<ConfigEntry> {
+        entries | { $0.first { $0.name == name }.asNonOptional }
     }
     
     var config : R<Config> {
