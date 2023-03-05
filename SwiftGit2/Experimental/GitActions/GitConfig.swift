@@ -6,12 +6,22 @@ import Essentials
 public struct GitConfigDefault {
     public init() { }
     
+    public static var url : URL { URL.userHome.appendingPathComponent(".gitconfig") }
+    
     public var entries : R<[ConfigEntry]> {
         config | { config in config.iterator | { $0.entries } }
     }
     
     public func entry(name: String) -> R<ConfigEntry> {
         entries | { $0.first { $0.name == name }.asNonOptional }
+    }
+    
+    public func exist(name: String) -> R<Bool> {
+        entries | { $0.first { $0.name == name } != nil }
+    }
+    
+    public func set(name: String, value: String) -> R<Void> {
+        config | { $0.set(name: name, value: value) }
     }
     
     var config : R<Config> {
@@ -59,6 +69,20 @@ extension Config {
         git_try("git_config_delete_entry") {
             git_config_delete_entry(self.pointer, name)
         }
+    }
+    
+    func set(name: String, value: String) -> R<Void> {
+        git_try("git_config_set_string") {
+            git_config_set_string(self.pointer, name, value)
+        }
+    }
+    
+    func getPath(name: String) -> R<String> {
+        var buf = git_buf(ptr: nil, asize: 0, size: 0)
+        
+        return git_try("git_config_get_path") {
+            git_config_get_path(&buf, self.pointer, name)
+        } | { Buffer(buf: buf).asString() }
     }
 }
 
