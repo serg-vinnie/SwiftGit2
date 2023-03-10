@@ -63,6 +63,7 @@ public extension GitRemotes {
     
     var list        : R<GitRemotesList> { instances | { $0.toOrderedDictionary(key: \.name) { $0.asRemoteInfo(repoID: repoID) } } }
     var names       : R<[String]>       { repoID.repo | { $0.remoteNameList() } }
+    var urls        : R<[String]>       { instances   | { $0.compactMap { $0.url } } }
     var count       : R<Int>            { names | { $0.count } }
     
     var instances   : R<[Remote]>       { repoID.repo | { $0.remoteList() } }
