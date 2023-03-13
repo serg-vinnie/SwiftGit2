@@ -21,6 +21,7 @@ class RepositoryLocalTests: XCTestCase {
     func test_DetachedHead() throws {
         let folder = self.root.with(repo: "DetachedHead", content: .empty).shouldSucceed()!
         let repo = folder.repo.shouldSucceed()!
+        let repoID = folder.repoID
         
         // HEAD is unborn
         XCTAssert(repo.headIsUnborn)
@@ -45,9 +46,12 @@ class RepositoryLocalTests: XCTestCase {
         repo.detachHEAD()
             .shouldSucceed("set HEAD detached")
         
-        guard let fixResultAmbigues = repo.detachedHeadFix().shouldSucceed("detached HEAD fix") else { fatalError() }
+        guard let fixResultAmbigues = repo.detachedHeadFix()
+            .shouldSucceed("detached HEAD fix") else { fatalError() }
         
-        XCTAssert(fixResultAmbigues == .ambiguous(branches: ["refs/heads/branch1", "refs/heads/main"]))
+        XCTAssert(fixResultAmbigues == .ambiguous(branches:
+                                                    [ReferenceID(repoID: repoID, name: "refs/heads/branch1"),
+                                                     ReferenceID(repoID: repoID, name: "refs/heads/main")]))
     }
 }
 
