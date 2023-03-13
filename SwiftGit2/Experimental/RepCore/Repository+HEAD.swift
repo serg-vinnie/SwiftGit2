@@ -31,7 +31,7 @@ public extension Repository {
 public enum DetachedHeadFix {
     case notNecessary
     case fixed
-    case ambiguous(branches: [String])
+    case ambiguous(branches: [ReferenceID])
 }
 
 public extension Repository {
@@ -50,7 +50,12 @@ public extension Repository {
             .map { $0.map { $0.branch.nameAsReference } }
             .if({ $0.count == 1 },
                 then: { $0.checkoutFirst(in: self).map { _ in DetachedHeadFix.fixed } },
-                else: { .success(.ambiguous(branches: $0)) })
+                else: { list in
+                        self.repoID | { repoID in
+                            .ambiguous(branches: list.map { ReferenceID(repoID: repoID, name: $0) })
+                        }
+                      }
+            )
     }
 
     // possible solution
@@ -59,7 +64,11 @@ public extension Repository {
         // if there are two branches
         // then checkout NOT master
         guard branches.count == 2,
-              let masterIdx = branches.masterIdx else { return .success(.ambiguous(branches: branches)) }
+              let masterIdx = branches.masterIdx else {
+            return self.repoID | { repoID in
+                    .ambiguous(branches: branches.map { ReferenceID(repoID: repoID, name: $0) } )
+            }
+        }
 
         if masterIdx == 0 {
             return checkout(ref: branches[1], stashing: false).map { .fixed }
