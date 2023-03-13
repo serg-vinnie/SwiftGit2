@@ -59,6 +59,9 @@ final class CacheStorageTests: XCTestCase {
     }
     
     func test_simple() {
+        TestContainer.counter = 0
+        TestContainer.deinits = 0
+        
         let folder = root.with(repo: "simple", content: .empty).shouldSucceed()!
         let repoID = folder.repoID
         let storage = CacheStorage<RepoID>()
