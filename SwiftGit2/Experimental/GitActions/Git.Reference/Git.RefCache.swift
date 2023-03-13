@@ -117,7 +117,7 @@ public final class GitRefCache {
         guard let oid = HEAD_OID else { return [] }
         guard let set = self.oids[oid] else { return [] }
         
-        return Array(set)
+        return Array(set.filter { $0.isBranch && $0.name != "HEAD" } )
     }
 }
 
