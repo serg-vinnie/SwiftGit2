@@ -131,7 +131,7 @@ public extension Repository {
         guard url.exists else {
             return false
         }
-        if case .success(_) = at(url: url, fixDetachedHead: false) {
+        if case .success(_) = at(url: url) {
             return true
         }
         return false
@@ -150,17 +150,12 @@ public extension Repository {
         }
     }
     
-    class func at(url: URL, fixDetachedHead: Bool = true) -> Result<Repository, Error> {
-        var pointer: OpaquePointer?
-        
-        return git_try("git_repository_open") {
+    class func at(url: URL) -> Result<Repository, Error> {
+        git_instance(of: Repository.self, "git_repository_open") { pointer in
             url.withUnsafeFileSystemRepresentation {
                 git_repository_open(&pointer, $0)
             }
         }
-        .map { _ in Repository(pointer!) }
-        .if(fixDetachedHead,
-            then: { repo in repo.detachedHeadFix().map { _ in repo } })
     }
     
     class func create(at url: URL) -> Result<Repository, Error> {
@@ -171,8 +166,6 @@ public extension Repository {
         }
         
         return url.appendingPathComponent(".git/HEAD").write(content: "ref: refs/heads/main") | { _ in repo }
-        
-        //return repo
     }
 }
 
