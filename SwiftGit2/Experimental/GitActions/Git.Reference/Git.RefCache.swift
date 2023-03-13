@@ -2,6 +2,7 @@
 import Foundation
 import Essentials
 import SwiftUI
+import OrderedCollections
 
 public struct Refs {
     public let local  : [ReferenceEx]
@@ -28,7 +29,7 @@ public final class GitRefCache {
     public private(set) var remotes: GitRemotesList = [:]
     public private(set) var remoteHEADs: [String:ReferenceEx?] = [:]
     
-    public private(set) var oids: [OID: Set<ReferenceID>] = [:]
+    public private(set) var oids: [OID: OrderedSet<ReferenceID>] = [:]
     
     lazy var upstreams : OneOnOne = { local.upstreams() }()
     
@@ -59,7 +60,7 @@ public final class GitRefCache {
         for ref in list {
             if let oid = ref.targetOID.maybeSuccess {
                 if oids.keys.contains(oid) {
-                    oids[oid]?.insert(ref)
+                    oids[oid]?.append(ref)
                 } else {
                     oids[oid] = [ref]
                 }
@@ -69,7 +70,7 @@ public final class GitRefCache {
         
         if let oid = HEAD_OID {
             if oids.keys.contains(oid) {
-                oids[oid]?.insert(head)
+                oids[oid]?.append(head)
             } else {
                 oids[oid] = [head]
             }
@@ -110,6 +111,13 @@ public final class GitRefCache {
         }
         
         return nil
+    }
+    
+    public var headCandidates : [ReferenceID] {
+        guard let oid = HEAD_OID else { return [] }
+        guard let set = self.oids[oid] else { return [] }
+        
+        return Array(set)
     }
 }
 
