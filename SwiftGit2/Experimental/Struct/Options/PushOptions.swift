@@ -11,17 +11,19 @@ import Foundation
 
 public class PushOptions {
     let callbacks: RemoteCallbacks
+    let callbacksConnect: RemoteCallbacks
     private var push_options = git_push_options()
 
-    public init(callbacks: RemoteCallbacks) {
+    public init(callbacks: RemoteCallbacks, callbacksConnect: RemoteCallbacks) {
         self.callbacks = callbacks
+        self.callbacksConnect = callbacksConnect
 
         let result = git_push_init_options(&push_options, UInt32(GIT_PUSH_OPTIONS_VERSION))
         assert(result == GIT_OK.rawValue)
     }
 
     public convenience init(auth: Auth) {
-        self.init(callbacks: RemoteCallbacks(auth: auth))
+        self.init(callbacks: RemoteCallbacks(auth: auth), callbacksConnect: RemoteCallbacks(auth: auth))
     }
 }
 
