@@ -51,6 +51,19 @@ public extension Remote {
             }
         }.map { (self.url ?? "no url", callbacks.recentCredentials) }
     }
+    
+    func connect(direction: Direction, callbacks: RemoteCallbacks) -> R<(String, Credentials)> {
+//        let callbacks = callbacks
+        let proxyOptions = ProxyOptions()
+
+        return git_try("git_remote_connect") {
+            proxyOptions.with_git_proxy_options { options in
+                callbacks.with_git_remote_callbacks { cb in
+                    git_remote_connect(pointer, git_direction(UInt32(direction.rawValue)), &cb, &options, nil)
+                }
+            }
+        }.map { (self.url ?? "no url", callbacks.recentCredentials) }
+    }
 }
 
 
