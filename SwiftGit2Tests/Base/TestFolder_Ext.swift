@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 @testable import SwiftGit2
-import EssetialTesting
+import EssentialsTesting
 
 extension TestFolder {
     var clearRepo        : R<Repository> { cleared() | { $0.repoCreate } }

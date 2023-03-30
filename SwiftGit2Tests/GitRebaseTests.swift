@@ -1,7 +1,7 @@
 import Essentials
 import SwiftGit2
 import XCTest
-import EssetialTesting
+import EssentialsTesting
 
 class GitRebaseTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "GitRebaseTests")

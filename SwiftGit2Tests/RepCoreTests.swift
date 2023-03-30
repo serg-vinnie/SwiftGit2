@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import EssetialTesting
+import EssentialsTesting
 import SwiftGit2
 
 public class TestContainer {

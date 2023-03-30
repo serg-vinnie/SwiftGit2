@@ -1,7 +1,7 @@
 import Essentials
 @testable import SwiftGit2
 import XCTest
-import EssetialTesting
+import EssentialsTesting
 
 final class GitTagTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "tag")

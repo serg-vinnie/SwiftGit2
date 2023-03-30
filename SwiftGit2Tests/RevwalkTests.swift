@@ -7,7 +7,7 @@
 //
 
 import Essentials
-import EssetialTesting
+import EssentialsTesting
 @testable import SwiftGit2
 import XCTest
 

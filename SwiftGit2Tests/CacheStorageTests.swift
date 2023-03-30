@@ -2,7 +2,7 @@
 import XCTest
 import SwiftGit2
 import Essentials
-import EssetialTesting
+import EssentialsTesting
 
 extension RepoID : CacheStorageAgent {
     public var storageFactory: TestContainer { TestContainer(repoID: self) }

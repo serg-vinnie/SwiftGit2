@@ -2,7 +2,7 @@
 import Essentials
 @testable import SwiftGit2
 import XCTest
-import EssetialTesting
+import EssentialsTesting
 
 class MergeAnalysisTests: XCTestCase {
     let root  = TestFolder.git_tests.sub(folder: "MergeAnalysisTests")
