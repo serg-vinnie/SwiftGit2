@@ -20,8 +20,8 @@ public struct SubmoduleID : Hashable {
 
 let gitdirFileParser = Parse {
     StartsWith("gitdir:")
-    Whitespace(.all)
-    Rest()
+    Whitespace<PartialRangeFrom<Int>,Conversions.SubstringToUTF8View>(.all)
+    Rest<String.SubSequence>()
 }
 
 extension String {

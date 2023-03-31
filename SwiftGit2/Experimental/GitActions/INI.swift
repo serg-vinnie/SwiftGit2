@@ -134,7 +134,7 @@ var sectionParser = Parse {
         Prefix { $0 != "\n" }
     }
     Many {
-        Whitespace(.all)
+        Whitespace<PartialRangeFrom<Int>,Conversions.SubstringToUTF8View>(.all)
         Prefix { $0 != "\n" }
     } separator: {
       "\n"
@@ -147,20 +147,20 @@ var titleParser = Parse {
     "["
     Prefix { $0 != "]" }
     Skip {
-        Rest()
+        Rest<String.SubSequence>()
     }
 }
 
 var submoduleParser = Parse {
     StartsWith("[submodule")
-    Whitespace(.all)
+    Whitespace<PartialRangeFrom<Int>,Conversions.SubstringToUTF8View>(.all)
     Parse {
         "\""
         Prefix { $0 != "\"" }
         "\""
     }
     "]"
-    Rest()
+    Rest<String.SubSequence>()
 }
 
 var sectionsParser = Many {
@@ -168,7 +168,7 @@ var sectionsParser = Many {
         StartsWith("[")
         OneOf {
            Prefix { $0 != "[" }
-           Rest()
+           Rest<String.SubSequence>()
        }
     }
 }
