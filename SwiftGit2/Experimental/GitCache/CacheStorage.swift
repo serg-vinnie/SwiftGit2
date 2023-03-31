@@ -2,27 +2,6 @@
 import Foundation
 import Essentials
 
-public extension RepoID {
-//    class Global<Agent: CacheStorageAgent> : ThreadSafeAccess {
-//        public let lock = UnfairLock()
-//        public private(set) var roots     = [Agent : Agent.RootStorage]()
-//        public private(set) var items     = [Agent : Agent.Storage]()
-//        public private(set) var flatTrees = [Agent : Set<Agent>]()
-//        
-//        public init() {}
-//        
-//        public func remove(root: Agent) {
-//            
-//            guard let tree = flatTrees[root] else { return }
-//            flatTrees[root] = nil
-//            for item in tree {
-//                self.items[item] = nil
-//            }
-//            roots[root] = nil
-//        }
-//    }
-}
-
 public class CacheStorage<Agent: CacheStorageAgent> {
     public private(set) var roots     = [Agent : Agent.RootStorage]()
     public private(set) var items     = [Agent : Agent.Storage]()
@@ -129,7 +108,7 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         public let inserted : Set<Agent>
         public let removed : Set<Agent>
         
-        init(old: Set<Agent>, new: Set<Agent>) {
+        public init(old: Set<Agent>, new: Set<Agent>) {
             self.inserted = new.subtracting(old)
             self.removed = old.subtracting(new)
         }
