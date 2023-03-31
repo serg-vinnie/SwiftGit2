@@ -2,14 +2,14 @@
 import Foundation
 import Essentials
 
-public class CacheStorage<Agent: CacheStorageAgent> {
+public struct CacheStorage<Agent: CacheStorageAgent> {
     public private(set) var roots     = [Agent : Agent.RootStorage]()
     public private(set) var items     = [Agent : Agent.Storage]()
     public private(set) var flatTrees = [Agent : Set<Agent>]()
     
     public init() {}
     
-    public func remove(root: Agent) {
+    public mutating func remove(root: Agent) {
         guard let tree = flatTrees[root] else { return }
         flatTrees[root] = nil
         for item in tree {
@@ -18,8 +18,7 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         roots[root] = nil
     }
     
-    @discardableResult
-    public func update(root: Agent) -> Update {
+    public mutating func update(root: Agent) -> Update {
         if !roots.keys.contains(root) {
             roots[root] = root.rootStorageFactory
         }
@@ -67,11 +66,11 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         return agent
     }
     
-    public func storage(for agent: Agent) -> Agent.Storage {
+    public mutating func storage(for agent: Agent) -> Agent.Storage {
         if let stor = items[agent] {
             return stor
         }
-        update(root: agent)
+        _ = update(root: agent)
         if let stor = items[agent] {
             return stor
         } else {
@@ -81,7 +80,7 @@ public class CacheStorage<Agent: CacheStorageAgent> {
         }
     }
     
-    public func rootStorage(for agent: Agent) -> Agent.RootStorage {
+    public mutating func rootStorage(for agent: Agent) -> Agent.RootStorage {
         if let root = roots[agent] {
             return root
         }
@@ -94,7 +93,7 @@ public class CacheStorage<Agent: CacheStorageAgent> {
             }
         }
         
-        update(root: agent)
+        _ = update(root: agent)
         if let root = roots[agent] {
             return root
         } else {
