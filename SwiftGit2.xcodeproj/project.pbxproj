@@ -95,7 +95,7 @@
 		E66360DB27BEEC1C001292FB /* RepoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DA27BEEC1C001292FB /* RepoID.swift */; };
 		E66360DF27BF063D001292FB /* RepCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DE27BF063D001292FB /* RepCore.swift */; };
 		E66360E127BF1403001292FB /* RepCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360E027BF1403001292FB /* RepCoreTests.swift */; };
-		E6731226292AA0A200606E91 /* CacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6731223292AA0A100606E91 /* CacheStorage.swift */; };
+		E6731226292AA0A200606E91 /* TreeStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6731223292AA0A100606E91 /* TreeStorage.swift */; };
 		E673122B292AB19D00606E91 /* CacheStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E673122A292AB19D00606E91 /* CacheStorageTests.swift */; };
 		E678EFF62916C5A000B7591C /* RepoID_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E678EFF52916C5A000B7591C /* RepoID_Tests.swift */; };
 		E678EFF82916F6B300B7591C /* RepoID+HEAD.swift in Sources */ = {isa = PBXBuildFile; fileRef = E678EFF72916F6B300B7591C /* RepoID+HEAD.swift */; };
@@ -293,7 +293,7 @@
 		E66360DA27BEEC1C001292FB /* RepoID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.swift; sourceTree = "<group>"; };
 		E66360DE27BF063D001292FB /* RepCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCore.swift; sourceTree = "<group>"; };
 		E66360E027BF1403001292FB /* RepCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCoreTests.swift; sourceTree = "<group>"; };
-		E6731223292AA0A100606E91 /* CacheStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CacheStorage.swift; sourceTree = "<group>"; };
+		E6731223292AA0A100606E91 /* TreeStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeStorage.swift; sourceTree = "<group>"; };
 		E673122A292AB19D00606E91 /* CacheStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStorageTests.swift; sourceTree = "<group>"; };
 		E678EFF52916C5A000B7591C /* RepoID_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID_Tests.swift; sourceTree = "<group>"; };
 		E678EFF72916F6B300B7591C /* RepoID+HEAD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepoID+HEAD.swift"; sourceTree = "<group>"; };
@@ -701,7 +701,7 @@
 			isa = PBXGroup;
 			children = (
 				E60BB75E293259D1006EE309 /* RepoID.Tree.swift */,
-				E6731223292AA0A100606E91 /* CacheStorage.swift */,
+				E6731223292AA0A100606E91 /* TreeStorage.swift */,
 				E61C06E1290C409E0047D243 /* Git.LogCache.swift */,
 				E6F0B9392910318C008E2176 /* Git.CommitBasicInfo.swift */,
 			);
@@ -994,7 +994,7 @@
 				1D4BCEF727440F95008831DC /* Git.Index.swift in Sources */,
 				1D914FB92856799D00034EC1 /* URL_ext.swift in Sources */,
 				E63EDF7C265DBAE500A3D048 /* ProxyOptions.swift in Sources */,
-				E6731226292AA0A200606E91 /* CacheStorage.swift in Sources */,
+				E6731226292AA0A200606E91 /* TreeStorage.swift in Sources */,
 				E6D4A92024DEACC000E8041E /* Repository.swift in Sources */,
 				E60B86C928E0FEA4001D6150 /* SubmoduleID.swift in Sources */,
 				E6AF628D26938457007D0585 /* Repository+Sync.swift in Sources */,

@@ -4,7 +4,7 @@ import SwiftGit2
 import Essentials
 import EssentialsTesting
 
-extension RepoID : CacheStorageAgent {
+extension RepoID : TreeStorageAgent {
     public var storageFactory: TestContainer { TestContainer(repoID: self) }
     public var rootStorageFactory: TestContainer { TestContainer(repoID: self, id: "_root") }
 }

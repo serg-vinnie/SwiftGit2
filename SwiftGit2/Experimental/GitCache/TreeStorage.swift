@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public class CacheStorage<Agent: CacheStorageAgent> {
+public class TreeStorage<Agent: TreeStorageAgent> {
     @Locked(.unfair)
     public private(set) var roots     = [Agent : Agent.RootStorage]()
     @Locked(.unfair)
@@ -118,7 +118,7 @@ public class CacheStorage<Agent: CacheStorageAgent> {
     }
 }
 
-public protocol CacheStorageAgent : Hashable {
+public protocol TreeStorageAgent : Hashable {
     associatedtype RootStorage
     associatedtype Storage
     
