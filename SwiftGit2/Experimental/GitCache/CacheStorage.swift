@@ -2,14 +2,17 @@
 import Foundation
 import Essentials
 
-public struct CacheStorage<Agent: CacheStorageAgent> {
+public class CacheStorage<Agent: CacheStorageAgent> {
+    @Locked(.unfair)
     public private(set) var roots     = [Agent : Agent.RootStorage]()
+    @Locked(.unfair)
     public private(set) var items     = [Agent : Agent.Storage]()
+    @Locked(.unfair)
     public private(set) var flatTrees = [Agent : Set<Agent>]()
     
     public init() {}
     
-    public mutating func remove(root: Agent) {
+    public func remove(root: Agent) {
         guard let tree = flatTrees[root] else { return }
         flatTrees[root] = nil
         for item in tree {
@@ -18,7 +21,8 @@ public struct CacheStorage<Agent: CacheStorageAgent> {
         roots[root] = nil
     }
     
-    public mutating func update(root: Agent) -> Update {
+    @discardableResult
+    public func update(root: Agent) -> Update {
         if !roots.keys.contains(root) {
             roots[root] = root.rootStorageFactory
         }
@@ -66,11 +70,11 @@ public struct CacheStorage<Agent: CacheStorageAgent> {
         return agent
     }
     
-    public mutating func storage(for agent: Agent) -> Agent.Storage {
+    public func storage(for agent: Agent) -> Agent.Storage {
         if let stor = items[agent] {
             return stor
         }
-        _ = update(root: agent)
+        update(root: agent)
         if let stor = items[agent] {
             return stor
         } else {
@@ -80,7 +84,7 @@ public struct CacheStorage<Agent: CacheStorageAgent> {
         }
     }
     
-    public mutating func rootStorage(for agent: Agent) -> Agent.RootStorage {
+    public func rootStorage(for agent: Agent) -> Agent.RootStorage {
         if let root = roots[agent] {
             return root
         }
@@ -93,7 +97,7 @@ public struct CacheStorage<Agent: CacheStorageAgent> {
             }
         }
         
-        _ = update(root: agent)
+        update(root: agent)
         if let root = roots[agent] {
             return root
         } else {
