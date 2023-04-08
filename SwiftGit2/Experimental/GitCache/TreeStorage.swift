@@ -3,12 +3,10 @@ import Foundation
 import Essentials
 
 public class TreeStorage<Agent: TreeStorageAgent> {
-    @Locked(.unfair)
-    public private(set) var roots     = [Agent : Agent.RootStorage]()
-    @Locked(.unfair)
-    public private(set) var items     = [Agent : Agent.Storage]()
-    @Locked(.unfair)
-    public private(set) var flatTrees = [Agent : Set<Agent>]()
+
+    public private(set) var roots     = LockedVar([Agent : Agent.RootStorage]())
+    public private(set) var items     = LockedVar([Agent : Agent.Storage]())
+    public private(set) var flatTrees = LockedVar([Agent : Set<Agent>]())
     
     public init() {}
     
@@ -23,7 +21,7 @@ public class TreeStorage<Agent: TreeStorageAgent> {
     
     @discardableResult
     public func update(root: Agent) -> Update {
-        if !roots.keys.contains(root) {
+        if !roots.contains(key: root) {
             roots[root] = root.rootStorageFactory
         }
         
@@ -57,11 +55,11 @@ public class TreeStorage<Agent: TreeStorageAgent> {
     }
     
     public func rootOf(_ agent: Agent) -> Agent {
-        if roots.keys.contains(agent) {
+        if roots.contains(key: agent) {
             return agent
         }
         
-        for (root, children) in flatTrees {
+        for (root, children) in flatTrees.read({ $0 }) {
             if children.contains(agent) {
                 return root
             }
@@ -89,7 +87,7 @@ public class TreeStorage<Agent: TreeStorageAgent> {
             return root
         }
         
-        for (key,tree) in flatTrees {
+        for (key,tree) in flatTrees.read({ $0 }) {
             if tree.contains(agent) {
                 if let root = roots[key] {
                     return root
