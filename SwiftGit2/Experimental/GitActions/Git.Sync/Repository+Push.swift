@@ -43,8 +43,8 @@ public extension Remote {
         
     func push(refspec: [String], options: PushOptions) -> R<Void> {
         print("Trying to push ''\(refspec)'' to remote ''\(name)'' with URL:''\(url)''")
-        return self.connect(direction: .push, callbacks: options.callbacksConnect)
-        | { _ in
+        return //self.connect(direction: .push, callbacks: options.callbacksConnect)
+//        | { _ in
             git_try("git_remote_push") {
                 options.with_git_push_options { push_options in
                     refspec.with_git_strarray { strarray in
@@ -52,7 +52,7 @@ public extension Remote {
                     }
                 }
             }
-        }
+//        }
     }
 }
 
