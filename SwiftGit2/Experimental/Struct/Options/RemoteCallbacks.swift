@@ -12,7 +12,38 @@ import Essentials
 
 public typealias TransferProgressCB = (git_indexer_progress) -> (Bool) // return false to cancel progree
 
+fileprivate final class CallbacksLock {
+    private var _lock: UnsafeMutablePointer<os_unfair_lock>
+    private var _owner : UUID?
+
+    public init() {
+        _lock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
+        _lock.initialize(to: os_unfair_lock())
+    }
+
+    deinit {
+        _lock.deallocate()
+    }
+    
+    fileprivate func lock() { os_unfair_lock_lock(_lock) }
+    
+    fileprivate func unlock() { os_unfair_lock_unlock(_lock) }
+}
+
+fileprivate let callbackLock = CallbacksLock()
+
+fileprivate final class SSHAccessLock {
+    init() { callbackLock.lock() }
+    deinit { callbackLock.unlock() }
+}
+
+
+
 public class RemoteCallbacks: GitPayload {
+    fileprivate var locker : SSHAccessLock?
+    fileprivate func lock() { locker = .init() }
+    fileprivate func unlock() { locker = nil }
+    
     var list = [Credentials]()
     var callback : AuthCB?
     
@@ -21,7 +52,7 @@ public class RemoteCallbacks: GitPayload {
     public var transferProgress: TransferProgressCB?
     public var onStart : ()->() = { }
     public var onStop  : ()->() = { }
-
+    
     public init(auth: Auth, transfer: TransferProgressCB? = nil) {
         self.transferProgress = transfer
         switch auth {
@@ -54,7 +85,7 @@ public class RemoteCallbacks: GitPayload {
     #endif
 }
 
-let connectionLocking = UnfairLock()
+//let connectionLocking = UnfairLock()
 
 extension RemoteCallbacks {
     func with_git_remote_callbacks<T>(_ body: (inout git_remote_callbacks) -> T) -> T {
@@ -69,9 +100,9 @@ extension RemoteCallbacks {
             RemoteCallbacks.release(pointer: remote_callbacks.payload)
         }
 
-        return connectionLocking.locked {
-            body(&remote_callbacks)
-        }
+//        return connectionLocking.locked {
+        return body(&remote_callbacks)
+//        }
     }
 }
 
@@ -101,12 +132,15 @@ private func credentialsCallback(
     case .default:
         result = git_credential_default_new(cred)
     case .sshAgent:
+        _payload.lock()
         result = git_credential_ssh_key_from_agent(cred, name!)
     case let .plaintext(username, password):
         result = git_credential_userpass_plaintext_new(cred, username, password)
     case let .sshMemory(username, publicKey, privateKey, passphrase):
+        _payload.lock()
         result = git_credential_ssh_key_memory_new(cred, username, publicKey, privateKey, passphrase)
     case let .ssh(publicKey: publicKey, privateKey: privateKey, passphrase: passphrase):
+        _payload.lock()
         result = git_credential_ssh_key_new(cred, name, publicKey, privateKey, passphrase)
     }
 
@@ -119,6 +153,8 @@ private func transferCallback(stats: UnsafePointer<git_indexer_progress>?, paylo
     guard let payload = payload else { return -1 }
 
     let callbacks = RemoteCallbacks.unretained(pointer: payload)
+    
+    callbacks.unlock()
 
     // if progress callback didn't set just continue
     if let transferProgress = callbacks.transferProgress {
