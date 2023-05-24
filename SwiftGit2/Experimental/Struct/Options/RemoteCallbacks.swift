@@ -49,7 +49,7 @@ fileprivate final class SSHAccessLock {
 
 public class RemoteCallbacks: GitPayload {
     fileprivate var locker : SSHAccessLock?
-    fileprivate func lock() { locker = .init() }
+    fileprivate func lock() { if locker == nil { locker = .init() } }
     fileprivate func unlock() { locker = nil }
     
     var list = [Credentials]()
