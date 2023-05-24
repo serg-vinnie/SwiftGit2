@@ -38,11 +38,11 @@ fileprivate let callbackLock = CallbacksLock()
 
 fileprivate final class SSHAccessLock {
     init() {
-        print("SSHAccessLock+")
+        print("SSHAccessLock+ " + Thread.current.dbgName)
         callbackLock.lock()
     }
     deinit {
-        print("SSHAccessLock-")
+        print("SSHAccessLock- " + Thread.current.dbgName)
         callbackLock.unlock()
     }
 }
