@@ -12,25 +12,49 @@ import Essentials
 
 public typealias TransferProgressCB = (git_indexer_progress) -> (Bool) // return false to cancel progree
 
-fileprivate final class CallbacksLock {
-    private var _lock: UnsafeMutablePointer<os_unfair_lock>
-    private var _owner : UUID?
 
-    public init() {
-        _lock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
-        _lock.initialize(to: os_unfair_lock())
+public class MutexRecursiveLock  {
+    private var _lock = pthread_mutex_t()
+    
+    init() {
+        var attr = pthread_mutexattr_t()
+        pthread_mutexattr_init(&attr)
+        pthread_mutexattr_settype(&attr, Int32(PTHREAD_MUTEX_RECURSIVE))
+        pthread_mutex_init(&_lock, &attr)
     }
-
+    
     deinit {
-        _lock.deallocate()
+        pthread_mutex_destroy(&_lock)
+    }
+    
+    @inline(__always) public func locked<ReturnValue>(_ f: () throws -> ReturnValue) rethrows -> ReturnValue {
+        pthread_mutex_lock(&_lock)
+        defer { pthread_mutex_unlock(&_lock) }
+        return try f()
+    }
+}
+
+
+fileprivate final class CallbacksLock {
+    private var _lock = pthread_mutex_t()
+
+    init() {
+        var attr = pthread_mutexattr_t()
+        pthread_mutexattr_init(&attr)
+        pthread_mutexattr_settype(&attr, Int32(PTHREAD_MUTEX_RECURSIVE))
+        pthread_mutex_init(&_lock, &attr)
+    }
+    
+    deinit {
+        pthread_mutex_destroy(&_lock)
     }
     
     fileprivate func lock() {
-        os_unfair_lock_lock(_lock)
+        pthread_mutex_lock(&_lock)
     }
     
     fileprivate func unlock() {
-        os_unfair_lock_unlock(_lock)
+        pthread_mutex_unlock(&_lock)
     }
 }
 
