@@ -25,19 +25,27 @@ fileprivate final class CallbacksLock {
         _lock.deallocate()
     }
     
-    fileprivate func lock() { os_unfair_lock_lock(_lock) }
+    fileprivate func lock() {
+        os_unfair_lock_lock(_lock)
+    }
     
-    fileprivate func unlock() { os_unfair_lock_unlock(_lock) }
+    fileprivate func unlock() {
+        os_unfair_lock_unlock(_lock)
+    }
 }
 
 fileprivate let callbackLock = CallbacksLock()
 
 fileprivate final class SSHAccessLock {
-    init() { callbackLock.lock() }
-    deinit { callbackLock.unlock() }
+    init() {
+        print("SSHAccessLock+")
+        callbackLock.lock()
+    }
+    deinit {
+        print("SSHAccessLock-")
+        callbackLock.unlock()
+    }
 }
-
-
 
 public class RemoteCallbacks: GitPayload {
     fileprivate var locker : SSHAccessLock?
