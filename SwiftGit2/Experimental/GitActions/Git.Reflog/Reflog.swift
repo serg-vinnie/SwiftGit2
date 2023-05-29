@@ -27,9 +27,9 @@ extension Repository {
 extension Reflog {
     var entryCount : Int { git_reflog_entrycount(self.pointer) }
     
-    func entry(idx: Int) -> R<ReflogEntry> {
-        git_reflog_entry_byindex(self.pointer, idx)
-            .asNonOptional("git_reflog_entry_byindex invalid idx")
-            .map { ReflogEntry($0) }
+    func entry(idx: Int) -> ReflogEntry? {
+        guard let entry = git_reflog_entry_byindex(self.pointer, idx) else { return nil }
+//            .asNonOptional("git_reflog_entry_byindex invalid idx")
+        return ReflogEntry(entry, reflog: self)
     }
 }

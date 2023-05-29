@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 import Clibgit2
-//import DequeModule
+
 
 public struct GitReflog {
     let repoID: RepoID
@@ -12,6 +12,8 @@ public struct GitReflog {
         self.repoID = repoID
         self.name = name
     }
+    
+    public var iterator : R<GitReflogIterator> { reflog | { .init(reflog: $0) } }
     
     fileprivate var reflog : R<Reflog> { repoID.repo | { $0.reflog(name: self.name) } }
 }
