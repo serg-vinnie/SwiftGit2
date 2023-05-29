@@ -14,12 +14,12 @@ final class CacheStorageTests: XCTestCase {
     
     func test_taogit() {
         let repoID = RepoID(path: "/Users/loki/dev/taogit")
-        let storage = CacheStorage<RepoID>()
+        let storage = TreeStorage<RepoID>()
         storage.update(root: repoID)
-        XCTAssertEqual(storage.roots.count, 1)
-        XCTAssertEqual(storage.items.count, 9)
+        XCTAssertEqual(storage.roots.read(\.count), 1)
+        XCTAssertEqual(storage.items.read(\.count), 9)
         
-        let tree = storage.roots.first!.value.tree
+        let tree = storage.roots.read(\.first)!.value.tree
         
         let all = tree.items.sorted { $0.url.pathComponents.count < $1.url.pathComponents.count }
         for item in all {
@@ -64,10 +64,10 @@ final class CacheStorageTests: XCTestCase {
         
         let folder = root.with(repo: "simple", content: .empty).shouldSucceed()!
         let repoID = folder.repoID
-        let storage = CacheStorage<RepoID>()
+        let storage = TreeStorage<RepoID>()
         storage.update(root: repoID)
-        XCTAssertEqual(storage.roots.count, 1)
-        XCTAssertEqual(storage.items.count, 1)
+        XCTAssertEqual(storage.roots.read(\.count), 1)
+        XCTAssertEqual(storage.items.read(\.count), 1)
         XCTAssertEqual(TestContainer.counter, 2)
         XCTAssertEqual(TestContainer.deinits, 0)
         
@@ -77,8 +77,8 @@ final class CacheStorageTests: XCTestCase {
         storage.update(root: repoID)
         storage.update(root: repoID)
         
-        XCTAssertEqual(storage.roots.count, 1)
-        XCTAssertEqual(storage.items.count, 2)
+        XCTAssertEqual(storage.roots.read(\.count), 1)
+        XCTAssertEqual(storage.items.read(\.count), 2)
         XCTAssertEqual(TestContainer.counter, 3)
         XCTAssertEqual(TestContainer.deinits, 0)
         
@@ -88,8 +88,8 @@ final class CacheStorageTests: XCTestCase {
         
         storage.update(root: repoID)
         storage.update(root: repoID)
-        XCTAssertEqual(storage.roots.count, 1)
-        XCTAssertEqual(storage.items.count, 1)
+        XCTAssertEqual(storage.roots.read(\.count), 1)
+        XCTAssertEqual(storage.items.read(\.count), 1)
         XCTAssertEqual(TestContainer.counter, 2)
         XCTAssertEqual(TestContainer.deinits, 1)
     }
