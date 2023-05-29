@@ -5,12 +5,12 @@ import Essentials
 import EssentialsTesting
 
 final class GitReflogTests: XCTestCase {
+    let root = TestFolder.git_tests.sub(folder: "Reflog")
 
     func testReflog() {
-        let repo = Repository.at(path: "/Users/loki/dev/a")
-        (repo | { $0.reflog(name: "HEAD") } | { $0.entryCount })
+        let repoID = RepoID(path: "/Users/loki/dev/a")
+        GitReflog(repoID: repoID)
+            .entryCount
             .shouldSucceed("entry count")
-        
-//        reflog
     }
 }
