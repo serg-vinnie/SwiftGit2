@@ -6,14 +6,16 @@ import Essentials
 public class ReflogEntry {
     public var pointer: OpaquePointer
     let reflog: Reflog
+    let idx: Int
     
-    init(_ pointer: OpaquePointer, reflog: Reflog) {
+    init(_ pointer: OpaquePointer, reflog: Reflog, idx: Int) {
         self.pointer = pointer
         self.reflog = reflog
+        self.idx = idx
     }
 }
 
-extension ReflogEntry {
+public extension ReflogEntry {
     var oldOID : OID { OID(git_reflog_entry_id_old(self.pointer).pointee) }
     var newOID : OID { OID(git_reflog_entry_id_new(self.pointer).pointee) }
     
@@ -21,6 +23,9 @@ extension ReflogEntry {
     var message  : String { String(validatingUTF8: git_reflog_entry_message(self.pointer)) ?? "" }
 }
 
+extension ReflogEntry : Identifiable {
+    public var id: Int { idx }
+}
 
 extension ReflogEntry : CustomStringConvertible {
     public var description: String {

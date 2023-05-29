@@ -30,6 +30,6 @@ extension Reflog {
     func entry(idx: Int) -> ReflogEntry? {
         guard let entry = git_reflog_entry_byindex(self.pointer, idx) else { return nil }
 //            .asNonOptional("git_reflog_entry_byindex invalid idx")
-        return ReflogEntry(entry, reflog: self)
+        return ReflogEntry(entry, reflog: self, idx: idx)
     }
 }
