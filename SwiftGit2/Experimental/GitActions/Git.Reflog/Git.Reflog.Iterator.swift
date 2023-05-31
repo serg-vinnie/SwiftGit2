@@ -5,18 +5,20 @@ import Clibgit2
 
 public final class GitReflogIterator : RandomAccessCollection {
     let reflog : Reflog
+    let repoID : RepoID
     
     public typealias Element = ReflogEntry
     public typealias Index = Int
     public typealias Indices = DefaultIndices<GitReflogIterator>
     
-    init(reflog: Reflog) {
+    init(reflog: Reflog, repoID: RepoID) {
         self.reflog = reflog
+        self.repoID = repoID
     }
     
     public subscript(position: Int) -> ReflogEntry {
         _read {
-            let element = reflog.entry(idx: position)!
+            let element = reflog.entry(idx: position, repoID: repoID)!
             yield element
         }
     }

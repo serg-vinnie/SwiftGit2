@@ -6,12 +6,15 @@ import Essentials
 public class ReflogEntry {
     public var pointer: OpaquePointer
     let reflog: Reflog
-    let idx: Int
     
-    init(_ pointer: OpaquePointer, reflog: Reflog, idx: Int) {
+    public let idx: Int
+    public let repoID: RepoID
+    
+    init(_ pointer: OpaquePointer, reflog: Reflog, idx: Int, repoID: RepoID) {
         self.pointer = pointer
         self.reflog = reflog
         self.idx = idx
+        self.repoID = repoID
     }
 }
 

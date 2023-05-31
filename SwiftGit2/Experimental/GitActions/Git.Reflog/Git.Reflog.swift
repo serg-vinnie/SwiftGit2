@@ -13,7 +13,7 @@ public struct GitReflog {
         self.name = name
     }
     
-    public var iterator : R<GitReflogIterator> { reflog | { .init(reflog: $0) } }
+    public var iterator : R<GitReflogIterator> { reflog | { .init(reflog: $0, repoID: repoID) } }
     
     fileprivate var reflog : R<Reflog> { repoID.repo | { $0.reflog(name: self.name) } }
 }
