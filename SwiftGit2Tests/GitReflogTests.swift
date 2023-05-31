@@ -13,4 +13,29 @@ final class GitReflogTests: XCTestCase {
         (GitReflog(repoID: repoID).iterator | { $0[0] } )
             .shouldSucceed("first entry")
     }
+    
+    func test_shouldParse() {
+        let folder = root.with(repo: "parse", content: .clone(.testRepoSSH, .defaultSSH)).shouldSucceed()!
+        let repoID = folder.repoID
+        
+        let cloneEntry = (GitReflog(repoID: repoID).iterator | { $0[0] } )
+        
+        (cloneEntry | { $0.kind })
+            .assertEqual(to: .clone(URL.testRepoSSH.path), "kind == clone")
+        
+        folder.commit(msg: "quick and dirty commit")
+            .shouldSucceed()
+        
+        (GitReflog(repoID: repoID).iterator | { $0[0].kind } )
+            .assertEqual(to: .commit("quick and dirty commit"), "kind == commit")
+        
+        
+        let oid = cloneEntry | { $0.newOID }
+        let repo = repoID.repo
+        (combine(repo, oid) | { repo, oid in repo.checkout(oid, options: .init()) })
+            .shouldSucceed()
+        
+        (GitReflog(repoID: repoID).iterator | { $0[0].kind } )
+            .assertEqual(to: .checkout(.branch("master"), .commit(oid.maybeSuccess!)), "kind == checkout")
+    }
 }
