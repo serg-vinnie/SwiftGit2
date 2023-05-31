@@ -19,7 +19,7 @@ public extension ReflogEntry {
     }
 }
 
-extension ReflogEntry {
+public extension ReflogEntry {
     var kind : Kind {
         let message = self.message
         
