@@ -15,6 +15,7 @@ public extension ReflogEntry {
         case pull(String)
         case commit(String)
         case commitInitial(String)
+        case commitMerge(String)
         case checkout(Target,Target)
         
         case undefined
@@ -28,6 +29,7 @@ public extension ReflogEntry.Kind {
         case .pull(_):          return "pull"
         case .commit(_):        return "commit"
         case .commitInitial(_): return "commit"
+        case .commitMerge(_):   return "commit"
         case .checkout(_, _):   return "checkout"
         case .undefined:        return ""
         }
@@ -37,6 +39,7 @@ public extension ReflogEntry.Kind {
 public extension ReflogEntry {
     var kind : Kind {
         let message = self.message
+        
         
         do {
             let msg = try commitParser.parse(message)
@@ -49,9 +52,18 @@ public extension ReflogEntry {
         } catch { }
         
         do {
+            let msg = try commitMergeParser.parse(message)
+            return .commitMerge(String(msg))
+        } catch { }
+        
+        do {
             let msg = try pullParser.parse(message)
             return .pull(String(msg))
         } catch { }
+        
+        if message.starts(with: "Fast Forward") {
+            return .pull(message)
+        }
         
         do {
             let (src,dst) = try checkoutParser.parse(message)
@@ -72,6 +84,11 @@ public extension ReflogEntry {
 
 var commitParser = Parse {
     StartsWith("commit: ")
+    Rest<String.SubSequence>()
+}
+
+var commitMergeParser = Parse {
+    StartsWith("commit (merge): ")
     Rest<String.SubSequence>()
 }
 
