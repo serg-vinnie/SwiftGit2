@@ -12,7 +12,7 @@ public extension ReflogEntry {
     
     enum Kind : Equatable, Hashable {
         case clone(String)
-        case commit(OID)
+        case commit(String)
         case checkout(Target,Target)
         
         case undefined
@@ -25,9 +25,7 @@ public extension ReflogEntry {
         
         do {
             let message = try commitParser.parse(message)
-            if let oid = OID(string: String(message)) {
-                return .commit(oid)
-            }
+            return .commit(String(message))
         } catch { }
         
         do {
