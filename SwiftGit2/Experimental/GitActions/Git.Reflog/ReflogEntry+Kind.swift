@@ -34,6 +34,15 @@ public extension ReflogEntry.Kind {
         case .undefined:        return ""
         }
     }
+    
+    var isCommit : Bool {
+        switch self {
+        case .commit(_): return true
+        case .commitMerge(_): return true
+        case .commitInitial(_): return true
+        default: return false
+        }
+    }
 }
 
 public extension ReflogEntry {
