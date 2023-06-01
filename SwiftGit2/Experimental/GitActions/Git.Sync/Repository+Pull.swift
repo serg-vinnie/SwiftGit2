@@ -70,7 +70,7 @@ public extension Repository {
     private func mergeFastForward(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
         let targetOID = their.targetOID
         
-        let message = "Fast Forward MERGE \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned)"
+        let message = "pull: Fast-forward \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned)"
         
         return GitStasher(repo: self).wrap(skip: !stashing) {
             targetOID
