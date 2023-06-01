@@ -88,7 +88,7 @@ public extension Repository {
         let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
         
         let message = baseOID
-            | { base in "Merge \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned)] \n Base: \(base)" }
+            | { base in "Merge \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned) | Base: \(base)" }
         
         let ourCommit   = ourOID   | { self.commit(oid: $0) }
         let theirCommit = theirOID | { self.commit(oid: $0) }
