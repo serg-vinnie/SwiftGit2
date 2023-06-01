@@ -13,6 +13,7 @@ public extension ReflogEntry {
     enum Kind : Equatable, Hashable {
         case clone(String)
         case commit(String)
+        case commitInitial(String)
         case checkout(Target,Target)
         
         case undefined
@@ -26,6 +27,11 @@ public extension ReflogEntry {
         do {
             let message = try commitParser.parse(message)
             return .commit(String(message))
+        } catch { }
+        
+        do {
+            let message = try commitInitParser.parse(message)
+            return .commitInitial(String(message))
         } catch { }
         
         do {
@@ -47,6 +53,11 @@ public extension ReflogEntry {
 
 var commitParser = Parse {
     StartsWith("commit: ")
+    Rest<String.SubSequence>()
+}
+
+var commitInitParser = Parse {
+    StartsWith("commit (initial): ")
     Rest<String.SubSequence>()
 }
 
