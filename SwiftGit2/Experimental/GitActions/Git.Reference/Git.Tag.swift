@@ -20,12 +20,6 @@ public extension GitTag {
         repoID.repo | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
     }
     
-    func createOld(at oid: OID, name: String, message: String, signature: Signature, auth: Auth) -> R<OID> {
-        self.repoID.repo
-            | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
-        | { oid in self.pushToFirstRemote(tag: name, auth: auth) | { _ in oid } }
-    }
-    
     func delete(tag: String) -> R<Void> {
         repoID.repo | { $0.delete(tag: tag) }
     }
@@ -79,7 +73,7 @@ public extension Repository {
         
         return self.commit(oid: commitOid) | { commit in
             git_try("git_tag_create") {
-                git_tag_create_lightweight(&oid, self.pointer, "name", commit.pointer, force ? 1 : 0)
+                git_tag_create_lightweight(&oid, self.pointer, name, commit.pointer, force ? 1 : 0)
             }
         } | { _ in OID(oid) }
     }
