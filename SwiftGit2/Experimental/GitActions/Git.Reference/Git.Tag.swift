@@ -12,6 +12,14 @@ public struct GitTag {
 }
 
 public extension GitTag {
+    func createLight(at oid: OID, name: String, force: Bool = false) -> R<OID> {
+        repoID.repo | { $0.createLightTag(at: oid, name: name, force: force) }
+    }
+    
+    func create(at oid: OID, name: String, message: String, signature: Signature) -> R<OID> {
+        repoID.repo | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
+    }
+    
     func createOld(at oid: OID, name: String, message: String, signature: Signature, auth: Auth) -> R<OID> {
         self.repoID.repo
             | { $0.createTag(from: oid, tag: name, message: message, signature: signature) }
@@ -66,14 +74,14 @@ public extension Repository {
         }
     }
     
-    func createLightTag(from commitOid: OID, name: String, force: Bool = false) -> R<Void> {
+    func createLightTag(at commitOid: OID, name: String, force: Bool = false) -> R<OID> {
         var oid = git_oid()
         
         return self.commit(oid: commitOid) | { commit in
             git_try("git_tag_create") {
                 git_tag_create_lightweight(&oid, self.pointer, "name", commit.pointer, force ? 1 : 0)
             }
-        }
+        } | { _ in OID(oid) }
     }
     
     fileprivate func createTag(from commitOid: OID, tag: String, message: String, signature: Signature) -> Result<OID, Error> {
