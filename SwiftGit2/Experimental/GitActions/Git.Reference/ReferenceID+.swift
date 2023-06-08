@@ -39,7 +39,7 @@ public extension ReferenceID {
     }
     
     func delete() -> R<()> {
-        repoID.repo | { $0.reference(name: name) } | { $0.delete() }
+        repoID.repo | { $0.reference(name: name) | { $0.delete() } } 
     }
     
     func pushAsBranch(auth: Auth) -> R<Void> {
