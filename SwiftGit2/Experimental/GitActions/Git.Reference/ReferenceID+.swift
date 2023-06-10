@@ -38,7 +38,7 @@ public extension ReferenceID {
         }
     }
     
-    func delete() -> R<()> {
+    func delete() -> R<()> { // upstream will be deleted too
         repoID.repo | { $0.reference(name: name) | { $0.delete() } } 
     }
     
@@ -46,8 +46,8 @@ public extension ReferenceID {
         guard let remote = self.remote else { return .wtf("not a remote") }
         let repo = repoID.repo
         return repo
-        | { $0.remote(name: remote) }
-        | { $0.push(refspec: ":refs/heads/\(self.displayName)", options: PushOptions(auth: auth)) }
+                | { $0.remote(name: remote) }
+                | { $0.push(refspec: ":refs/heads/\(self.displayName)", options: PushOptions(auth: auth)) }
     }
 
 }

@@ -17,11 +17,11 @@ public extension ReferenceID {
 }
 
 public extension ReferenceID {
-    func createUpstreamAt(remote: String, reflog: String = "update by push") -> R<ReferenceID> {
+    func createUpstreamAt(remote: String, reflog: String = "update by push", force: Bool = false) -> R<ReferenceID> {
         guard isBranch else { return .wtf("can't create upstream: not a branch")  }
-        let upstreamID = ReferenceID(repoID: repoID, name: id.replace(of: "refs/heads", to: "refs/remotes/\(remote)/") + displayName)
+        let upstreamID = ReferenceID(repoID: repoID, name: id.replace(of: "refs/heads", to: "refs/remotes/\(remote)"))
         
-        return targetOID | { upstreamID.create(at: $0, reflog: reflog, force: false) }
+        return targetOID | { upstreamID.create(at: $0, reflog: reflog, force: force) }
                          | { self.set(upstream: $0) }
     }
     

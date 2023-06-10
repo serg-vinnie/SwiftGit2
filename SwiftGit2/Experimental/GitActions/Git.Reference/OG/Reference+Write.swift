@@ -16,7 +16,7 @@ public extension Repository {
 }
 
 public extension Reference {
-    func delete() -> Result<Void, Error> {
+    func delete() -> Result<Void, Error> { // upstream will be deleted too
         return git_try("git_reference_delete") {
             git_reference_delete(self.pointer)
         }

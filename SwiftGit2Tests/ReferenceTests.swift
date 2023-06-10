@@ -31,27 +31,30 @@ class ReferenceTests: XCTestCase {
         let refID = GitReference(repoID).new(branch: "test_branch", from: .HEAD, checkout: false)
             .shouldSucceed("create branch")!
         
-        let sync = refID.createUpstream(in: .firstRemote, pushOptions: .init(auth: .defaultSSH))
-            .shouldSucceed("createUpstream")!
+        let upstreamID = refID.createUpstreamAt(remote: "origin", force: true)
+                    .shouldSucceed("createUpstream")!
         
-        if case let .upstreamCreated(upstreamID) = sync {
-            print(upstreamID)
-            
-            upstreamID.pushAsBranch(auth: .defaultSSH)
-                .shouldSucceed("push")
-            
-            refID.delete()
-                .shouldSucceed("delete")
-            
-            upstreamID
-                .delete()
-                .shouldSucceed("refID.delete")
-            
-            upstreamID.pushAsBranch(auth: .defaultSSH)
-                .shouldSucceed("push after delete")
-        }
+        repoID.references
+            .map { $0.map { $0.name } }
+            .shouldSucceed("refs")
+        
+        upstreamID.pushAsBranch(auth: .defaultSSH)
+            .shouldSucceed("push")
+        
+//        refID.delete()
+//            .shouldSucceed("delete")
+//        
+//        repoID.references
+//            .map { $0.map { $0.name } }
+//            .shouldSucceed("refs2")
+        
+//        upstreamID
+//            .delete()
+//            .shouldSucceed("refID.delete")
         
         
+//        upstreamID.pushAsBranch(auth: .defaultSSH)
+//            .shouldSucceed("push after delete")
     }
     
     func test_branchCheckout() {
