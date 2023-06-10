@@ -42,12 +42,34 @@ public extension ReferenceID {
         repoID.repo | { $0.reference(name: name) | { $0.delete() } } 
     }
     
-    func pushAsBranch(auth: Auth) -> R<Void> {
+    func ___pushAsBranch(auth: Auth) -> R<Void> {
         guard let remote = self.remote else { return .wtf("not a remote") }
         let repo = repoID.repo
         return repo
                 | { $0.remote(name: remote) }
                 | { $0.push(refspec: ":refs/heads/\(self.displayName)", options: PushOptions(auth: auth)) }
+    }
+    
+    enum PushRefspec {
+        case onCreate
+        case onDelete
+    }
+    
+    func string(refspec: PushRefspec) -> String {
+        switch refspec {
+        case .onCreate: return "refs/heads/\(self.displayName)"
+        case .onDelete: return ":refs/heads/\(self.displayName)"
+        }
+    }
+    
+    func push(auth: Auth, refspec: PushRefspec) -> R<Void> {
+        guard let remote = self.remote else { return .wtf("not a remote") }
+        let refspec = string(refspec: refspec)
+        
+        let repo = repoID.repo  // keep reference
+        return repo
+                | { $0.remote(name: remote) }
+                | { $0.push(refspec: refspec, options: PushOptions(auth: auth)) }
     }
 
 }

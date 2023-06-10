@@ -20,8 +20,6 @@ class ReferenceTests: XCTestCase {
         ReferenceID(repoID: repoID, name: "refs/heads/branch")
             .rename("branch2")
             .shouldSucceed("rename")
-        
-        
     }
     
     func test_clone_rename_branch() {
@@ -38,23 +36,14 @@ class ReferenceTests: XCTestCase {
             .map { $0.map { $0.name } }
             .shouldSucceed("refs")
         
-        upstreamID.pushAsBranch(auth: .defaultSSH)
+        upstreamID.push(auth: .defaultSSH, refspec: .onCreate)
             .shouldSucceed("push")
         
-//        refID.delete()
-//            .shouldSucceed("delete")
-//        
-//        repoID.references
-//            .map { $0.map { $0.name } }
-//            .shouldSucceed("refs2")
+        refID.delete()
+            .shouldSucceed("delete")
         
-//        upstreamID
-//            .delete()
-//            .shouldSucceed("refID.delete")
-        
-        
-//        upstreamID.pushAsBranch(auth: .defaultSSH)
-//            .shouldSucceed("push after delete")
+        upstreamID.push(auth: .defaultSSH, refspec: .onDelete)
+            .shouldSucceed("push after delete")
     }
     
     func test_branchCheckout() {
