@@ -26,24 +26,37 @@ class ReferenceTests: XCTestCase {
         let folder = root.with(repo: "clone_rename", content: .clone(.testRepoSSH, .defaultSSH)).shouldSucceed()!
         let repoID = folder.repoID
         
+        
         let refID = GitReference(repoID).new(branch: "test_branch", from: .HEAD, checkout: false)
             .shouldSucceed("create branch")!
         
         let upstreamID = refID.createUpstreamAt(remote: "origin", force: true)
                     .shouldSucceed("createUpstream")!
         
-        repoID.references
-            .map { $0.map { $0.name } }
-            .shouldSucceed("refs")
+        refID.upstream
+            .map { $0.name }
+            .assertEqual(to: upstreamID.name, "upstream equal")
         
         upstreamID.push(auth: .defaultSSH, refspec: .onCreate)
-            .shouldSucceed("push")
+            .shouldSucceed()
         
-        refID.delete()
-            .shouldSucceed("delete")
+        refID.rename("test_branch_renamed", force: true)
+            .shouldSucceed()
+        
+        let renamedUpstreamID = upstreamID.rename("test_branch_renamed", force: true)
+            .shouldSucceed("rename")!
         
         upstreamID.push(auth: .defaultSSH, refspec: .onDelete)
             .shouldSucceed("push after delete")
+        
+        renamedUpstreamID.push(auth: .defaultSSH, refspec: .onCreate)
+            .shouldSucceed("push renamed upstream")
+        
+        renamedUpstreamID.push(auth: .defaultSSH, refspec: .onDelete)
+            .shouldSucceed("delete renamed upstream")
+        
+        repoID.references.map { $0.map { $0.name } }.shouldSucceed("refs")
+
     }
     
     func test_branchCheckout() {

@@ -9,10 +9,18 @@ public extension ReferenceID {
         
         let repo = self.repoID.repo
         let reference = repo | { $0.reference(name: self.id) }
+        let upstream = self.upstream.maybeSuccess
         
         return reference
-        | { $0.rename(self.prefix + newName, reflog: reflog, force: force) }
-        | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
+                | { $0.rename(self.prefix + newName, reflog: reflog, force: force) }
+                | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference).setting(upstream: upstream) }
+    }
+    
+    private func setting(upstream: ReferenceID?) -> R<ReferenceID> {
+        if let upstream = upstream {
+            return self.set(upstream: upstream) | { _ in self }
+        }
+        return .success(self)
     }
 }
 
@@ -25,12 +33,19 @@ public extension ReferenceID {
                          | { self.set(upstream: $0) }
     }
     
+    var upstream : R<ReferenceID> {
+        let repo = self.repoID.repo
+        return repo | { $0.reference(name: self.id) }
+                    | { $0.upstream() }
+                    | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
+    }
+    
     func set(upstream: ReferenceID) -> R<ReferenceID> {
-        guard upstream.isRemote else { return .wtf("can't set upstream: not a remote branch : \(upstream.id)") }
+        guard let remote = upstream.remote else { return .wtf("can't set upstream: not a remote branch : \(upstream.id)") }
         let repo = self.repoID.repo
         let reference = repo | { $0.reference(name: self.id) }
         
-        return reference | { $0.setUpstream(name: upstream.displayName) } | { _ in upstream }
+        return reference | { $0.setUpstream(name: upstream.displayNameEx) } | { _ in upstream }
     }
     
     func create(at oid: OID, reflog: String, force: Bool) -> R<ReferenceID> {
@@ -72,9 +87,8 @@ extension Reference {
         }
     }
     
-    /// can be called only for local branch;
-    ///
-    /// newName looks like "BrowserGridItemView" BUT NOT LIKE "refs/heads/BrowserGridItemView"
+    /// newName like  "origin/BrowserGridItemView"
+    /// BUT NOT LIKE "refs/heads/BrowserGridItemView"
     func setUpstream(name: String) -> R<Branch> {
         git_try("git_branch_set_upstream") {
             git_branch_set_upstream(self.pointer, name)
@@ -83,9 +97,9 @@ extension Reference {
 }
 
 public extension Branch {
-    /// can be called only for local branch;
-    ///
-    /// newName looks like "BrowserGridItemView" BUT NOT LIKE "refs/heads/BrowserGridItemView"
+    
+    /// newName like  "origin/BrowserGridItemView"
+    /// BUT NOT LIKE "refs/heads/BrowserGridItemView"
     func _setUpstream(name: String) -> R<Branch> {
         git_try("git_branch_set_upstream") {
             git_branch_set_upstream(self.pointer, name)
