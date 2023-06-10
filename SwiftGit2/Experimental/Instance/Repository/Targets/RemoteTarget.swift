@@ -47,6 +47,6 @@ private extension Duo where T1 == RemoteTarget, T2 == Repository {
         return combine(referenceName, oid)
             | { repo.createReference(name: $0, oid: $1, force: force, reflog: "TaoSync: upstream for \(branch.nameAsReference)") }
             | { _ in upstreamName }
-            | { branch.setUpstream(name: $0)}
+            | { branch._setUpstream(name: $0)}
     }
 }

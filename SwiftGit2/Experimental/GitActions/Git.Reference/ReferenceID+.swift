@@ -33,7 +33,7 @@ public extension ReferenceID {
             // set HEAD branch's upstream to existing remote branch
                 .flatMap { repo.HEAD() }
                 .flatMap { $0.asBranch() }
-                .flatMap { $0.setUpstream(name: upstreamName) }
+                .flatMap { $0._setUpstream(name: upstreamName) }
                 .flatMap { _ in .success(()) }
         }
     }

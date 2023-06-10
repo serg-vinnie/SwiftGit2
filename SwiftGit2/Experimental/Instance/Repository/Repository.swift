@@ -59,13 +59,7 @@ extension Repository: CustomDebugStringConvertible {
 
 
 public extension Repository {
-    func createReference(name: String, oid: OID, force: Bool, reflog: String)-> R<Reference> {
-        var oid = oid.oid
-        
-        return git_instance(of: Reference.self, "git_reference_create") { pointer in
-            git_reference_create(&pointer, self.pointer, name, &oid, force ? 1 : 0, reflog)
-        }
-    }
+
     
 //    @available(*, deprecated, message: "use createBranch(from target) instead. But this method works with detached head")
 //    // Works with detached head

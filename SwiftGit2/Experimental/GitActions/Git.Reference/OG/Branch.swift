@@ -40,14 +40,6 @@ public extension Branch {
 
 public extension Branch {
     /// can be called only for local branch;
-    ///
-    /// newName looks like "BrowserGridItemView" BUT NOT LIKE "refs/heads/BrowserGridItemView"
-    func setUpstream(name: String) -> R<Branch> {
-        git_try("git_branch_set_upstream") {
-            git_branch_set_upstream(self.pointer, name)
-        }.map { self }
-    }
-    /// can be called only for local branch;
     func upstreamName(clean: Bool = false) -> Result<String, Error> {
         if clean {
             return upstream().map { $0.nameAsReference.replace(of: "refs/remotes/", to: "") }
