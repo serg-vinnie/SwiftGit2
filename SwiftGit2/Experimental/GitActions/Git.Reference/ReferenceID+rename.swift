@@ -13,7 +13,8 @@ public extension ReferenceID {
         
         return reference
                 | { $0.rename(self.prefix + newName, reflog: reflog, force: force) }
-                | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference).setting(upstream: upstream) }
+                | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
+                | { $0.setting(upstream: upstream) }
     }
     
     private func setting(upstream: ReferenceID?) -> R<ReferenceID> {
@@ -41,7 +42,7 @@ public extension ReferenceID {
     }
     
     func set(upstream: ReferenceID) -> R<ReferenceID> {
-        guard let remote = upstream.remote else { return .wtf("can't set upstream: not a remote branch : \(upstream.id)") }
+        guard upstream.isRemote else { return .wtf("can't set upstream: not a remote branch : \(upstream.id)") }
         let repo = self.repoID.repo
         let reference = repo | { $0.reference(name: self.id) }
         
