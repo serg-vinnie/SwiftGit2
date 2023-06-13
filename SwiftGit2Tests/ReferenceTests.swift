@@ -43,8 +43,8 @@ class ReferenceTests: XCTestCase {
         let renamedRefID = refID.rename("test_branch_renamed", force: true)
             .shouldSucceed()!
         
-        let renamedUpstreamID = upstreamID.rename("test_branch_renamed", force: true)
-            .assertEqual(to: ReferenceID(repoID: repoID, name: "refs/remotes/origin/test_branch_renamed"))!
+        let renamedUpstreamID = upstreamID.rename("test_branch_renamed_up", force: true)
+            .assertEqual(to: ReferenceID(repoID: repoID, name: "refs/remotes/origin/test_branch_renamed_up"))!
             //.shouldSucceed("upstream rename")!
         
         repoID.references.map { $0.map { $0.name } }
