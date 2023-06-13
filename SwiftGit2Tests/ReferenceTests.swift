@@ -40,11 +40,18 @@ class ReferenceTests: XCTestCase {
         upstreamID.push(auth: .defaultSSH, refspec: .onCreate)
             .shouldSucceed()
         
-        refID.rename("test_branch_renamed", force: true)
-            .shouldSucceed()
+        let renamedRefID = refID.rename("test_branch_renamed", force: true)
+            .shouldSucceed()!
         
         let renamedUpstreamID = upstreamID.rename("test_branch_renamed", force: true)
-            .shouldSucceed("rename")!
+            .assertEqual(to: ReferenceID(repoID: repoID, name: "refs/remotes/origin/test_branch_renamed"))!
+            //.shouldSucceed("upstream rename")!
+        
+        repoID.references.map { $0.map { $0.name } }
+            .shouldSucceed("list")
+        
+        renamedRefID.upstream.map { $0.name }
+            .assertEqual(to: renamedUpstreamID.name)
         
         upstreamID.push(auth: .defaultSSH, refspec: .onDelete)
             .shouldSucceed("push after delete")

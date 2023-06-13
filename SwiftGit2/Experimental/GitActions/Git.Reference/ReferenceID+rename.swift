@@ -5,16 +5,48 @@ import Essentials
 
 public extension ReferenceID {
     func rename( _ newName: String, force: Bool = false) -> R<ReferenceID> {
-        let reflog = "branch: renamed " + self.id + " to " + self.prefix + newName
+        if isBranch {
+            return renameBranch(newName, force: force)
+        } else if isRemote {
+            return renameRemoteBranch(newName, force: force)
+        } else if isTag {
+            return .notImplemented("rename tag")
+        } else {
+            return .wtf("ReferenceID.rename: unexpected name: " + name)
+        }
+    }
+    
+    private func renameBranch( _ newName: String, force: Bool) -> R<ReferenceID> {
+        let reflog = "branch: renamed " + self.name + " to " + self.prefix + newName
         
         let repo = self.repoID.repo
-        let reference = repo | { $0.reference(name: self.id) }
+        let reference = repo | { $0.reference(name: self.name) }
         let upstream = self.upstream.maybeSuccess
         
         return reference
                 | { $0.rename(self.prefix + newName, reflog: reflog, force: force) }
                 | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
                 | { $0.setting(upstream: upstream) }
+    }
+    
+    private func renameRemoteBranch( _ newName: String, force: Bool) -> R<ReferenceID> {
+        let reflog = "branch: renamed " + self.id + " to " + self.prefix + newName
+        
+        let repo = self.repoID.repo
+        let reference = repo | { $0.reference(name: self.name) }
+//        let refs = repo | { $0.references(withPrefix: "") }
+        let downstream = GitReference(self.repoID).list(.local) | { $0.first { $0.upstream.maybeSuccess?.name == self.name }.asNonOptional }
+        
+        if let downstream = downstream.maybeSuccess {
+            return reference
+                    | { $0.rename(self.prefix + newName, reflog: reflog, force: force) }
+                    | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
+                    | { renamed in downstream.setting(upstream: renamed) | { _ in renamed } }
+        } else {
+            return reference
+                    | { $0.rename(self.prefix + newName, reflog: reflog, force: force) }
+                    | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
+        }
     }
     
     private func setting(upstream: ReferenceID?) -> R<ReferenceID> {
@@ -36,7 +68,7 @@ public extension ReferenceID {
     
     var upstream : R<ReferenceID> {
         let repo = self.repoID.repo
-        return repo | { $0.reference(name: self.id) }
+        return repo | { $0.reference(name: self.name) }
                     | { $0.upstream() }
                     | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
     }
