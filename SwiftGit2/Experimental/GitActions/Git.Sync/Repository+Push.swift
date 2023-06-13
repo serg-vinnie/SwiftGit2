@@ -9,7 +9,7 @@
 import Clibgit2
 import Essentials
 
-public extension Repository {
+extension Repository {
     func push(_ target: BranchTarget, options: PushOptions) -> R<Void> {
         let branch = target.with(self).branchInstance
         let remote = target.with(self).remote
@@ -17,9 +17,9 @@ public extension Repository {
         return combine(remote, branch) | { $0.push(refspec: $1.nameAsReference, options: options) }
     }
 
-    func push(remoteName: String, branchName: String, options: PushOptions) -> Result<Void, Error> {
-        remote(name: remoteName) | { $0.push(refspec: branchName, options: options) }
-    }
+//    func push(remoteName: String, refspec: String, options: PushOptions) -> Result<Void, Error> {
+//        remote(name: remoteName) | { $0.push(refspec: refspec, options: options) }
+//    }
 }
 
 public extension Remote {
