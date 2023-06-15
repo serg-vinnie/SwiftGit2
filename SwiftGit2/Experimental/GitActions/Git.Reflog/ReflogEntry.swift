@@ -26,7 +26,24 @@ public extension ReflogEntry {
     var newCommit : CommitID { CommitID(repoID: repoID, oid: newOID) }
     
     var commiter : GitSignature { GitSignature(git_reflog_entry_committer(self.pointer).pointee) }
-    var message  : String { String(validatingUTF8: git_reflog_entry_message(self.pointer)) ?? "" }
+    var message  : String { git_reflog_entry_message(self.pointer).asSwiftString }
+}
+
+extension Optional where Wrapped == UnsafePointer<CChar> {
+    var asSwiftString : String {
+        if let a = self {
+            return String(cString: a)
+        }
+        return ""
+    }
+    
+    var asSwiftStringOptional : String? {
+        if let a = self {
+            return String(cString: a)
+        }
+        
+        return nil
+    }
 }
 
 extension ReflogEntry : Identifiable {

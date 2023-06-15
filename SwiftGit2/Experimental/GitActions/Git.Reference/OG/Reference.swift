@@ -23,8 +23,8 @@ public class Reference: Branch { // Branch: InstanceProtocol
 }
 
 public extension Reference {
-    var nameAsReference: String { String(validatingUTF8: git_reference_name(pointer)) ?? "" }
-    var nameAsReferenceSymbolic: String? { String(validatingUTF8: git_reference_symbolic_target(pointer)) }
+    var nameAsReference: String { git_reference_name(pointer).asSwiftString }
+    var nameAsReferenceSymbolic: String? { git_reference_symbolic_target(pointer).asSwiftStringOptional }
     
     var nameAsReferenceCleaned: String{ nameAsReference.fixNameAsReference() }
 

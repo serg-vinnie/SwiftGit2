@@ -21,14 +21,9 @@ public class Commit: Object {
     }
     
     /// Subject
-    public var summary: String { String(validatingUTF8: git_commit_summary(pointer)) ?? "" }
+    public var summary: String { git_commit_summary(pointer).asSwiftString }
     /// Description
-    public var body: String {
-        if let commitBody = git_commit_body(pointer) {
-            return String(validatingUTF8: commitBody) ?? ""
-        }
-        return ""
-    }
+    public var body: String { git_commit_body(pointer).asSwiftString }
     
     /// Description + \n\n + Subject
     // public var message 	: String 	{ String(validatingUTF8: git_commit_message(pointer)) ?? "" }

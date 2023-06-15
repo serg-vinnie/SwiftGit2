@@ -121,8 +121,8 @@ public struct Tag: InstanceProtocol, ObjectType, Hashable  {
         let targetOid = OID(git_tag_target_id(pointer).pointee)
         self.targetOid = targetOid
         //target = Pointer(oid: targetOid, type: git_tag_target_type(pointer))!
-        name = String(validatingUTF8: git_tag_name(pointer))!
+        name = git_tag_name(pointer).asSwiftString
         tagger = git_tag_tagger(pointer)?.pointee
-        message = String(validatingUTF8: git_tag_message(pointer))!
+        message = git_tag_message(pointer).asSwiftString
     }
 }
