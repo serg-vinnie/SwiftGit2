@@ -31,7 +31,7 @@ public extension ReflogEntry.Kind {
         case .commitInitial(_): return "commit"
         case .commitMerge(_):   return "commit"
         case .checkout(_, _):   return "checkout"
-        case .undefined:        return ""
+        case .undefined:        return "other"
         }
     }
     

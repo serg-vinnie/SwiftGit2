@@ -3,6 +3,33 @@ import Foundation
 import Clibgit2
 import Essentials
 
+extension FileHandle {
+    func write(data: Data) -> R<Void> {
+        do {
+            try self.write(contentsOf: data)
+            return .success(())
+        } catch {
+            return .failure(error)
+        }
+    }
+}
+
+extension URL {
+    func append(content: String) -> R<Void> {
+        if let fileHandle = FileHandle(forWritingAtPath: self.path) {
+            do {
+                let b = try fileHandle.seekToEnd()
+                fileHandle.seek(toFileOffset: b - 1)
+            } catch {
+                return .failure(error)
+            }
+            return content.asData() | { fileHandle.write(data: $0) }
+        } else {
+            return .wtf("can't open file \(self.path)")
+        }
+    }
+}
+
 public extension ReferenceID {
     func rename( _ newName: String, force: Bool = false) -> R<ReferenceID> {
         if isBranch {
@@ -17,8 +44,8 @@ public extension ReferenceID {
     }
     
     private func renameBranch( _ newName: String, force: Bool) -> R<ReferenceID> {
-        let reflog = "branch: renamed " + self.name + " to " + self.prefix + newName
-        
+        let reflog = "Branch: renamed " + self.name + " to " + self.prefix + newName
+
         let repo = self.repoID.repo
         let reference = repo | { $0.reference(name: self.name) }
         let upstream = self.upstream.maybeSuccess
@@ -26,7 +53,17 @@ public extension ReferenceID {
         return reference
                 | { $0.rename(self.prefix + newName, reflog: reflog, force: force) }
                 | { ReferenceID(repoID: self.repoID, name: $0.nameAsReference) }
+                | { $0.appnendHead(reflog: reflog) }
                 | { $0.setting(upstream: upstream) }
+    }
+    
+    private func appnendHead(reflog: String) -> R<ReferenceID> {
+        let head = (repoID.repo | { $0.HEAD() | { $0.nameAsReference } })
+        if head.maybeSuccess == self.name {
+            return self.repoID.dbURL | { $0.appendingPathComponent("logs/HEAD") } | { $0.append(content: "\t" + reflog + "\n") } | { _ in self }
+        } else {
+            return .success(self)
+        }
     }
     
     private func renameRemoteBranch( _ newName: String, force: Bool) -> R<ReferenceID> {
@@ -34,7 +71,7 @@ public extension ReferenceID {
         
         let repo = self.repoID.repo
         let reference = repo | { $0.reference(name: self.name) }
-//        let refs = repo | { $0.references(withPrefix: "") }
+
         let downstream = GitReference(self.repoID).list(.local) | { $0.first { $0.upstream.maybeSuccess?.name == self.name }.asNonOptional }
         
         if let downstream = downstream.maybeSuccess {
