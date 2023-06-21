@@ -36,8 +36,21 @@ public extension ReferenceID {
     var isRemote  : Bool { name.hasPrefix("refs/remotes/") }
     var isTag     : Bool { name.hasPrefix("refs/tags/") }
     
-    var prefix      : String { name.replace(of: displayName, to: "")}
-    var prefixEx      : String { name.replace(of: displayNameEx, to: "")}
+    var prefix      : String {
+        if name.starts(with: "refs/heads/") { return "refs/heads/" }
+        if let remote = remote, name.starts(with: "refs/remotes/") { return "refs/heads/\(remote)/" }
+        if name.starts(with: "refs/tags/") { return "refs/tags/" }
+        
+        return ""
+    }
+    var prefixEx      : String {
+        if name.starts(with: "refs/heads/")     { return "refs/heads/" }
+        if name.starts(with: "refs/remotes/")   { return "refs/heads/" }
+        if name.starts(with: "refs/tags/")      { return "refs/tags/" }
+        
+        return ""
+        
+    }
     
     var displayName : String {
         if isBranch {
