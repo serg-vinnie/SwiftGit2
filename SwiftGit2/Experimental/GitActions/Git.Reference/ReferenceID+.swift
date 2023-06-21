@@ -56,6 +56,13 @@ public extension ReferenceID {
     }
     
     func string(refspec: PushRefspec) -> String {
+        if self.isTag {
+            switch refspec {
+            case .onCreate: return "\(name):refs/tags/\(self.displayName)"
+            case .onDelete: return ":refs/tags/\(self.displayName)"
+            }
+        }
+        
         switch refspec {
         case .onCreate: return "\(name):refs/heads/\(self.displayName)"
         case .onDelete: return ":refs/heads/\(self.displayName)"

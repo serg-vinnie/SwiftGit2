@@ -24,11 +24,15 @@ public extension GitTag {
         repoID.repo | { $0.delete(tag: tag) }
     }
     
-    func pushToRemote(tag: String, remote: String, auth: Auth) -> R<Void> {
+    func pushToRemote(tag: String, remote: String, auth: Auth, refspec: ReferenceID.PushRefspec) -> R<Void> {
         let repo = repoID.repo
-        return repo
+        let refID = ReferenceID(repoID: repoID, name: "refs/tags/" + tag)
+        
+        let push = repo
         | { $0.remote(name: remote) }
-        | { $0.push(refspec: ":refs/tags/\(tag)", options: PushOptions(auth: auth)) }
+        | { $0.push(refspec: refID.string(refspec: refspec), options: PushOptions(auth: auth)) }
+        
+        return push
     }
     
     func pushToFirstRemote(tag: String, auth: Auth) -> R<Void> {
