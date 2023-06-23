@@ -17,6 +17,7 @@ public extension ReflogEntry {
         case commitInitial(String)
         case commitMerge(String)
         case checkout(Target,Target)
+        case reset
         
         case undefined
     }
@@ -32,6 +33,7 @@ public extension ReflogEntry.Kind {
         case .commitMerge(_):   return "commit"
         case .checkout(_, _):   return "checkout"
         case .undefined:        return "other"
+        case .reset:            return "reset"
         }
     }
     
@@ -87,8 +89,18 @@ public extension ReflogEntry {
             return .clone(String(url))
         } catch { }
         
+        do {
+            let _ = try resetParser.parse(message)
+            return .reset
+        } catch { }
+        
         return .undefined
     }
+}
+
+var resetParser = Parse {
+    StartsWith("reset: moving to")
+    Rest<String.SubSequence>()
 }
 
 var commitParser = Parse {
