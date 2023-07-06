@@ -53,7 +53,8 @@ public extension GitRemotes {
     }
     
     func fetch(name: String, refspec: [String], options: @escaping (String)->FetchOptions) -> R<()> {
-        let remote = repoID.repo | { $0.remote(name: name) }
+        let repo = repoID.repo
+        let remote = repo | { $0.remote(name: name) }
         let url = remote | { $0.url.asNonOptional("remote url") }
         
         return combine(remote, url)
