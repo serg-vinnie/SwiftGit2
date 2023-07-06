@@ -39,8 +39,8 @@ public struct PullOptions {
 }
 
 public extension Repository {    
-    func pull(_ target: BranchTarget, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
-        return combine(fetch(target, options: options.fetch), mergeAnalysisUpstream(target))
+    func pull(refspec: [String], _ target: BranchTarget, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
+        return combine(fetch(refspec: refspec ,target, options: options.fetch), mergeAnalysisUpstream(target))
         | { branch, anal in self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options, stashing: stashing) }
     }
     

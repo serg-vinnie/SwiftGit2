@@ -11,17 +11,23 @@ import Foundation
 import Essentials
 
 public extension Repository {
-    func fetch(_ target: BranchTarget, options: FetchOptions) -> Result<Branch, Error> {
+    func fetch(refspec: [String], _ target: BranchTarget, options: FetchOptions) -> Result<Branch, Error> {
         let duo = target.with(self)
-        return duo.remote | { $0.fetch(options: options) } | { duo.branchInstance }
+        return duo.remote | { $0.fetch(refspec: refspec, options: options) } | { duo.branchInstance }
     }
 }
 
 public extension Remote {
-    func fetch(options: FetchOptions) -> Result<Void, Error> {
+    func fetch(refspec: [String], options: FetchOptions) -> Result<Void, Error> {
         return git_try("git_remote_fetch") {
-            options.with_git_fetch_options {
-                git_remote_fetch(pointer, nil, &$0, nil)
+            options.with_git_fetch_options { options in
+                if !refspec.isEmpty {
+                    return refspec.with_git_strarray { strarray in
+                        git_remote_fetch(pointer, &strarray, &options, nil)
+                    }
+                } else {
+                    return git_remote_fetch(pointer, nil, &options, nil)
+                }
             }
         }
     }

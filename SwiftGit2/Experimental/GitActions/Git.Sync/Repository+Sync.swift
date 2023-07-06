@@ -28,10 +28,10 @@ public extension ReferenceID {
 
 public extension Repository {
     
-    func sync(_ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
+    func sync(refspec: [String], _ remoteTarget: RemoteTarget, _ branchTarget: BranchTarget, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
         return upstreamExistsFor(.HEAD)
             .if(\.self, then: { _ in
-                pullAndPush(.HEAD, options: options, stashing: stashing)
+                pullAndPush(refspec: refspec, .HEAD, options: options, stashing: stashing)
             }, else: { _ in
                 createUpstream(for: branchTarget, in: remoteTarget, options: options.push)
             })
@@ -47,8 +47,8 @@ public extension Repository {
             .map { .upstreamCreated($0) }
     }
     
-    func pullAndPush(_ target: BranchTarget, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
-        switch pull(target, options: options.pull, stashing: stashing) {
+    func pullAndPush(refspec: [String],_ target: BranchTarget, options: SyncOptions, stashing: Bool) -> R<PullPushResult> {
+        switch pull(refspec: refspec, target, options: options.pull, stashing: stashing) {
         case let .success(result):
             switch result {
             case let .threeWayConflict(index):

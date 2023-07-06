@@ -16,7 +16,7 @@ public struct GitSync {
         self.repoID = repoID
     }
     
-    public func pull(_ target: BranchTarget, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
-        repoID.repo | { $0.pull(target, options: options, stashing: stashing) }
+    public func pull(refspec: [String], _ target: BranchTarget, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
+        repoID.repo | { $0.pull(refspec: refspec, target, options: options, stashing: stashing) }
     }
 }

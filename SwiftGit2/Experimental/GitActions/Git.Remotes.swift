@@ -52,12 +52,12 @@ public extension GitRemotes {
         return .wtf("remoteOf(reference: IMPOSIBRU")
     }
     
-    func fetch(name: String, options: @escaping (String)->FetchOptions) -> R<()> {
+    func fetch(name: String, refspec: [String], options: @escaping (String)->FetchOptions) -> R<()> {
         let remote = repoID.repo | { $0.remote(name: name) }
         let url = remote | { $0.url.asNonOptional("remote url") }
         
         return combine(remote, url)
-                    | { $0.fetch(options: options($1)) }
+                    | { $0.fetch(refspec: refspec, options: options($1)) }
                     | { _ in () }
     }
     
@@ -77,9 +77,9 @@ extension Remote {
 }
 
 public extension GitRemotes {
-    func fetchAll(options: @escaping (String)->FetchOptions) -> R<()> {
+    func fetchAll(refspec: [String], options: @escaping (String)->FetchOptions) -> R<()> {
         (repoID.repo | { $0.remoteList() | { $0 | { r in
-            r.url.asNonOptional("remote url") | { r.fetch(options: options($0)) }
+            r.url.asNonOptional("remote url") | { r.fetch(refspec: refspec, options: options($0)) }
         } } } )
             .map { _ in () }
     }
