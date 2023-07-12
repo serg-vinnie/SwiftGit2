@@ -25,14 +25,15 @@ public struct StashFlags: OptionSet {
 }
 
 public struct Stash {
-    public let message: String?
+    public let message: String
     public let index: Int
-    public let id: OID?
-    public var commitOIDofStash: OID? { id }
-    public let time: Date?
+    public let oid: OID
+    public let time: Date
 }
 
-extension Stash: Identifiable { }
+extension Stash: Identifiable {
+    public var id: OID { oid }
+}
 
 extension Stash: Hashable { }
 
@@ -55,15 +56,19 @@ public class StashCallbacks {
         
         let msg: String?
         
-        if let msgCCchar = message
-            { msg = String(cString:msgCCchar) }
-            else { msg = nil }
+        if let msgCCchar = message {
+            msg = String(cString:msgCCchar)
+        } else {
+            msg = nil
+        }
         
         let oid = (id?.pointee)?.asOID()
         
-        let sth = Stash(message: msg, index: index, id: oid, time: me.date(oid: oid).maybeSuccess)
-        
-        me.stashes.append( sth )
+        if let msg = msg, let oid = oid, let time = me.date(oid: oid).maybeSuccess {
+            let sth = Stash(message: msg, index: index, oid: oid, time: time)
+            
+            me.stashes.append( sth )
+        }
         
         return 0
     }
