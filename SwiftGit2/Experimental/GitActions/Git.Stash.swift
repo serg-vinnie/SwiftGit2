@@ -48,9 +48,10 @@ internal extension Repository {
     func stashForeach() -> R<[Stash]> {
         var cb = StashCallbacks(repo: self)
         
-        return _result( { cb.stashes } , pointOfFailure: "git_stash_foreach") {
+        return git_try("git_stash_foreach")  {
             git_stash_foreach(self.pointer, cb.git_stash_cb, &cb)
         }
+        .map { _ in cb.stashes }
     }
     
     func stashSave(signature: Signature, message: String?, flags: StashFlags ) -> R<OID> {
