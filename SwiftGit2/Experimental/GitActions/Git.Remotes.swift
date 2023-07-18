@@ -69,6 +69,10 @@ public extension GitRemotes {
     
     var instances   : R<[Remote]>       { repoID.repo | { $0.remoteList() } }
     var first       : R<Remote>         { repoID.repo | { $0.remoteList() } | { $0.first.asNonOptional }}
+    
+    func url(name: String) -> R<String> {
+        repoID.repo | { $0.remote(name: name) } | { $0.url.asNonOptional("remote.url") }
+    }
 }
 
 extension Remote {
