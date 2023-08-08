@@ -98,12 +98,31 @@ public extension Repository {
     }
     
     func mergeFastForward(our: ReferenceID, their: ReferenceID) -> R<Reference> {
-        let targetOID = their.targetOID
+        
         let message = "Fast Forward MERGE \(their.name) -> \(our.name)"
-        let ref = our.reference
+        
         return combine(their.targetOID, our.reference) | { oid, ref in
             ref.set(target: oid, message: message)
         }
+    }
+    
+    func applyConflicts(from index: Index, theirOID: OID) -> R<MergeResult> {
+        // MERGE_HEAD creation
+        let _ = RevFile( repo: self, type: .PullMsg)?
+            .generatePullMsg(from: index)
+            .save()
+        
+        // MERGE_MODE creation
+        let _ = RevFile(repo: self, type: .MergeMode )?
+            .save()
+        
+        // MERGE_HEAD creation
+        OidRevFile( repo: self, type: .MergeHead)?
+            .set(oid: theirOID)
+            .save()
+        
+        return self.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
+        | { _ in .success(.threeWayConflict(index)) }
     }
     
     func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions, stashing: Bool = false) -> Result<MergeResult, Error> {

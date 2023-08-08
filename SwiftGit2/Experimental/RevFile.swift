@@ -56,6 +56,12 @@ public class OidRevFile {
         return self
     }
     
+    public func set(oid: OID) -> OidRevFile {
+        self.content = oid.description
+        
+        return self
+    }
+    
     public func save() {
         switch type {
         case .MergeHead:
