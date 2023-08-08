@@ -166,6 +166,8 @@ public extension Repository {
     }
 }
 
+
+
 public class AnnotatedCommit: InstanceProtocol {
     public var pointer: OpaquePointer
     public required init(_ pointer: OpaquePointer) {
