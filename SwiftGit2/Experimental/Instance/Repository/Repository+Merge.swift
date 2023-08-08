@@ -10,7 +10,40 @@ import Clibgit2
 import Essentials
 import Foundation
 
+public extension ReferenceID {
+    func mergeFastForward() -> R<Void> {
+        let ourID = repoID.headRefID
+        let their = self
+        return combine(ourID, repoID.repo).flatMap { ourID, repo in
+            repo.mergeFastForward(our: ourID, their: their)
+        } | { _ in () }
+    }
+}
+
+extension RepoID {
+    var headRefID : R<ReferenceID> { repo | { $0.headRefID } }
+}
+
 public extension Repository {
+    var unbornReference : R<ReferenceID> {
+        let name = self.directoryURL
+        | { $0.appendingPathComponent(".git/HEAD").readToString }
+        | { $0.dropFirst("ref: ".count) }
+        | { String($0) }
+        
+        return combine(name, self.repoID) | { name, repoID in
+            ReferenceID(repoID: repoID, name: name)
+        }
+    }
+    
+    var headRefID : R<ReferenceID> {
+        if self.headIsUnborn {
+            return unbornReference
+        }
+        
+        return self.repoID | { $0.HEAD } | { $0.asReference }
+    }
+    
     func commit(branch: String) -> R<Commit> {
         reference(name: branch) | { $0.asBranch() } | { $0.targetOID } | { self.instanciate($0)}
     }
@@ -62,6 +95,15 @@ public extension Repository {
         let anal = their | { mergeAnalysis(branch: $0) }
         return combine(anal, our, their)
             | { self.mergeAndCommit(anal: $0, our: $1, their: $2, signature: signature, options: options) }
+    }
+    
+    func mergeFastForward(our: ReferenceID, their: ReferenceID) -> R<Reference> {
+        let targetOID = their.targetOID
+        let message = "Fast Forward MERGE \(their.name) -> \(our.name)"
+        let ref = our.reference
+        return combine(their.targetOID, our.reference) | { oid, ref in
+            ref.set(target: oid, message: message)
+        }
     }
     
     func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
