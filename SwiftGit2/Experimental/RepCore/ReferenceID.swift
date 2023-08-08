@@ -93,7 +93,7 @@ public extension ReferenceID {
         return nil
     }
     
-    internal var reference : R<Reference> { repoID.repo | { $0.reference(name: name) } }
+    private var reference : R<Reference> { repoID.repo | { $0.reference(name: name) } }
     
     var isSymbolic : R<Bool> { reference | { $0.isSymbolic } }
     var isDirect : R<Bool> { reference | { $0.isDirect } }

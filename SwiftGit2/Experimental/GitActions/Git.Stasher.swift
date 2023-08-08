@@ -33,6 +33,19 @@ public struct GitStasher {
     }
 }
 
+extension StatusIterator {
+    public var _isEmpty: Bool {
+        if isEmpty {
+            return true
+        } else {
+            if let e = self.first {
+                print(e.stagePath)
+            }
+            return false
+        }
+    }
+}
+
 public extension GitStasher {
     func push() -> R<Self> {
         if repo.headIsUnborn {
@@ -41,7 +54,7 @@ public extension GitStasher {
             return repo
                 .status()
                 //.map { !$0.isEmpty }
-                .if(\.isEmpty,
+                .if(\._isEmpty,
                      then: { _ in   .success(GitStasher(repo: repo, state: .empty)) },
                      else: { _ in
                                     stash()

@@ -31,6 +31,10 @@ public extension GitIndex {
 internal extension Repository {
     func stage(_ t: StagingTarget) -> R<Repository> {
         switch t {
+        case .path(let path):
+            return self.index()
+                .flatMap { $0.addAll(pathPatterns: [path]).map{ _ in () } }
+                .map{ self }
         case .all:
             return self.index()
                 .flatMap { $0.addAll().map{ _ in () } }
@@ -59,6 +63,9 @@ internal extension Repository {
     
     func unStage(_ t: StagingTarget) -> R<Repository> {
         switch t {
+        case .path(let path):
+            return self.resetDefault(pathPatterns: [path])
+                .map{ self }
         case .all:
             return self.resetDefault()
                 .map{ self }
@@ -74,6 +81,7 @@ internal extension Repository {
 
 
 public enum StagingTarget {
+    case path(String)
     case entry(StatusEntry)
     case all
 }

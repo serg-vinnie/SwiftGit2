@@ -11,11 +11,14 @@ import Essentials
 import Foundation
 
 public extension ReferenceID {
-    func mergeFastForward() -> R<Void> {
+    func mergeFastForward(stashing: Bool) -> R<Void> {
         let ourID = repoID.headRefID
         let their = self
         return combine(ourID, repoID.repo).flatMap { ourID, repo in
-            repo.mergeFastForward(our: ourID, their: their)
+            GitStasher(repo: repo).wrap(skip: !stashing) {
+                repo.mergeFastForward(our: ourID, their: their) //| { _ in repo.checkoutHead(options: CheckoutOptions(strategy: .Force), stashing: stashing) }
+                | { _ in ourID.checkout(options: CheckoutOptions(strategy: .Force), stashing: false) }
+            }
         } | { _ in () }
     }
 }
@@ -100,8 +103,10 @@ public extension Repository {
     func mergeFastForward(our: ReferenceID, their: ReferenceID) -> R<Reference> {
         
         let message = "Fast Forward MERGE \(their.name) -> \(our.name)"
+        let repo = our.repoID.repo
+        let ourRef = repo | { $0.reference(name: our.name) }
         
-        return combine(their.targetOID, our.reference) | { oid, ref in
+        return combine(their.targetOID, ourRef) | { oid, ref in
             ref.set(target: oid, message: message)
         }
     }
