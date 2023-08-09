@@ -111,10 +111,10 @@ public extension Repository {
         }
     }
     
-    func applyConflicts(from index: Index, theirOID: OID) -> R<MergeResult> {
+    func goMergeMode(index: Index, theirOID: OID, message: String?) {
         // MERGE_HEAD creation
         let _ = RevFile( repo: self, type: .PullMsg)?
-            .generatePullMsg(from: index)
+            .generatePullMsg(from: index, msg: message)
             .save()
         
         // MERGE_MODE creation
@@ -125,9 +125,13 @@ public extension Repository {
         OidRevFile( repo: self, type: .MergeHead)?
             .set(oid: theirOID)
             .save()
-        
+    }
+    
+    func applyConflicts(from index: Index, theirOID: OID) -> R<MergeResult> {
+//        goMergeMode(index: index, theirOID: theirOID)
+
         return self.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
-        | { _ in .success(.threeWayConflict(index)) }
+            | { _ in .success(.threeWayConflict(index)) }
     }
     
     func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
@@ -174,25 +178,27 @@ public extension Repository {
                 .flatMap { self.merge(our: $0, their: $1, ancestor: $2,options: options) } // -> Index
                 .if(\.hasConflicts,
                     then: { index in
-                        parents
-                            .map {
-                                // MERGE_HEAD creation
-                                let _ = RevFile( repo: self, type: .PullMsg)?
-                                    .generatePullMsg(from: index)
-                                    .save()
-                                
-                                // MERGE_MODE creation
-                                let _ = RevFile(repo: self, type: .MergeMode )?
-                                    .save()
-                                
-                                // MERGE_HEAD creation
-                                OidRevFile( repo: self, type: .MergeHead)?
-                                    .setOid(from: $0[1] )
-                                    .save()
-                            } | { _ in
-                                self.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
-                                    | { _ in .success(.threeWayConflict(index)) }
-                            }
+                    theirOID
+                        .onSuccess {
+                                self.goMergeMode(index: index, theirOID: $0, message: nil)
+//                                // MERGE_HEAD creation
+//                                let _ = RevFile( repo: self, type: .PullMsg)?
+//                                    .generatePullMsg(from: index)
+//                                    .save()
+//
+//                                // MERGE_MODE creation
+//                                let _ = RevFile(repo: self, type: .MergeMode )?
+//                                    .save()
+//
+//                                // MERGE_HEAD creation
+//                                OidRevFile( repo: self, type: .MergeHead)?
+//                                    .setOid(from: $0[1] )
+//                                    .save()
+                        }
+                        .flatMap { _ in
+                            self.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
+                                .map { _ in .threeWayConflict(index) }
+                        }
                     },
                     else: { index in
                         combine(message, parents)

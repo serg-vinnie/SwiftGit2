@@ -116,8 +116,8 @@ public class RevFile {
         return self
     }
     
-    func generatePullMsg(from index: Index) -> RevFile {
-        return generateMergeMsgBase(from: index, msgHeader: "MERGE conflicts resolve")
+    func generatePullMsg(from index: Index, msg: String?) -> RevFile {
+        return generateMergeMsgBase(from: index, msgHeader: msg ?? "MERGE conflicts resolve")
     }
     
     func generateMergeMsg(from index: Index, commit: Commit) -> RevFile {
@@ -133,6 +133,11 @@ public class RevFile {
     }
     
     private func generateMergeMsgBase(from index: Index, msgHeader: String) -> RevFile {
+        if case let .success(c) = index.conflicts(), c.isEmpty {
+            self.content = msgHeader
+            return self
+        }
+        
         let separator = "\n * "
         
         let msgDescription = try? index

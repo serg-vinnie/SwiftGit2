@@ -117,7 +117,7 @@ public extension Repository {
                         .map {
                             // MERGE_HEAD creation
                             let _ = RevFile( repo: repo, type: .PullMsg)?
-                                .generatePullMsg(from: index)
+                                .generatePullMsg(from: index, msg: nil)
                                 .save()
 
                             // MERGE_MODE creation
