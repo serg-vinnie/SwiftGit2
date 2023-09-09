@@ -1,4 +1,3 @@
-
 import XCTest
 import SwiftGit2
 import Essentials

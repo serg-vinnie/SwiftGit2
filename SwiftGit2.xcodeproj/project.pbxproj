@@ -3,11 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		1D0AFF642534AC440045D68D /* StatusOptions.Flags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */; };
+		1D2AF3432AACD15A00346C45 /* KnownHosts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2AF3422AACD15A00346C45 /* KnownHosts.swift */; };
+		1D2AF3452AACD1F800346C45 /* KnownHostsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2AF3442AACD1F800346C45 /* KnownHostsTests.swift */; };
 		1D2E4DEF27F9B07700A90463 /* GitDiscard+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2E4DEE27F9B07700A90463 /* GitDiscard+Test.swift */; };
 		1D496A4225372FA800789177 /* git_strarray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D496A4125372FA800789177 /* git_strarray.swift */; };
 		1D4BCEF727440F95008831DC /* Git.Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4BCEF627440F95008831DC /* Git.Index.swift */; };
@@ -194,6 +196,8 @@
 
 /* Begin PBXFileReference section */
 		1D0AFF632534AC440045D68D /* StatusOptions.Flags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusOptions.Flags.swift; sourceTree = "<group>"; };
+		1D2AF3422AACD15A00346C45 /* KnownHosts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnownHosts.swift; sourceTree = "<group>"; };
+		1D2AF3442AACD1F800346C45 /* KnownHostsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnownHostsTests.swift; sourceTree = "<group>"; };
 		1D2E4DEE27F9B07700A90463 /* GitDiscard+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GitDiscard+Test.swift"; sourceTree = "<group>"; };
 		1D496A4125372FA800789177 /* git_strarray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = git_strarray.swift; sourceTree = "<group>"; };
 		1D4BCEF627440F95008831DC /* Git.Index.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.Index.swift; sourceTree = "<group>"; };
@@ -496,6 +500,7 @@
 				BE7A753E1A4A2BCC002DA7E3 /* Pointers.swift */,
 				E653907B23E73CDE00C08416 /* Patch.swift */,
 				E63EDF7D265FF5A300A3D048 /* UrlSshHttp.swift */,
+				1D2AF3422AACD15A00346C45 /* KnownHosts.swift */,
 			);
 			path = SwiftGit2;
 			sourceTree = "<group>";
@@ -626,6 +631,7 @@
 				E6332DD0265167F0004990E7 /* Info.plist */,
 				1D914FBA28567A1300034EC1 /* Base */,
 				1D5ABADF2882264200F9791C /* FileChangesTests.swift */,
+				1D2AF3442AACD1F800346C45 /* KnownHostsTests.swift */,
 			);
 			path = SwiftGit2Tests;
 			sourceTree = "<group>";
@@ -1077,6 +1083,7 @@
 				E6D4A91824DEA8EC00E8041E /* Instance.swift in Sources */,
 				E6AA18F927AF815E002AFC33 /* GitModule.swift in Sources */,
 				BE7A753F1A4A2BCC002DA7E3 /* Pointers.swift in Sources */,
+				1D2AF3432AACD15A00346C45 /* KnownHosts.swift in Sources */,
 				E6D4A92224DF1B4300E8041E /* Object.swift in Sources */,
 				1DDFC0FB261B4DBD00EBBDE9 /* RevisionWalker.swift in Sources */,
 				1D6C643B2831B38F003E9072 /* Stash.swift in Sources */,
@@ -1109,6 +1116,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1DD99229276A24540088848F /* StatusDiffTests.swift in Sources */,
+				1D2AF3452AACD1F800346C45 /* KnownHostsTests.swift in Sources */,
 				E6F29F0027B58ADD00F473A1 /* TestFolder_Ext.swift in Sources */,
 				1D2E4DEF27F9B07700A90463 /* GitDiscard+Test.swift in Sources */,
 				E673122B292AB19D00606E91 /* CacheStorageTests.swift in Sources */,

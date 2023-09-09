@@ -1,11 +1,3 @@
-//
-//  RevwalkTests.swift
-//  SwiftGit2Tests
-//
-//  Created by loki on 29.06.2021.
-//  Copyright © 2021 GitHub, Inc. All rights reserved.
-//
-
 import Essentials
 import EssentialsTesting
 @testable import SwiftGit2
@@ -37,7 +29,7 @@ class RevwalkTests: XCTestCase {
         repo1.push(.HEAD, options: PushOptions(auth: .credentials(.sshDefault)))
             .shouldSucceed("push")
         
-        repo2.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
+        repo2.fetch(refspec: [], .HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
             .shouldSucceed()
         
         repo2.mergeAnalysisUpstream(.HEAD)

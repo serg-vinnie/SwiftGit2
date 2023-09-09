@@ -82,7 +82,7 @@ class GitStashTests: XCTestCase {
             .shouldSucceed()
         
         (GitStash(repoID: repoID).items() | { $0.first! })
-            .map { $0.message! }
+            .map { $0.message }
             .assertEqual(to: "On main: auto stash tag")
     }
     
@@ -101,7 +101,7 @@ class GitStashTests: XCTestCase {
         (repoID.repo | { $0.t_write(file: .fileA, with: .random) })
             .shouldSucceed()
 
-        GitSync(repoID: repoID).pull(.HEAD, options: .local, stashing: true)
+        GitSync(repoID: repoID).pull(refspec: [], .HEAD, options: .local, stashing: true)
             .shouldSucceed()
         
         (repoID.repo | { $0.status() } | { $0.count })

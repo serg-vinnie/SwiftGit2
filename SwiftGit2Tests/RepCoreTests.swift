@@ -1,11 +1,3 @@
-//
-//  RepCoreTests.swift
-//  SwiftGit2Tests
-//
-//  Created by loki on 18.02.2022.
-//  Copyright © 2022 GitHub, Inc. All rights reserved.
-//
-
 import XCTest
 import EssentialsTesting
 import SwiftGit2

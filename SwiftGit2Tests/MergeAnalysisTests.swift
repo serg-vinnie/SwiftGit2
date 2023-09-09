@@ -1,4 +1,3 @@
-
 import Essentials
 @testable import SwiftGit2
 import XCTest
@@ -66,7 +65,7 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: [.fastForward, .normal])
         
-        (dst.repo | { $0.pull(.HEAD, options: .local) })
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .assertEqual(to: .fastForward, "pull fast forward merge")
     }
     
@@ -83,7 +82,7 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: .normal)
         
-        (dst.repo | { $0.pull(.HEAD, options: .local) })
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .assertEqual(to: .threeWaySuccess, "Pull")
     }
     
@@ -100,7 +99,7 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.mergeAnalysisUpstream(.HEAD) })
             .assertEqual(to: .normal)
         
-        (dst.repo | { $0.pull(.HEAD, options: .local) })
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .map { $0.hasConflict }
             .assertEqual(to: true, "Pull has conflict")
     }
@@ -128,7 +127,7 @@ class MergeAnalysisTests: XCTestCase {
         src.commit(file: .fileA, with: .oneLine1, msg: "File A").shouldSucceed()
         dst.commit(file: .fileA, with: .oneLine2, msg: "File A").shouldSucceed()
                 
-        (dst.repo | { $0.pull(.HEAD, options: .local) })
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .shouldSucceed()
         
         // -------------------------------------------------------------------
@@ -209,7 +208,7 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed()
         
         // update submodule in SRC repo
-        (src.sub(folder: subRepo).repo | { $0.pull(.HEAD, options: .local) })
+        (src.sub(folder: subRepo).repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .shouldSucceed()
         (src.repo | { $0.addBy(path: subRepo) })
             .shouldSucceed()
@@ -221,7 +220,7 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed()
         
         // update submodule in DST repo
-        (dst.sub(folder: subRepo).repo | { $0.pull(.HEAD, options: .local) })
+        (dst.sub(folder: subRepo).repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .shouldSucceed()
         (dst.repo | { $0.addBy(path: subRepo) })
             .shouldSucceed()
@@ -229,7 +228,7 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed()
         
         // ---------------------------------
-        (dst.repo | { $0.pull(.HEAD, options: .local) })
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .shouldSucceed()
         
         let repoID = RepoID(url: dst.url )
@@ -299,7 +298,7 @@ extension MergeAnalysisTests {
         repo1.t_commit(file: .fileLong, with: .random, msg: "[OUR] for THREE WAY **SUCCESSFUL** MERGE test")
             .shouldSucceed()
         
-        repo1.fetch(.HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
+        repo1.fetch(refspec: [], .HEAD, options: FetchOptions(auth: .credentials(.sshDefault)))
             .shouldSucceed()
         
         let merge = repo1.mergeAnalysisUpstream(.HEAD)
@@ -309,7 +308,7 @@ extension MergeAnalysisTests {
         
         let options = PullOptions(signature: GitTest.signature, fetch: FetchOptions(auth: .credentials(.sshDefault)))
         
-        repo1.pull(.HEAD, options: options)
+        repo1.pull(refspec: [], .HEAD, options: options)
             .map { $0.hasConflict }
             .assertEqual(to: true)
         

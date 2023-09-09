@@ -1,17 +1,7 @@
-//
-//  SwiftGit2Tests.swift
-//  SwiftGit2Tests
-//
-//  Created by loki on 16.05.2021.
-//  Copyright © 2021 GitHub, Inc. All rights reserved.
-//
-
 import Essentials
 import EssentialsTesting
 @testable import SwiftGit2
 import XCTest
-
-
 
 class RepositoryRemoteTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "RepositoryRemoteTests")

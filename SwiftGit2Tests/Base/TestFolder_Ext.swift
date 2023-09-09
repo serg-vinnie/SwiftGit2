@@ -149,7 +149,7 @@ extension TestFolder {
     
     func fetchHead(options: FetchOptions) -> Result<Branch, Error> {
         self.repo
-            .flatMap { $0.fetch(.HEAD, options: options) }
+            .flatMap { $0.fetch(refspec: [], .HEAD, options: options) }
     }
     
     var repoID: RepoID {
