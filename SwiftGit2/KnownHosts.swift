@@ -40,7 +40,7 @@ public class KnownHosts {
     
     static func checkAutenticity(toHost host: String) -> Bool {
         let shell = XR.Shell(cmd: sshDir.appendingPathComponent("ssh").path)
-        let result = shell.run2(args: ["-T", "git@\(host)"])
+        let result = shell.run(args: ["-T", "git@\(host)"])
         
         return false
     }
