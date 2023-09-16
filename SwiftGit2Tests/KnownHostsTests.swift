@@ -46,6 +46,12 @@ final class KnownHostsTests: XCTestCase {
         
         XCTAssertEqual(results3.count, 0)
     }
+    
+    func test_checkAutenticity() {
+        let result = KnownHosts.checkAutenticity(toHost: "github.com")
+        
+        XCTAssertTrue(result)
+    }
 }
 
 let test1 =

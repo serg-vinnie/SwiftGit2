@@ -37,6 +37,13 @@ public class KnownHosts {
         
         return .success(result)
     }
+    
+    static func checkAutenticity(toHost host: String) -> Bool {
+        let shell = XR.Shell(cmd: sshDir.appendingPathComponent("ssh").path)
+        let result = shell.run2(args: ["-T", "git@\(host)"])
+        
+        return false
+    }
 }
 
 public struct HFHost: Equatable {
