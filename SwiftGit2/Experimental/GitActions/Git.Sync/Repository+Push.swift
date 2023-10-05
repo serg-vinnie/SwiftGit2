@@ -10,7 +10,7 @@ import Clibgit2
 import Essentials
 
 extension Repository {
-    func push(_ target: BranchTarget, options: PushOptions) -> R<Void> {
+    public func push(_ target: BranchTarget, options: PushOptions) -> R<Void> {
         let branch = target.with(self).branchInstance
         let remote = target.with(self).remote
 
