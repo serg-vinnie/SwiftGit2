@@ -159,7 +159,20 @@ public extension Repository {
             git_repository_init(&pointer, url.path, 0)
         }
         
-        return url.appendingPathComponent(".git/HEAD").write(content: "ref: refs/heads/main") | { _ in repo }
+        return url.replaceMasterWithMain() | { _ in repo }
+    }
+    
+    func replaceMasterWithMainIfHeadIsUnborn() -> R<Bool> {
+        guard headIsUnborn else { return .success(false) }
+        
+        return self.directoryURL | { $0.replaceMasterWithMain() } | { _ in true }
+    }
+}
+
+fileprivate extension URL {
+    func replaceMasterWithMain() -> R<Void> {
+        appendingPathComponent(".git/HEAD")
+            .write(string: "ref: refs/heads/main")
     }
 }
 
