@@ -8,10 +8,10 @@ final class GitDBTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "db")
 
     func testExample() {
-        let folder = root.with(repo: "oid", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+        let folder = root.with(repo: "objects", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
         let repoID = folder.repoID
         
-        GitDB(repoID: repoID).objects.shouldSucceed("oids")
+        GitDB(repoID: repoID).objects.shouldSucceed("objects")
     }
 
     func testPerformanceExample() throws {

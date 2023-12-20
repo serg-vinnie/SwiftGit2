@@ -21,7 +21,7 @@ public extension XR.Shell {
             
             let shell = XR.Shell(cmd: binPath, workDir: workDir)
             
-            return shell.run(args: args, waitUntilExit: false).outputAsString
+            return shell.run(args: args).outputAsString
         }
         
         public func add(path: String) -> R<String> {
