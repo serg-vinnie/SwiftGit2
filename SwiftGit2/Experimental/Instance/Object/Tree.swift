@@ -21,11 +21,54 @@ public class Tree: InstanceProtocol {
     }
 }
 
+fileprivate class TreeEntry {
+    public var pointer: OpaquePointer
+    
+    public required init(_ pointer: OpaquePointer) {
+        self.pointer = pointer
+    }
+}
+
+extension TreeEntry {
+//    var name : String { git_tree_entry_name(self.pointer).asSwiftString }
+//    var type : git_object_t { git_tree_entry_type(self.pointer) }
+    var oid  : OID { OID(git_tree_entry_id(self.pointer).pointee) }
+}
+
+
 public extension Tree {
     var oid : OID { OID(git_tree_id(self.pointer).pointee) }
 }
 
+fileprivate class GitTreePayload : GitPayload {
+    var oids = [OID]()
+}
+
+func treeCB(_ root: UnsafePointer<Int8>?, _ tree_entry: OpaquePointer?, _ payload: UnsafeMutableRawPointer?) -> (Int32) {
+    guard let _p = tree_entry else { return -1 }
+    guard let payload = payload else { return -1 }
+    let entry = TreeEntry(_p)
+    let root = root.flatMap(String.init(validatingUTF8:)) ?? "WTF"
+    let _payload = GitTreePayload.unretained(pointer: payload)
+    
+    _payload.oids.append(entry.oid)
+//    print("root: \(root), entry: \(entry.oid)")
+    
+    return 0
+}
+
 public extension Tree {
+    func walk() -> R<Void> {
+        let p = GitTreePayload()
+        let _p = p.toRetainedPointer()
+        defer {
+            GitTreePayload.release(pointer: _p)
+        }
+        
+        return git_try("git_tree_walk") {
+            git_tree_walk(self.pointer, GIT_TREEWALK_PRE, treeCB, _p)
+        } //.map { _ in () }
+    }
 //    func blobLookup(byPath: String) -> R<Blob>{
 //        var pointer: OpaquePointer?
 //

@@ -16,6 +16,10 @@ public extension GitDB {
         return XR.Shell.Git(repoID: repoID).run(args: ["cat-file", "--batch-check", "--batch-all-objects", "--unordered"])
         | { $0.split(byCharsIn: "\n").compactMap { $0.asObject.maybeSuccess } }
     }
+    
+    var trees : R<[GitTree]> {
+        objects | { $0.filter { $0.type == "tree" } } | { $0.map { GitTree(repoID: repoID, oid: $0.oid) } }
+    }
 }
 
 fileprivate extension String {

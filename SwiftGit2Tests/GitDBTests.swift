@@ -11,7 +11,9 @@ final class GitDBTests: XCTestCase {
         let folder = root.with(repo: "objects", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
         let repoID = folder.repoID
         
-        GitDB(repoID: repoID).objects.shouldSucceed("objects")
+        GitDB(repoID: repoID).trees
+            .flatMap { $0.flatMap { $0.walk() } }
+            .shouldSucceed("trees")
     }
 
     func testPerformanceExample() throws {
