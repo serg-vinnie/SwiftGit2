@@ -12,7 +12,7 @@ public extension TreeID {
             case wtf
         }
         
-        let repoID: RepoID
+        let treeID: TreeID
         let name: String
         let oid: OID
         let kind: Kind

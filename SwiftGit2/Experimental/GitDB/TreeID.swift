@@ -14,7 +14,7 @@ public struct TreeID {
 }
 
 public extension TreeID {
-    var tree : R<Tree> { repoID.repo | { $0.treeLookup(oid: oid) } }
+    internal var tree : R<Tree> { repoID.repo | { $0.treeLookup(oid: oid) } }
     
     var entries : R<[TreeID.Entry]> {
         repoID.repo | { $0.treeLookup(oid: oid) | { $0.entries(repoID: repoID) } }

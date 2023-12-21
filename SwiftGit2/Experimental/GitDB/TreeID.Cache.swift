@@ -14,7 +14,7 @@ public extension TreeID {
 }
 
 public extension TreeID.Entry {
-    var children : R<[TreeID.Entry]> { TreeID(repoID: self.repoID , oid: self.oid).entries }
+    var children : R<[TreeID.Entry]> { TreeID(repoID: self.treeID.repoID, oid: self.oid).entries }
     
     var asCache : R<TreeID.Cache.Entry> {
         if self.kind == .tree {
