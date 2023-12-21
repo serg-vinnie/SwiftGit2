@@ -15,6 +15,9 @@ public struct GitTree {
 
 public extension GitTree {
     func walk() -> R<()> {
-        repoID.repo | { $0.treeLookup(oid: oid) } | { $0.walk() }
+        print("walk start \(oid.oidShort)")
+        let b =  repoID.repo | { $0.treeLookup(oid: oid) } | { $0.walk() }
+        print("walk stop \(oid.oidShort)")
+        return b
     }
 }
