@@ -8,8 +8,8 @@ public extension TreeID {
     }
     
     struct Cache {
-        let tree : TreeID
-        let entries : [TreeID.Cache.Entry]
+        public let tree : TreeID
+        public let entries : [TreeID.Cache.Entry]
     }
 }
 
