@@ -13,8 +13,9 @@ public struct GitDB {
 
 public extension GitDB {    
     var entries : R<[String]> {
-        return XR.Shell.Git(repoID: repoID).run(args: ["cat-file", "--batch-check", "--batch-all-objects", "--unordered"])
-        | { $0.split(byCharsIn: "\n") }
+        XR.Shell.Git(repoID: repoID)
+            .run(args: ["cat-file", "--batch-check", "--batch-all-objects", "--unordered"])
+            .map { $0.split(byCharsIn: "\n") }
     }
     
     var trees : R<[TreeID]> {
