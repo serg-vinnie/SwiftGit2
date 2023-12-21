@@ -11,15 +11,13 @@ import Clibgit2
 import Essentials
 
 public extension Tree {
-    var entries : R<[String]> {
-        let b = (0..<self.count).compactMap { self.entry(idx: $0) }
-        
-        return .notImplemented
+    var entries : [GitDB.Tree.Entry] {
+        (0..<self.count).compactMap { self.entry(idx: $0) }.map { $0.dbEntry }
     }
     
-    private func entry(idx: Int) -> TreeEntry_? {
+    private func entry(idx: Int) -> TreeEntryNoFree? {
         if let p = git_tree_entry_byindex(self.pointer, idx) {
-            return TreeEntry_(p)
+            return TreeEntryNoFree(p)
         }
         return nil
     }
@@ -47,7 +45,7 @@ fileprivate class GitTreePayload : GitPayload {
 func treeCB(_ root: UnsafePointer<Int8>?, _ tree_entry: OpaquePointer?, _ payload: UnsafeMutableRawPointer?) -> (Int32) {
     guard let _p = tree_entry else { return -1 }
     guard let payload = payload else { return -1 }
-    let entry = TreeEntryWalk(_p)
+    let entry = TreeEntryNoFree(_p)
     let root = root.flatMap(String.init(validatingUTF8:)) ?? "WTF"
     let _payload = GitTreePayload.unretained(pointer: payload)
     
@@ -57,19 +55,7 @@ func treeCB(_ root: UnsafePointer<Int8>?, _ tree_entry: OpaquePointer?, _ payloa
     return 0
 }
 
-fileprivate class TreeEntry_ : TreeEntry{
-    public var pointer: OpaquePointer
-    
-    public required init(_ pointer: OpaquePointer) {
-        self.pointer = pointer
-    }
-    
-    deinit {
-        git_tree_entry_free(self.pointer)
-    }
-}
-
-fileprivate class TreeEntryWalk : TreeEntry{
+fileprivate class TreeEntryNoFree : TreeEntryProtocol {
     public var pointer: OpaquePointer
     
     public required init(_ pointer: OpaquePointer) {
@@ -77,12 +63,22 @@ fileprivate class TreeEntryWalk : TreeEntry{
     }
 }
 
-protocol TreeEntry {
+protocol TreeEntryProtocol {
     var pointer: OpaquePointer { get }
 }
 
-extension TreeEntry {
+extension TreeEntryProtocol {
     var name : String { git_tree_entry_name(self.pointer).asSwiftString }
-//    var type : git_object_t { git_tree_entry_type(self.pointer) }
     var oid  : OID { OID(git_tree_entry_id(self.pointer).pointee) }
+    var type : git_object_t { git_tree_entry_type(self.pointer) }
+    
+    var dbEntry : GitDB.Tree.Entry {
+        if type == GIT_OBJECT_BLOB {
+            return GitDB.Tree.Entry(name: name, oid: oid, kind: .blob)
+        } else if type == GIT_OBJECT_TREE {
+            return GitDB.Tree.Entry(name: name, oid: oid, kind: .tree)
+        } else {
+            return GitDB.Tree.Entry(name: name, oid: oid, kind: .wtf)
+        }
+    }
 }

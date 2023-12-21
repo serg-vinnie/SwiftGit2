@@ -21,7 +21,7 @@ final class GitDBTests: XCTestCase {
 //            .shouldSucceed()
         
         GitDB(repoID: repoID).trees
-            .flatMap { $0.flatMap { $0.walk() } }
+            .flatMap { $0.flatMap { $0.entries } }
             .shouldSucceed("trees")
     }
 
