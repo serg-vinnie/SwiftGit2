@@ -17,8 +17,8 @@ public extension GitDB {
         | { $0.split(byCharsIn: "\n").compactMap { $0.asObject.maybeSuccess } }
     }
     
-    var trees : R<[GitDB.Tree]> {
-        objects | { $0.filter { $0.type == "tree" } } | { $0.map { GitDB.Tree(repoID: repoID, oid: $0.oid) } }
+    var trees : R<[TreeID]> {
+        objects | { $0.filter { $0.type == "tree" } } | { $0.map { TreeID(repoID: repoID, oid: $0.oid) } }
     }
 }
 
