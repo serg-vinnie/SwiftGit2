@@ -11,25 +11,29 @@ public struct GitDB {
 }
 
 
-public extension GitDB {
-    var objects : R<[GitDB.Object]> {
+public extension GitDB {    
+    var entries : R<[String]> {
         return XR.Shell.Git(repoID: repoID).run(args: ["cat-file", "--batch-check", "--batch-all-objects", "--unordered"])
-        | { $0.split(byCharsIn: "\n").compactMap { $0.asObject.maybeSuccess } }
+        | { $0.split(byCharsIn: "\n") }
     }
     
     var trees : R<[TreeID]> {
-        objects | { $0.filter { $0.type == "tree" } } | { $0.map { TreeID(repoID: repoID, oid: $0.oid) } }
+        entries | { $0.compactMap { $0.asTreeID(repoID: self.repoID).maybeSuccess } }
     }
 }
 
-fileprivate extension String {
-    var asObject : R<GitDB.Object> {
+private extension String {
+    func asTreeID(repoID: RepoID) -> R<TreeID> {
         do {
             let (_oid, type, _) = try objectParser.parse(self)
-            if let oid = OID(string: String(_oid)) {
-                return .success(GitDB.Object(oid: oid, type: String(type)))
+            if type == "tree" {
+                if let oid = OID(string: String(_oid)) {
+                    return .success(TreeID(repoID: repoID, oid: oid))
+                } else {
+                    return .wtf("can't parse oid: \(_oid)")
+                }
             } else {
-                return .wtf("can't parse oid: \(_oid)")
+               return .wtf("not a tree")
             }
         } catch {
             return .failure(error)
@@ -37,7 +41,7 @@ fileprivate extension String {
     }
 }
 
-var objectParser = Parse {
+fileprivate var objectParser = Parse {
     Prefix { $0 != " " }
     " "
     Prefix { $0 != " " }
