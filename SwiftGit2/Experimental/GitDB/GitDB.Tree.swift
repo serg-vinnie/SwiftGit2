@@ -19,7 +19,7 @@ public extension GitDB.Tree {
     var tree : R<Tree> { repoID.repo | { $0.treeLookup(oid: oid) } }
     
     var entries : R<[GitDB.Tree.Entry]> {
-        repoID.repo | { $0.treeLookup(oid: oid) | { $0.entries } } 
+        repoID.repo | { $0.treeLookup(oid: oid) | { $0.entries(repoID: repoID) } } 
     }
     
     func walk() -> R<()> {
@@ -29,21 +29,18 @@ public extension GitDB.Tree {
 
 
 public extension GitDB.Tree {
-    struct Entry {
+    struct Entry : CustomStringConvertible {
         enum Kind : String {
             case blob
             case tree
             case wtf
         }
         
+        let repoID: RepoID
         let name: String
         let oid: OID
         let kind: Kind
-    }
-}
-
-extension GitDB.Tree.Entry : CustomStringConvertible {
-    public var description: String {
-        "\(oid.oidShort) \(name) \(kind)"
+        
+        public var description: String { "\(oid.oidShort) \(name) \(kind)" }
     }
 }

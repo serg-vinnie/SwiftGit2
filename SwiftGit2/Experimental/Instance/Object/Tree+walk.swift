@@ -11,8 +11,8 @@ import Clibgit2
 import Essentials
 
 public extension Tree {
-    var entries : [GitDB.Tree.Entry] {
-        (0..<self.count).compactMap { self.entry(idx: $0) }.map { $0.dbEntry }
+    func entries(repoID: RepoID) -> [GitDB.Tree.Entry] {
+        (0..<self.count).compactMap { self.entry(idx: $0) }.map { $0.dbEntry(repoID: repoID) }
     }
     
     private func entry(idx: Int) -> TreeEntryNoFree? {
@@ -72,13 +72,13 @@ extension TreeEntryProtocol {
     var oid  : OID { OID(git_tree_entry_id(self.pointer).pointee) }
     var type : git_object_t { git_tree_entry_type(self.pointer) }
     
-    var dbEntry : GitDB.Tree.Entry {
+    func dbEntry(repoID: RepoID) -> GitDB.Tree.Entry {
         if type == GIT_OBJECT_BLOB {
-            return GitDB.Tree.Entry(name: name, oid: oid, kind: .blob)
+            return GitDB.Tree.Entry(repoID: repoID, name: name, oid: oid, kind: .blob)
         } else if type == GIT_OBJECT_TREE {
-            return GitDB.Tree.Entry(name: name, oid: oid, kind: .tree)
+            return GitDB.Tree.Entry(repoID: repoID, name: name, oid: oid, kind: .tree)
         } else {
-            return GitDB.Tree.Entry(name: name, oid: oid, kind: .wtf)
+            return GitDB.Tree.Entry(repoID: repoID, name: name, oid: oid, kind: .wtf)
         }
     }
 }
