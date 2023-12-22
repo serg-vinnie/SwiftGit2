@@ -25,6 +25,15 @@ public class Blob: Object {
 
 public extension Blob {
     var isBinary: Bool { git_blob_is_binary(pointer) == 1 }
+
+    var asBuffer : Buffer {
+        let buffPointer = git_blob_rawcontent(self.pointer)
+        let size = git_blob_rawsize(pointer)
+        return Buffer(data: buffPointer, size: size.bitWidth)
+    }
+    var asData : Data { 
+        asBuffer.asData
+    }
     
     func content() -> R<String>{
         let buffPointer = git_blob_rawcontent(self.pointer)

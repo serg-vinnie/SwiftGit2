@@ -7,7 +7,7 @@ import EssentialsTesting
 final class GitDBTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "db")
 
-    func testExample() {
+    func test_extract() {
         let folder = root.with(repo: "objects", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
         let repoID = folder.repoID
         
@@ -19,9 +19,14 @@ final class GitDBTests: XCTestCase {
         
 //        (repoID.repo | { $0.t_with_commit(file: .fileBInFolder, with: .random, msg: "second commit") })
 //            .shouldSucceed()
+        let extract = root.url.appendingPathComponent("objects_extract")
+        extract.rm().shouldSucceed()
+        extract.makeSureDirExist().shouldSucceed()
         
         GitDB(repoID: repoID).trees
-            .flatMap { $0.flatMap { $0.entries } }
+            .flatMap { $0.last.asNonOptional("last tree") }
+            .flatMap { $0.extract(at: extract) }
+//            .flatMap { $0.flatMap { $0.entries } }
             .shouldSucceed("trees")
     }
 

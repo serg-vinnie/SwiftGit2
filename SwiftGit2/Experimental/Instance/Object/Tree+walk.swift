@@ -11,8 +11,15 @@ import Clibgit2
 import Essentials
 
 public extension Tree {
+//    var treeID: TreeID { TreeID(repoID: <#T##RepoID#>, oid: <#T##OID#>) }
+    
     func entries(repoID: RepoID) -> [TreeID.Entry] {
         (0..<self.count).compactMap { self.entry(idx: $0) }.map { $0.dbEntry(treeID: TreeID(repoID: repoID, oid: $0.oid)) }
+    }
+    
+    func iteratorEntries(repoID: RepoID, url: URL) -> [TreeID.IteratorEntry] {
+        (0..<self.count).compactMap { self.entry(idx: $0) }
+            .map { TreeID.IteratorEntry(treeID: TreeID(repoID: repoID, oid: self.oid), url: url, oid: $0.oid, name: $0.name) }
     }
     
     private func entry(idx: Int) -> TreeEntryNoFree? {

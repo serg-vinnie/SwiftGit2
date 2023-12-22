@@ -47,6 +47,8 @@ public extension Buffer {
     var size: Int { buf.size }
     var ptr: UnsafeMutablePointer<Int8> { buf.ptr }
 
+    var asData : Data { Data(bytes: ptr, count: size) }
+    
     func set(string: String) -> Result<Void, Error> {
         guard let data = string.data(using: .utf8) else {
             return .failure(NSError(gitError: 0, pointOfFailure: "string.data(using: .utf8)"))
@@ -92,4 +94,6 @@ public extension Buffer {
             git_message_prettify(&out, message, 0, /* ascii for # */ 35)
         }.map { Buffer(buf: out) }
     }
+    
+    
 }
