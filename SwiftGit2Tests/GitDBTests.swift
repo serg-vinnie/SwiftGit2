@@ -17,8 +17,6 @@ final class GitDBTests: XCTestCase {
         folder.addAllAndCommit(msg: "second commit")
             .shouldSucceed()
         
-//        (repoID.repo | { $0.t_with_commit(file: .fileBInFolder, with: .random, msg: "second commit") })
-//            .shouldSucceed()
         let extract = root.url.appendingPathComponent("objects_extract")
         extract.rm().shouldSucceed()
         extract.makeSureDirExist().shouldSucceed()
@@ -26,13 +24,15 @@ final class GitDBTests: XCTestCase {
         GitDB(repoID: repoID).trees
             .flatMap { $0.last.asNonOptional("last tree") }
             .flatMap { $0.extract(at: extract) }
-//            .flatMap { $0.flatMap { $0.entries } }
             .shouldSucceed("trees")
+        
+
     }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {
+
             // Put the code you want to measure the time of here.
         }
     }
