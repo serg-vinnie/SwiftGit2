@@ -18,6 +18,10 @@ public extension TreeID {
         let kind: Kind
         
         public var description: String { "\(oid.oidShort) \(name) \(kind)" }
+        var asTreeID : R<TreeID> {
+            guard self.kind == .tree else { return .wtf("not a tree") }
+            return .success(TreeID(repoID: treeID.repoID, oid: oid))
+        }
     }
     
     struct IteratorEntry {

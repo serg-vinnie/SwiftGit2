@@ -22,11 +22,15 @@ final class GitDBTests: XCTestCase {
         extract.makeSureDirExist().shouldSucceed()
         
         GitDB(repoID: repoID).trees
+            .shouldSucceed("trees").asNonOptional
             .flatMap { $0.last.asNonOptional("last tree") }
             .flatMap { $0.extract(at: extract) }
-            .shouldSucceed("trees")
+            .shouldSucceed("extract")
         
 
+        (GitDB(repoID: repoID).trees | { $0.hierarchy })
+            .map { $0.roots.keys.map { $0.oid.oidShort } }
+            .shouldSucceed("root")
     }
 
     func testPerformanceExample() throws {
