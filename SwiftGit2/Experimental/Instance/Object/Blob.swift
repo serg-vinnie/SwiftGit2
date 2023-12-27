@@ -29,7 +29,7 @@ public extension Blob {
     var asBuffer : Buffer {
         let buffPointer = git_blob_rawcontent(self.pointer)
         let size = git_blob_rawsize(pointer)
-        return Buffer(data: buffPointer, size: size.bitWidth)
+        return Buffer(data: buffPointer, size: Int(size))
     }
     var asData : Data { 
         asBuffer.asData
@@ -40,7 +40,7 @@ public extension Blob {
         
         let size = git_blob_rawsize(pointer)
         
-        let a = Buffer(data: buffPointer, size: size.bitWidth)
+        let a = Buffer(data: buffPointer, size: Int(size))
         
         return a.asString()
     }
