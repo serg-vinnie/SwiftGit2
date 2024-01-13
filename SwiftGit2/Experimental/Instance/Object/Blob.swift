@@ -34,27 +34,9 @@ public extension Blob {
     var asData : Data { 
         asBuffer.asData
     }
-    
-    func content() -> R<String>{
-        let buffPointer = git_blob_rawcontent(self.pointer)
-        
-        let size = git_blob_rawsize(pointer)
-        
-        let a = Buffer(data: buffPointer, size: Int(size))
-        
-        return a.asString()
-    }
 }
 
-public extension Repository {
-//    func diffBlobs(old: Blob?, new: Blob?, options: DiffOptions = DiffOptions()) -> Result<[Diff.Delta], Error> {
-//        var cb = options.callbacks
-//        
-//        return _result({ cb.deltas }, pointOfFailure: "git_diff_blobs") {
-//            git_diff_blobs(old?.pointer, nil, new?.pointer, nil, &options.diff_options, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
-//        }
-//    }
-    
+public extension Repository {    
     func hunksBetweenBlobs(old: Blob?, new: Blob?, options: DiffOptions = DiffOptions()) -> Result<HunksResult, Error> {
         var cb = options.callbacks
         
