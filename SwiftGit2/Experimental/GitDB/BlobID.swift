@@ -13,6 +13,10 @@ public struct BlobID {
 }
 
 public extension BlobID {
+    var exists : Bool {
+        (repoID.repo | { $0.blob(oid: oid) }).maybeSuccess != nil
+    }
+    
     enum Content {
         case binary(Data)
         case text(String)
