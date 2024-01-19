@@ -2,9 +2,12 @@
 import Clibgit2
 import Essentials
 
-public struct StatusEntryID {
+public struct StatusEntryID : Identifiable {
     public let repoID : RepoID
     public let idx : Int
+    
+    public var id: String { repoID.path + "_\(idx)" }
+    
     public init(repoID: RepoID, idx: Int) {
         self.repoID = repoID
         self.idx = idx
