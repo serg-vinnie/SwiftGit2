@@ -8,7 +8,7 @@ public struct GitStash {
 }
 
 public extension GitStash {
-    func save(signature: Signature, message: String?, flags: StashFlags = .defaultt ) -> R<OID>  {
+    func save(signature: Signature, message: String?, flags: StashFlags) -> R<OID>  {
         return repoID.repo
             .flatMap { $0.stashSave(signature: signature, message: message, flags: flags) }
     }

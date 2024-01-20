@@ -18,10 +18,10 @@ public struct StashFlags: OptionSet {
         self.rawValue = rawValue
     }
     
-    public static let defaultt = StashFlags(rawValue: GIT_STASH_DEFAULT.rawValue)
-    public static let keepIndex = StashFlags(rawValue: GIT_STASH_KEEP_INDEX.rawValue)
-    public static let includeUntracked = StashFlags(rawValue: GIT_STASH_INCLUDE_UNTRACKED.rawValue)
-    public static let includeIgnored = StashFlags(rawValue: GIT_STASH_INCLUDE_IGNORED.rawValue)
+    public static let defaultt          = StashFlags(rawValue: GIT_STASH_DEFAULT.rawValue)
+    public static let keepIndex         = StashFlags(rawValue: GIT_STASH_KEEP_INDEX.rawValue)
+    public static let includeUntracked  = StashFlags(rawValue: GIT_STASH_INCLUDE_UNTRACKED.rawValue)
+    public static let includeIgnored    = StashFlags(rawValue: GIT_STASH_INCLUDE_IGNORED.rawValue)
 }
 
 public struct Stash {
