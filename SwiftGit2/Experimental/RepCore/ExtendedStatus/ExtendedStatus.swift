@@ -24,15 +24,26 @@ public struct ExtendedStatus {
     public let status : StatusIterator
     public let isConflicted : Bool
     public let head: HEAD
-    public let hunks: [Int:StatusEntryHunks]
+    public let uuid = UUID()
     
-    public static var empty : ExtendedStatus { ExtendedStatus(status: StatusIterator(nil), isConflicted: false, head: .isUnborn, hunks: [:]) }
+    public static var empty : ExtendedStatus { ExtendedStatus(status: StatusIterator(nil), isConflicted: false, head: .isUnborn) }
 }
 
 public extension ExtendedStatus {
-    func appending(hunks: StatusEntryHunks, at idx: Int) -> ExtendedStatus {
-        var newHunks = self.hunks
-        newHunks[idx] = hunks
-        return ExtendedStatus(status: status, isConflicted: isConflicted, head: head, hunks: newHunks)
+    class Cache {
+        public var uuid  = LockedVar<UUID>(UUID())
+        public var hunks = LockedVar<[Int:StatusEntryHunks]>([:])
+        
+        public init() {}
+        
+        public func verify(uuid: UUID) {
+            let _uuid = self.uuid.read { $0 }
+            if uuid == _uuid {
+                return
+            }
+            self.uuid.access { $0 = uuid }
+            self.hunks.access { $0.removeAll() }
+        }
     }
 }
+

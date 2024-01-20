@@ -55,7 +55,7 @@ public extension ExtendedStatus.HEAD {
 extension Repository {
     func extendedStatus(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
         if headIsUnborn {
-            return statusConflictSafe(options: options) | { ExtendedStatus(status: $0, isConflicted: false, head: .isUnborn, hunks: [:]) }
+            return statusConflictSafe(options: options) | { ExtendedStatus(status: $0, isConflicted: false, head: .isUnborn) }
         }
         
         let repoID = self.repoID
@@ -65,12 +65,12 @@ extension Repository {
             let headOID = HEAD().flatMap{ Duo($0, self).targetOID() }
             
             return combine(statusConflictSafe(options: options), isConflicted, repoID, headOID)
-            | { ExtendedStatus(status: $0, isConflicted: $1, head: .dettached(CommitID(repoID: $2, oid: $3)), hunks: [:]) }
+            | { ExtendedStatus(status: $0, isConflicted: $1, head: .dettached(CommitID(repoID: $2, oid: $3))) }
         }
         
         let ref = self.repoID | { $0.HEAD } | { $0.asReference }
         return combine(statusConflictSafe(options: options), isConflicted,ref)
-        | { ExtendedStatus(status: $0, isConflicted: $1, head: .reference($2), hunks: [:]) }
+        | { ExtendedStatus(status: $0, isConflicted: $1, head: .reference($2)) }
     }
 }
 
