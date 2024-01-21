@@ -4,12 +4,14 @@ import Essentials
 
 public struct StatusEntryID : Identifiable, Hashable {
     public let repoID     : RepoID
+    public let statusID   : UUID
     public let idx        : Int
     
-    public var id: String { repoID.path + "_\(idx)" }
+    public var id: String { repoID.path + statusID.uuidString + "_\(idx)" }
     
-    public init(repoID: RepoID, idx: Int) {
+    public init(repoID: RepoID, statusID: UUID, idx: Int) {
         self.repoID = repoID
+        self.statusID = statusID
         self.idx = idx
     }
 }
