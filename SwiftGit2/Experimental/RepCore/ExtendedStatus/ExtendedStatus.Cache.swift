@@ -9,6 +9,7 @@ public extension ExtendedStatus {
         public var hunks = LockedVar<[Int:StatusEntryHunks]>([:])
         
         public var hunks_ = LockedVar<[String:StatusEntryHunks]>([:])
+        public var signature = ExtendedStatus.Signature(entries: [])
         
         public init() {}
         
