@@ -1,12 +1,13 @@
-//
-//  StatusEntryHunks.swift
-//  SwiftGit2-OSX
-//
-//  Created by UKS on 21.12.2021.
-//  Copyright © 2021 GitHub, Inc. All rights reserved.
 
 import Foundation
 import Clibgit2
+
+public struct StatusEntryHunks {
+    public let staged       : HunksResult
+    public let unstaged     : HunksResult
+    
+    public var isBinary : Bool { staged.IsBinary || unstaged.IsBinary }
+}
 
 public struct HunksResult {
     public let hunks        : [Diff.Hunk]
@@ -14,13 +15,6 @@ public struct HunksResult {
     public let IsBinary       : Bool
     static var empty : HunksResult { HunksResult(hunks: [], incomplete: false, IsBinary: false) }
     static var binary : HunksResult { HunksResult(hunks: [], incomplete: false, IsBinary: true)}
-}
-
-public struct StatusEntryHunks {
-    public let staged       : HunksResult
-    public let unstaged     : HunksResult
-    
-    public var isBinary : Bool { staged.IsBinary || unstaged.IsBinary }
 }
 
 extension StatusEntryHunks {

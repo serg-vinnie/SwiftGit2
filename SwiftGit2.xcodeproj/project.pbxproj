@@ -96,6 +96,9 @@
 		E653907A23E7328200C08416 /* Diff+Delta.swift in Sources */ = {isa = PBXBuildFile; fileRef = E653907923E7328200C08416 /* Diff+Delta.swift */; };
 		E653907C23E73CDE00C08416 /* Patch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E653907B23E73CDE00C08416 /* Patch.swift */; };
 		E655E1D62A27B67400D6731F /* ReflogEntry+Kind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E655E1D52A27B67400D6731F /* ReflogEntry+Kind.swift */; };
+		E659B3282B6147E9003B4B30 /* ExtendedStatus.Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E659B3272B6147E9003B4B30 /* ExtendedStatus.Cache.swift */; };
+		E659B32A2B6149B4003B4B30 /* StatusEntryIdx.swift in Sources */ = {isa = PBXBuildFile; fileRef = E659B3292B6149B4003B4B30 /* StatusEntryIdx.swift */; };
+		E659B32C2B614A47003B4B30 /* StatusEntryID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E659B32B2B614A47003B4B30 /* StatusEntryID.swift */; };
 		E66360DB27BEEC1C001292FB /* RepoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DA27BEEC1C001292FB /* RepoID.swift */; };
 		E66360DF27BF063D001292FB /* RepCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DE27BF063D001292FB /* RepCore.swift */; };
 		E66360E127BF1403001292FB /* RepCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360E027BF1403001292FB /* RepCoreTests.swift */; };
@@ -314,6 +317,9 @@
 		E653907923E7328200C08416 /* Diff+Delta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Diff+Delta.swift"; sourceTree = "<group>"; };
 		E653907B23E73CDE00C08416 /* Patch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Patch.swift; sourceTree = "<group>"; };
 		E655E1D52A27B67400D6731F /* ReflogEntry+Kind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReflogEntry+Kind.swift"; sourceTree = "<group>"; };
+		E659B3272B6147E9003B4B30 /* ExtendedStatus.Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedStatus.Cache.swift; sourceTree = "<group>"; };
+		E659B3292B6149B4003B4B30 /* StatusEntryIdx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryIdx.swift; sourceTree = "<group>"; };
+		E659B32B2B614A47003B4B30 /* StatusEntryID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryID.swift; sourceTree = "<group>"; };
 		E66360DA27BEEC1C001292FB /* RepoID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.swift; sourceTree = "<group>"; };
 		E66360DE27BF063D001292FB /* RepCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCore.swift; sourceTree = "<group>"; };
 		E66360E027BF1403001292FB /* RepCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCoreTests.swift; sourceTree = "<group>"; };
@@ -879,7 +885,10 @@
 			isa = PBXGroup;
 			children = (
 				1DEC291427723308007C32FF /* StatusEntryHunks.swift */,
+				E659B3292B6149B4003B4B30 /* StatusEntryIdx.swift */,
+				E659B32B2B614A47003B4B30 /* StatusEntryID.swift */,
 				E6E0211E29996EA500697170 /* ExtendedStatus.swift */,
+				E659B3272B6147E9003B4B30 /* ExtendedStatus.Cache.swift */,
 			);
 			path = ExtendedStatus;
 			sourceTree = "<group>";
@@ -1097,7 +1106,9 @@
 				1DA3413D26B964FC0097E488 /* RevFile.swift in Sources */,
 				E6F10F352B33887A009D9369 /* GitDB.swift in Sources */,
 				1D5B38A825228C790019E593 /* Repository+Diff.swift in Sources */,
+				E659B32A2B6149B4003B4B30 /* StatusEntryIdx.swift in Sources */,
 				E6FF8348292E613C007CC5B4 /* Config.swift in Sources */,
+				E659B32C2B614A47003B4B30 /* StatusEntryID.swift in Sources */,
 				E6F0B93C29105995008E2176 /* Git.Signature.swift in Sources */,
 				E6D4A91A24DEA93E00E8041E /* Commit.swift in Sources */,
 				1D764BD8252CD148008417A7 /* Submodule.swift in Sources */,
@@ -1137,6 +1148,7 @@
 				E6AF629226939D65007D0585 /* RemoteTarget.swift in Sources */,
 				E653907A23E7328200C08416 /* Diff+Delta.swift in Sources */,
 				E686071D2B35B10500D17D07 /* AnyGitObject.swift in Sources */,
+				E659B3282B6147E9003B4B30 /* ExtendedStatus.Cache.swift in Sources */,
 				1DC8A54327E1247600860A0F /* Git.Conflicts.swift in Sources */,
 				E66360DF27BF063D001292FB /* RepCore.swift in Sources */,
 				E6D4A91E24DEAA3000E8041E /* Reference.swift in Sources */,
