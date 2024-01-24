@@ -99,6 +99,7 @@
 		E659B3282B6147E9003B4B30 /* ExtendedStatus.Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E659B3272B6147E9003B4B30 /* ExtendedStatus.Cache.swift */; };
 		E659B32A2B6149B4003B4B30 /* StatusEntryIdx.swift in Sources */ = {isa = PBXBuildFile; fileRef = E659B3292B6149B4003B4B30 /* StatusEntryIdx.swift */; };
 		E659B32C2B614A47003B4B30 /* StatusEntryID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E659B32B2B614A47003B4B30 /* StatusEntryID.swift */; };
+		E659B32E2B614BF9003B4B30 /* ExtendedStatus.Signature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E659B32D2B614BF9003B4B30 /* ExtendedStatus.Signature.swift */; };
 		E66360DB27BEEC1C001292FB /* RepoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DA27BEEC1C001292FB /* RepoID.swift */; };
 		E66360DF27BF063D001292FB /* RepCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360DE27BF063D001292FB /* RepCore.swift */; };
 		E66360E127BF1403001292FB /* RepCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66360E027BF1403001292FB /* RepCoreTests.swift */; };
@@ -320,6 +321,7 @@
 		E659B3272B6147E9003B4B30 /* ExtendedStatus.Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedStatus.Cache.swift; sourceTree = "<group>"; };
 		E659B3292B6149B4003B4B30 /* StatusEntryIdx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryIdx.swift; sourceTree = "<group>"; };
 		E659B32B2B614A47003B4B30 /* StatusEntryID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntryID.swift; sourceTree = "<group>"; };
+		E659B32D2B614BF9003B4B30 /* ExtendedStatus.Signature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedStatus.Signature.swift; sourceTree = "<group>"; };
 		E66360DA27BEEC1C001292FB /* RepoID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.swift; sourceTree = "<group>"; };
 		E66360DE27BF063D001292FB /* RepCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCore.swift; sourceTree = "<group>"; };
 		E66360E027BF1403001292FB /* RepCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepCoreTests.swift; sourceTree = "<group>"; };
@@ -889,6 +891,7 @@
 				E659B32B2B614A47003B4B30 /* StatusEntryID.swift */,
 				E6E0211E29996EA500697170 /* ExtendedStatus.swift */,
 				E659B3272B6147E9003B4B30 /* ExtendedStatus.Cache.swift */,
+				E659B32D2B614BF9003B4B30 /* ExtendedStatus.Signature.swift */,
 			);
 			path = ExtendedStatus;
 			sourceTree = "<group>";
@@ -1062,6 +1065,7 @@
 				E6332CDD264E80FD004990E7 /* DiffOptions.swift in Sources */,
 				E63EDF8226617ADA00A3D048 /* Repository+Fetch.swift in Sources */,
 				1D4C9B5426AD79C600ADBBDE /* Repository+Blob.swift in Sources */,
+				E659B32E2B614BF9003B4B30 /* ExtendedStatus.Signature.swift in Sources */,
 				E63EDF76265D255500A3D048 /* Repository+HEAD.swift in Sources */,
 				E6EEFC8228A146CD00E60185 /* BranchSync.swift in Sources */,
 				BE276B291ACCD3CF00D6DAD7 /* CheckoutStrategy.swift in Sources */,

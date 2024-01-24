@@ -8,6 +8,8 @@ public extension ExtendedStatus {
         public var uuid  = LockedVar<UUID>(UUID())
         public var hunks = LockedVar<[Int:StatusEntryHunks]>([:])
         
+        public var hunks_ = LockedVar<[String:StatusEntryHunks]>([:])
+        
         public init() {}
         
         public func verify(uuid: UUID) {
