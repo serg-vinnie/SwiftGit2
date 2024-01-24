@@ -2,7 +2,7 @@
 import Clibgit2
 import Essentials
 
-public struct StatusEntryID : Identifiable, Hashable {
+public struct StatusEntryIdx : Identifiable, Hashable {
     public let repoID     : RepoID
     public let statusID   : UUID
     public let idx        : Int
