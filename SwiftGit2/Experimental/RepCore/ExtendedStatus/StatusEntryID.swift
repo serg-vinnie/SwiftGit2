@@ -1,10 +1,16 @@
 
 import Foundation
 
-struct StatuEntryID : Identifiable, Hashable {
+public struct StatusEntryID : Identifiable, Hashable {
     public let repoID     : RepoID
     public let statusID   : UUID
-    public let stagingPath: String
+    public let stagePath: String
     
-    public var id: String { repoID.path + "/" + stagingPath + "_" + statusID.uuidString }
+    public var id: String { repoID.path + "/" + stagePath + "_" + statusID.uuidString }
+    
+    public init(repoID: RepoID, statusID: UUID, stagePath: String) {
+        self.repoID = repoID
+        self.statusID = statusID
+        self.stagePath = stagePath
+    }
 }
