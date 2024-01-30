@@ -86,6 +86,28 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: .threeWaySuccess, "Pull")
     }
     
+    func test_mergeTree() {
+        let folder = root.with(repo: "mergeTree", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+        let repoID = folder.repoID
+        
+        let refID = GitReference(repoID).new(branch: "branch", from: .HEAD , checkout: false)
+            .shouldSucceed()!
+        let mainID = ReferenceID(repoID: repoID, name: "refs/heads/main")
+        
+        folder.commit(file: .fileB, msg: "commit from main")
+            .shouldSucceed()
+        
+        refID.checkout(options: CheckoutOptions())
+            .shouldSucceed()
+        
+        folder.commit(file: .fileB, msg: "commit from branch")
+            .shouldSucceed()
+        
+        refID.checkout(options: CheckoutOptions())
+            .shouldSucceed()
+
+    }
+    
     func test_shoulConflict() {
         let folder = root.sub(folder: "conflict").cleared().shouldSucceed()!
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!

@@ -52,5 +52,12 @@ internal extension Repository {
             | { $0.hide(ref: hideRef) }
             | { $0.all() }
     }
+    
+    func oids(our pushOID: OID, their hideOID: OID) -> Result<[OID], Error> {
+        Revwalk.new(in: self)
+            | { $0.push(oid: pushOID) }
+            | { $0.hide(oid: hideOID) }
+            | { $0.all() }
+    }
 }
 

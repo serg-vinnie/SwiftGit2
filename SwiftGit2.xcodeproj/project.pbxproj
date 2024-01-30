@@ -147,6 +147,8 @@
 		E6D4A92224DF1B4300E8041E /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D4A92124DF1B4300E8041E /* Object.swift */; };
 		E6D4A92424DF40CA00E8041E /* Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D4A92324DF40CA00E8041E /* Index.swift */; };
 		E6D4A92824DF55E400E8041E /* Reference+Write.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D4A92724DF55E400E8041E /* Reference+Write.swift */; };
+		E6D5C59B2B694AA5001E0B50 /* GitMergeTree+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D5C59A2B694AA5001E0B50 /* GitMergeTree+.swift */; };
+		E6D5C59D2B695A37001E0B50 /* GitMergeTree.Slot+desc.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D5C59C2B695A37001E0B50 /* GitMergeTree.Slot+desc.swift */; };
 		E6DEC671291581F40076684B /* ReferenceID+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DEC670291581F40076684B /* ReferenceID+.swift */; };
 		E6E0211F29996EA500697170 /* ExtendedStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E0211E29996EA500697170 /* ExtendedStatus.swift */; };
 		E6E76D69296A0BB2009E745E /* SubmoduleID+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E76D68296A0BB2009E745E /* SubmoduleID+Status.swift */; };
@@ -369,6 +371,8 @@
 		E6D4A92124DF1B4300E8041E /* Object.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
 		E6D4A92324DF40CA00E8041E /* Index.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Index.swift; sourceTree = "<group>"; };
 		E6D4A92724DF55E400E8041E /* Reference+Write.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reference+Write.swift"; sourceTree = "<group>"; };
+		E6D5C59A2B694AA5001E0B50 /* GitMergeTree+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GitMergeTree+.swift"; sourceTree = "<group>"; };
+		E6D5C59C2B695A37001E0B50 /* GitMergeTree.Slot+desc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GitMergeTree.Slot+desc.swift"; sourceTree = "<group>"; };
 		E6DEC670291581F40076684B /* ReferenceID+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReferenceID+.swift"; sourceTree = "<group>"; };
 		E6E0211E29996EA500697170 /* ExtendedStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedStatus.swift; sourceTree = "<group>"; };
 		E6E76D68296A0BB2009E745E /* SubmoduleID+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubmoduleID+Status.swift"; sourceTree = "<group>"; };
@@ -740,7 +744,6 @@
 			isa = PBXGroup;
 			children = (
 				E6E0212029996F5600697170 /* ExtendedStatus */,
-				E6EEFC8128A146CC00E60185 /* BranchSync.swift */,
 				E66360DE27BF063D001292FB /* RepCore.swift */,
 				E6AA18F827AF815E002AFC33 /* GitModule.swift */,
 				E60B86C828E0FEA4001D6150 /* SubmoduleID.swift */,
@@ -768,7 +771,10 @@
 		E67B85752B6881F8005F01D1 /* GitMergeTree */ = {
 			isa = PBXGroup;
 			children = (
+				E6EEFC8128A146CC00E60185 /* BranchSync.swift */,
 				E67B85762B688236005F01D1 /* GitMergeTree.swift */,
+				E6D5C59A2B694AA5001E0B50 /* GitMergeTree+.swift */,
+				E6D5C59C2B695A37001E0B50 /* GitMergeTree.Slot+desc.swift */,
 			);
 			path = GitMergeTree;
 			sourceTree = "<group>";
@@ -1050,6 +1056,7 @@
 				1DEC2917277233B0007C32FF /* Duo.StatusEntry+Repo.swift in Sources */,
 				1D0AFF642534AC440045D68D /* StatusOptions.Flags.swift in Sources */,
 				1D6EFB2A252BA5A1000D0BE1 /* Tree.swift in Sources */,
+				E6D5C59D2B695A37001E0B50 /* GitMergeTree.Slot+desc.swift in Sources */,
 				E69D5CEE2573AC8E00AEBA28 /* Repository+Submodules.swift in Sources */,
 				E6ED7AAD289B6CB50021456F /* Git.RefCache.swift in Sources */,
 				1D991AE12518FA7900335255 /* Duo.swift in Sources */,
@@ -1107,6 +1114,7 @@
 				E6AF628D26938457007D0585 /* Repository+Sync.swift in Sources */,
 				E6DEC671291581F40076684B /* ReferenceID+.swift in Sources */,
 				E644ACD628C6984C00BF27A7 /* RebaseOptions.swift in Sources */,
+				E6D5C59B2B694AA5001E0B50 /* GitMergeTree+.swift in Sources */,
 				E6E76D69296A0BB2009E745E /* SubmoduleID+Status.swift in Sources */,
 				E6E0211F29996EA500697170 /* ExtendedStatus.swift in Sources */,
 				E6169DF628149496001EB8A6 /* Git.Remotes.swift in Sources */,

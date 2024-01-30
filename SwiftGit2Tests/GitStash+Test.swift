@@ -194,7 +194,7 @@ fileprivate func createStash(folder: TestFolder, gitStash: GitStash, expectedSta
     
     _ = gitStash.repoID.repo.map{ $0.stage(.all) }.shouldSucceed()!
     
-    _ = gitStash.save(signature: .test, message: UUID().uuidString)
+    _ = gitStash.save(signature: .test, message: UUID().uuidString, flags: .defaultt)
         .shouldSucceed()
     
     let stashItems = gitStash.items().shouldSucceed()!
