@@ -37,7 +37,7 @@ extension GitMergeTree {
         let source      = push | { $0 | { $0.basicInfo } }
         let destination = pull | { $0 | { $0.basicInfo } }
 
-        return combine(base,source, destination) | { combine(base: $0, source: $1, destination: $2) }
+        return combine(base, source, destination) | { combine(base: $0, source: $1, destination: $2) }
     }
 }
 
