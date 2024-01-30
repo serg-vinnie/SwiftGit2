@@ -105,6 +105,11 @@ class MergeAnalysisTests: XCTestCase {
         
         refID.checkout(options: CheckoutOptions())
             .shouldSucceed()
+        
+        GitMergeTree(src: .reference(mainID), dst: refID)
+            .rows
+            .map { "\n\n" + $0.map { $0.description }.joined(separator: "\n") }
+            .shouldSucceed("rows")
 
     }
     

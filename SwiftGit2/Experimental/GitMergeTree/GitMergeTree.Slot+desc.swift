@@ -3,6 +3,19 @@
 import Foundation
 import Essentials
 
+//extension Array where Element == GitMergeTree.RowDuo {
+//    var description: String {
+//        self.map { $0.description }.joined(separator: "")
+////        left.description(kind: .source) + "   " + right.description(kind: .destination)
+//    }
+//}
+
+extension GitMergeTree.RowDuo : CustomStringConvertible {
+    var description: String {
+        left.description(kind: .source) + "   " + right.description(kind: .destination)
+    }
+}
+
 extension GitMergeTree.Slot {
     enum Kind {
         case source
@@ -10,7 +23,7 @@ extension GitMergeTree.Slot {
     }
 }
 
-fileprivate let WIDTH = 30
+fileprivate let WIDTH = 20
 
 extension GitMergeTree.Slot {
     func description(kind: GitMergeTree.Slot.Kind) -> String {
@@ -23,9 +36,9 @@ extension GitMergeTree.Slot {
             case .destination:  "|".fitIn(count: WIDTH)
             }
             
-        case .mergeInto:        return "".fitIn(count: WIDTH - 1) + "↗️"
-        case .branchFrom:       return "".fitIn(count: WIDTH - 1) + "↖️"
-        case .mergeTarget:      return "🔯".fitIn(count: WIDTH)
+        case .mergeInto:        return "".fitIn(count: WIDTH + 2) + "╔  "
+        case .branchFrom:       return "".fitIn(count: WIDTH + 2) + "╚  "
+        case .mergeTarget:      return " 🔯".fitIn(count: WIDTH)
         }
     }
 }
@@ -33,8 +46,8 @@ extension GitMergeTree.Slot {
 fileprivate extension GitCommitBasicInfo {
     func nodeDesc(kind: GitMergeTree.Slot.Kind) -> String {
         switch kind {
-        case .source:       _node + " " + _summary
-        case .destination:  _summary + " " + _node
+        case .source:       _summary + " " + _node
+        case .destination:  _node + " " + _summary
         }
     }
     
@@ -46,7 +59,7 @@ fileprivate extension GitCommitBasicInfo {
 
 internal extension String {
     var nameInitials : String {
-        split(byCharsIn: " ").map { $0.firstCharOrSpace }.joined().fitIn(count: 2).uppercased()
+        split(byCharsIn: " ").map { $0.firstCharOrSpace }.joined().fitIn(count: 2).uppercased().trimmingCharacters(in: ["…"])
     }
     
     var firstCharOrSpace : String {
@@ -60,7 +73,7 @@ internal extension String {
         let diff = self.count - count
         
         if diff > 0 {
-            return self.truncStart(length: count)
+            return self.truncEnd(length: count).trimmingCharacters(in: ["…"])
         } else if diff < 0 {
             return self + String(repeating: " ", count: abs(diff))
         }
