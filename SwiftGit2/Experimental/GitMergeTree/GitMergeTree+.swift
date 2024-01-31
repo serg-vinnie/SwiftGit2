@@ -18,7 +18,7 @@ extension MergeSource {
     }
 }
 
-extension GitMergeTree {
+public extension GitMergeTree {
     var rows : R<[RowDuo]> {
         if src.repoID != dst.repoID { return .wtf("GitMergeTree: src and dst are from different repositories") }
 
@@ -34,8 +34,8 @@ extension GitMergeTree {
         let pull = _combine | { repo, our, their in repo.oids(our: their, their: our) } | { $0.map { CommitID(repoID: repoID, oid: $0) } }
         
         let base        = baseOID | { CommitID(repoID: repoID, oid: $0) } | { $0.basicInfo }
-        let source      = push | { $0 | { $0.basicInfo } }
-        let destination = pull | { $0 | { $0.basicInfo } }
+        let source      = pull | { $0 | { $0.basicInfo } }
+        let destination = push | { $0 | { $0.basicInfo } }
 
         return combine(base, source, destination) | { combine(base: $0, source: $1, destination: $2) }
     }

@@ -2,20 +2,27 @@
 import Foundation
 import Essentials
 
-enum MergeSource {
+public enum MergeSource {
     case commit(CommitID)
     case reference(ReferenceID)
 }
 
-struct GitMergeTree {
-    let src : MergeSource
-    let dst : ReferenceID
+public struct GitMergeTree {
+    public let src : MergeSource
+    public let dst : ReferenceID
+    
+    public init(src: MergeSource, dst: ReferenceID) {
+        self.src = src
+        self.dst = dst
+    }
 }
 
-extension GitMergeTree {
-    struct RowDuo {
-        let left  : Slot
-        let right : Slot
+public extension GitMergeTree {
+    struct RowDuo : Identifiable {
+        public let id = UUID() // compatibility with SwiftUI ForEach
+        
+        public let left  : Slot
+        public let right : Slot
     }
     
     enum Slot {

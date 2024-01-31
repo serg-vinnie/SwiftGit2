@@ -7,7 +7,7 @@ public extension RepoID {
     enum HeadType : Equatable {
         case unborn
         case attached(ReferenceID)
-        case detached(OID, RepoID)
+        case detached(CommitID)
     }
 
     var HEAD : R<HeadType> {
@@ -22,25 +22,33 @@ public extension RepoID {
     private var _HEAD : R<HeadType> {
         self.repo
             .if(\.headIsDetached,
-                 then: { repo in repo.HEAD() | { Duo($0, repo).targetOID() } | { HeadType.detached($0, self)} },
+                 then: { repo in repo.HEAD() | { Duo($0, repo).targetOID() } | { HeadType.detached(CommitID(repoID: self, oid: $0))} },
                  else: { repo in repo.HEAD() | { HeadType.attached(ReferenceID(repoID: self, name: $0.nameAsReference))} }
             )
     }
 }
 
 public extension RepoID.HeadType {
+    var asMergeSource : R<MergeSource> {
+        switch self {
+        case .attached(let refID):      return .success(.reference(refID))
+        case .detached(let commitID):   return .success(.commit(commitID))
+        case .unborn:                   return .wtf("Head is unborn")
+        }
+    }
+    
     var asReference : R<ReferenceID> {
         switch self {
         case .attached(let ref):        return .success(ref)
-        case .detached(_, let repoID):  return .success(ReferenceID(repoID: repoID, name: "HEAD"))
+        case .detached(let commitID):   return .success(ReferenceID(repoID: commitID.repoID, name: "HEAD"))
         case .unborn:                   return .wtf("Head is unborn")
         }
     }
     
     var asOID : R<OID> {
         switch self {
-        case .attached(let ref): return ref.targetOID
-        case .detached(let oid, _): return .success(oid)
+        case .attached(let ref):        return ref.targetOID
+        case .detached(let commitID):   return .success(commitID.oid)
         case .unborn:                   return .wtf("Head is unborn")
         }
     }
@@ -48,7 +56,7 @@ public extension RepoID.HeadType {
     var repoID: R<RepoID> {
         switch self {
         case .attached(let ref):        return .success(ref.repoID)
-        case .detached(_, let repoID):  return .success(repoID)
+        case .detached(let commitID):   return .success(commitID.repoID)
         case .unborn:                   return .wtf("Head is unborn")
         }
     }

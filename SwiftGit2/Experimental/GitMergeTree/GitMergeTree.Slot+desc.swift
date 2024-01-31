@@ -11,12 +11,12 @@ import Essentials
 //}
 
 extension GitMergeTree.RowDuo : CustomStringConvertible {
-    var description: String {
+    public var description: String {
         left.description(kind: .source) + "   " + right.description(kind: .destination)
     }
 }
 
-extension GitMergeTree.Slot {
+public extension GitMergeTree.Slot {
     enum Kind {
         case source
         case destination
