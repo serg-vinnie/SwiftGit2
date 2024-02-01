@@ -236,6 +236,17 @@ public extension Repository {
             git_merge_analysis(&anal, &pref, self.pointer, &their_heads, 1)
         }.map { MergeAnalysis(rawValue: anal.rawValue) }
     }
+    
+    // Analyzes the given branch(es) and determines the opportunities for merging them into the ourRef of the repository.
+    func mergeAnalysis(their_head: AnnotatedCommit, ourRef: Reference) -> Result<MergeAnalysis, Error> {
+        var anal = git_merge_analysis_t.init(0)
+        var pref = git_merge_preference_t.init(0)
+        var their_heads: OpaquePointer? = their_head.pointer
+
+        return git_try("git_merge_analysis") {
+            git_merge_analysis_for_ref(&anal, &pref, self.pointer, ourRef.pointer, &their_heads, 1)
+        }.map { MergeAnalysis(rawValue: anal.rawValue) }
+    }
 }
 
 
