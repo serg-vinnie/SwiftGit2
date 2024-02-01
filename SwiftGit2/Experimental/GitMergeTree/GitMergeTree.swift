@@ -35,3 +35,12 @@ public extension GitMergeTree {
     }
 }
 
+public extension GitMergeTree.Slot {
+    var asCommitInfo : GitCommitBasicInfo? {
+        switch self {
+        case .commit(let info): return info
+        case .base(_): return nil // NO
+        default: return nil
+        }
+    }
+}
