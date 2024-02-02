@@ -133,6 +133,12 @@ public extension Repository {
             | { _ in .success(.threeWayConflict(index)) }
     }
     
+//    func mergeFastForward(our: Branch, their: OID, message: String, stashing: Bool) -> R<Void> {
+//        our.set(target: their, message: message)
+//            | { $0.asBranch() }
+//            | { self.checkout(branch: $0, strategy: .Force, stashing: stashing) }
+//    }
+    
     func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
@@ -179,20 +185,7 @@ public extension Repository {
                     then: { index in
                     theirOID
                         .onSuccess {
-                                self.goMergeMode(index: index, theirOID: $0, message: nil)
-//                                // MERGE_HEAD creation
-//                                let _ = RevFile( repo: self, type: .PullMsg)?
-//                                    .generatePullMsg(from: index)
-//                                    .save()
-//
-//                                // MERGE_MODE creation
-//                                let _ = RevFile(repo: self, type: .MergeMode )?
-//                                    .save()
-//
-//                                // MERGE_HEAD creation
-//                                OidRevFile( repo: self, type: .MergeHead)?
-//                                    .setOid(from: $0[1] )
-//                                    .save()
+                            self.goMergeMode(index: index, theirOID: $0, message: nil)
                         }
                         .flatMap { _ in
                             self.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
