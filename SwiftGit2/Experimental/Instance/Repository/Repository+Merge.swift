@@ -11,15 +11,14 @@ import Essentials
 import Foundation
 
 public extension ReferenceID {
-    func mergeFastForward(stashing: Bool) -> R<Void> {
+    func mergeFastForward() -> R<Void> {
         let ourID = repoID.headRefID
         let their = self
         return combine(ourID, repoID.repo).flatMap { ourID, repo in
-            GitStasher(repo: repo).wrap(skip: !stashing) {
-                repo.mergeFastForward(our: ourID, their: their) //| { _ in repo.checkoutHead(options: CheckoutOptions(strategy: .Force), stashing: stashing) }
-                | { _ in ourID.checkout(options: CheckoutOptions(strategy: .Force), stashing: false) }
+            repo.mergeFastForward(our: ourID, their: .reference(self)) | { _ in
+                ourID.checkout(options: CheckoutOptions(strategy: .Force), stashing: false)
             }
-        } | { _ in () }
+        }.asVoid
     }
 }
 
@@ -100,13 +99,13 @@ public extension Repository {
             | { self.mergeAndCommit(anal: $0, our: $1, their: $2, signature: signature, options: options) }
     }
     
-    func mergeFastForward(our: ReferenceID, their: ReferenceID) -> R<Reference> {
+    func mergeFastForward(our: ReferenceID, their: MergeSource) -> R<Reference> {
         
-        let message = "Fast Forward MERGE \(their.name) -> \(our.name)"
+        let message = "Fast Forward MERGE \(their.description) -> \(our.name)"
         let repo = our.repoID.repo
         let ourRef = repo | { $0.reference(name: our.name) }
         
-        return combine(their.targetOID, ourRef) | { oid, ref in
+        return combine(their.oid, ourRef) | { oid, ref in
             ref.set(target: oid, message: message)
         }
     }
