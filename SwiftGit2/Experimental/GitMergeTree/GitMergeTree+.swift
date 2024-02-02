@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-extension MergeSource {
+public extension MergeSource {
     var repoID: RepoID {
         switch self {
         case let .commit(commitID): return commitID.repoID

@@ -7,6 +7,15 @@ public enum MergeSource {
     case reference(ReferenceID)
 }
 
+extension MergeSource : CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .commit(let commitID): commitID.oid.description
+        case .reference(let refID): refID.name
+        }
+    }
+}
+
 public struct GitMergeTree {
     public let src : MergeSource
     public let dst : ReferenceID
