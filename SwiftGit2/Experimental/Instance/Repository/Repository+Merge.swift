@@ -126,19 +126,6 @@ public extension Repository {
             .save()
     }
     
-    func applyConflicts(from index: Index, theirOID: OID) -> R<MergeResult> {
-//        goMergeMode(index: index, theirOID: theirOID)
-
-        return self.checkout(index: index, strategy: [.Force, .AllowConflicts, .ConflictStyleMerge, .ConflictStyleDiff3])
-            | { _ in .success(.threeWayConflict(index)) }
-    }
-    
-//    func mergeFastForward(our: Branch, their: OID, message: String, stashing: Bool) -> R<Void> {
-//        our.set(target: their, message: message)
-//            | { $0.asBranch() }
-//            | { self.checkout(branch: $0, strategy: .Force, stashing: stashing) }
-//    }
-    
     func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
