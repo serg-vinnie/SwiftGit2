@@ -9,6 +9,13 @@
 import Clibgit2
 import Essentials
 
+public extension RepoID {
+    func checkout(index: Index, strategy: CheckoutStrategy, progress: CheckoutProgressBlock? = nil) -> R<Void> {
+        (repo | { $0.checkout(index: index, strategy: strategy, progress: progress) })
+    }
+}
+
+
 // SetHEAD and Checkout
 public extension Repository {
     func checkout(ref name: String, strategy: CheckoutStrategy = .Safe, progress: CheckoutProgressBlock? = nil, stashing: Bool) -> Result<Void, Error> {
