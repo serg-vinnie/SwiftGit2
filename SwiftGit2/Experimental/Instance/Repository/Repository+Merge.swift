@@ -13,7 +13,7 @@ import Foundation
 public extension ReferenceID {
     func mergeFastForward() -> R<Void> {
         let ourID = repoID.headRefID
-        let their = self
+//        let their = self
         return combine(ourID, repoID.repo).flatMap { ourID, repo in
             repo.mergeFastForward(our: ourID, their: .reference(self)) | { _ in
                 ourID.checkout(options: CheckoutOptions(strategy: .Force), stashing: false)
@@ -24,6 +24,24 @@ public extension ReferenceID {
 
 extension RepoID {
     var headRefID : R<ReferenceID> { repo | { $0.headRefID } }
+    
+    public func goMergeMode(index: Index, theirOID: OID, message: String?) -> R<Void> {
+        // MERGE_HEAD creation
+        let msg = RevFile(repoID: self, type: .PullMsg)
+            .generatePullMsg(from: index, msg: message)
+            .save()
+        
+        // MERGE_MODE creation
+        let mergeMode = RevFile(repoID: self, type: .MergeMode )
+            .save()
+        
+        // MERGE_HEAD creation
+        let head = OidRevFile(repoID: self, type: .MergeHead)
+            .set(oid: theirOID)
+            .save()
+        
+        return combine(msg, mergeMode, head).asVoid
+    }
 }
 
 public extension Repository {
@@ -110,18 +128,18 @@ public extension Repository {
         }
     }
     
-    func goMergeMode(index: Index, theirOID: OID, message: String?) {
+    private func goMergeMode(index: Index, theirOID: OID, message: String?) {
         // MERGE_HEAD creation
-        let _ = RevFile( repo: self, type: .PullMsg)?
+        _ = RevFile( repo: self, type: .PullMsg)?
             .generatePullMsg(from: index, msg: message)
             .save()
         
         // MERGE_MODE creation
-        let _ = RevFile(repo: self, type: .MergeMode )?
+        _ = RevFile(repo: self, type: .MergeMode )?
             .save()
         
         // MERGE_HEAD creation
-        OidRevFile( repo: self, type: .MergeHead)?
+        _ = OidRevFile( repo: self, type: .MergeHead)?
             .set(oid: theirOID)
             .save()
     }

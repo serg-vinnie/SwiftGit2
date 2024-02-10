@@ -34,6 +34,14 @@ public class OidRevFile {
         getContent(type: type)
     }
     
+    public init(repoID: RepoID, type: OidRevFileType) {        
+        self.type = type
+        self.gitDir = repoID.url.appendingPathComponent(".git")
+        self.content = nil
+        
+        getContent(type: type)
+    }
+    
     private func getContent(type: OidRevFileType) {
         switch type {
         case .MergeHead:
@@ -62,21 +70,30 @@ public class OidRevFile {
         return self
     }
     
-    public func save() {
-        switch type {
-        case .MergeHead:
-            if let content = content{
-                try? File(url: gitDir.appendingPathComponent("MERGE_HEAD"))
-                    .setContent(content)
-            }
-            
-        default:
-            print("Did you forgot to add something into save() method?")
-            break
-        }
+    public func save() -> R<Void> {
+        let url = gitDir.appendingPathComponent("MERGE_HEAD")
         
-        print("OidRevFile saved")
+        switch type {
+        case .MergeHead:    return content.asNonOptional("content") | { url.write(content: $0).asVoid }
+        default:            return .wtf("OidRevFile wrong type \(type)")
+        }
     }
+    
+//    public func save() {
+//        switch type {
+//        case .MergeHead:
+//            if let content = content{
+//                try? File(url: gitDir.appendingPathComponent("MERGE_HEAD"))
+//                    .setContent(content)
+//            }
+//            
+//        default:
+//            print("Did you forgot to add something into save() method?")
+//            break
+//        }
+//        
+//        print("OidRevFile saved")
+//    }
     
     public func delete() -> OidRevFile {
         File(url: gitDir.appendingPathComponent( self.type.asFileName() ) )
@@ -108,6 +125,12 @@ public class RevFile {
         
         self.type = type
         self.gitDir = gitDir
+        self.content = File(url: gitDir.appendingPathComponent(type.asFileName())).getContent()
+    }
+    
+    public init(repoID: RepoID, type: RevFileType ) {
+        self.type = type
+        self.gitDir = repoID.url.appendingPathComponent(".git")
         self.content = File(url: gitDir.appendingPathComponent(type.asFileName())).getContent()
     }
     
@@ -158,11 +181,9 @@ public class RevFile {
         return self
     }
     
-    public func save()  -> RevFile {
-        try? File(url: gitDir.appendingPathComponent( self.type.asFileName() ) )
-            .setContent(content ?? "")
-        
-        return self
+    public func save() -> R<Void> {
+        let url = gitDir.appendingPathComponent( self.type.asFileName() )
+        return content.asNonOptional("content") | { url.write(content: $0).asVoid }
     }
     
     public func delete() -> RevFile {
