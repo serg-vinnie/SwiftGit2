@@ -33,7 +33,14 @@ extension Array where Element : Hashable {
         guard self.count == other.count else {
             return .failure(WTF("can't map into dictionary: my count = \(self.count), other count: \(other.count)"))
         }
-        let dic = Dictionary(uniqueKeysWithValues: self.enumerated().map { idx, element in (element, other[idx]) })
+        
+        var dic: [Element : Other] = [:]
+        
+        for i in 0..<self.count {
+            let key = self[i]
+            dic[key] = other[i]
+        }
+        
         return .success(dic)
     }
 }
