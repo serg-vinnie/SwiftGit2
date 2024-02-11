@@ -150,7 +150,7 @@ private extension Result where Success == OID, Failure == Error {
     }
 }
 
-internal extension Index {
+public extension Index {
     func commit(into repo: Repository, signature: Signature, message: String, parents: [Commit]) -> Result<Void, Error> {
         writeTree(to: repo)
             | { tree in repo.commitCreate(signature: signature, message: message, tree: tree, parents: parents) }
