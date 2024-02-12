@@ -183,7 +183,7 @@ public class RevFile {
     
     public func save() -> R<Void> {
         let url = gitDir.appendingPathComponent( self.type.asFileName() )
-        return content.asNonOptional("content") | { url.write(content: $0).asVoid }
+        return url.write(content: self.content ?? "").asVoid
     }
     
     public func delete() -> RevFile {

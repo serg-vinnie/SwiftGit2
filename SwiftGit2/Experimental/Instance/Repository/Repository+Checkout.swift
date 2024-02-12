@@ -80,7 +80,7 @@ public extension Repository {
         }
     }
     
-    internal func checkoutHead(options: CheckoutOptions) -> Result<Void, Error> {
+    func checkoutHead(options: CheckoutOptions) -> Result<Void, Error> {
         git_try("git_checkout_head") {
             options.with_git_checkout_options {
                 git_checkout_head(self.pointer, &$0)
