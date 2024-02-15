@@ -29,7 +29,16 @@ extension Reflog {
     
     func entry(idx: Int, repoID: RepoID) -> ReflogEntry? {
         guard let entry = git_reflog_entry_byindex(self.pointer, idx) else { return nil }
-//            .asNonOptional("git_reflog_entry_byindex invalid idx")
         return ReflogEntry(entry, reflog: self, idx: idx, repoID: repoID)
+    }
+    
+    func append(signature: Signature, oid: OID, msg: String) -> R<Void> {
+        var oid = oid.oid
+        return signature.make() | { sig in
+            git_try("git_reflog_append") {
+                git_reflog_append(self.pointer, &oid, sig.pointer, msg)
+            }
+        }
+        
     }
 }

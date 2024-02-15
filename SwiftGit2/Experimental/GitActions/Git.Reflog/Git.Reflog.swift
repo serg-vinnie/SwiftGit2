@@ -20,4 +20,8 @@ public struct GitReflog {
 
 public extension GitReflog {
     var entryCount : R<Int> { reflog | { $0.entryCount } }
+    
+    func append(signature: Signature, oid: OID, msg: String) -> R<Void> {
+        reflog | { $0.append(signature: signature, oid: oid, msg: msg) }
+    }
 }
