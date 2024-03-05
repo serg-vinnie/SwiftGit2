@@ -5,10 +5,12 @@ import Essentials
 public struct BlobID {
     public let oid: OID
     public let repoID: RepoID
+    public let path: String?
     
-    public init(oid: OID, repoID: RepoID) {
+    public init(oid: OID, repoID: RepoID, path: String? = nil) {
         self.oid = oid
         self.repoID = repoID
+        self.path = path
     }
 }
 
@@ -24,6 +26,15 @@ public extension BlobID {
     
     var data : R<Data> { repoID.repo | { $0.blob(oid: oid) | { $0.asData } } }
     var content : R<BlobID.Content> { repoID.repo | { $0.blob(oid: oid) | { $0.content } } }
+    var url : R<URL> { path.asNonOptional("BlobID.path") | { repoID.url.appendingPathComponent($0) } }
+    
+    func extract(to url: URL? = nil) -> R<Void> {
+        guard let dstURL = url ?? self.url.maybeSuccess else {
+            return .wtf("can't resolve URL for Blob \(oid.oidShort)")
+        }
+        
+        return data | { dstURL.write(data: $0).asVoid }
+    }
 }
 
 extension Blob {
