@@ -102,11 +102,9 @@ extension TreeEntryProtocol {
             return .tree( TreeID(repoID: repoID, oid: self.oid))
             
         } else {
-            let subID = SubmoduleID(repoID: treeID.repoID, name: <#T##String#>)
-            
-//            return TreeID.Entry(treeID: treeID, name: name, oid: oid, kind: .wtf)
+            // TODO: proper submodule handling
+            let subID = SubmoduleID(repoID: treeID.repoID, name: name)
+            return .submodule(subID)
         }
-        
-        return .tree(treeID)
     }
 }
