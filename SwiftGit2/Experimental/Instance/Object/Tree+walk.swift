@@ -88,4 +88,25 @@ extension TreeEntryProtocol {
             return TreeID.Entry(treeID: treeID, name: name, oid: oid, kind: .wtf)
         }
     }
+    
+    func dbEntry(treeID: TreeID, path: String, commitID: CommitID?) -> GitTreeEntry {
+        let repoID = treeID.repoID
+        
+        if type == GIT_OBJECT_BLOB {
+            let blobID = BlobID(oid: oid, repoID: repoID)
+            let filePath = path.appendingPath(component: name)
+            let fileID = GitFileID(path: filePath, blobID: blobID, commitID: commitID)
+            return .file( fileID )
+            
+        } else if type == GIT_OBJECT_TREE {
+            return .tree( TreeID(repoID: repoID, oid: self.oid))
+            
+        } else {
+            let subID = SubmoduleID(repoID: treeID.repoID, name: <#T##String#>)
+            
+//            return TreeID.Entry(treeID: treeID, name: name, oid: oid, kind: .wtf)
+        }
+        
+        return .tree(treeID)
+    }
 }
