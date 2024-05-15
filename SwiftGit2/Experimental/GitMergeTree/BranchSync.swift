@@ -42,19 +42,21 @@ extension Repository {
             | { self.commit(oid: $0) | { $0.tree() } }
             | { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options) } // -> Index
     }
+    
+    var revwalk : R<Revwalk> { Revwalk.new(in: self) }
 }
 
 
 internal extension Repository {
-    func oids(our pushRef: String, their hideRef: String) -> Result<[OID], Error> {
-        Revwalk.new(in: self)
+    func oids(our pushRef: String, their hideRef: String) -> R<[OID]> {
+        revwalk
             | { $0.push(ref: pushRef) }
             | { $0.hide(ref: hideRef) }
             | { $0.all() }
     }
     
-    func oids(our pushOID: OID, their hideOID: OID) -> Result<[OID], Error> {
-        Revwalk.new(in: self)
+    func oids(our pushOID: OID, their hideOID: OID) -> R<[OID]> {
+        revwalk
             | { $0.push(oid: pushOID) }
             | { $0.hide(oid: hideOID) }
             | { $0.all() }
