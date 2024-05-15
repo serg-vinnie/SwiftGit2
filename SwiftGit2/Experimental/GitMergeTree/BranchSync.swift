@@ -32,15 +32,15 @@ public struct BranchSync  {
         let repo = our.repoID.repo
         
         return combine(repo, ourOID, theirOID)
-            .flatMap { repo, our, their in repo.merge(our: our, their: their, base: self.base, options: MergeOptions()) }
+            | { repo, our, their in repo.merge(our: our, their: their, base: self.base, options: MergeOptions()) }
     }
 }
 
 extension Repository {
     func merge(our: OID, their: OID, base: OID, options: MergeOptions) -> R<Index> {
         return [our, their, base]
-            .flatMap { self.commit(oid: $0) | { $0.tree() } }
-            .flatMap { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options) } // -> Index
+            | { self.commit(oid: $0) | { $0.tree() } }
+            | { self.merge(our: $0[0], their: $0[1], ancestor: $0[2], options: options) } // -> Index
     }
 }
 
