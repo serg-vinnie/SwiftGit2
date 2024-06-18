@@ -102,6 +102,13 @@ public class RemoteCallbacks: GitPayload {
     
     func next(url: String?, username: String?) -> Credentials {
         if let cred = list.popLast() {
+            if case .function(let block) = cred {
+                switch block() {
+                case .success(let cred): return cred
+                case .failure(_): return .default
+                }
+            }
+            
             return cred
         } else if let cb = callback {
             return cb(url, username)
@@ -174,6 +181,8 @@ private func credentialsCallback(
     case let .ssh(publicKey: publicKey, privateKey: privateKey, passphrase: passphrase):
         _payload.lock()
         result = git_credential_ssh_key_new(cred, name, publicKey, privateKey, passphrase)
+    case let .function(block):
+        return -1 // this block should be handled already
     }
 
     return (result != GIT_OK.rawValue) ? -1 : 0

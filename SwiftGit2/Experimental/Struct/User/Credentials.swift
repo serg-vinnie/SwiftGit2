@@ -16,6 +16,7 @@ public enum Credentials {
     case plaintext(username: String, password: String)
     case sshMemory(username: String, publicKey: String, privateKey: String, passphrase: String)
     case ssh(publicKey: String, privateKey: String, passphrase: String)
+    case function(()->R<Credentials>)
     
     public var isNone : Bool { if case .none = self { return true } else { return false } }
     
@@ -99,6 +100,8 @@ extension Credentials : CustomStringConvertible {
             return "Credentials.sshMemory(username: \(username) ...)"
         case let .ssh(publicKey, privateKey, passphrase):
             return "Credentials.ssh(publicKey: \(publicKey), privateKey: \(privateKey), passphrase: \(passphrase.asPassword)"
+        case .function(_):
+            return "Credentials.function"
         }
     }
     
@@ -116,6 +119,8 @@ extension Credentials : CustomStringConvertible {
             return "sshMemory name: \(username) ...)"
         case let .ssh(publicKey, privateKey, _):
             return "publicKey: \(publicKey)\nprivateKey: \(privateKey)"
+        case .function(_):
+            return "Credentials.function"
         }
     }
     
