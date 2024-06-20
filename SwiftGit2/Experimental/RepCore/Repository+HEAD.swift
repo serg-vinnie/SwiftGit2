@@ -34,7 +34,37 @@ public enum DetachedHeadFix {
     case ambiguous(branches: [ReferenceID])
 }
 
+public extension RepoID {
+    var masterRefID : ReferenceID { .init(repoID: self, name: "refs/heads/master") }
+    var mainRefID   : ReferenceID { .init(repoID: self, name: "refs/heads/main") }
+    func fixIfHeadIsUnborn() -> R<Void> {
+        repo | { $0.fixIfHeadIsUnborn() }
+    }
+}
+
+private extension Array where Element == ReferenceID {
+    func checkoutFirstExisting() -> R<Void> {
+        for refID in self {
+            if refID.exists {
+                return refID.checkout(options: CheckoutOptions())
+            }
+        }
+        return .success(())
+    }
+}
+
 public extension Repository {
+    func fixIfHeadIsUnborn() -> R<Void> {
+        if headIsUnborn {
+            let mainRefID = self.repoID | { $0.mainRefID }
+            let masterRefID = self.repoID | { $0.mainRefID }
+            let refs = self.repoID | { GitReference($0).list(.local) }
+            return combine(mainRefID, masterRefID, refs) | { main, master, list in [main, master] + list } | { $0.checkoutFirstExisting() }
+        }
+        
+        return .success(())
+    }
+    
     func detachedHeadFix() -> Result<DetachedHeadFix, Error> {
         guard headIsDetached else {
             return .success(.notNecessary)

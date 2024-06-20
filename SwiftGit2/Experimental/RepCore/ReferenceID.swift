@@ -36,6 +36,8 @@ public extension ReferenceID {
     var isRemote  : Bool { name.hasPrefix("refs/remotes/") }
     var isTag     : Bool { name.hasPrefix("refs/tags/") }
     
+    var exists    : Bool { self.reference.maybeSuccess != nil }
+    
     var prefix      : String {
         if name.starts(with: "refs/heads/") { return "refs/heads/" }
         if let remote = remote, name.starts(with: "refs/remotes/") { return "refs/heads/\(remote)/" }
