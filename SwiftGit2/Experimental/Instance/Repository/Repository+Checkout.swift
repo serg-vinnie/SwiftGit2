@@ -69,6 +69,9 @@ public extension Repository {
     }
 
     func setHEAD(_ reference: String) -> Result<Void, Error> {
+        let refID = self.repoID | { ReferenceID(repoID: $0, name: reference) }
+        guard let ref = refID.maybeSuccess, ref.exists else { return .wtf("reference not exist, can't checkout: \(reference)") }
+        
         return _result((), pointOfFailure: "git_repository_set_head") {
             return git_repository_set_head(self.pointer, reference)
         }
