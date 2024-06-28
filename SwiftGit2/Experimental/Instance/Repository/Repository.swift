@@ -282,6 +282,14 @@ fileprivate extension Diff.Delta {
 }
 
 public extension Repository {
+    func headOID() -> R<OID> {
+        var oid = git_oid()
+        
+        return git_try("git_reference_name_to_id") {
+            git_reference_name_to_id(&oid, self.pointer, "HEAD")
+        }.map { _ in OID(oid) }
+    }
+    
     func headCommit() -> Result<Commit, Error> {
         var oid = git_oid()
         
