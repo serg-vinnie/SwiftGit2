@@ -17,17 +17,23 @@ public class CheckoutOptions: GitPayload {
         
         git_checkout_options_init(&checkout_options, UInt32(GIT_CHECKOUT_OPTIONS_VERSION ))
         checkout_options.checkout_strategy = strategy.gitCheckoutStrategy.rawValue
+        
+        checkout_options.progress_payload = toRetainedPointer() // RETAIN
+    }
+    
+    deinit {
+        CheckoutOptions.release(pointer: checkout_options.progress_payload) // RELEASE
     }
 }
 
 extension CheckoutOptions {
     func with_git_checkout_options<T>(_ body: (inout git_checkout_options) -> T) -> T {
-        checkout_options.progress_payload = toRetainedPointer() // RETAIN
+//        checkout_options.progress_payload = toRetainedPointer() // RETAIN
         checkout_options.progress_cb = checkoutProgressCallback
         
-        defer {
-            CheckoutOptions.release(pointer: checkout_options.progress_payload) // RELEASE
-        }
+//        defer {
+//            CheckoutOptions.release(pointer: checkout_options.progress_payload) // RELEASE
+//        }
         
         if pathspec.isEmpty {
             return body(&checkout_options)

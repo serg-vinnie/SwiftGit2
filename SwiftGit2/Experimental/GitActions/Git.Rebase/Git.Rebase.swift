@@ -12,17 +12,34 @@ public struct GitRebase {
 }
 
 public extension GitRebase {
-    // naming of functions rely on usage GitRebase(repoID).head(from: ref)
-    func head(from ref: ReferenceID, sigature: Signature) -> R<()> {
-        repoID.repo | { $0.HEAD() }
-                    | { ReferenceID(repoID: repoID, name: $0.nameAsReference) }
-                    | { self.from(ref, onto: $0, sigature: sigature) }
+
+    
+    internal func start(onto: ReferenceID, options: RebaseOptions = RebaseOptions()) -> R<Rebase> {
+        let head = repoID.HEAD | { $0.asReference }
+        let head_ac = head | { $0.annotatedCommit }
+        let sync = head | { BranchSync.with(our: $0, their: onto) }
+        let base = sync | { $0.base } | { CommitID(repoID: repoID, oid: $0) } | { $0.annotatedCommit }
+        return combine(repoID.repo, onto.annotatedCommit, base, head_ac)
+        | { repo, onto, base, head in
+             repo.rebase(branch: head /* base */ /*no head*/, upstream: onto, onto: nil, options: options)
+        }
     }
     
-    func from( _ ref: ReferenceID, onto: ReferenceID, options: RebaseOptions = RebaseOptions(), sigature: Signature) -> R<()> {
-        combine(repoID.repo, ref.annotatedCommit, onto.annotatedCommit)
-            | { repo, branch, onto in repo.rebase(branch: branch, upstream: nil, onto: onto, options: options) }
-            | { $0.iterate(sigature: sigature) }
+    // naming of functions rely on usage GitRebase(repoID).head(from: ref)
+    func head(from ref: ReferenceID, signature: Signature) -> R<[OID]> {
+        repoID.HEAD | { $0.asReference }
+                    | { self.from(target: $0, upstream: ref, signature: signature) }
+    }
+    
+    func from(target: ReferenceID, upstream: ReferenceID, options: RebaseOptions = RebaseOptions(), signature: Signature) -> R<[OID]> {
+        combine(repoID.repo, target.annotatedCommit, upstream.annotatedCommit)
+            .flatMap { repo, target, upstream in repo.rebase(branch: nil, upstream: upstream, onto: nil, options: options) }
+            .flatMap { rebase in
+                let oids = rebase.iterate(sigature: signature)
+                return rebase.finish(signature: signature) | { _ in oids }
+            }
+//            | { $0.finish(signature: signature) }
+        
     }
 }
 

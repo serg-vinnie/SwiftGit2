@@ -159,7 +159,26 @@ public extension ReferenceID {
      */
     
     var annotatedCommit : R<AnnotatedCommit> {
-        combine(repoID.repo, targetOID) | { repo, oid in repo.annotatedCommit(oid: oid) }
+        //        combine(repoID.repo, targetOID) | { repo, oid in repo.annotatedCommit(oid: oid) }
+        repoID.repo | { $0.annotatedCommit(from: self) }
+    }
+}
+
+extension CommitID {
+    var annotatedCommit : R<AnnotatedCommit> {
+        repoID.repo | { $0.annotatedCommit(oid: self.oid) }
+    }
+}
+
+extension Repository {
+    func annotatedCommit(from ref: ReferenceID) -> R<AnnotatedCommit> {
+        self.reference(name: ref.name)
+            .flatMap { ref in
+                git_instance(of: AnnotatedCommit.self, "git_annotated_commit_from_ref") { pointer in
+                    //        git_try("git_annotated_commit_from_ref") {
+                    git_annotated_commit_from_ref(&pointer, self.pointer, ref.pointer)
+                }
+            }
     }
 }
 

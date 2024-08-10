@@ -15,6 +15,14 @@ internal class Rebase: InstanceProtocol {
 }
 
 internal extension Rebase {
+    var operationsCount : Int { git_rebase_operation_entrycount(self.pointer) }
+    var currentOperationIdx : Int { git_rebase_operation_current(self.pointer) }
+    var currentOperation : UnsafeMutablePointer<git_rebase_operation>? { operation(idx: currentOperationIdx) }
+    
+    func operation(idx: Int) -> UnsafeMutablePointer<git_rebase_operation>? {
+        git_rebase_operation_byindex(self.pointer, idx)
+    }
+    
     //
     // https://libgit2.org/libgit2/#HEAD/group/rebase/git_rebase_next
     //
@@ -32,9 +40,17 @@ internal extension Rebase {
                                   nil /* author */,
                                   signature.pointer /*committer*/,
                                   nil /* message_encoding */,
-                                  nil /* message */)
+                                  nil /* message */)  //The message for this commit, or NULL to use the message from the original commit.
             }
         } | { OID(oid) }
+    }
+    
+    func finish(signature: Signature) -> R<Void> {
+        signature.make().flatMap { sig in
+            git_try("git_rebase_finish") {
+                git_rebase_finish(self.pointer, sig.pointer)
+            }
+        }
     }
 }
 
