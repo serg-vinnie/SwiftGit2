@@ -6,13 +6,16 @@ internal class RebaseIterator : ResultIterator {
     typealias Success = OID
     
     let rebase : Rebase
+    let repo: Repository
     let signature : Signature
+    let options: RebaseOptions
     var operation : UnsafeMutablePointer<git_rebase_operation>?
     
-    init(rebase: Rebase, sigature: Signature) {
+    init(rebase: Rebase, repo: Repository, sigature: Signature, options: RebaseOptions) {
         self.rebase = rebase
+        self.repo = repo
         self.signature = sigature
-        self.operation = rebase.currentOperation
+        self.options = options
     }
     
     func next() -> R<OID?> {   // return nil to complete
@@ -28,7 +31,7 @@ internal class RebaseIterator : ResultIterator {
 
 extension Rebase {
     
-    func iterate(sigature: Signature) -> R<[OID]> {
-        RebaseIterator(rebase: self, sigature: sigature).all()
+    func iterate(repo: Repository, sigature: Signature, options: RebaseOptions) -> R<[OID]> {
+        RebaseIterator(rebase: self, repo: repo, sigature: sigature, options: options).all()
     }
 }

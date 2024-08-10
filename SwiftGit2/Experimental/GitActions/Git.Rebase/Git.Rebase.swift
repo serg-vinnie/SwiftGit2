@@ -26,20 +26,20 @@ public extension GitRebase {
     }
     
     // naming of functions rely on usage GitRebase(repoID).head(from: ref)
-    func head(from ref: ReferenceID, signature: Signature) -> R<[OID]> {
+    func head(source: ReferenceID, signature: Signature) -> R<[OID]> {
         repoID.HEAD | { $0.asReference }
-                    | { self.from(target: $0, upstream: ref, signature: signature) }
+                    | { head in self.from(branch: source, upstream: head, signature: signature) }
     }
     
-    func from(target: ReferenceID, upstream: ReferenceID, options: RebaseOptions = RebaseOptions(), signature: Signature) -> R<[OID]> {
-        combine(repoID.repo, target.annotatedCommit, upstream.annotatedCommit)
-            .flatMap { repo, target, upstream in repo.rebase(branch: nil, upstream: upstream, onto: nil, options: options) }
-            .flatMap { rebase in
-                let oids = rebase.iterate(sigature: signature)
-                return rebase.finish(signature: signature) | { _ in oids }
+    func from(branch: ReferenceID, upstream: ReferenceID, options: RebaseOptions = RebaseOptions(), signature: Signature) -> R<[OID]> {
+        combine(repoID.repo, branch.annotatedCommit, upstream.annotatedCommit)
+            .flatMap { repo, branch, upstream in
+                repo.rebase(branch: branch, upstream: upstream, onto: nil, options: options)
+                    .flatMap { rebase in
+                        let oids = rebase.iterate(repo: repo, sigature: signature, options: options)
+                        return rebase.finish(signature: signature) | { _ in oids }
+                    }
             }
-//            | { $0.finish(signature: signature) }
-        
     }
 }
 

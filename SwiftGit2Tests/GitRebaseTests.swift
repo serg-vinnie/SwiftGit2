@@ -28,62 +28,19 @@ class GitRebaseTests: XCTestCase {
         
         let main = (repoID.HEAD | { $0.asReference })
             .shouldSucceed()!
+        
         // checkout branch
-//        branch.checkout(options: CheckoutOptions(strategy: .Force))
-//            .shouldSucceed()
+        branch.checkout(options: CheckoutOptions(strategy: .Force))
+            .shouldSucceed()
+        
+        GitRebase(repoID).head(source: main, signature: .test)
+            .shouldSucceed("rebase")
         
 //        let rebaseURL = repoID.dbURL | { $0.appendingPathComponent("rebase-merge") }
 //        (rebaseURL | { $0.exists })
 //            .assertEqual(to: false)
 //        let todoURL = rebaseURL | { $0.appendingPathComponent("git-rebase-todo") }
-        
-        // rebase
-//        let rebase = GitRebase(repoID).start(onto: branch)
-//            .shouldSucceed("start")!
-        
-        let checkoutOption = CheckoutOptions()
-        
-        let onto = branch
-        let head = repoID.HEAD | { $0.asReference }
-        let head_ac = head | { $0.annotatedCommit }
-        let sync = head | { BranchSync.with(our: $0, their: onto) }
-        let base = sync | { $0.base } | { CommitID(repoID: repoID, oid: $0) } | { $0.annotatedCommit }
-        let repo = repoID.repo
-        let _rebase = combine(repo, onto.annotatedCommit, base, head_ac)
-        | { repo, onto, base, head in
-             repo.rebase(branch: head /* base */ /*no head*/, upstream: onto, onto: nil, options: RebaseOptions(checkout: checkoutOption))
-        }
-        let rebase = _rebase.maybeSuccess!
-        
-//        print(rebase.operationsCount)
-//        let headOID = main.targetOID
-//        (combine(headOID, todoURL) | { oid, url in ("pick " + oid.description.first(7) + " 2").write(to: url) })
-//            .shouldSucceed("write")
-//        print(rebase.operationsCount)
-        
-        var operation : UnsafeMutablePointer<git_rebase_operation>? 
-        rebase.next(operation: &operation)
-            .shouldSucceed("next")
-        
-        print(operation!.pointee)
-        
-        rebase.commit(signature: .test)
-            .shouldSucceed("commit")
-        
-        rebase.next(operation: &operation)
-            .shouldFail("next end")
-        
-
-        
-//        todoURL | { $0. }
-        
-        rebase.finish(signature: .test)
-            .shouldSucceed("finish")
-        
-        (repoID.dbURL | { $0.appendingPathComponent("rebase-merge").exists })
-            .assertEqual(to: false)
-//        GitRebase(repoID).head(from: main, signature: .test)
-//            .shouldSucceed("rebase")
+ 
     }
     
     func test_rebaseNormal() {
@@ -114,7 +71,7 @@ class GitRebaseTests: XCTestCase {
         (repoID.repo | { $0.t_commit(file: .fileB, with: .random, msg: "branch 1", signature: .test) })
             .shouldSucceed()
 
-        GitRebase(repoID).head(from: main, signature: .test)
+        GitRebase(repoID).head(source: main, signature: .test)
             .shouldSucceed("rebase")
     }
     
@@ -146,7 +103,7 @@ class GitRebaseTests: XCTestCase {
         (repoID.repo | { $0.t_commit(file: .fileA, with: .random, msg: "branch 1", signature: .test) })
             .shouldSucceed()
         
-        GitRebase(repoID).head(from: main, signature: .test)
+        GitRebase(repoID).head(source: main, signature: .test)
             .shouldSucceed("rebase")
     }
 }
