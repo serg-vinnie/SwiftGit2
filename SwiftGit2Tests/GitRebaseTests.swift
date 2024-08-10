@@ -15,7 +15,7 @@ class GitRebaseTests: XCTestCase {
         // rebase
         
         // create repo with intial commit
-        let src = root.with(repo: "fastForward", content: .commit(.fileA, .content1, "1")).shouldSucceed()!
+        let src = root.with(repo: "fastForward", content: .commit(.fileA, .content1, "commit 1")).shouldSucceed()!
         let repoID = RepoID(url: src.url)
         
         // branch
@@ -23,16 +23,16 @@ class GitRebaseTests: XCTestCase {
             .shouldSucceed()!
         
         // commit into main
-        (repoID.repo | { $0.t_commit(file: .fileA, with: .content2, msg: "2", signature: .test) } )
+        (repoID.repo | { $0.t_commit(file: .fileA, with: .content2, msg: "commit 2", signature: .test) } )
             .shouldSucceed()
+        
+//        (repoID.repo | { $0.t_commit(file: .fileA, with: .content2, msg: "commit 3", signature: .test) } )
+//            .shouldSucceed()
         
         let main = (repoID.HEAD | { $0.asReference })
             .shouldSucceed()!
         
-        // checkout branch
-        branch.checkout(options: CheckoutOptions(strategy: .Force))
-            .shouldSucceed()
-        
+        // rebase
         let oids = GitRebase(repoID).run(src: .ref(main), dst: branch, signature: .test)
             .shouldSucceed("rebase")!
         
