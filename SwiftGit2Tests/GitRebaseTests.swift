@@ -33,8 +33,15 @@ class GitRebaseTests: XCTestCase {
         branch.checkout(options: CheckoutOptions(strategy: .Force))
             .shouldSucceed()
         
-        GitRebase(repoID).head(source: main, signature: .test)
-            .shouldSucceed("rebase")
+        let oids = GitRebase(repoID).head(source: main, signature: .test)
+            .shouldSucceed("rebase")!
+        
+        XCTAssert(!oids.isEmpty)
+        
+        if let oid = oids.last {
+            branch.set(target: oid, message: "rebase (finish): \(branch.name) onto \(oid.description)")
+                .shouldSucceed("set target")!
+        }
         
 //        let rebaseURL = repoID.dbURL | { $0.appendingPathComponent("rebase-merge") }
 //        (rebaseURL | { $0.exists })

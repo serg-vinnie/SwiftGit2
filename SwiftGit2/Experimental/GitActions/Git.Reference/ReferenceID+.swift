@@ -7,6 +7,12 @@ import Clibgit2
 // TODO: auto rename, probably name_remote
 
 public extension ReferenceID {
+    func set(target: OID, message: String) -> R<Void> {
+        let repo = repoID.repo
+        let ref = repo | { $0.reference(name: self.name) }
+        return ref | { $0.set(target: target, message: message).asVoid }
+    }
+    
     var tagInfo : R<Tag> {
         guard isTag else { return .wtf("reference shoud be tag: \(self.name)")}
         let repo = repoID.repo

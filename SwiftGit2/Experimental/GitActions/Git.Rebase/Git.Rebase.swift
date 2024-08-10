@@ -11,18 +11,35 @@ public struct GitRebase {
     public init( _ repoID: RepoID) { self.repoID = repoID }
 }
 
-public extension GitRebase {
-
-    
-    internal func start(onto: ReferenceID, options: RebaseOptions = RebaseOptions()) -> R<Rebase> {
-        let head = repoID.HEAD | { $0.asReference }
-        let head_ac = head | { $0.annotatedCommit }
-        let sync = head | { BranchSync.with(our: $0, their: onto) }
-        let base = sync | { $0.base } | { CommitID(repoID: repoID, oid: $0) } | { $0.annotatedCommit }
-        return combine(repoID.repo, onto.annotatedCommit, base, head_ac)
-        | { repo, onto, base, head in
-             repo.rebase(branch: head /* base */ /*no head*/, upstream: onto, onto: nil, options: options)
+extension GitRebase.Target {
+    func annotatedCommit(in repoID: RepoID) -> R<AnnotatedCommit> {
+        switch self {
+        case .HEAD:                 
+            let t = repoID.repo | { $0.HEAD() } | { $0.target }
+            
+            return .notImplemented
+        case .ref(let refID):       return .notImplemented
+        case .commit(let comID):    return .notImplemented
         }
+    }
+}
+
+public extension GitRebase {
+    enum Target {
+        case HEAD
+        case ref(ReferenceID)
+        case commit(CommitID)
+    }
+    
+    enum CheckoutTarget {
+        case src
+        case dst
+    }
+    
+    func run(src: Target, dst: Target, checkout: CheckoutTarget, signature: Signature, options: RebaseOptions = RebaseOptions()) -> R<[OID]> {
+        
+        
+        return .notImplemented
     }
     
     // naming of functions rely on usage GitRebase(repoID).head(from: ref)
