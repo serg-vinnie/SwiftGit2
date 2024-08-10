@@ -37,6 +37,7 @@ public enum DetachedHeadFix {
 public extension RepoID {
     var masterRefID : ReferenceID { .init(repoID: self, name: "refs/heads/master") }
     var mainRefID   : ReferenceID { .init(repoID: self, name: "refs/heads/main") }
+    
     func fixIfHeadIsUnborn() -> R<Void> {
         repo | { $0.fixIfHeadIsUnborn() }
     }

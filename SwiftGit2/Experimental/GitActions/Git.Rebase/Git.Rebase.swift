@@ -14,13 +14,21 @@ public struct GitRebase {
 extension GitRebase.Target {
     func annotatedCommit(in repoID: RepoID) -> R<AnnotatedCommit> {
         switch self {
-        case .HEAD:                 
-            let t = repoID.repo | { $0.HEAD() } | { $0.target }
-            
-            return .notImplemented
-        case .ref(let refID):       return .notImplemented
-        case .commit(let comID):    return .notImplemented
+        case .HEAD:                 return repoID.repo | { repo in repo.headOID() | { repo.annotatedCommit(oid: $0) } }
+        case .ref(let refID):       return refID.annotatedCommit
+        case .commit(let comID):    return comID.annotatedCommit
         }
+    }
+}
+
+extension Array where Element == OID {
+    func checkingout(refID: ReferenceID) -> R<[OID]> {
+        if let oid = self.last {
+            return refID.set(target: oid, message: "rebase (finish): \(refID.name) onto \(oid.description)")
+                .flatMap { _ in refID.checkout(options: .init(strategy: .Force)) }
+                .map { _ in self }
+        }
+        return .success(self)
     }
 }
 
@@ -30,16 +38,25 @@ public extension GitRebase {
         case ref(ReferenceID)
         case commit(CommitID)
     }
-    
-    enum CheckoutTarget {
-        case src
-        case dst
-    }
-    
-    func run(src: Target, dst: Target, checkout: CheckoutTarget, signature: Signature, options: RebaseOptions = RebaseOptions()) -> R<[OID]> {
+        
+    func run(src: Target, dst: ReferenceID, signature: Signature, options: RebaseOptions = RebaseOptions()) -> R<[OID]> {
+        let src_ac = src.annotatedCommit(in: repoID)
+        let dst_ac = dst.annotatedCommit
+        let dst_ref = dst
         
         
-        return .notImplemented
+        return combine(repoID.repo, src_ac, dst_ac) | { repo, src, dst in
+            repo.rebase(branch: src, upstream: dst, onto: nil, options: options)
+                .flatMap { rebase in
+                    let oids = rebase.iterate(repo: repo, sigature: signature, options: options)
+                    if case let .failure(error) = oids {
+                        return .failure(error) // rebase will not be finalized
+                    }
+                    return rebase.finish(signature: signature)
+                            | { _ in oids }
+                            | { $0.checkingout(refID: dst_ref) }
+                }
+        }
     }
     
     // naming of functions rely on usage GitRebase(repoID).head(from: ref)
