@@ -68,7 +68,7 @@ public extension Repository {
     }
 
     private func mergeFastForward(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
-        let targetOID = their.targetOID
+        let targetOID = their.target_resut
         
         let message = "pull: Fast-forward \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned)"
         
@@ -83,8 +83,8 @@ public extension Repository {
     
     private func mergeThreeWay(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
         let repo = self
-        let ourOID   = our.targetOID
-        let theirOID = our.upstream()            | { $0.targetOID }
+        let ourOID   = our.target_resut
+        let theirOID = our.upstream()            | { $0.target_resut }
         let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
         
         let message = baseOID

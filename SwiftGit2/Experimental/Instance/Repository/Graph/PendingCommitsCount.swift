@@ -49,8 +49,8 @@ public extension Repository {
             return pendingCommitsOIDs(target, .push) | { $0.count } | { .publish_pending($0) }
         }
         
-        let local = target.branch(in: self) | { $0.targetOID }
-        let upstream = branches.findMainBranch().flatMap { $0.targetOID }
+        let local = target.branch(in: self) | { $0.target_resut }
+        let upstream = branches.findMainBranch().flatMap { $0.target_resut }
         //
         return combine(local,upstream)
             .flatMap { graphAheadBehind(local: $0, upstream: $1) }

@@ -65,7 +65,7 @@ public extension Repository {
     }
     
     func commit(branch: String) -> R<Commit> {
-        reference(name: branch) | { $0.asBranch() } | { $0.targetOID } | { self.instanciate($0)}
+        reference(name: branch) | { $0.target_resut } | { self.instanciate($0)}
     }
     
     func merge(from: String, into: String, signature: Signature) -> R<Commit> {
@@ -152,7 +152,7 @@ public extension Repository {
             // FAST-FORWARD MERGE
             /////////////////////////////////////
             
-            let targetOID = their.targetOID
+            let targetOID = their.target_resut
             
             let message = "Fast Forward MERGE \(their.nameAsReference) -> \(our.nameAsReference)"
 
@@ -167,8 +167,8 @@ public extension Repository {
             // THREE-WAY MERGE
             /////////////////////////////////
             
-            let ourOID   = our.targetOID
-            let theirOID = their.targetOID
+            let ourOID   = our.target_resut
+            let theirOID = their.target_resut
             let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
             
             let message = baseOID
@@ -212,13 +212,13 @@ public extension Repository {
     func mergeAnalysisUpstream(_ target: BranchTarget) -> R<MergeAnalysis> {
         target.branch(in: self)
             | { $0.upstream() }
-            | { $0.targetOID }
+            | { $0.target_resut }
             | { self.annotatedCommit(oid: $0) }
             | { self.mergeAnalysis(their_head: $0) }
     }
     
     func mergeAnalysis(branch: Branch) -> R<MergeAnalysis> {
-        branch.targetOID
+        branch.target_resut
             | { self.annotatedCommit(oid: $0) }
             | { self.mergeAnalysis(their_head: $0) }
     }

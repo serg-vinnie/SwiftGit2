@@ -123,7 +123,7 @@ private struct Branch_Info {
     let oid: OID
 
     static func create(from branch: Branch) -> Result<Branch_Info, Error> {
-        branch.targetOID
+        branch.target_resut
             .map { Branch_Info(branch: branch, oid: $0) }
     }
 }

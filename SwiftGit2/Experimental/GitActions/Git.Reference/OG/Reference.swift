@@ -50,28 +50,38 @@ public extension Reference {
         return nil
     }
     
-    @available(*, deprecated, message: "prefered to use Duo<Reference,Repository> instead if possible")
-    var targetOID: Result<OID, Error> { targetOIDNoWarning }
+//    @available(*, deprecated, message: "prefered to use Duo<Reference,Repository> instead if possible")
+//    var targetOID: Result<OID, Error> { targetOIDNoWarning }
     
-    var targetOIDNoWarning: Result<OID, Error> {
-        if isSymbolic {
-//            var resolved: OpaquePointer?
-//            defer {
-//                git_reference_free(resolved)
-//            }
-            
-            return .wtf("Mail to support@taogit.com: targetOIDNoWarning used in wrong way")
-            
-//            git_try("git_reference_name_to_id")
-//                { git_reference_resolve(&resolved, self.pointer) }
-//                .map { OID(git_reference_target(resolved).pointee) }
-            
-        } else {
-            return .success(OID(git_reference_target(pointer).pointee))
-        }
+//    var targetOIDNoWarning: Result<OID, Error> {
+//        if isSymbolic {
+////            var resolved: OpaquePointer?
+////            defer {
+////                git_reference_free(resolved)
+////            }
+//            
+//            return .wtf("Mail to support@taogit.com: targetOIDNoWarning used in wrong way")
+//            
+////            git_try("git_reference_name_to_id")
+////                { git_reference_resolve(&resolved, self.pointer) }
+////                .map { OID(git_reference_target(resolved).pointee) }
+//            
+//        } else {
+//            return .success(OID(git_reference_target(pointer).pointee))
+//        }
+//    }
+    
+    var target_resut : R<OID> {
+        target.asNonOptional("reference.target : OID")
     }
     
-    internal var target : OID { OID(git_reference_target(pointer).pointee) }
+    var target : OID? {
+        let git_oid = git_reference_target(pointer)
+        if let oid = git_oid {
+            return OID(oid.pointee)
+        }
+        return nil
+    }
 }
 
 public extension Repository {
@@ -137,7 +147,7 @@ public extension Duo where T1 == Reference, T2 == Repository {
         if ref.isSymbolic {
             return ref.nameAsReferenceSymbolic.asNonOptional | { repo.referenceTarget(name: $0) }
         } else {
-            return ref.targetOIDNoWarning
+            return ref.target_resut
         }
     }
     
