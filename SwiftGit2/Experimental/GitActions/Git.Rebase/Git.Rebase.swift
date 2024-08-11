@@ -12,9 +12,8 @@ public struct GitRebase {
 }
 
 extension GitRebase.Target {
-    func annotatedCommit(in repoID: RepoID) -> R<AnnotatedCommit> {
+    var annotatedCommit : R<AnnotatedCommit> {
         switch self {
-        case .HEAD:                 return repoID.repo | { repo in repo.headOID() | { repo.annotatedCommit(oid: $0) } }
         case .ref(let refID):       return refID.annotatedCommit
         case .commit(let comID):    return comID.annotatedCommit
         }
@@ -34,13 +33,12 @@ extension Array where Element == OID {
 
 public extension GitRebase {
     enum Target {
-        case HEAD
         case ref(ReferenceID)
         case commit(CommitID)
     }
-        
+    
     func run(src: Target, dst: ReferenceID, signature: Signature, options: RebaseOptions = RebaseOptions()) -> R<[OID]> {
-        let src_ac = src.annotatedCommit(in: repoID)
+        let src_ac = src.annotatedCommit
         let dst_ac = dst.annotatedCommit
         let dst_ref = dst
         
@@ -48,6 +46,7 @@ public extension GitRebase {
         return combine(repoID.repo, src_ac, dst_ac) | { repo, src, dst in
             repo.rebase(branch: src, upstream: dst, onto: nil, options: options)
                 .flatMap { rebase in
+                    print("operations count \(rebase.operationsCount)")
                     let oids = rebase.iterate(repo: repo, sigature: signature, options: options)
                     if case let .failure(error) = oids {
                         return .failure(error) // rebase will not be finalized

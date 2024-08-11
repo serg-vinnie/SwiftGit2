@@ -12,6 +12,12 @@ enum RepositoryContent {
     case clone(URL, CloneOptions)
 }
 
+extension RepoID {
+    func t_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> R<Commit> {
+        repo | { $0.t_commit(file: file, with: content, msg: msg, signature: signature) }
+    }
+}
+
 extension Repository {
     func t_with(content: RepositoryContent) -> R<Repository> {
         switch content {

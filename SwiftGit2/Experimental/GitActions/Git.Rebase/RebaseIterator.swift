@@ -18,11 +18,29 @@ internal class RebaseIterator : ResultIterator {
         self.options = options
     }
     
+    func getReadyToCommit() -> R<Void> {
+        let hasConflicts = repo.index() | { $0.hasConflicts }
+        switch hasConflicts {
+        case .failure(let error): return .failure(error)
+        case .success(let conflicted):
+            if conflicted {
+                return .failure(WTF("rebase.conflicted"))
+            }
+        }
+        
+        return repo.stage(.all).asVoid
+    }
+    
     func next() -> R<OID?> {   // return nil to complete
-        (rebase.next(operation: &operation) | { rebase.commit(signature: signature) } | { $0 })
+        (rebase.next(operation: &operation) | { getReadyToCommit() } | { rebase.commit(signature: signature) } | { $0 })
             .flatMapError { error in
                 if error.isGit2(func: "git_rebase_next", code: -31) {
                     return .success(nil)
+                }
+                // if this patch has already been applied (if you do two identical commits)
+                // skip the commit
+                if error.isGit2(func: "git_rebase_commit", code: -18) {
+                    return self.next()
                 }
                 return .failure(error)
             }
