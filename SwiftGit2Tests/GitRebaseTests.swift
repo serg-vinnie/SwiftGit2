@@ -85,6 +85,59 @@ class GitRebaseTests: XCTestCase {
             .shouldSucceed("commit 2")
     }
     
+    func test_lowLevel2() {
+        let src = root.with(repo: "lowLevel", content: .commit(.fileA, .content1, "commit 1 on main")).shouldSucceed()!
+        let repoID = RepoID(url: src.url)
+        
+        let branch = GitReference(repoID).new(branch: "branch", from: .HEAD, checkout: false)
+            .shouldSucceed()!
+        
+        // commit 2 into main
+        (repoID.repo | { $0.t_commit(file: .fileA, with: .random, msg: "main 2", signature: .test) })
+            .shouldSucceed()
+        
+        let main = (repoID.HEAD | { $0.asReference })
+            .shouldSucceed()!
+        
+        branch.checkout(options: CheckoutOptions())
+            .shouldSucceed()
+        
+        // commit into branch | FileB
+        (repoID.repo | { $0.t_commit(file: .fileB, with: .random, msg: "branch 1", signature: .test) })
+            .shouldSucceed()
+        
+        let options = RebaseOptions()
+        let repo = repoID.repo.maybeSuccess!
+        var operation : UnsafeMutablePointer<git_rebase_operation>?
+        
+        let src_ac = main.annotatedCommit
+        let dst_ac = branch.annotatedCommit
+        
+        let rebase = (combine(src_ac, dst_ac) | { src, dst in repo.rebase(branch: src, upstream: dst, onto: nil, options: options) })
+            .shouldSucceed("rebase")!
+        
+        
+        print("operations count \(rebase.operationsCount)")
+        
+        rebase.next(operation: &operation)
+            .shouldSucceed("next 1")
+        
+        print(operation!.pointee)
+        
+        repo.stage(.all)
+            .shouldSucceed("stage all")
+        
+        rebase.commit(signature: .test).map { $0.oidShort }
+            .shouldSucceed("commit 1")
+        
+        rebase.next(operation: &operation)
+            .shouldSucceed("next 2")
+        print(operation!.pointee)
+        
+        rebase.commit(signature: .test).map { $0.oidShort }
+            .shouldSucceed("commit 2")
+    }
+    
     func test_rebaseFastForward() {
         // create repo with intial commit
         // branch
