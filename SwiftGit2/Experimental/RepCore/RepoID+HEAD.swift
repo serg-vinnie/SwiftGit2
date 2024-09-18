@@ -9,6 +9,10 @@ public extension RepoID {
         case attached(ReferenceID)
         case detached(CommitID)
     }
+    
+    var headTreeID: R<TreeID> {
+        self.repo | { $0.headCommit() } | { $0.treeOID } | { TreeID(repoID: self, oid: $0) }
+    }
 
     var HEAD : R<HeadType> {
         repo
