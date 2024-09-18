@@ -20,6 +20,11 @@ public extension TreeID {
         repoID.repo | { $0.treeLookup(oid: oid) | { $0.entries(repoID: repoID) } }
     }
     
+    @available(macOS 12.0, *)
+    var entriesSorted : R<[TreeID.Entry]> {
+        repoID.repo | { $0.treeLookup(oid: oid) | { $0.entries(repoID: repoID).sorted(using: TreeOrderCmp(order: .forward)) } }
+    }
+    
     func walk() -> R<()> {
         tree | { $0.walk() }
     }
@@ -31,3 +36,39 @@ public extension TreeID {
 }
 
 
+@available(macOS 12.0, *)
+struct TreeOrderCmp : SortComparator {
+    func compare(_ lhs: TreeID.Entry, _ rhs: TreeID.Entry) -> ComparisonResult {
+        if lhs.kind != rhs.kind {
+            if lhs.kind == .wtf { // submodule??
+                return .orderedAscending
+            }
+            
+            if rhs.kind == .wtf { // submodule??
+                return .orderedDescending
+            }
+            
+            if lhs.kind == .tree {
+                return .orderedAscending
+            }
+            
+            if rhs.kind == .tree {
+                return .orderedDescending
+            }
+        } else {
+            if lhs.name < rhs.name {
+                return .orderedAscending
+            }
+            
+            if lhs.name > rhs.name {
+                return .orderedDescending
+            }
+        }
+        
+        return .orderedSame
+    }
+    
+    typealias Compared = TreeID.Entry
+    
+    var order: SortOrder
+}
