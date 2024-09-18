@@ -20,11 +20,23 @@ public extension TreeID {
     
     struct Navigation {
         let levels : [Level]
+        
+        public init(treeID: TreeID) {
+            self.levels = [Level(treeID: treeID)]
+        }
+        
+        init(levels: [Level]) {
+            self.levels = levels
+        }
     }
 }
 
 extension TreeID.Navigation {
-    func going(subTreeID: TreeID) -> R<TreeID.Navigation> {
+    public func appending(level: TreeID.Level) -> TreeID.Navigation {
+        TreeID.Navigation(levels: self.levels + level)
+    }
+    
+    public func going(subTreeID: TreeID) -> R<TreeID.Navigation> {
         var newLevels = self.levels
         
         return .notImplemented

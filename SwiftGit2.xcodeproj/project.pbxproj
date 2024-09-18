@@ -93,7 +93,6 @@
 		E64F957527E8B91B00E2D5D7 /* Git.Discard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */; };
 		E6518C1F2C9A972400E2F5A5 /* Essentials in Frameworks */ = {isa = PBXBuildFile; productRef = E6518C1E2C9A972400E2F5A5 /* Essentials */; };
 		E6518C212C9A97E700E2F5A5 /* TreeID.Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6518C202C9A97E700E2F5A5 /* TreeID.Navigation.swift */; };
-		E6518C232C9AA58500E2F5A5 /* TreeID.ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6518C222C9AA58500E2F5A5 /* TreeID.ViewModel.swift */; };
 		E653907A23E7328200C08416 /* Diff+Delta.swift in Sources */ = {isa = PBXBuildFile; fileRef = E653907923E7328200C08416 /* Diff+Delta.swift */; };
 		E653907C23E73CDE00C08416 /* Patch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E653907B23E73CDE00C08416 /* Patch.swift */; };
 		E655E1D62A27B67400D6731F /* ReflogEntry+Kind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E655E1D52A27B67400D6731F /* ReflogEntry+Kind.swift */; };
@@ -321,7 +320,6 @@
 		E64BED972B360DF500DFE458 /* TreeID.Hierarchy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeID.Hierarchy.swift; sourceTree = "<group>"; };
 		E64F957427E8B91B00E2D5D7 /* Git.Discard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.Discard.swift; sourceTree = "<group>"; };
 		E6518C202C9A97E700E2F5A5 /* TreeID.Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeID.Navigation.swift; sourceTree = "<group>"; };
-		E6518C222C9AA58500E2F5A5 /* TreeID.ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeID.ViewModel.swift; sourceTree = "<group>"; };
 		E653907923E7328200C08416 /* Diff+Delta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Diff+Delta.swift"; sourceTree = "<group>"; };
 		E653907B23E73CDE00C08416 /* Patch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Patch.swift; sourceTree = "<group>"; };
 		E655E1D52A27B67400D6731F /* ReflogEntry+Kind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReflogEntry+Kind.swift"; sourceTree = "<group>"; };
@@ -932,7 +930,6 @@
 			children = (
 				E6F10F342B33887A009D9369 /* GitDB.swift */,
 				E6F10F3C2B339C25009D9369 /* TreeID.swift */,
-				E6518C222C9AA58500E2F5A5 /* TreeID.ViewModel.swift */,
 				E6518C202C9A97E700E2F5A5 /* TreeID.Navigation.swift */,
 				E69AE6D62B3477180057CBE6 /* TreeID.Entry.swift */,
 				E6F10F402B33CBD4009D9369 /* TreeID.Cache.swift */,
@@ -1128,7 +1125,6 @@
 				E6E0211F29996EA500697170 /* ExtendedStatus.swift in Sources */,
 				E6169DF628149496001EB8A6 /* Git.Remotes.swift in Sources */,
 				E6C03B442A5E05EE006E59D4 /* GitLog+filter.swift in Sources */,
-				E6518C232C9AA58500E2F5A5 /* TreeID.ViewModel.swift in Sources */,
 				E6AF6288269256CD007D0585 /* Repository+Graph.swift in Sources */,
 				E67F462A28AEE5EE0055BA99 /* Git.Stasher.swift in Sources */,
 				E6AF629026939D31007D0585 /* BranchTarget.swift in Sources */,

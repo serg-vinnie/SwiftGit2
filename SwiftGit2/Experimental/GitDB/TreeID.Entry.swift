@@ -5,17 +5,19 @@ import Clibgit2
 import Foundation
 
 public extension TreeID {
-    struct Entry : CustomStringConvertible {
-        enum Kind : String {
+    struct Entry : CustomStringConvertible, Identifiable {
+        public var id: OID { oid }
+        
+        public enum Kind : String {
             case blob
             case tree
             case wtf
         }
         
-        let treeID: TreeID
-        let name: String
-        let oid: OID
-        let kind: Kind
+        public let treeID: TreeID
+        public let name: String
+        public let oid: OID
+        public let kind: Kind
         
         public var description: String { "\(oid.oidShort) \(name) \(kind)" }
         var asTreeID : R<TreeID> {
