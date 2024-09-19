@@ -2,17 +2,21 @@
 import Foundation
 import Essentials
 
+extension TreeID.Level : Identifiable {
+    public var id : OID { treeID.oid }
+}
+
 public extension TreeID {
     struct Level {
-        let name: String
-        let treeID: TreeID
+        public let name: String
+        public let treeID: TreeID
         
-        init(treeID: TreeID) {
+        public init(treeID: TreeID) {
             self.name = ""
             self.treeID = treeID
         }
         
-        init(name: String, treeID: TreeID) {
+        public init(name: String, treeID: TreeID) {
             self.name = name
             self.treeID = treeID
         }
