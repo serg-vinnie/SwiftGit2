@@ -5,7 +5,7 @@ import Clibgit2
 import Foundation
 
 public extension TreeID {
-    struct Entry : CustomStringConvertible, Identifiable {
+    struct Entry : CustomStringConvertible, Identifiable, Hashable {
         public var id: OID { oid }
         
         public enum Kind : String {
@@ -23,6 +23,11 @@ public extension TreeID {
         var asTreeID : R<TreeID> {
             guard self.kind == .tree else { return .wtf("not a tree") }
             return .success(TreeID(repoID: treeID.repoID, oid: oid))
+        }
+        
+        var asBlobID : R<BlobID> {
+            guard self.kind == .tree else { return .wtf("not a tree") }
+            return .success(BlobID(repoID: treeID.repoID, oid: oid))
         }
     }
     

@@ -93,7 +93,7 @@ extension TreeEntryProtocol {
         let repoID = treeID.repoID
         
         if type == GIT_OBJECT_BLOB {
-            let blobID = BlobID(oid: oid, repoID: repoID)
+            let blobID = BlobID(repoID: repoID, oid: oid)
             let filePath = path.appendingPath(component: name)
             let fileID = GitFileID(path: filePath, blobID: blobID, commitID: commitID)
             return .file( fileID )

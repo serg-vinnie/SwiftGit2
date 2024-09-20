@@ -7,7 +7,7 @@ public struct BlobID {
     public let repoID: RepoID
     public let path: String?
     
-    public init(oid: OID, repoID: RepoID, path: String? = nil) {
+    public init(repoID: RepoID, oid: OID,  path: String? = nil) {
         self.oid = oid
         self.repoID = repoID
         self.path = path
