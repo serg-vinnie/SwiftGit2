@@ -20,13 +20,13 @@ public extension TreeID {
         public let kind: Kind
         
         public var description: String { "\(oid.oidShort) \(name) \(kind)" }
-        var asTreeID : R<TreeID> {
+        public var asTreeID : R<TreeID> {
             guard self.kind == .tree else { return .wtf("not a tree") }
             return .success(TreeID(repoID: treeID.repoID, oid: oid))
         }
         
-        var asBlobID : R<BlobID> {
-            guard self.kind == .tree else { return .wtf("not a tree") }
+        public var asBlobID : R<BlobID> {
+            guard self.kind == .blob else { return .wtf("not a tree") }
             return .success(BlobID(repoID: treeID.repoID, oid: oid))
         }
     }
