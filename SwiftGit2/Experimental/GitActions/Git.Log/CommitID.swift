@@ -13,6 +13,8 @@ public struct CommitID : CustomStringConvertible, Hashable, Identifiable {
         self.oid = oid
     }
 
+    public var treeID: R<TreeID> { commit | { TreeID(repoID: repoID, oid: $0.treeOID) } }
+    
     public var commit: R<Commit> { self.repoID.repo | { repo in repo.commit(oid: self.oid) } }
     public var deltas: R<CommitDeltas> { self.repoID.repo | { repo in repo.deltas(target: .commit(oid)) } }
     

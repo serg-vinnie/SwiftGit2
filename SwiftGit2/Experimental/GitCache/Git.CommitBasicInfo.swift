@@ -9,6 +9,8 @@ public struct GitCommitBasicInfo {
     public let tree : OID
     public let parents : [OID]
     
+    var treeID : TreeID { TreeID(repoID: id.repoID, oid: tree)}
+    
     public let summary     : String
     public let body        : String
     public let description : String
