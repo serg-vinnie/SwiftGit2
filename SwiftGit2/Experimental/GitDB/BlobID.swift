@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public struct BlobID {
+public struct BlobID : Hashable {
     public let oid: OID
     public let repoID: RepoID
     public let path: String?
