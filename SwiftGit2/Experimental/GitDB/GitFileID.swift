@@ -2,7 +2,7 @@
 import Foundation
 import Essentials
 
-public struct GitFileID {
+public struct GitFileID : Hashable {
     public let path: String
     public let blobID: BlobID
     public let commitID: CommitID?
