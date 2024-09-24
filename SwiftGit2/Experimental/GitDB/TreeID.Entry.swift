@@ -11,7 +11,7 @@ public extension TreeID {
         public enum Kind : String {
             case blob
             case tree
-            case wtf
+            case submodule
         }
         
         public let treeID: TreeID

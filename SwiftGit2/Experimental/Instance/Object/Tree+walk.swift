@@ -85,7 +85,7 @@ extension TreeEntryProtocol {
         } else if type == GIT_OBJECT_TREE {
             return TreeID.Entry(treeID: treeID, name: name, oid: oid, kind: .tree)
         } else {
-            return TreeID.Entry(treeID: treeID, name: name, oid: oid, kind: .wtf)
+            return TreeID.Entry(treeID: treeID, name: name, oid: oid, kind: .submodule)
         }
     }
     

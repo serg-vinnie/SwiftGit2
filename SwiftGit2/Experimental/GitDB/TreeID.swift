@@ -40,11 +40,11 @@ public extension TreeID {
 struct TreeOrderCmp : SortComparator {
     func compare(_ lhs: TreeID.Entry, _ rhs: TreeID.Entry) -> ComparisonResult {
         if lhs.kind != rhs.kind {
-            if lhs.kind == .wtf { // submodule??
+            if lhs.kind == .submodule { // submodule??
                 return .orderedAscending
             }
             
-            if rhs.kind == .wtf { // submodule??
+            if rhs.kind == .submodule { // submodule??
                 return .orderedDescending
             }
             
