@@ -22,6 +22,13 @@ public extension BlobID {
     enum Content {
         case binary(Data)
         case text(String)
+        
+        var asString : R<String> {
+            switch self {
+            case .text(let str): return .success(str)
+            case .binary(_): return .wtf("content is binary")
+            }
+        }
     }
     
     var data : R<Data> { repoID.repo | { $0.blob(oid: oid) | { $0.asData } } }

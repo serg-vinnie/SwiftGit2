@@ -1,6 +1,7 @@
 
 import Foundation
 import Essentials
+import Parsing
 
 public struct GitFileID : Hashable {
     public let path: String
@@ -16,4 +17,26 @@ public struct GitFileID : Hashable {
         self.blobID = blobID
         self.commitID = commitID
     }
+}
+
+public extension GitFileID {
+    struct SubLines {
+        let content : String
+        let lines: [Substring]
+    }
+    
+    var subLines : R<SubLines> {
+        let content = self.blobID.content | { $0.asString }
+        let lines = content | { $0.subStrings }
+        return combine(content, lines) | { SubLines(content: $0, lines: $1) }
+    }
+}
+
+var linesParser = Parse {
+    Many {
+        Prefix { $0 != "\n" }
+    } separator: {
+      "\n"
+    }
+    
 }

@@ -43,7 +43,7 @@ public extension Blame {
 }
 
 extension Repository {
-    func blame(path: String, options: BlameOptions = BlameOptions()) -> R<Blame> {
+    func blame(path: String, options: BlameOptions) -> R<Blame> {
         git_instance(of: Blame.self, "git_blame_file") { pointer in
             git_blame_file(&pointer,self.pointer,path, &options.options)
         }
