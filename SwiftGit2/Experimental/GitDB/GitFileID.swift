@@ -22,7 +22,7 @@ public struct GitFileID : Hashable {
 public extension GitFileID {
     struct SubLines {
         let content : String
-        let lines: [Substring]
+        let lines: [String.SubSequence]
     }
     
     var subLines : R<SubLines> {
@@ -30,13 +30,4 @@ public extension GitFileID {
         let lines = content | { $0.subStrings }
         return combine(content, lines) | { SubLines(content: $0, lines: $1) }
     }
-}
-
-var linesParser = Parse {
-    Many {
-        Prefix { $0 != "\n" }
-    } separator: {
-      "\n"
-    }
-    
 }

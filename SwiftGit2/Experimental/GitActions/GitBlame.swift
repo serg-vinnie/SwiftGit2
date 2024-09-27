@@ -22,13 +22,8 @@ public struct GitBlame {
 }
 
 extension String {
-    var subStrings : R<[Substring]> {
-        do {
-            let lines = try linesParser.parse(self)
-            return .success(lines)
-        } catch {
-            return .failure(error)
-        }
+    var subStrings : R<[String.SubSequence]> {        
+        return .success(self.split(separator: "\n", omittingEmptySubsequences: false))
     }
 }
 
@@ -39,13 +34,13 @@ public extension GitFileID {
 }
 
 extension GitFileID.SubLines {
-    func at(idx: Int, len: Int) -> R<[Substring]> {
-        guard idx+len < self.lines.count else { return .wtf("idx out of bounds: \(idx)+\(len) < \(lines.count)") }
+    func at(idx: Int, len: Int) -> R<[GitBlame.Line]> {
+        guard idx+len <= self.lines.count else { return .wtf("idx out of bounds: \(idx)+\(len) <= \(lines.count)") }
         
-        var lines = [Substring]()
+        var lines = [GitBlame.Line]()
         
-        for i in idx...idx+len {
-            lines.append(self.lines[i])
+        for i in idx..<idx+len {
+            lines.append(GitBlame.Line(num: i, substring: self.lines[i]))
         }
         
         return .success(lines)
@@ -53,7 +48,12 @@ extension GitFileID.SubLines {
 }
 
 public extension GitBlame {
-    func lines(in hunk: BlameHunk) -> R<[Substring]> {
+    struct Line {
+        public let num : Int
+        public let substring : String.SubSequence
+    }
+    
+    func lines(in hunk: BlameHunk) -> R<[GitBlame.Line]> {
         //let origLines = self.subLines.at(idx: hunk.origStartLine, len: hunk.linesCount)
         return self.subLines.at(idx: hunk.finalStartLine, len: hunk.linesCount)
     }
@@ -62,6 +62,7 @@ public extension GitBlame {
 public struct BlameHunk {
     public let fileID : GitFileID
     public let hunk : git_blame_hunk
+    public let idx: Int
     
     public var linesCount: Int         { Int(hunk.lines_in_hunk) }
     public var origStartLine: Int      { Int(hunk.orig_start_line_number) }
@@ -100,7 +101,7 @@ extension Blame {
         for i in 0..<self.hunkCount {
             switch self.hunk(idx: i) {
             case .success(let hunk): 
-                list.append(BlameHunk(fileID: fileID, hunk: hunk))
+                list.append(BlameHunk(fileID: fileID, hunk: hunk, idx: Int(i)))
             case .failure(let error):
                 return .failure(error)
             }
