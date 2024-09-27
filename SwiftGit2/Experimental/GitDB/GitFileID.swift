@@ -11,6 +11,7 @@ public struct GitFileID : Hashable {
     public var repoID : RepoID { blobID.repoID }
     public var fullPath : String { repoID.path + "/" + path }
     public var url : URL { URL(fileURLWithPath: fullPath) }
+    public var displayName : String { url.lastPathComponent }
     
     public init(path: String, blobID: BlobID, commitID: CommitID?) {
         self.path = path

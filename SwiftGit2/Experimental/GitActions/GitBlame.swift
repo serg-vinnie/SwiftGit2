@@ -40,7 +40,7 @@ extension GitFileID.SubLines {
         var lines = [GitBlame.Line]()
         
         for i in idx..<idx+len {
-            lines.append(GitBlame.Line(num: i, substring: self.lines[i]))
+            lines.append(GitBlame.Line(num: i, substring: self.lines[i - 1]))
         }
         
         return .success(lines)
@@ -51,6 +51,13 @@ public extension GitBlame {
     struct Line {
         public let num : Int
         public let substring : String.SubSequence
+        
+        public var numString : String {
+            if num < 10 {
+                return "0" + "\(num)"
+            }
+            return "\(num)"
+        }
     }
     
     func lines(in hunk: BlameHunk) -> R<[GitBlame.Line]> {
