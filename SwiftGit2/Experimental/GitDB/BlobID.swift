@@ -23,7 +23,7 @@ public extension BlobID {
         case binary(Data)
         case text(String)
         
-        var asString : R<String> {
+        public var asString : R<String> {
             switch self {
             case .text(let str): return .success(str)
             case .binary(_): return .wtf("content is binary")
