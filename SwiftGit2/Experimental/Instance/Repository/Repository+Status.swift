@@ -53,7 +53,7 @@ public extension ExtendedStatus.HEAD {
 }
 
 extension Repository {
-    func extendedStatus(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
+    internal func extendedStatus(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
         if headIsUnborn {
             return statusConflictSafe(options: options) | { ExtendedStatus(status: $0, isConflicted: false, head: .isUnborn) }
         }
@@ -80,7 +80,7 @@ public extension RepoID {
         self.repo | { $0.statusConflictSafe(options: options) }
     }
     
-    func statusEx(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
+    internal func statusEx(options: StatusOptions = StatusOptions()) -> R<ExtendedStatus> {
         self.repo | { $0.extendedStatus(options: options) }
     }
 }

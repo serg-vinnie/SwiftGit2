@@ -2,25 +2,49 @@
 import Foundation
 import Essentials
 
-
-
-//extension String {
-//    var gravatarVM : GravatarViewModel { gravatarVMs.access { $0.item(key: self) { GravatarViewModel(email: $0) } } }
-//}
-
-
 public class StatusStorage {
-    var uuid: UUID { status.uuid }
-    
     public let repoID: RepoID
-    public let status: ExtendedStatus
-    public let entries : [StatusEntryID]
     public let hunks = LockedVar<[StatusEntryID:[Diff.Hunk]]>([:])
     
-    init(status: ExtendedStatus, repoID: RepoID) {
+    var statusEx : ExtendedStatus? { _statusEx.read }
+    var _statusEx                   = LockedVar<ExtendedStatus?>(nil)
+    public let statusListDidChange  = S<Void>(queue: .main)
+    
+    init(repoID: RepoID) {
         self.repoID = repoID
-        self.status = status
-        self.entries = status.entries(in: repoID)
+    }
+    
+    func refreshing() -> R<ExtendedStatus>  {
+        repoID.statusEx()
+            .onSuccess { newStatus in
+                _statusEx.access { $0 = newStatus }
+                self.statusListDidChange.update(())
+            }
+    }
+    
+    func refreshingSoft() -> R<ExtendedStatus>  {
+        repoID.statusEx() | { self.refreshingSoft(statusEx: $0) }
+    }
+    
+    func refreshingSoft(statusEx newStatus: ExtendedStatus) -> ExtendedStatus {
+        guard let oldStatusEx = self._statusEx.read else {
+            _statusEx.access { $0 = newStatus }
+            self.statusListDidChange.update(())
+            return newStatus
+        }
+        let oldSignature = oldStatusEx.signature
+        let newSignature = newStatus.signature
+        
+        if oldSignature == newSignature {
+            self._statusEx.access { $0 = newStatus.replacing(uuid: oldStatusEx.uuid) }
+            // NOT HERE
+            // self.statusListDidChange.update(())
+            //
+        } else {
+            self._statusEx.access { $0 = newStatus }
+            self.statusListDidChange.update(())
+        }
+        return newStatus
     }
 }
 
