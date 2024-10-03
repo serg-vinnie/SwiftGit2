@@ -13,6 +13,16 @@ public protocol IEntry {
     var id: String { get }
 }
 
+public extension String {
+    var filePathHasImageExtension : Bool {
+        lowercased().hasSuffix( [// Absolutely sure supported extensions
+            ".jpeg",".jpg", ".gif", ".ai", ".pdf", ".eps",".icns",".jp2",".ico",".pbm",".pgm",
+            ".pict",".png",".ppm",".psd",".sgi",".tga",".tiff",".cr2",".dng",".heic", ".heif",
+            ".nef",".nrw",".orf",".pef",".raf",".rw2",".webp",".bmp",".dds",".exr",".hdr",".jpe",
+            ".pgm"])
+    }
+}
+
 extension StatusEntry: IEntry {
     public var id: String { "\(stagePath)_____\(statuses)" }
     
