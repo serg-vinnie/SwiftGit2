@@ -33,6 +33,10 @@ public class Commit: Object {
     public var time: Date { Date(timeIntervalSince1970: Double(git_commit_time(pointer))) }
 }
 
+public extension CommitID {
+    var parents : R<[CommitID]> { self.commit | { $0.parents() } | { $0.map {  CommitID(repoID: self.repoID, oid: $0.oid) } } }
+}
+
 public extension Commit {
     func parents() -> Result<[Commit], Error> {
         var result: [Commit] = []
