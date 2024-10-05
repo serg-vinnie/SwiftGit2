@@ -34,7 +34,13 @@ public class Commit: Object {
 }
 
 public extension CommitID {
-    var parents : R<[CommitID]> { self.commit | { $0.parents() } | { $0.map {  CommitID(repoID: self.repoID, oid: $0.oid) } } }
+//    var parents : R<[CommitID]> { self.commit | { $0.parents() } | { $0.map {  CommitID(repoID: self.repoID, oid: $0.oid) } } }
+    var parents : R<[CommitID]> {
+        withCommit { c in
+            c.parents()
+                | { $0.map { CommitID(repoID: self.repoID, oid: $0.oid) } }
+        }
+    }
 }
 
 public extension Commit {
