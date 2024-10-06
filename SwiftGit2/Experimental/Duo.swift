@@ -1,7 +1,7 @@
 
 import Foundation
 
-// TODO: move to Essentials
+// TODO: remove this shit completely one day
 public struct Duo<T1, T2> {
     public let value: (T1, T2)
 
