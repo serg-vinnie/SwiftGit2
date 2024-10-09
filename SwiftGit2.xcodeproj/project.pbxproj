@@ -59,6 +59,7 @@
 		E60BB75D29302A40006EE309 /* Parsing in Frameworks */ = {isa = PBXBuildFile; productRef = E60BB75C29302A40006EE309 /* Parsing */; };
 		E60BB75F293259D1006EE309 /* RepoID.Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60BB75E293259D1006EE309 /* RepoID.Tree.swift */; };
 		E6169DF628149496001EB8A6 /* Git.Remotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6169DF528149496001EB8A6 /* Git.Remotes.swift */; };
+		E61A746B2CB343E9008A1D0C /* DiffStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61A746A2CB343E9008A1D0C /* DiffStorage.swift */; };
 		E61C06E2290C409E0047D243 /* Git.LogCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61C06E1290C409E0047D243 /* Git.LogCache.swift */; };
 		E61C06E4290C47660047D243 /* CommitID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61C06E3290C47660047D243 /* CommitID.swift */; };
 		E623A308263486A500484E11 /* FetchOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E623A307263486A500484E11 /* FetchOptions.swift */; };
@@ -290,6 +291,7 @@
 		E60B86C828E0FEA4001D6150 /* SubmoduleID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmoduleID.swift; sourceTree = "<group>"; };
 		E60BB75E293259D1006EE309 /* RepoID.Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoID.Tree.swift; sourceTree = "<group>"; };
 		E6169DF528149496001EB8A6 /* Git.Remotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.Remotes.swift; sourceTree = "<group>"; };
+		E61A746A2CB343E9008A1D0C /* DiffStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffStorage.swift; sourceTree = "<group>"; };
 		E61C06E1290C409E0047D243 /* Git.LogCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Git.LogCache.swift; sourceTree = "<group>"; };
 		E61C06E3290C47660047D243 /* CommitID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommitID.swift; sourceTree = "<group>"; };
 		E623A307263486A500484E11 /* FetchOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchOptions.swift; sourceTree = "<group>"; };
@@ -949,6 +951,7 @@
 				E6CEED8B2B52145A00078A24 /* BlobID.swift */,
 				E69CCCEA2B9D015E005B3200 /* GitFileID.swift */,
 				E69CCCEC2B9D042B005B3200 /* GitTreeEntry.swift */,
+				E61A746A2CB343E9008A1D0C /* DiffStorage.swift */,
 			);
 			path = GitDB;
 			sourceTree = "<group>";
@@ -1112,6 +1115,7 @@
 				E6DFBEB62CABCEC9009F000E /* GitStatus.swift in Sources */,
 				E68A3ACC2663A26300B0244C /* Branch+Repository.swift in Sources */,
 				E6332D7326501055004990E7 /* Repository+Pull.swift in Sources */,
+				E61A746B2CB343E9008A1D0C /* DiffStorage.swift in Sources */,
 				E6DEB95F2CA375020044B294 /* GitBlame.swift in Sources */,
 				E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */,
 				E6F0B93A2910318C008E2176 /* Git.CommitBasicInfo.swift in Sources */,

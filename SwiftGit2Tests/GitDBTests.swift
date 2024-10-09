@@ -6,6 +6,15 @@ import EssentialsTesting
 
 final class GitDBTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "db")
+    
+    func test_status() {
+        let folder = root.with(repo: "status", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+        let repoID = folder.repoID
+        
+        let b = repoID.headCommitID | { $0.diffToParent() }
+        
+        
+    }
 
     func test_extract() {
         let folder = root.with(repo: "objects", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
@@ -32,6 +41,8 @@ final class GitDBTests: XCTestCase {
             .map { $0.roots.keys.map { $0.oid.oidShort } }
             .shouldSucceed("root")
     }
+    
+
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.

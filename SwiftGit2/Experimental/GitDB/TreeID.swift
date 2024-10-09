@@ -3,7 +3,9 @@ import Foundation
 import Essentials
 import Clibgit2
 
-public struct TreeID : Hashable {
+public struct TreeID : Hashable, Identifiable {
+    public var id: OID { oid }
+    
     public let repoID: RepoID
     public let oid: OID
     
