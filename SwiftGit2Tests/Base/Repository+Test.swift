@@ -80,6 +80,10 @@ enum TestFile: String {
     case fileB = "fileB.txt"
     case fileC = "fileC.txt"
     case fileD = "fileD.txt"
+    case fileE = "fileE.txt"
+    case fileF = "fileF.txt"
+    case fileG = "fileG.txt"
+    case fileH = "fileH.txt"
     case fileLong = "pneumonoultramicroscopicsilicovolcanoconiosis.txt"
 }
 

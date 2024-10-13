@@ -15,6 +15,26 @@ final class GitDBTests: XCTestCase {
             .shouldSucceed("diff")!.first!.diff
             
         XCTAssertEqual(diff.paths[TestFile.fileA.rawValue], .added)
+        
+        //
+        // subf00/ -> subf01/  ->  [d.txt, e.txt]
+        // a.txt      subf02/  ->  [f.txt, g.txt]
+        // b.txt      c.txt
+        
+        let subf00 = folder.sub(folder: "subf00")
+        let subf01 = subf00.sub(folder: "subf01")
+        let subf02 = subf00.sub(folder: "subf02")
+        
+        folder.add(file: .fileB, content: .random).shouldSucceed()
+        subf00.add(file: .fileC, content: .random).shouldSucceed()
+        
+        subf01.add(file: .fileD, content: .random).shouldSucceed()
+        subf01.add(file: .fileE, content: .random).shouldSucceed()
+        
+        subf02.add(file: .fileF, content: .random).shouldSucceed()
+        subf02.add(file: .fileG, content: .random).shouldSucceed()
+        
+        folder.addAllAndCommit(msg: "second commit")
     }
 
     func test_extract() {

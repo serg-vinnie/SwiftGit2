@@ -45,6 +45,10 @@ extension TestFolder {
 }
 
 extension TestFolder {
+    func add(file : TestFile, content: TestFileContent) -> R<Void> {
+        self.url.appendingPathComponent(file.rawValue).write(string: content.get())
+    }
+    
     func with(repo name: String, content: RepositoryContent, cleared: Bool = true) -> R<TestFolder> {
         let subFolder : TestFolder
         if cleared {
