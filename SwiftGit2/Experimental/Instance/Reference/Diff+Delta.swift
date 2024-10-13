@@ -72,6 +72,24 @@ extension Diff.Delta: Identifiable {
     }
 }
 
+extension Diff.Delta.Status : CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .unmodified:   ".unmodified"
+        case .added:        ".added"
+        case .deleted:      ".deleted"
+        case .modified:     ".modified"
+        case .renamed:      ".renamed"
+        case .copied:       ".copied"
+        case .ignored:      ".ignored"
+        case .untracked:    ".untracked"
+        case .typechange:   ".typechange"
+        case .unreadable:   ".unreadable"
+        case .conflicted:   ".conflicted"
+        }
+    }
+}
+
 public extension Diff.Delta {
     enum Status: UInt32 {
         case unmodified = 0 /** < no changes */

@@ -35,6 +35,15 @@ final class GitDBTests: XCTestCase {
         subf02.add(file: .fileG, content: .random).shouldSucceed()
         
         folder.addAllAndCommit(msg: "second commit")
+        
+        let diff2 = (repoID.headCommitID | { $0.diffToParent() })
+            .shouldSucceed("diff 2")!.first!.diff
+        
+        print("subs \(diff2.folders.keys.count) :", diff2.folders.keys)
+        XCTAssertEqual(diff2.folders.count, 3)
+        XCTAssertEqual(diff2.folders["subf00"], [.added, .added, .added, .added, .added])
+        XCTAssertEqual(diff2.folders["subf00/subf01"], [.added, .added])
+        XCTAssertEqual(diff2.folders["subf00/subf02"], [.added, .added])
     }
 
     func test_extract() {

@@ -14,26 +14,37 @@ public struct TreeDiffID : Hashable, Identifiable {
 public struct TreeDiff {
     public let deltas : [Diff.Delta]
     public let paths : [String:Diff.Delta.Status]
+    public let folders : [String:[Diff.Delta.Status]]
     public let deletedPaths : [String:String]
+    
+//    func statuses(folder: St)
     
     init(deltas: [Diff.Delta]) {
         self.deltas = deltas
     
         var _paths = [String:Diff.Delta.Status]()
         var _deletedPaths = [String:String]()
+        var _folders = [String:[Diff.Delta.Status]]()
         
         for delta in deltas {
-            if delta.status == .deleted {
-                
+            if delta.status == .deleted, let path = delta.oldFile?.path {
+                assert(false)
+                _deletedPaths[path] = ""
+                _paths[path] = delta.status
             } else if delta.status == .renamed {
                 
             } else if let path = delta.newFile?.path {
                 _paths[path] = delta.status
+                
+                for subPath in path.subPathes {
+                    _folders.append(key: subPath, value: delta.status)
+                }
             }
         }
         
         self.paths = _paths
         self.deletedPaths = _deletedPaths
+        self.folders = _folders
     }
 }
 
@@ -44,5 +55,40 @@ extension TreeDiff : Hashable, Equatable {
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(paths)
+    }
+}
+
+
+extension String {
+    var subPathes : [String] {
+        var result = [String]()
+        
+        var accum = ""
+        
+        for item in split(bySeparators: ["/"]).dropLast() {
+            if accum == "" {
+                accum = item
+            } else {
+                accum += "/" + item
+            }
+            
+            result.append(accum)
+        }
+        
+        return result
+    }
+}
+
+extension Dictionary where Key == String, Value == [Diff.Delta.Status] {
+    mutating func append(key: String, value: Diff.Delta.Status) {
+        if self.keys.contains(key) {
+            self[key]?.append(value)
+        } else {
+            self[key] = [value]
+        }
+    }
+    
+    func statuses(path: String) -> [Diff.Delta.Status] {
+        self[path] ?? []
     }
 }
