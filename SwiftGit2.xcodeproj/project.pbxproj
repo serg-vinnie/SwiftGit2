@@ -157,6 +157,8 @@
 		E6DEC671291581F40076684B /* ReferenceID+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DEC670291581F40076684B /* ReferenceID+.swift */; };
 		E6DFBEB62CABCEC9009F000E /* GitStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DFBEB52CABCEC9009F000E /* GitStatus.swift */; };
 		E6E0211F29996EA500697170 /* ExtendedStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E0211E29996EA500697170 /* ExtendedStatus.swift */; };
+		E6E032142CBC328000D32740 /* TreeDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E032132CBC328000D32740 /* TreeDiff.swift */; };
+		E6E0321A2CBC497C00D32740 /* EssentialsTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E6E032192CBC497C00D32740 /* EssentialsTesting */; };
 		E6E76D69296A0BB2009E745E /* SubmoduleID+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E76D68296A0BB2009E745E /* SubmoduleID+Status.swift */; };
 		E6E99235268BBF5E00F8E8BD /* RevwalkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */; };
 		E6EAA4A8269F4C2000D86506 /* StatusEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */; };
@@ -389,6 +391,7 @@
 		E6DEC670291581F40076684B /* ReferenceID+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReferenceID+.swift"; sourceTree = "<group>"; };
 		E6DFBEB52CABCEC9009F000E /* GitStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitStatus.swift; sourceTree = "<group>"; };
 		E6E0211E29996EA500697170 /* ExtendedStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtendedStatus.swift; sourceTree = "<group>"; };
+		E6E032132CBC328000D32740 /* TreeDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeDiff.swift; sourceTree = "<group>"; };
 		E6E76D68296A0BB2009E745E /* SubmoduleID+Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubmoduleID+Status.swift"; sourceTree = "<group>"; };
 		E6E99234268BBF5E00F8E8BD /* RevwalkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevwalkTests.swift; sourceTree = "<group>"; };
 		E6EAA4A7269F4C2000D86506 /* StatusEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEntry.swift; sourceTree = "<group>"; };
@@ -433,6 +436,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6E0321A2CBC497C00D32740 /* EssentialsTesting in Frameworks */,
 				E6332DD1265167F0004990E7 /* SwiftGit2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -952,6 +956,7 @@
 				E69CCCEA2B9D015E005B3200 /* GitFileID.swift */,
 				E69CCCEC2B9D042B005B3200 /* GitTreeEntry.swift */,
 				E61A746A2CB343E9008A1D0C /* DiffStorage.swift */,
+				E6E032132CBC328000D32740 /* TreeDiff.swift */,
 			);
 			path = GitDB;
 			sourceTree = "<group>";
@@ -1010,6 +1015,7 @@
 			);
 			name = SwiftGit2Tests;
 			packageProductDependencies = (
+				E6E032192CBC497C00D32740 /* EssentialsTesting */,
 			);
 			productName = SwiftGit2Tests;
 			productReference = E6332DCC265167F0004990E7 /* SwiftGit2Tests.xctest */;
@@ -1132,6 +1138,7 @@
 				1D914FB92856799D00034EC1 /* URL_ext.swift in Sources */,
 				E63EDF7C265DBAE500A3D048 /* ProxyOptions.swift in Sources */,
 				E69932042A33C27A009F6B1B /* ReferenceID+rename.swift in Sources */,
+				E6E032142CBC328000D32740 /* TreeDiff.swift in Sources */,
 				E6731226292AA0A200606E91 /* TreeStorage.swift in Sources */,
 				E655E1D62A27B67400D6731F /* ReflogEntry+Kind.swift in Sources */,
 				E6D4A92024DEACC000E8041E /* Repository.swift in Sources */,
@@ -1579,6 +1586,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E6FC107427BD94CE002C9CEE /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = DequeModule;
+		};
+		E6E032192CBC497C00D32740 /* EssentialsTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EssentialsTesting;
 		};
 		E6FC107527BD94CE002C9CEE /* OrderedCollections */ = {
 			isa = XCSwiftPackageProductDependency;

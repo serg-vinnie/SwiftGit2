@@ -11,9 +11,10 @@ final class GitDBTests: XCTestCase {
         let folder = root.with(repo: "status", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
         let repoID = folder.repoID
         
-        let b = repoID.headCommitID | { $0.diffToParent() }
-        
-        
+        let diff = (repoID.headCommitID | { $0.diffToParent() })
+            .shouldSucceed("diff")!.first!.diff
+            
+        XCTAssertEqual(diff.paths[TestFile.fileA.rawValue], .added)
     }
 
     func test_extract() {
