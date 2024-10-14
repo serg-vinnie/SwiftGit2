@@ -15,7 +15,7 @@ public struct TreeDiff {
     public let deltas : [Diff.Delta]
     public let paths : [String:Diff.Delta.Status]
     public let folders : [String:[Diff.Delta.Status]]
-    public let deletedPaths : [String:String]
+    public let deletedPaths : [String:[String]]
     
 //    func statuses(folder: St)
     
@@ -23,15 +23,29 @@ public struct TreeDiff {
         self.deltas = deltas
     
         var _paths = [String:Diff.Delta.Status]()
-        var _deletedPaths = [String:String]()
+        var _deletedPaths = [String:[String]]()
         var _folders = [String:[Diff.Delta.Status]]()
         
         for delta in deltas {
             if delta.status == .deleted, let path = delta.oldFile?.path {
-                assert(false)
-                _deletedPaths[path] = ""
+                _deletedPaths.append(path.splitPathName)
                 _paths[path] = delta.status
-            } else if delta.status == .renamed {
+                for subPath in path.subPathes {
+                    _folders.append(key: subPath, value: delta.status)
+                }
+                
+            } else if delta.status == .renamed, let oldPath = delta.oldFile?.path, let newPath = delta.newFile?.path {
+                _paths[newPath] = delta.status
+                _paths[oldPath] = delta.status
+                _deletedPaths.append(oldPath.splitPathName)
+                
+                for subPath in newPath.subPathes {
+                    _folders.append(key: subPath, value: delta.status)
+                }
+                
+                for subPath in oldPath.subPathes {
+                    _folders.append(key: subPath, value: delta.status)
+                }
                 
             } else if let path = delta.newFile?.path {
                 _paths[path] = delta.status
@@ -60,6 +74,14 @@ extension TreeDiff : Hashable, Equatable {
 
 
 extension String {
+    var splitPathName : (String, String) {
+        var items = split(bySeparators: ["/"])
+        if let name = items.popLast() {
+            return (items.joined(separator: "/"), name)
+        }
+        return ("","")
+    }
+    
     var subPathes : [String] {
         var result = [String]()
         
@@ -76,6 +98,18 @@ extension String {
         }
         
         return result
+    }
+}
+
+extension Dictionary where Key == String, Value == [String] {
+    mutating func append(_ value: (String,String)) {
+        guard !value.1.isEmpty else { return }
+        
+        if self.keys.contains(value.0) {
+            self[value.0]?.append(value.1)
+        } else {
+            self[value.0] = [value.1]
+        }
     }
 }
 

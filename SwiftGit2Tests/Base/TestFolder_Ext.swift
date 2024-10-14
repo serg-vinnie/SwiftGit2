@@ -45,6 +45,10 @@ extension TestFolder {
 }
 
 extension TestFolder {
+    func rm(file : TestFile) -> R<Void> {
+        self.url.appendingPathComponent(file.rawValue).rm()
+    }
+    
     func add(file : TestFile, content: TestFileContent) -> R<Void> {
         self.url.appendingPathComponent(file.rawValue).write(string: content.get())
     }
