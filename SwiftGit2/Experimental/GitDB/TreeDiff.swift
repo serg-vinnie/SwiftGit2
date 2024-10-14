@@ -17,8 +17,6 @@ public struct TreeDiff {
     public let folders : [String:[Diff.Delta.Status]]
     public let deletedPaths : [String:[String]]
     
-//    func statuses(folder: St)
-    
     init(deltas: [Diff.Delta]) {
         self.deltas = deltas
     

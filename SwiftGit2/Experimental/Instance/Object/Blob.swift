@@ -37,6 +37,17 @@ public extension Blob {
 }
 
 public extension Repository {    
+    func diffBlobs(old: Blob?, new: Blob?, options: DiffOptions) -> R<[Diff.Hunk]> {
+        var cb = options.callbacks
+
+        if let old = old, old.isBinary { return .success([]) }
+        if let new = new, new.isBinary { return .success([]) }
+        
+        return git_try("git_diff_blobs") {
+            git_diff_blobs(old?.pointer, nil, new?.pointer, nil, &options.diff_options, cb.each_file_cb, nil, cb.each_hunk_cb, cb.each_line_cb, &cb)
+        }.map { cb.deltas.first?.hunks ?? [] }
+    }
+    
     func hunksBetweenBlobs(old: Blob?, new: Blob?, options: DiffOptions = DiffOptions()) -> Result<HunksResult, Error> {
         var cb = options.callbacks
         
