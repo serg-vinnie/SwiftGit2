@@ -80,6 +80,10 @@ final class GitDBTests: XCTestCase {
         
         let diff4 = (repoID.headCommitID | { $0.diffToParent() })
             .shouldSucceed("diff 4")!.first!.diff
+        
+        XCTAssertEqual(diff4.folders["subf00"], [.renamed, .renamed])
+        XCTAssertEqual(diff4.folders["subf00/subf01"], [.renamed])
+        XCTAssertEqual(diff4.folders["subf00/subf02"], [.renamed])
     }
 
     func test_extract() {
