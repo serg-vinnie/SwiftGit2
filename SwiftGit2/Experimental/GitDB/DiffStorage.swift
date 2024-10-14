@@ -12,7 +12,7 @@ extension RepoID {
 class DiffStorage {
     let diffOptions : DiffOptions
     let findOptions : Diff.FindOptions
-    var diffs       = LockedVar<[TreeDiffID:TreeDiff]>([:])
+    var treeDiffs   = LockedVar<[TreeDiffID:TreeDiff]>([:])
     
     init(diffOptions: DiffOptions = DiffOptions(), findOptions: Diff.FindOptions = Diff.FindOptions()) {
         self.diffOptions = diffOptions
@@ -22,19 +22,19 @@ class DiffStorage {
     func diff(old: TreeID?, new: TreeID?) -> R<TreeDiff> {
         let id = TreeDiffID(oldTree: old, newTree: new)
         
-        if let diff = self.diffs[id] {
+        if let diff = self.treeDiffs[id] {
             return .success(diff)
         }
         
         return _diff(old: old, new: new)
             .onSuccess {
-                self.diffs[id] = $0
+                self.treeDiffs[id] = $0
             }
     }
 }
 
 private extension DiffStorage {
-     func _diff(old: TreeID?, new: TreeID?) -> R<TreeDiff> {
+    func _diff(old: TreeID?, new: TreeID?) -> R<TreeDiff> {
         if old == nil, let new { return diff(new: new) }
         if new == nil, let old { return diff(old: old) }
         guard let new, let old else { return .wtf("at least one argument shoud be not nil") }
@@ -44,7 +44,7 @@ private extension DiffStorage {
         let newTree = repo | { $0.treeLookup(oid: new.oid) }
         
         let diff = combine(repo, oldTree, newTree) | { repo, old, new in repo.diffTreeToTree(oldTree: old, newTree: new, options: self.diffOptions) }
-         return diff | { $0.findSimilar(options: self.findOptions) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
+        return diff | { $0.findSimilar(options: self.findOptions) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
     }
     
     func diff(old: TreeID) -> R<TreeDiff> {

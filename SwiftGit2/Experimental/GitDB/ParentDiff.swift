@@ -26,7 +26,7 @@ public extension CommitID {
     }
 }
 
-extension Array where Element == CommitID {
+private extension Array where Element == CommitID {
     func diff(treeID: TreeID, commitID: CommitID) -> R<[ParentDiff]> {
         let repoID = treeID.repoID
         if count == 0 {
