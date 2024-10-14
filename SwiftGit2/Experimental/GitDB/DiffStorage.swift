@@ -9,13 +9,7 @@ extension RepoID {
     var diffStorage : DiffStorage { _diffStorages.item(key: self) { _ in DiffStorage() } }
 }
 
-public struct BlobDiffID : Hashable, Identifiable {
-    public var id: String { (oldBlob?.oid.description ?? "nil") + "_" + (newBlob?.oid.description ?? "") }
-    
-    // both nils will return error
-    let oldBlob : BlobID?
-    let newBlob : BlobID?
-}
+
 
 class DiffStorage {
     let diffOptions : DiffOptions
