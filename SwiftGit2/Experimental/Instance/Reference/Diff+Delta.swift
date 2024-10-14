@@ -35,6 +35,11 @@ public extension Diff {
     }
 }
 
+fileprivate let zero_OID = OID(string: "0000000000000000000000000000000000000000")!
+extension OID {
+    static var zero : OID { zero_OID }
+}
+
 extension Diff.Delta {
     public func blobDiffID(repoID: RepoID) -> BlobDiffID {
         return BlobDiffID(oldBlob: oldBlobID(repoID: repoID), newBlob: newBlobID(repoID: repoID))
@@ -42,7 +47,7 @@ extension Diff.Delta {
     
     func oldBlobID(repoID: RepoID) -> BlobID? {
         guard let file = oldFile else { return nil }
-        guard file.oid != OID(string: "0000000000000000000000000000000000000000") else { return nil }
+        guard file.oid != OID.zero else { return nil }
         return BlobID(repoID: repoID, oid: file.oid, path: file.path)
     }
     
