@@ -37,17 +37,18 @@ public extension Diff {
 
 extension Diff.Delta {
     public func blobDiffID(repoID: RepoID) -> BlobDiffID {
-        BlobDiffID(oldBlob: oldBlobID(repoID: repoID), newBlob: newBlobID(repoID: repoID))
+        return BlobDiffID(oldBlob: oldBlobID(repoID: repoID), newBlob: newBlobID(repoID: repoID))
     }
     
     func oldBlobID(repoID: RepoID) -> BlobID? {
         guard let file = oldFile else { return nil }
-        return BlobID(repoID: repoID, oid: file.oid)
+        guard file.oid != OID(string: "0000000000000000000000000000000000000000") else { return nil }
+        return BlobID(repoID: repoID, oid: file.oid, path: file.path)
     }
     
     func newBlobID(repoID: RepoID) -> BlobID? {
-        guard let file = oldFile else { return nil }
-        return BlobID(repoID: repoID, oid: file.oid)
+        guard let file = newFile else { return nil }
+        return BlobID(repoID: repoID, oid: file.oid, path: file.path)
     }
 }
 

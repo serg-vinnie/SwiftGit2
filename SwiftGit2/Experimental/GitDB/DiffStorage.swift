@@ -91,7 +91,9 @@ private extension DiffStorage {
         let oldBlob = repo | { $0.blob(oid: old.oid) }
         let newBlob = repo | { $0.blob(oid: new.oid) }
         
-        return combine(repo, oldBlob, newBlob) | { repo, old, new in repo.diffBlobs(old: old, new: new, options: self.diffOptions) }
+        return combine(repo, oldBlob, newBlob) | { repo, old, new in
+            repo.diffBlobs(old: old, new: new, options: self.diffOptions)
+        }
     }
     
     func diff(old: BlobID) -> R<[Diff.Hunk]> {
