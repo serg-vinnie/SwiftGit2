@@ -35,12 +35,14 @@ public extension GitFileID {
 
 extension GitFileID.SubLines {
     func at(idx: Int, len: Int) -> R<[GitBlame.Line]> {
-        guard idx+len <= self.lines.count else { return .wtf("idx out of bounds: \(idx)+\(len) <= \(lines.count)") }
+        guard idx+len <= self.lines.count else {
+            return .wtf("idx out of bounds: \(idx)+\(len) <= \(lines.count)")
+        }
         
         var lines = [GitBlame.Line]()
         
         for i in idx..<idx+len {
-            lines.append(GitBlame.Line(num: i, substring: self.lines[i - 1]))
+            lines.append(GitBlame.Line(num: i + 1, substring: self.lines[i]))
         }
         
         return .success(lines)
@@ -62,7 +64,7 @@ public extension GitBlame {
     
     func lines(in hunk: BlameHunk) -> R<[GitBlame.Line]> {
         //let origLines = self.subLines.at(idx: hunk.origStartLine, len: hunk.linesCount)
-        return self.subLines.at(idx: hunk.finalStartLine, len: hunk.linesCount)
+        return self.subLines.at(idx: hunk.finalStartLine - 1, len: hunk.linesCount)
     }
 }
 
