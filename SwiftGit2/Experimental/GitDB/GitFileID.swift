@@ -24,11 +24,10 @@ public extension GitFileID {
     struct SubLines {
         let content : String
         let lines: [String.SubSequence]
+        let isBinary: Bool
     }
     
     var subLines : R<SubLines> {
-        let content = self.blobID.content | { $0.asString }
-        let lines = content | { $0.subStrings }
-        return combine(content, lines) | { SubLines(content: $0, lines: $1) }
+        blobID.content | { $0.asSubLines }
     }
 }

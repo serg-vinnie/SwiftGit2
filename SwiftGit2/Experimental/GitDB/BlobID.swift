@@ -29,6 +29,16 @@ public extension BlobID {
             case .binary(_): return .wtf("content is binary")
             }
         }
+        
+        public var asSubLines : R<GitFileID.SubLines> {
+            switch self {
+            case .text(let str):
+                return str.subStrings | { .init(content: str, lines: $0, isBinary: false) }
+                
+            case .binary(_):
+                return .success(.init(content: "", lines: [], isBinary: true))
+            }
+        }
     }
     
     var data : R<Data> { repoID.repo | { $0.blob(oid: oid) | { $0.asData } } }

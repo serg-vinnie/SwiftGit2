@@ -9,6 +9,7 @@ public struct GitBlame {
     public let fileID : GitFileID
     public let subLines : GitFileID.SubLines
     public let hunks: [BlameHunk]
+    public var isBinary : Bool { subLines.isBinary }
     
     public static func create(fileID: GitFileID, options: BlameOptions = BlameOptions()) -> R<GitBlame> {
         let subLines = fileID.subLines
@@ -68,7 +69,9 @@ public extension GitBlame {
     }
 }
 
-public struct BlameHunk {
+public struct BlameHunk : Identifiable {
+    public var id: Int { idx }
+    
     public let fileID : GitFileID
     public let hunk : git_blame_hunk
     public let idx: Int
