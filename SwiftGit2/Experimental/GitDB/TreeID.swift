@@ -24,7 +24,7 @@ public extension TreeID {
     
     @available(macOS 12.0, *)
     var entriesSorted : R<[TreeID.Entry]> {
-        repoID.repo | { $0.treeLookup(oid: oid) | { $0.entries(repoID: repoID).sorted(using: TreeOrderCmp(order: .forward)) } }
+        entries | { $0.sorted(using: TreeOrderCmp(order: .forward)) }
     }
     
     func walk() -> R<()> {
@@ -37,34 +37,29 @@ public extension TreeID {
     }
 }
 
+public extension Array where Element == TreeID.Entry {
+    @available(macOS 12.0, *)
+    var customSorted : Self {
+        sorted(using: TreeOrderCmp(order: .forward))
+    }
+}
 
 @available(macOS 12.0, *)
 struct TreeOrderCmp : SortComparator {
     func compare(_ lhs: TreeID.Entry, _ rhs: TreeID.Entry) -> ComparisonResult {
         if lhs.kind != rhs.kind {
-            if lhs.kind == .submodule { // submodule??
-                return .orderedAscending
-            }
+            if lhs.kind == .submodule { return .orderedAscending }
+            if rhs.kind == .submodule { return .orderedDescending }
             
-            if rhs.kind == .submodule { // submodule??
-                return .orderedDescending
-            }
+            if lhs.kind == .tree { return .orderedAscending }
+            if rhs.kind == .tree { return .orderedDescending }
             
-            if lhs.kind == .tree {
-                return .orderedAscending
-            }
+            if lhs.kind == .fake { return .orderedAscending }
+            if rhs.kind == .fake { return .orderedDescending }
             
-            if rhs.kind == .tree {
-                return .orderedDescending
-            }
         } else {
-            if lhs.name < rhs.name {
-                return .orderedAscending
-            }
-            
-            if lhs.name > rhs.name {
-                return .orderedDescending
-            }
+            if lhs.name < rhs.name { return .orderedAscending }
+            if lhs.name > rhs.name { return .orderedDescending }
         }
         
         return .orderedSame

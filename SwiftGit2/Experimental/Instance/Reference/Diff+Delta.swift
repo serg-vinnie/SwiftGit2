@@ -36,7 +36,7 @@ public extension Diff {
 }
 
 fileprivate let zero_OID = OID(string: "0000000000000000000000000000000000000000")!
-extension OID {
+public extension OID {
     static var zero : OID { zero_OID }
 }
 

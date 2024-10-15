@@ -12,12 +12,20 @@ public extension TreeID {
             case blob
             case tree
             case submodule
+            case fake
         }
         
         public let treeID: TreeID
         public let name: String
         public let oid: OID
         public let kind: Kind
+        
+        public init(treeID: TreeID, name: String, oid: OID, kind: Kind) {
+            self.treeID = treeID
+            self.name = name
+            self.oid = oid
+            self.kind = kind
+        }
         
         public var description: String { "\(oid.oidShort) \(name) \(kind)" }
         public var asTreeID : R<TreeID> {
