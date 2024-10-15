@@ -31,7 +31,7 @@ private extension Array where Element == CommitID {
         let repoID = treeID.repoID
         if count == 0 {
             return repoID.diffStorage.diff(old: nil, new: treeID)
-                | { diff in ParentDiff(idx: 0, total: 1, commitID: commitID, parentID: commitID, diff: diff)}
+                | { diff in ParentDiff(idx: 0, total: 1, commitID: commitID, parentID: nil, diff: diff)}
                 | { [$0] }
         }
 
