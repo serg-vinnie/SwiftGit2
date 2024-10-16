@@ -6,6 +6,13 @@ extension TreeID.Level : Identifiable {
     public var id : OID { treeID.oid }
 }
 
+
+extension TreeID.Level : CustomStringConvertible {
+    public var description: String {
+        "Level:\(self.name)|Tree:\(self.treeID.oid.oidShort)"
+    }
+}
+
 public extension TreeID {
     struct Level {
         public let name: String

@@ -112,6 +112,26 @@ extension Diff.Delta.Status : CustomStringConvertible {
     }
 }
 
+extension Diff.Delta.StatusEx : CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .unmodified:       ".unmodified"
+        case .added:            ".added"
+        case .deleted:          ".deleted"
+        case .modified:         ".modified"
+        case .renamed:          ".renamed"
+        case .renamedAdded:     ".renamedAdded"
+        case .renamedDeleted:   ".renamedDeleted"
+        case .copied:           ".copied"
+        case .ignored:          ".ignored"
+        case .untracked:        ".untracked"
+        case .typechange:       ".typechange"
+        case .unreadable:       ".unreadable"
+        case .conflicted:       ".conflicted"
+        }
+    }
+}
+
 public extension Diff.Delta.Status {
     var asEx : Diff.Delta.StatusEx {
         return Diff.Delta.StatusEx(rawValue: Int(self.rawValue))!
