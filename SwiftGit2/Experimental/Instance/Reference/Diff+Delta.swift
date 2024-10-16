@@ -138,8 +138,9 @@ public extension Diff.Delta {
         case added = 1
         case deleted = 2
         case modified = 3
-        case renamedAdded = 4
-        case renamedDeleted = -4
+        case renamed = 4
+        case renamedAdded   = 44
+        case renamedDeleted = -44
         case copied = 5
         case ignored = 6
         case untracked = 7

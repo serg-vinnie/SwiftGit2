@@ -13,28 +13,28 @@ public struct TreeDiffID : Hashable, Identifiable {
 
 public struct TreeDiff {
     public let deltas : [Diff.Delta]
-    public let paths : [String:Diff.Delta.Status]
-    public let folders : [String:[Diff.Delta.Status]]
+    public let paths : [String:Diff.Delta.StatusEx]
+    public let folders : [String:[Diff.Delta.StatusEx]]
     public let deletedPaths : [String:[String]]
     
     init(deltas: [Diff.Delta]) {
         self.deltas = deltas
     
-        var _paths = [String:Diff.Delta.Status]()
+        var _paths = [String:Diff.Delta.StatusEx]()
         var _deletedPaths = [String:[String]]()
-        var _folders = [String:[Diff.Delta.Status]]()
+        var _folders = [String:[Diff.Delta.StatusEx]]()
         
         for delta in deltas {
             if delta.status == .deleted, let path = delta.oldFile?.path {
                 _deletedPaths.append(path.splitPathName)
-                _paths[path] = delta.status
+                _paths[path] = delta.status.asEx
                 for subPath in path.subPathes {
-                    _folders.append(key: subPath, value: delta.status)
+                    _folders.append(key: subPath, value: delta.status.asEx)
                 }
                 
             } else if delta.status == .renamed, let oldPath = delta.oldFile?.path, let newPath = delta.newFile?.path {
-                _paths[newPath] = delta.status
-                _paths[oldPath] = delta.status
+                _paths[newPath] = delta.status.asEx
+                _paths[oldPath] = delta.status.asEx
                 _deletedPaths.append(oldPath.splitPathName)
                 
                 let newSP = newPath.subPathes
@@ -47,20 +47,20 @@ public struct TreeDiff {
                 
                 
                 for subPath in commonPrefix {
-                    _folders.append(key: subPath, value: delta.status)
+                    _folders.append(key: subPath, value: delta.status.asEx)
                 }
                 for subPath in newSP_suffix {
-                    _folders.append(key: subPath, value: delta.status)
+                    _folders.append(key: subPath, value: delta.status.asEx)
                 }
                 for subPath in oldSP_suffix {
-                    _folders.append(key: subPath, value: delta.status)
+                    _folders.append(key: subPath, value: delta.status.asEx)
                 }
                 
             } else if let path = delta.newFile?.path {
-                _paths[path] = delta.status
+                _paths[path] = delta.status.asEx
                 
                 for subPath in path.subPathes {
-                    _folders.append(key: subPath, value: delta.status)
+                    _folders.append(key: subPath, value: delta.status.asEx)
                 }
             }
         }
@@ -122,8 +122,8 @@ extension Dictionary where Key == String, Value == [String] {
     }
 }
 
-extension Dictionary where Key == String, Value == [Diff.Delta.Status] {
-    mutating func append(key: String, value: Diff.Delta.Status) {
+extension Dictionary where Key == String, Value == [Diff.Delta.StatusEx] {
+    mutating func append(key: String, value: Diff.Delta.StatusEx) {
         if self.keys.contains(key) {
             self[key]?.append(value)
         } else {
@@ -131,7 +131,7 @@ extension Dictionary where Key == String, Value == [Diff.Delta.Status] {
         }
     }
     
-    func statuses(path: String) -> [Diff.Delta.Status] {
+    func statuses(path: String) -> [Diff.Delta.StatusEx] {
         self[path] ?? []
     }
 }
