@@ -37,11 +37,22 @@ public struct TreeDiff {
                 _paths[oldPath] = delta.status
                 _deletedPaths.append(oldPath.splitPathName)
                 
-                for subPath in newPath.subPathes {
+                let newSP = newPath.subPathes
+                let oldSP = oldPath.subPathes
+                
+                let count = countCommonPrefixElements(array1: newSP, array2: oldSP)
+                let commonPrefix = newSP.prefix(count)
+                let newSP_suffix = newSP.dropFirst(count)
+                let oldSP_suffix = oldSP.dropFirst(count)
+                
+                
+                for subPath in commonPrefix {
                     _folders.append(key: subPath, value: delta.status)
                 }
-                
-                for subPath in oldPath.subPathes {
+                for subPath in newSP_suffix {
+                    _folders.append(key: subPath, value: delta.status)
+                }
+                for subPath in oldSP_suffix {
                     _folders.append(key: subPath, value: delta.status)
                 }
                 
@@ -123,4 +134,19 @@ extension Dictionary where Key == String, Value == [Diff.Delta.Status] {
     func statuses(path: String) -> [Diff.Delta.Status] {
         self[path] ?? []
     }
+}
+
+func countCommonPrefixElements<T: Equatable>(array1: [T], array2: [T]) -> Int {
+    var count = 0
+    let minLength = min(array1.count, array2.count)
+    
+    for i in 0..<minLength {
+        if array1[i] == array2[i] {
+            count += 1
+        } else {
+            break
+        }
+    }
+    
+    return count
 }

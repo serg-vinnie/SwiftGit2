@@ -112,6 +112,12 @@ extension Diff.Delta.Status : CustomStringConvertible {
     }
 }
 
+public extension Diff.Delta.Status {
+    var asEx : Diff.Delta.StatusEx {
+        return Diff.Delta.StatusEx(rawValue: Int(self.rawValue))!
+    }
+}
+
 public extension Diff.Delta {
     enum Status: UInt32 {
         case unmodified = 0 /** < no changes */
@@ -126,6 +132,21 @@ public extension Diff.Delta {
         case unreadable = 9 /** < entry is unreadable */
         case conflicted = 10 /** < entry in the index is conflicted */
     } // git_delta_t
+    
+    enum StatusEx: Int {
+        case unmodified = 0
+        case added = 1
+        case deleted = 2
+        case modified = 3
+        case renamedAdded = 4
+        case renamedDeleted = -4
+        case copied = 5
+        case ignored = 6
+        case untracked = 7
+        case typechange = 8
+        case unreadable = 9
+        case conflicted = 10
+    }
 }
 
 public extension Diff {
