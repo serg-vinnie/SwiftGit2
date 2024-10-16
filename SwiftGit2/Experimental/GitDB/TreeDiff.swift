@@ -33,8 +33,8 @@ public struct TreeDiff {
                 }
                 
             } else if delta.status == .renamed, let oldPath = delta.oldFile?.path, let newPath = delta.newFile?.path {
-                _paths[newPath] = delta.status.asEx
-                _paths[oldPath] = delta.status.asEx
+                _paths[newPath] = .renamedAdded
+                _paths[oldPath] = .renamedDeleted
                 _deletedPaths.append(oldPath.splitPathName)
                 
                 let newSP = newPath.subPathes
@@ -50,10 +50,10 @@ public struct TreeDiff {
                     _folders.append(key: subPath, value: delta.status.asEx)
                 }
                 for subPath in newSP_suffix {
-                    _folders.append(key: subPath, value: delta.status.asEx)
+                    _folders.append(key: subPath, value: .renamedAdded)
                 }
                 for subPath in oldSP_suffix {
-                    _folders.append(key: subPath, value: delta.status.asEx)
+                    _folders.append(key: subPath, value: .renamedDeleted)
                 }
                 
             } else if let path = delta.newFile?.path {
