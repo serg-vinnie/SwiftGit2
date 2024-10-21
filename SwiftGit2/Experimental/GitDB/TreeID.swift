@@ -54,8 +54,8 @@ struct TreeOrderCmp : SortComparator {
             if lhs.kind == .tree { return .orderedAscending }
             if rhs.kind == .tree { return .orderedDescending }
             
-            if lhs.kind == .fake { return .orderedAscending }
-            if rhs.kind == .fake { return .orderedDescending }
+            if lhs.kind == .deleted { return .orderedAscending }
+            if rhs.kind == .deleted { return .orderedDescending }
             
         } else {
             if lhs.name < rhs.name { return .orderedAscending }

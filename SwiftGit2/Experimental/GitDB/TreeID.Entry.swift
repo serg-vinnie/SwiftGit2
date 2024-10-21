@@ -12,7 +12,7 @@ public extension TreeID {
             case blob
             case tree
             case submodule
-            case fake
+            case deleted
         }
         
         public let treeID: TreeID
