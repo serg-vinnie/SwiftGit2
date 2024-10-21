@@ -71,3 +71,9 @@ public struct GitFileFlags : Equatable, Hashable {
     public let isAtHEAD: Bool
     public let isAtHomeDir: Bool
 }
+
+public extension GitFileFlags {
+    var canShowInFinder : Bool {
+        fileExists && isAtHEAD
+    }
+}
