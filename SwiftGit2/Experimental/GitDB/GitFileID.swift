@@ -31,3 +31,38 @@ public extension GitFileID {
         blobID.content | { $0.asSubLines }
     }
 }
+
+public extension GitFileID {
+    var flags : R<GitFileFlags> {
+        let opt = StatusOptions(flags: [.includeUnmodified] , pathspec: [self.path])
+        let status = blobID.repoID.status(options: opt)
+        return status | { $0._flags(fileID: self) }
+    }
+}
+
+extension StatusIterator {
+    func _flags(fileID: GitFileID) -> R<GitFileFlags> {
+        if count == 0 { return .success(GitFileFlags(fileExists: false, isAtHEAD: false, isAtHomeDir: false)) }
+        guard count == 1 else { return .wtf("status.count != 1") }
+        
+        let entry = self[0]
+        guard let file = entry.headToIndex?.newFile else { return .wtf("file doesn't exist in StatusEntry.headToIndex") }
+        
+        if entry.status == .current {
+            if file.oid == fileID.blobID.oid {
+                return .success(GitFileFlags(fileExists: true, isAtHEAD: true, isAtHomeDir: true))
+            }
+        }
+        
+//        if file.oid == fileID.blobID.oid
+        
+        return .notImplemented
+    }
+}
+
+
+public struct GitFileFlags : Equatable {
+    public let fileExists: Bool
+    public let isAtHEAD: Bool
+    public let isAtHomeDir: Bool
+}

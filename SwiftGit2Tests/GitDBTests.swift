@@ -7,6 +7,31 @@ import EssentialsTesting
 final class GitDBTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "db")
     
+    func test_fileFlags() {
+        let folder = root.with(repo: "test_fileFlags", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+        let repoID = folder.repoID
+        
+        let opt = StatusOptions(flags: [.includeUnmodified])
+        let status = repoID.status(options: opt)
+            .shouldSucceed()!
+        XCTAssertEqual(status.count, 1)
+        
+        let commidID = repoID.headCommitID.shouldSucceed()!
+        let entry = status[0]
+        let oid = entry.headToIndex!.newFile!.oid
+        let blobID = BlobID(repoID: repoID, oid: oid)
+        let fileID_A = GitFileID(path: TestFile.fileA.rawValue, blobID: blobID, commitID: commidID)
+        let fileID_B = GitFileID(path: TestFile.fileB.rawValue, blobID: blobID, commitID: commidID)
+        
+        fileID_B.flags
+            .assertEqual(to: GitFileFlags(fileExists: false, isAtHEAD: false, isAtHomeDir: false), "'B' doesn't exist")
+        
+        fileID_A.flags
+            .assertEqual(to: GitFileFlags(fileExists: true, isAtHEAD: true, isAtHomeDir: true), "'A' exists")
+        
+        
+    }
+    
     func test_splitPathName() {
         let split1 = "hello.txt".splitPathName
         XCTAssert(split1.0 == "")
