@@ -11,7 +11,8 @@ public struct GitBlame {
     public let hunks: [BlameHunk]
     public var isBinary : Bool { subLines.isBinary }
     
-    public static func create(fileID: GitFileID, options: BlameOptions = BlameOptions()) -> R<GitBlame> {
+    public static func create(fileID: GitFileID) -> R<GitBlame> {
+        let options: BlameOptions = BlameOptions(commitOID: fileID.commitID?.oid)
         let subLines = fileID.subLines
         let blame = fileID.repoID.repo | { $0.blame(path: fileID.path, options: options) }
         let hunks = blame | { $0.hunks(fileID: fileID) }
@@ -29,8 +30,8 @@ extension String {
 }
 
 public extension GitFileID {
-    func blame(options: BlameOptions = BlameOptions()) -> R<GitBlame> {
-        GitBlame.create(fileID: self, options: options)
+    func blame() -> R<GitBlame> {
+        GitBlame.create(fileID: self)
     }
 }
 

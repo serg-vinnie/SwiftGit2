@@ -53,9 +53,12 @@ extension Repository {
 public class BlameOptions {
     var options = git_blame_options()
     
-    public init(flags: GitBlame.Flags = [.normal]) {
+    public init(flags: GitBlame.Flags = [.normal], commitOID: OID?) {
         git_blame_options_init(&options, UInt32(GIT_BLAME_OPTIONS_VERSION))
         options.flags = flags.rawValue
+        if let oid = commitOID?.oid {
+            options.newest_commit = oid
+        }
     }
 }
 
