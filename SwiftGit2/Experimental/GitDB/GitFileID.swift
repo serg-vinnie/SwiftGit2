@@ -51,12 +51,16 @@ extension StatusIterator {
         if entry.status == .current {
             if file.oid == fileID.blobID.oid {
                 return .success(GitFileFlags(fileExists: true, isAtHEAD: true, isAtHomeDir: true))
+            } else {
+                return .success(GitFileFlags(fileExists: true, isAtHEAD: false, isAtHomeDir: true))
+            }
+        } else {
+            if file.oid == fileID.blobID.oid {
+                return .success(GitFileFlags(fileExists: true, isAtHEAD: true, isAtHomeDir: false))
+            } else {
+                return .success(GitFileFlags(fileExists: true, isAtHEAD: false, isAtHomeDir: false))
             }
         }
-        
-//        if file.oid == fileID.blobID.oid
-        
-        return .notImplemented
     }
 }
 
