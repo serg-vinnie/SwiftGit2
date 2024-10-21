@@ -23,7 +23,7 @@ public extension String {
     }
 }
 
-extension StatusEntry: IEntry {
+extension StatusEntry: IEntry, Identifiable {
     public var id: String { "\(stagePath)_____\(statuses)" }
     
     public var stagePath: String {
