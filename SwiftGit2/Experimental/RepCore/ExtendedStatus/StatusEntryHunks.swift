@@ -9,6 +9,7 @@ public struct StatusEntryHunks {
     public var isBinary : Bool { staged.IsBinary || unstaged.IsBinary }
 }
 
+
 public struct HunksResult {
     public let hunks        : [Diff.Hunk]
     public let incomplete   : Bool
@@ -19,8 +20,7 @@ public struct HunksResult {
 
 extension StatusEntryHunks {
     public var all : [Diff.Hunk] {
-        staged.hunks.appending(contentsOf: unstaged.hunks)
-            .sorted{ $0.newStart < $1.newStart }
+        unstaged.hunks.appending(contentsOf: staged.hunks)
     }
     
     public static func empty() -> StatusEntryHunks {
