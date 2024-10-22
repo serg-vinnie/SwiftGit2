@@ -42,7 +42,7 @@ public extension GitFileID {
 
 extension StatusIterator {
     func _flags(fileID: GitFileID) -> R<GitFileFlags> {
-        if count == 0 { return .success(GitFileFlags(id: fileID, fileExists: false, isAtHEAD: false, isAtHomeDir: false)) }
+        if count == 0 { return .success(GitFileFlags(fileID: fileID, fileExists: false, isAtHEAD: false, isAtHomeDir: false)) }
         guard count == 1 else { return .wtf("status.count != 1") }
         
         let entry = self[0]
@@ -50,15 +50,15 @@ extension StatusIterator {
         
         if entry.status == .current {
             if file.oid == fileID.blobID.oid {
-                return .success(GitFileFlags(id: fileID, fileExists: true, isAtHEAD: true, isAtHomeDir: true))
+                return .success(GitFileFlags(fileID: fileID, fileExists: true, isAtHEAD: true, isAtHomeDir: true))
             } else {
-                return .success(GitFileFlags(id: fileID, fileExists: true, isAtHEAD: false, isAtHomeDir: true))
+                return .success(GitFileFlags(fileID: fileID, fileExists: true, isAtHEAD: false, isAtHomeDir: true))
             }
         } else {
             if file.oid == fileID.blobID.oid {
-                return .success(GitFileFlags(id: fileID, fileExists: true, isAtHEAD: true, isAtHomeDir: false))
+                return .success(GitFileFlags(fileID: fileID, fileExists: true, isAtHEAD: true, isAtHomeDir: false))
             } else {
-                return .success(GitFileFlags(id: fileID, fileExists: true, isAtHEAD: false, isAtHomeDir: false))
+                return .success(GitFileFlags(fileID: fileID, fileExists: true, isAtHEAD: false, isAtHomeDir: false))
             }
         }
     }
@@ -66,7 +66,7 @@ extension StatusIterator {
 
 
 public struct GitFileFlags : Equatable, Hashable {
-    public let id: GitFileID
+    public let fileID: GitFileID
     public let fileExists: Bool
     public let isAtHEAD: Bool
     public let isAtHomeDir: Bool
