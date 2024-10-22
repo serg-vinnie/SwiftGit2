@@ -39,6 +39,15 @@ public extension BlobID {
                 return .success(.init(content: "", lines: [], isBinary: true))
             }
         }
+        
+        func saveTo(url: URL) -> R<Void> {
+            switch self {
+            case .binary(let data):
+                return data.write(url: url).asVoid
+            case .text(let text):
+                return url.write(string: text)
+            }
+        }
     }
     
     var data : R<Data> { repoID.repo | { $0.blob(oid: oid) | { $0.asData } } }

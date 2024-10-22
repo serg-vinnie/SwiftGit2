@@ -33,6 +33,23 @@ public extension GitFileID {
 }
 
 public extension GitFileID {
+    func revert(intoFolder: URL? = nil) -> R<Void> {
+        if let folder = intoFolder, !folder.isDirectory { return .wtf("intoFolder is not directory") }
+        
+        if let folder = intoFolder {
+            let finalURL = folder.appendingPathComponent(self.url.lastPathComponent)
+            return blobID.content | { $0.saveTo(url: finalURL) }
+        }
+        
+        if url.exists {
+            return blobID.content | { $0.saveTo(url: url) }
+        } else {
+            return .wtf("path no longer exist")
+        }
+    }
+}
+
+public extension GitFileID {
     var flags : R<GitFileFlags> {
         let opt = StatusOptions(flags: [.includeUnmodified] , pathspec: [self.path])
         let status = blobID.repoID.status(options: opt)
