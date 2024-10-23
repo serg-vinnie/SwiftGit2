@@ -122,8 +122,3 @@ public struct GitFileFlags : Equatable, Hashable {
     public let isAtWorkDir: Bool
 }
 
-public extension GitFileFlags {
-    var canShowInFinder : Bool {
-        fileExists && isAtHEAD
-    }
-}
