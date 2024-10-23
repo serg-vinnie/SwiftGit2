@@ -43,7 +43,7 @@ final class GitDBTests: XCTestCase {
         let fileID_A2 = GitFileID(path: TestFile.fileA.rawValue, blobID: blobID2, commitID: commitID2)
         
         fileID_A.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A, fileExists: true, isAtHEAD: false, isAtWorkDir: true), "'A' HEAD: false")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A, fileExists: true, isAtHEAD: false, isAtWorkDir: false), "'A' HEAD: false")
         
         fileID_A2.flags
             .assertEqual(to: GitFileFlags(fileID: fileID_A2, fileExists: true, isAtHEAD: true, isAtWorkDir: true), "'A2' HEAD: true")

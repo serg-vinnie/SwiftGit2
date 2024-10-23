@@ -80,7 +80,7 @@ extension StatusIterator {
             if file.oid == fileID.blobID.oid {
                 return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: true, isAtWorkDir: true))
             } else {
-                return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: true))
+                return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: false))
             }
         } else {
             
