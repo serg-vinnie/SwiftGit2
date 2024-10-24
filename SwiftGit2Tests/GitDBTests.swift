@@ -24,10 +24,10 @@ final class GitDBTests: XCTestCase {
         let fileID_B = GitFileID(path: TestFile.fileB.rawValue, blobID: blobID, commitID: commidID)
         
         fileID_B.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_B, fileExists: false, isAtHEAD: false, isAtWorkDir: false), "'B' doesn't exist")
+            .assertEqual(to: GitFileFlags(fileID: fileID_B, isWorkDirModified: false, fileExists: false, isAtHEAD: false, isAtWorkDir: false), "'B' doesn't exist")
         
         fileID_A.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A, fileExists: true, isAtHEAD: true, isAtWorkDir: true), "'A' exists")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A, isWorkDirModified: false, fileExists: true, isAtHEAD: true, isAtWorkDir: true), "'A' exists")
         
         let oid2 = folder.commit(file: .fileA, with: .content2, msg: "commit 2")
             .map { $0.oid }
@@ -43,30 +43,30 @@ final class GitDBTests: XCTestCase {
         let fileID_A2 = GitFileID(path: TestFile.fileA.rawValue, blobID: blobID2, commitID: commitID2)
         
         fileID_A.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A, fileExists: true, isAtHEAD: false, isAtWorkDir: false), "'A' HEAD: false")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A, isWorkDirModified: false, fileExists: true, isAtHEAD: false, isAtWorkDir: false), "'A' HEAD: false")
         
         fileID_A2.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A2, fileExists: true, isAtHEAD: true, isAtWorkDir: true), "'A2' HEAD: true")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A2, isWorkDirModified: false, fileExists: true, isAtHEAD: true, isAtWorkDir: true), "'A2' HEAD: true")
         
         repoID.url.appendingPathComponent(TestFile.fileA.rawValue)
             .write(string: "generate status M")
             .shouldSucceed()
         
         fileID_A.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A, fileExists: true, isAtHEAD: false, isAtWorkDir: false), "'A' isAtWorkDir: false")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A, isWorkDirModified: true, fileExists: true, isAtHEAD: false, isAtWorkDir: false), "'A' isAtWorkDir: false")
         
         fileID_A2.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A2, fileExists: true, isAtHEAD: true, isAtWorkDir: false), "'A2' isAtWorkDir: false")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A2, isWorkDirModified: true, fileExists: true, isAtHEAD: true, isAtWorkDir: false), "'A2' isAtWorkDir: false")
         
         
         fileID_A.revert()
             .shouldSucceed("revert")
         
         fileID_A.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A, fileExists: true, isAtHEAD: false, isAtWorkDir: true), "'A' isAtWorkDir: true")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A, isWorkDirModified: true, fileExists: true, isAtHEAD: false, isAtWorkDir: true), "'A' isAtWorkDir: true")
         
         fileID_A2.flags
-            .assertEqual(to: GitFileFlags(fileID: fileID_A2, fileExists: true, isAtHEAD: true, isAtWorkDir: false), "'A2' isAtHEAD: true")
+            .assertEqual(to: GitFileFlags(fileID: fileID_A2, isWorkDirModified: true, fileExists: true, isAtHEAD: true, isAtWorkDir: false), "'A2' isAtHEAD: true")
     }
     
     func test_splitPathName() {
