@@ -4,7 +4,21 @@ import Essentials
 import EssentialsTesting
 
 class FileChangesTests: XCTestCase {
-    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
+//    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
+    let root = TestFolder.git_tests.sub(folder: "FileHistory")
+    
+    func test_commitMatchPath() {
+        let folder = root.with(repo: "commitMatchPath", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+        let repoID = folder.repoID
+        let headCommitID = repoID.headCommitID
+            .shouldSucceed()!
+        
+        let fileID = headCommitID.matchFile(path: TestFile.fileA.rawValue)
+            .shouldSucceed()!
+        
+        XCTAssertEqual(fileID.path, TestFile.fileA.rawValue)
+        XCTAssertEqual(fileID.commitID, headCommitID)
+    }
     
     func test_changes() {
         let folder = root.sub(folder: "Changes")

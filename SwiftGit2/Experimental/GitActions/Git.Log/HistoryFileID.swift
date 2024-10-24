@@ -1,6 +1,15 @@
 import Foundation
 import Essentials
 
+public struct HistoryFileIDO : Hashable
+{
+    public let repoID: RepoID
+    public let path: String
+    public let commitOid: OID
+}
+
+
+
 public struct HistoryFileIDOLD : Hashable
 {
     public let repoID: RepoID
