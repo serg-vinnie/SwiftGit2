@@ -67,7 +67,7 @@ public extension GitFileID {
 
 extension StatusIterator {
     func _flags(fileID: GitFileID) -> R<GitFileFlags> {
-        if count == 0 { return .success(GitFileFlags(fileID: fileID, fileExists: false, isAtHEAD: false, isAtWorkDir: false)) }
+        if count == 0 { return .success(GitFileFlags(fileID: fileID, isWorkDirModified: false, fileExists: false, isAtHEAD: false, isAtWorkDir: false)) }
         guard count == 1 else { return .wtf("status.count != 1") }
         
         let entry = self[0]
@@ -78,9 +78,9 @@ extension StatusIterator {
             guard let file = entry.headToIndex?.newFile else { return .wtf("file doesn't exist in StatusEntry.headToIndex") }
             
             if file.oid == fileID.blobID.oid {
-                return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: true, isAtWorkDir: true))
+                return .success(GitFileFlags(fileID: fileID, isWorkDirModified: false, fileExists: isFileExists, isAtHEAD: true, isAtWorkDir: true))
             } else {
-                return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: false))
+                return .success(GitFileFlags(fileID: fileID, isWorkDirModified: false, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: false))
             }
         } else {
             
@@ -95,11 +95,11 @@ extension StatusIterator {
             switch fileID.isInWorkDir {
             case .success(let isInWorkDir):
                 if isInWorkDir {
-                    return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: true))
+                    return .success(GitFileFlags(fileID: fileID, isWorkDirModified: true, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: true))
                 } else if entry.indexToWorkDir?.oldFile?.oid == fileID.blobID.oid {
-                    return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: true, isAtWorkDir: false))
+                    return .success(GitFileFlags(fileID: fileID, isWorkDirModified: true, fileExists: isFileExists, isAtHEAD: true, isAtWorkDir: false))
                 } else {
-                    return .success(GitFileFlags(fileID: fileID, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: false))
+                    return .success(GitFileFlags(fileID: fileID, isWorkDirModified: true, fileExists: isFileExists, isAtHEAD: false, isAtWorkDir: false))
                 }
             case .failure(let error): return .failure(error)
             }
@@ -117,6 +117,7 @@ extension GitFileFlags : CustomStringConvertible {
 
 public struct GitFileFlags : Equatable, Hashable {
     public let fileID: GitFileID
+    public let isWorkDirModified: Bool
     public let fileExists: Bool
     public let isAtHEAD: Bool
     public let isAtWorkDir: Bool
