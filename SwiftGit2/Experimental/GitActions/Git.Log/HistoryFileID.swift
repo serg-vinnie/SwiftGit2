@@ -1,7 +1,7 @@
 import Foundation
 import Essentials
 
-public struct HistoryFileID : Hashable
+public struct HistoryFileIDOLD : Hashable
 {
     public let repoID: RepoID
     public let path: String
@@ -21,7 +21,7 @@ public struct HistoryFilePair : Hashable {
     public let details: CommitDeltas
 }
 
-public extension HistoryFileID {
+public extension HistoryFileIDOLD {
     func getFileContent() -> R<HistoryFilePair> {
         let commit = repoID.repo
             .flatMap{ $0.commit(oid: self.commitOid) }
@@ -33,7 +33,7 @@ public extension HistoryFileID {
 }
 
 public extension RepoID {
-    func getHistoryOfFile(withPath filePath: String, getFirst10: Bool = true) -> R<[HistoryFileID]> {
+    func getHistoryOfFile(withPath filePath: String, getFirst10: Bool = true) -> R<[HistoryFileIDOLD]> {
         let repoID = self
         
         var allCommitsR: Result<[Commit], Error>
@@ -59,7 +59,7 @@ public extension RepoID {
             }
             .map { $0.filter{ $0.1.count > 0 } }
         
-        return changesOfFileR.map { $0.map{ HistoryFileID(repoID: repoID, path: $0.1.first?.newFile?.path ?? $0.1.first?.oldFile?.path ?? "" , commitOid: $0.0.oid ) } }
+        return changesOfFileR.map { $0.map{ HistoryFileIDOLD(repoID: repoID, path: $0.1.first?.newFile?.path ?? $0.1.first?.oldFile?.path ?? "" , commitOid: $0.0.oid ) } }
             .map {
                 getFirst10 ? Array.init($0.first(10)) : $0
             }
