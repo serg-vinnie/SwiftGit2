@@ -22,7 +22,7 @@ class FileChangesTests: XCTestCase {
         let blobID2 = treeID2 | { $0.blob(name: TestFile.fileA.rawValue) }
         let fileID2 = blobID2 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: headCommitID2) }
         
-        (fileID2 | { $0.parentFiles })
+        (fileID2 | { $0.walk() })
             .shouldSucceed("parents")
         
 //        let fileID = headCommitID.matchFile(path: TestFile.fileA.rawValue)
