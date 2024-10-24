@@ -1,5 +1,5 @@
 import XCTest
-import SwiftGit2
+@testable import SwiftGit2
 import Essentials
 import EssentialsTesting
 
@@ -7,17 +7,29 @@ class FileChangesTests: XCTestCase {
 //    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
     let root = TestFolder.git_tests.sub(folder: "FileHistory")
     
-    func test_commitMatchPath() {
-        let folder = root.with(repo: "commitMatchPath", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+    func test_parents() {
+        let folder = root.with(repo: "parents", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
         let repoID = folder.repoID
-        let headCommitID = repoID.headCommitID
-            .shouldSucceed()!
         
-        let fileID = headCommitID.matchFile(path: TestFile.fileA.rawValue)
-            .shouldSucceed()!
+        let headCommitID1 = repoID.headCommitID.shouldSucceed()!
         
-        XCTAssertEqual(fileID.path, TestFile.fileA.rawValue)
-        XCTAssertEqual(fileID.commitID, headCommitID)
+        folder.commit(file: .fileA, with: .content2, msg: "commit 2")
+            .shouldSucceed()
+        
+        let headCommitID2 = repoID.headCommitID.shouldSucceed()!
+        
+        let treeID2 = headCommitID2.treeID
+        let blobID2 = treeID2 | { $0.blob(name: TestFile.fileA.rawValue) }
+        let fileID2 = blobID2 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: headCommitID2) }
+        
+        (fileID2 | { $0.parentFiles })
+            .shouldSucceed("parents")
+        
+//        let fileID = headCommitID.matchFile(path: TestFile.fileA.rawValue)
+//            .shouldSucceed()!
+        
+//        XCTAssertEqual(fileID.path, TestFile.fileA.rawValue)
+//        XCTAssertEqual(fileID.commitID, headCommitID)
     }
     
     func test_changes() {

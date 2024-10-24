@@ -20,6 +20,12 @@ public struct GitFileID : Hashable {
     }
 }
 
+extension GitFileID : CustomStringConvertible {
+    public var description: String {
+        "FileID.blob:\(blobID.oid.oidShort),repo:\(repoID.url.lastPathComponent):\(path)"
+    }
+}
+
 public extension GitFileID {
     struct SubLines {
         let content : String

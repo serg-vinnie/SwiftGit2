@@ -10,6 +10,16 @@ import Foundation
 import Clibgit2
 import Essentials
 
+public extension TreeID {
+    func subTree(name: String) -> R<TreeID> {
+        self.tree | { $0.subTree(name: name) } | { TreeID(repoID: repoID, oid: $0) }
+    }
+    
+    func blob(name: String) -> R<BlobID> {
+        self.tree | { $0.blob(name: name) } | { BlobID(repoID: repoID, oid: $0) }
+    }
+}
+
 public extension Tree {
 //    var treeID: TreeID { TreeID(repoID: <#T##RepoID#>, oid: <#T##OID#>) }
     
@@ -20,6 +30,28 @@ public extension Tree {
     func iteratorEntries(repoID: RepoID, url: URL) -> [TreeID.IteratorEntry] {
         (0..<self.count).compactMap { self.entry(idx: $0) }
             .map { TreeID.IteratorEntry(treeID: TreeID(repoID: repoID, oid: self.oid), url: url, oid: $0.oid, name: $0.name) }
+    }
+    
+    fileprivate func blob(name: String) -> R<OID> {
+        for idx in 0..<count {
+            guard let entry = entry(idx: idx) else { break }
+            guard entry.type == GIT_OBJECT_BLOB else { continue }
+            if entry.name == name {
+                return .success(entry.oid)
+            }
+        }
+        return .wtf("blob not found : \(name)")
+    }
+    
+    fileprivate func subTree(name: String) -> R<OID> {
+        for idx in 0..<count {
+            guard let entry = entry(idx: idx) else { break }
+            guard entry.type == GIT_OBJECT_TREE else { continue }
+            if entry.name == name {
+                return .success(entry.oid)
+            }
+        }
+        return .wtf("subTree not found : \(name)")
     }
     
     private func entry(idx: Int) -> TreeEntryNoFree? {
