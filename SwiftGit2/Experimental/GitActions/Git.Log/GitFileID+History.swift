@@ -28,6 +28,11 @@ internal extension Array where Element == GitFileID {
     func walk() -> R<[GitFileID]> {
         guard let last else { return .wtf("array [GitFileID] is empty") }
         
+        let step_result = last.step()
+        guard let step = step_result.maybeSuccess else { return .failure(step_result.maybeFailure!)}
+        
+        
+        
         var steps = last.step()
 //        var nextStep
         while steps.needNextStep(for: last) {
@@ -35,6 +40,20 @@ internal extension Array where Element == GitFileID {
         }
         
         return steps
+    }
+    
+    func _walk() throws -> [GitFileID] {
+        guard let last else { throw WTF("array [GitFileID] is empty") }
+        
+        var current_step = try last.step().get()
+        var accumulator = [GitFileID]()
+        
+        while !current_step.isEmpty, !last.isDifferent(to: current_step) {
+            accumulator.append(contentsOf: current_step)
+            current_step = try last.step().get()
+        }
+        
+        return []
     }
     
     func nextStep() -> R<[GitFileID]> {
@@ -103,10 +122,6 @@ fileprivate extension GitFileID {
             | { $0.first.asNonOptional("first delta for parent == nil") }
             | { $0.newFileID(commitID: parentCommitID) }
     }
-    
-//    func fileFrom(diff: Diff) -> GitFileID {
-////        diff.asDeltas()
-//    }
     
     func _diffToParent(commitID parentCommitID: CommitID) -> R<Diff> {
         guard let commitID else { return .wtf("commitID == nil")}
