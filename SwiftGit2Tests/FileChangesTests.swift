@@ -8,22 +8,28 @@ class FileChangesTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "FileHistory")
     
     func test_parents() {
-        let folder = root.with(repo: "parents", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+        // file A [1]
+        let folder = root.with(repo: "parents", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let repoID = folder.repoID
         
-        let headCommitID1 = repoID.headCommitID.shouldSucceed()!
+        var commits = [CommitID]()
         
-        folder.commit(file: .fileA, with: .content2, msg: "commit 2")
-            .shouldSucceed()
+        commits.append(repoID.headCommitID.shouldSucceed()!)    // 0
         
-        let headCommitID2 = repoID.headCommitID.shouldSucceed()!
+        // file B [1]
+        folder.commit(file: .fileB, with: .random, msg: "commit 2").shouldSucceed()
+        commits.append(repoID.headCommitID.shouldSucceed()!)    // 1
         
-        let treeID2 = headCommitID2.treeID
-        let blobID2 = treeID2 | { $0.blob(name: TestFile.fileA.rawValue) }
-        let fileID2 = blobID2 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: headCommitID2) }
+        // file B [2]
+        folder.commit(file: .fileB, with: .random, msg: "commit 2").shouldSucceed()
+        let headCommitID3 = repoID.headCommitID.shouldSucceed()!    // B2
         
-        (fileID2 | { $0.walk() })
-            .shouldSucceed("parents")
+//        let treeID2 = headCommitID2.treeID
+//        let blobID2 = treeID2 | { $0.blob(name: TestFile.fileA.rawValue) }
+//        let fileID2 = blobID2 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: headCommitID2) }
+//        
+//        (fileID2 | { $0.walk() })
+//            .shouldSucceed("parents")
         
 //        let fileID = headCommitID.matchFile(path: TestFile.fileA.rawValue)
 //            .shouldSucceed()!

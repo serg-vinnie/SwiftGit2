@@ -150,9 +150,10 @@ extension TestFolder {
             .flatMap { $0.remove(relPaths: ["*"]) }
     }
     
-    func commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> Result<Commit, Error> {
+    func commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> Result<CommitID, Error> {
         return self.repo
             .flatMap { $0.t_commit(file: file, with: content, msg: msg, signature: signature) }
+            .map { CommitID(repoID: repoID, oid: $0.oid) }
     }
     
     func fetchHead(options: FetchOptions) -> Result<Branch, Error> {

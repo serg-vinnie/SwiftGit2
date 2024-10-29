@@ -12,7 +12,7 @@ class GitCommitTests: XCTestCase {
         let repoID = RepoID(path: src.url.path )
         let gitCommit = GitCommit(repoID: repoID)
         
-        let commitToRevert = src.commit(file: .fileA, with: .content2, msg: "2").shouldSucceed()!
+        let commitToRevert = src.commit(file: .fileA, with: .content2, msg: "2").shouldSucceed()!.commit.shouldSucceed()!
         
         gitCommit.revert(commit: commitToRevert).shouldSucceed()
         
@@ -30,7 +30,7 @@ class GitCommitTests: XCTestCase {
         let repoID = RepoID(path: src.url.path )
         let gitCommit = GitCommit(repoID: repoID)
         
-        let commitToRevert = src.commit(file: .fileA, with: .content2, msg: "2").shouldSucceed()!
+        let commitToRevert = src.commit(file: .fileA, with: .content2, msg: "2").shouldSucceed()!.commit.shouldSucceed()!
         _ = src.commit(file: .fileA, with: .content3, msg: "3").shouldSucceed()!
         
         _ = gitCommit.revert(commit: commitToRevert).shouldSucceed()

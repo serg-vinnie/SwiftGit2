@@ -48,6 +48,11 @@ internal extension Array where Element == GitFileID {
         return last.step() | { self.appending(contentsOf: $0) }
     }
     
+
+}
+
+// if the array is a list of parents
+internal extension Array where Element == GitFileID {
     func nextStepAsParents() -> R<[GitFileID]> {
         guard let last else { return .wtf("array [GitFileID] is empty")}
         
