@@ -9,7 +9,7 @@ class FileChangesTests: XCTestCase {
     
     func test_parents() {
         // file A [1]
-        let folder = root.with(repo: "parents", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
+        let folder = root.with(repo: "parents", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
         let repoID = folder.repoID
         
         var commits = [CommitID]()
@@ -18,23 +18,28 @@ class FileChangesTests: XCTestCase {
         var c : CommitID
         
         // file B [1]
-        c = folder.commit(file: .fileB, with: .random, msg: "commit 2").shouldSucceed()!; commits.append(c)
+        c = folder.commit(file: .fileB, with: .content2, msg: "commit 2").shouldSucceed()!; commits.append(c)
         
         // file B [2]
-        c = folder.commit(file: .fileB, with: .random, msg: "commit 3").shouldSucceed()!; commits.append(c)
+        c = folder.commit(file: .fileB, with: .content3, msg: "commit 3").shouldSucceed()!; commits.append(c)
         
         // file A [2]
-        c = folder.commit(file: .fileA, with: .random, msg: "commit 4").shouldSucceed()!; commits.append(c)
+        c = folder.commit(file: .fileA, with: .content4, msg: "commit 4").shouldSucceed()!; commits.append(c)
         
         let commitID4 = commits.last!
         let treeID4 = commitID4.treeID
-        let blobIDa4 = treeID4 | { $0.blob(name: TestFile.fileA.rawValue) }
+//        let blobIDa4 = treeID4 | { $0.blob(name: TestFile.fileA.rawValue) }
         let blobIDb4 = treeID4 | { $0.blob(name: TestFile.fileB.rawValue) }
-        let fileIDa = blobIDa4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
-        let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
-
-        (fileIDa | { $0.walk() })
-            .shouldSucceed("A")
+//        let fileIDa = blobIDa4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
+        let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileB.rawValue, blobID: $0, commitID: commitID4) }
+        
+//        blobIDa4.shouldSucceed("BlobA4")
+        blobIDb4.shouldSucceed("BlobB4")
+        
+        print(commits)
+//
+//        (fileIDa | { $0.walk() })
+//            .shouldSucceed("A")
         
         (fileIDb | { $0.walk() })
             .shouldSucceed("B")

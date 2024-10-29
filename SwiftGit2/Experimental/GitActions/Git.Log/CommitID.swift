@@ -24,7 +24,7 @@ public struct CommitID : CustomStringConvertible, Hashable, Identifiable {
         }
     }
     
-    public var description: String { "\(repoID):\(oid)" }
+    public var description: String { "\(repoID.url.lastPathComponent):\(oid.oidShort)" }
 }
 
 public extension CommitID {

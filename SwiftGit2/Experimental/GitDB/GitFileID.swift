@@ -22,7 +22,7 @@ public struct GitFileID : Hashable {
 
 extension GitFileID : CustomStringConvertible {
     public var description: String {
-        "FileID.blob:\(blobID.oid.oidShort),repo:\(repoID.url.lastPathComponent):\(path)"
+        "FileID.\(path).blob:\(blobID.oid.oidShort),commit: \(commitID?.oid.oidShort ?? "nil")"
     }
 }
 

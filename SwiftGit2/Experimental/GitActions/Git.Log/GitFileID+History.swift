@@ -5,54 +5,50 @@ import Essentials
 
 public extension GitFileID {
     func walk() -> R<[GitFileID]> {
-        return [self].walk()
-    }
-}
-
-extension Result where Success == [GitFileID], Failure == Error {
-    func needNextStep(for fileID: GitFileID) -> Bool {
-        switch self {
-        case .success(let me):
-            if me.isEmpty { return false }
-            return !fileID.isDifferent(to: me)
-            
-        case .failure(_):       return false
-        }
-    }
-}
-
-
-internal extension Array where Element == GitFileID {
-    func walk() -> R<[GitFileID]> {
         Result { try _walk() }
     }
     
     private func _walk() throws -> [GitFileID] {
-        guard let last else { throw WTF("array [GitFileID] is empty") }
+        var list = [GitFileID]([self])
+        
+        var diff = try list.nextDiff()
+        
+        while !diff.isEmpty {
+            list.append(contentsOf: diff)
+            diff = try list.nextDiff()
+        }
+        
+        return list
+    }
+}
+
+// if the array is a list of parents
+internal extension Array where Element == GitFileID {
+    func nextDiff() throws -> [GitFileID] {
+        guard let last else { throw WTF("nextDiff: array [GitFileID] is empty") }
         
         var current_step = try last.step().get()
         var accumulator = [GitFileID]()
         
-        while !current_step.isEmpty, !last.isDifferent(to: current_step) {
+        while !current_step.isEmpty {
             accumulator.append(contentsOf: current_step)
-            current_step = try current_step.nextStep().get()
+            if !last.isDifferent(to: current_step) {
+                current_step = try current_step.nextStep().get()
+            } else {
+                current_step = []
+            }
         }
         
         return accumulator
     }
     
     func nextStep() -> R<[GitFileID]> {
-        guard let last else { return .wtf("array [GitFileID] is empty") }
-        return last.step() | { self.appending(contentsOf: $0) }
+        guard let last else { return .wtf("nextStep: array [GitFileID] is empty") }
+        return last.step() //| { self.appending(contentsOf: $0) }
     }
     
-
-}
-
-// if the array is a list of parents
-internal extension Array where Element == GitFileID {
     func nextStepAsParents() -> R<[GitFileID]> {
-        guard let last else { return .wtf("array [GitFileID] is empty")}
+        guard let last else { return .success([]) } // no parents: end
         
         if self.count == 1 {
             return .success([last])

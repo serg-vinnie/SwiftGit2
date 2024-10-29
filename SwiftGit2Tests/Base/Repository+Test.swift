@@ -128,6 +128,19 @@ enum TestFileContent: String {
     08
     09
     """
+    
+    case content4 = """
+    01 I must not fear.
+    02 Fear is the mind-killer.
+    03 Fear is the little-death that brings total obliteration.
+    04 I will face my fear.
+    05 I will permit it to pass over me and through me.
+    06 And when it has gone past I will turn the inner eye to see its path.
+    07 Where the fear has gone there will be nothing.
+    08 Only I will remain.
+    09
+    """
+    
 }
 
 extension TestFileContent {
