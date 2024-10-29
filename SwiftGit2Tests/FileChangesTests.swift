@@ -33,6 +33,11 @@ class FileChangesTests: XCTestCase {
         let fileIDa = blobIDa4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
         let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
 
+        (fileIDa | { $0.walk() })
+            .shouldSucceed("A")
+        
+        (fileIDb | { $0.walk() })
+            .shouldSucceed("B")
         
         //        let treeID2 = headCommitID2.treeID
 //        let blobID2 = treeID2 | { $0.blob(name: TestFile.fileA.rawValue) }

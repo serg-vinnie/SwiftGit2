@@ -5,9 +5,7 @@ import Essentials
 
 public extension GitFileID {
     func walk() -> R<[GitFileID]> {
-        
-        
-        return .notImplemented
+        return [self].walk()
     }
 }
 
@@ -37,7 +35,7 @@ internal extension Array where Element == GitFileID {
         
         while !current_step.isEmpty, !last.isDifferent(to: current_step) {
             accumulator.append(contentsOf: current_step)
-            current_step = try last.step().get()
+            current_step = try current_step.nextStep().get()
         }
         
         return accumulator
