@@ -15,16 +15,26 @@ class FileChangesTests: XCTestCase {
         var commits = [CommitID]()
         
         commits.append(repoID.headCommitID.shouldSucceed()!)    // 0
+        var c : CommitID
         
         // file B [1]
-        folder.commit(file: .fileB, with: .random, msg: "commit 2").shouldSucceed()
-        commits.append(repoID.headCommitID.shouldSucceed()!)    // 1
+        c = folder.commit(file: .fileB, with: .random, msg: "commit 2").shouldSucceed()!; commits.append(c)
         
         // file B [2]
-        folder.commit(file: .fileB, with: .random, msg: "commit 2").shouldSucceed()
-        let headCommitID3 = repoID.headCommitID.shouldSucceed()!    // B2
+        c = folder.commit(file: .fileB, with: .random, msg: "commit 3").shouldSucceed()!; commits.append(c)
         
-//        let treeID2 = headCommitID2.treeID
+        // file A [2]
+        c = folder.commit(file: .fileA, with: .random, msg: "commit 4").shouldSucceed()!; commits.append(c)
+        
+        let commitID4 = commits.last!
+        let treeID4 = commitID4.treeID
+        let blobIDa4 = treeID4 | { $0.blob(name: TestFile.fileA.rawValue) }
+        let blobIDb4 = treeID4 | { $0.blob(name: TestFile.fileB.rawValue) }
+        let fileIDa = blobIDa4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
+        let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
+
+        
+        //        let treeID2 = headCommitID2.treeID
 //        let blobID2 = treeID2 | { $0.blob(name: TestFile.fileA.rawValue) }
 //        let fileID2 = blobID2 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: headCommitID2) }
 //        
