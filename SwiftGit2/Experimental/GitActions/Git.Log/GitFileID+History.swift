@@ -26,23 +26,10 @@ extension Result where Success == [GitFileID], Failure == Error {
 
 internal extension Array where Element == GitFileID {
     func walk() -> R<[GitFileID]> {
-        guard let last else { return .wtf("array [GitFileID] is empty") }
-        
-        let step_result = last.step()
-        guard let step = step_result.maybeSuccess else { return .failure(step_result.maybeFailure!)}
-        
-        
-        
-        var steps = last.step()
-//        var nextStep
-        while steps.needNextStep(for: last) {
-            steps = steps | { $0.nextStep() }
-        }
-        
-        return steps
+        Result { try _walk() }
     }
     
-    func _walk() throws -> [GitFileID] {
+    private func _walk() throws -> [GitFileID] {
         guard let last else { throw WTF("array [GitFileID] is empty") }
         
         var current_step = try last.step().get()
@@ -53,7 +40,7 @@ internal extension Array where Element == GitFileID {
             current_step = try last.step().get()
         }
         
-        return []
+        return accumulator
     }
     
     func nextStep() -> R<[GitFileID]> {
