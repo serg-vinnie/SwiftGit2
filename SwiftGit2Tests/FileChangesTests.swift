@@ -7,42 +7,38 @@ class FileChangesTests: XCTestCase {
 //    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
     let root = TestFolder.git_tests.sub(folder: "FileHistory")
     
-    func test_parents() {
+    func test_fileWalk() {
         // file A [1]
-        let folder = root.with(repo: "parents", content: .commit(.fileA, .content1, "initial commit")).shouldSucceed()!
+        let folder = root.with(repo: "fileWalk", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
         let repoID = folder.repoID
+        let mainRefID = ReferenceID(repoID: repoID, name: "refs/heads/main")
+        var commits = GitLog(refID: mainRefID).commitIDs
+            .shouldSucceed("log")!
         
-        var commits = [CommitID]()
-        
-        commits.append(repoID.headCommitID.shouldSucceed()!)    // 0
-        var c : CommitID
-        
-        // file B [1]
-        c = folder.commit(file: .fileB, with: .content2, msg: "commit 2").shouldSucceed()!; commits.append(c)
-        
-        // file B [2]
-        c = folder.commit(file: .fileB, with: .content3, msg: "commit 3").shouldSucceed()!; commits.append(c)
-        
-        // file A [2]
-        c = folder.commit(file: .fileA, with: .content4, msg: "commit 4").shouldSucceed()!; commits.append(c)
-        
-        let commitID4 = commits.last!
+        if commits.count < 4 {
+            folder.commit(file: .fileA, with: .random, msg: "commit 22").shouldSucceed()
+            folder.commit(file: .fileB, with: .content2, msg: "commit 2").shouldSucceed()
+            folder.commit(file: .fileB, with: .content3, msg: "commit 3").shouldSucceed()
+            folder.commit(file: .fileA, with: .content4, msg: "commit 4").shouldSucceed()
+            
+            commits = GitLog(refID: mainRefID).commitIDs
+                .shouldSucceed("log again")!
+        }
+        print("log: ",commits.map { $0.oid.oidShort })
+
+        let commitID4 = commits.first!
         let treeID4 = commitID4.treeID
-//        let blobIDa4 = treeID4 | { $0.blob(name: TestFile.fileA.rawValue) }
+
         let blobIDb4 = treeID4 | { $0.blob(name: TestFile.fileB.rawValue) }
-//        let fileIDa = blobIDa4 | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID4) }
+        
         let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileB.rawValue, blobID: $0, commitID: commitID4) }
-        
-//        blobIDa4.shouldSucceed("BlobA4")
         blobIDb4.shouldSucceed("BlobB4")
-        
-        print(commits)
-//
-//        (fileIDa | { $0.walk() })
-//            .shouldSucceed("A")
-        
+                
         (fileIDb | { $0.walk() })
             .shouldSucceed("B")
+        
+        
+        
         
         //        let treeID2 = headCommitID2.treeID
 //        let blobID2 = treeID2 | { $0.blob(name: TestFile.fileA.rawValue) }

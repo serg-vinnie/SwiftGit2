@@ -56,7 +56,7 @@ public extension Tree {
 }
 
 public extension Repository {
-    func diffTreeToTree(oldTree: Tree?, newTree: Tree?, options: DiffOptions = DiffOptions()) -> Result<Diff, Error> {
+    func diffTreeToTree(oldTree: Tree?, newTree: Tree?, options: DiffOptions = DiffOptions()) -> R<Diff> {
         var diff: OpaquePointer?
         let result = git_diff_tree_to_tree(&diff, pointer, oldTree?.pointer, newTree?.pointer, &options.diff_options)
 

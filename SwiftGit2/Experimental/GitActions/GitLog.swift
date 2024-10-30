@@ -10,6 +10,7 @@ public struct GitLog {
     
     public func oids(count: Int) -> R<[OID]> { refID.repoID.repo | { $0.log(ref: refID.name, count: count) } }
     public var  oids              : R<[OID]> { refID.repoID.repo | { $0.log(ref: refID.name) } }
+    public var  commitIDs         : R<[CommitID]> { oids | { $0.map { CommitID(repoID: refID.repoID, oid: $0) } } }
 
 }
 
