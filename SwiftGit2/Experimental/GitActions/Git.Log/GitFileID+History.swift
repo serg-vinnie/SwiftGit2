@@ -86,6 +86,10 @@ extension Diff.Delta : CustomStringConvertible {
         
         let oids = oldFile.oid.oidShort + ":" + newFile.oid.oidShort + " "
         
+        if self.status == .renamed {
+            return "renamed:" + oids + oldFile.path + " -> " + newFile.path
+        }
+        
         if oldFile.path == newFile.path {
             return oids + oldFile.path
         } else {
@@ -96,6 +100,10 @@ extension Diff.Delta : CustomStringConvertible {
     func newFileID(commitID: CommitID) -> R<GitFileID> {
         guard let newFile else { return .wtf("newFile == nil") }
         
+        if self.status == .added {
+            print("added")
+        }
+        
         let blobID = BlobID(repoID: commitID.repoID, oid: newFile.oid, path: newFile.path)
         return .success(GitFileID(path: newFile.path, blobID: blobID, commitID: commitID))
     }
@@ -105,7 +113,10 @@ fileprivate extension GitFileID {
     func diffToParent(commitID parentCommitID: CommitID) -> R<GitFileID> {
         _diffToParent(commitID: parentCommitID)
             | { $0.asDeltas() }
-            | { $0.first.asNonOptional("first delta for parent == nil") }
+        | {
+            print("delta",$0)
+            return $0.first.asNonOptional("first delta for parent == nil")
+        }
             | { $0.newFileID(commitID: parentCommitID) }
     }
     
@@ -120,11 +131,16 @@ fileprivate extension GitFileID {
         let oldTree = repo | { $0.treeLookup(oid: old.oid) }
         let newTree = repo | { $0.treeLookup(oid: new.oid) }
         
+        print("pathspec [\(self.path)]")
         let diffOptions = DiffOptions(pathspec: [self.path])
         let findOptions = Diff.FindOptions()
+        
+        print("old blob",old.blob(name: self.path))
+        print("new blob",new.blob(name: self.path))
+//        oldTree
 
         return combine(repo, oldTree, newTree) 
             | { repo, old, new in repo.diffTreeToTree(oldTree: old, newTree: new, options: diffOptions) }
-            | { $0.findSimilar(options: findOptions) }
+//            | { $0.findSimilar(options: findOptions) }
     }
 }

@@ -11,6 +11,7 @@ class FileChangesTests: XCTestCase {
         // file A [1]
         let folder = root.with(repo: "fileWalk", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
         let repoID = folder.repoID
+        print(repoID)
         let mainRefID = ReferenceID(repoID: repoID, name: "refs/heads/main")
         var commits = GitLog(refID: mainRefID).commitIDs
             .shouldSucceed("log")!

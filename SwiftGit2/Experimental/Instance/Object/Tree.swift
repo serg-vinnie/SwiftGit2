@@ -57,39 +57,27 @@ public extension Tree {
 
 public extension Repository {
     func diffTreeToTree(oldTree: Tree?, newTree: Tree?, options: DiffOptions = DiffOptions()) -> R<Diff> {
-        var diff: OpaquePointer?
-        let result = git_diff_tree_to_tree(&diff, pointer, oldTree?.pointer, newTree?.pointer, &options.diff_options)
-
-        guard result == GIT_OK.rawValue else {
-            return Result.failure(NSError(gitError: result, pointOfFailure: "git_diff_tree_to_tree"))
+        git_instance(of: Diff.self, "git_diff_tree_to_tree") { diff in
+            options.with_diff_options { options in
+                git_diff_tree_to_tree(&diff, pointer, oldTree?.pointer, newTree?.pointer, &options)
+            }
         }
-
-        return .success(Diff(diff!))
     }
 
-    func diffTreeToIndex(tree: Tree, options: DiffOptions = DiffOptions()) -> Result<Diff, Error> {
-        var diff: OpaquePointer?
-        let result = git_diff_tree_to_index(&diff, pointer, tree.pointer, nil /* index */, &options.diff_options)
-
-        guard result == GIT_OK.rawValue else {
-            return Result.failure(NSError(gitError: result, pointOfFailure: "git_diff_tree_to_index"))
+    func diffTreeToIndex(tree: Tree, options: DiffOptions = DiffOptions()) -> R<Diff> {
+        git_instance(of: Diff.self, "git_diff_tree_to_index") { diff in
+            options.with_diff_options { options in
+                git_diff_tree_to_index(&diff, pointer, tree.pointer, nil /* index */, &options)
+            }
         }
-
-        return .success(Diff(diff!))
     }
     
-    func diffTreeToWorkdir(tree: Tree, options: DiffOptions = DiffOptions()) -> Result<Diff, Error> {
-        var diff: OpaquePointer?
-        
-        let result = options.with_diff_options { options in
-            git_diff_tree_to_workdir(&diff, pointer, tree.pointer, &options)
+    func diffTreeToWorkdir(tree: Tree, options: DiffOptions = DiffOptions()) -> R<Diff> {
+        git_instance(of: Diff.self, "git_diff_tree_to_workdir") { diff in
+            options.with_diff_options { options in
+                git_diff_tree_to_workdir(&diff, pointer, tree.pointer, &options)
+            }
         }
-
-        guard result == GIT_OK.rawValue else {
-            return Result.failure(NSError(gitError: result, pointOfFailure: "git_diff_tree_to_workdir"))
-        }
-
-        return .success(Diff(diff!))
     }
     
     

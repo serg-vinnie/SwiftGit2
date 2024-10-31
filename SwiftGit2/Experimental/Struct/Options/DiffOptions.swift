@@ -22,6 +22,8 @@ public class DiffOptions {
         
         let result = git_diff_options_init(&diff_options, UInt32(GIT_DIFF_OPTIONS_VERSION))
         assert(result == GIT_OK.rawValue)
+        
+//        diff_options.flags |=  GIT_DIFF_DISABLE_PATHSPEC_MATCH.rawValue
     }
 }
 
