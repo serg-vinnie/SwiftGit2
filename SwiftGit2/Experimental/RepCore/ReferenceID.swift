@@ -40,14 +40,14 @@ public extension ReferenceID {
     
     var prefix      : String {
         if name.starts(with: "refs/heads/") { return "refs/heads/" }
-        if let remote = remote, name.starts(with: "refs/remotes/") { return "refs/heads/\(remote)/" }
+        if let remote = remote, name.starts(with: "refs/remotes/") { return "refs/remotes/\(remote)/" }
         if name.starts(with: "refs/tags/") { return "refs/tags/" }
         
         return ""
     }
     var prefixEx      : String {
         if name.starts(with: "refs/heads/")     { return "refs/heads/" }
-        if name.starts(with: "refs/remotes/")   { return "refs/heads/" }
+        if name.starts(with: "refs/remotes/")   { return "refs/remotes/" }
         if name.starts(with: "refs/tags/")      { return "refs/tags/" }
         
         return ""
