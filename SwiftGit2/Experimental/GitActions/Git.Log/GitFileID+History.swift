@@ -46,19 +46,21 @@ internal extension Array where Element == GitFileID {
         guard let last else { return .wtf("nextStep: array [GitFileID] is empty") }
         return last.step() //| { self.appending(contentsOf: $0) }
     }
-    
+}
+
+internal extension Array where Element == ParentFileID {
     func nextStepAsParents() -> R<[GitFileID]> {
         guard let last else { return .success([]) } // no parents: end
         
         if self.count == 1 {
-            return .success([last])
+            return .success([last.fileID])
         }
         
         return .notImplemented
     }
 }
 
-fileprivate extension GitFileID {
+internal extension GitFileID {
     func step() -> R<[GitFileID]> {
         return parentFileIDs | { $0.nextStepAsParents() }
     }
@@ -73,7 +75,7 @@ fileprivate extension GitFileID {
         return false
     }
     
-    var parentFileIDs : R<[GitFileID]> {
+    var parentFileIDs : R<[ParentFileID]> {
         guard let commitID else { return .wtf("commitID == nil") }
         return commitID.parents | { $0.flatMap { self.diffToParent(commitID: $0) } }
     }
@@ -97,27 +99,33 @@ extension Diff.Delta : CustomStringConvertible {
         }
     }
     
-    func newFileID(commitID: CommitID) -> R<GitFileID> {
+    fileprivate func newParentFileID(commitID: CommitID) -> R<ParentFileID> {
         guard let newFile else { return .wtf("newFile == nil") }
         
-        if self.status == .added {
-            print("added")
-        }
-        
         let blobID = BlobID(repoID: commitID.repoID, oid: newFile.oid, path: newFile.path)
-        return .success(GitFileID(path: newFile.path, blobID: blobID, commitID: commitID))
+        let fileID = GitFileID(path: newFile.path, blobID: blobID, commitID: commitID)
+        let parentFileID = ParentFileID(fileID: fileID, endOfSearch: self.status == .added)
+        return .success(parentFileID)
     }
 }
 
+internal struct ParentFileID {
+    let fileID: GitFileID
+    let endOfSearch: Bool
+}
+
 fileprivate extension GitFileID {
-    func diffToParent(commitID parentCommitID: CommitID) -> R<GitFileID> {
+    func diffToParent(commitID parentCommitID: CommitID) -> R<ParentFileID> {
         _diffToParent(commitID: parentCommitID)
             | { $0.asDeltas() }
-        | {
-            print("delta",$0)
-            return $0.first.asNonOptional("first delta for parent == nil")
-        }
-            | { $0.newFileID(commitID: parentCommitID) }
+            | {
+                if $0.isEmpty {
+                    let fileID = GitFileID(path: self.path, blobID: self.blobID, commitID: parentCommitID)
+                    return  .success(ParentFileID(fileID: fileID, endOfSearch: false))
+                } else {
+                    return $0.first.asNonOptional("first delta for parent == nil") | { $0.newParentFileID(commitID: parentCommitID) }
+                }
+            }
     }
     
     func _diffToParent(commitID parentCommitID: CommitID) -> R<Diff> {
@@ -131,16 +139,15 @@ fileprivate extension GitFileID {
         let oldTree = repo | { $0.treeLookup(oid: old.oid) }
         let newTree = repo | { $0.treeLookup(oid: new.oid) }
         
-        print("pathspec [\(self.path)]")
+//        print("pathspec [\(self.path)]")
         let diffOptions = DiffOptions(pathspec: [self.path])
         let findOptions = Diff.FindOptions()
         
-        print("old blob",old.blob(name: self.path))
-        print("new blob",new.blob(name: self.path))
-//        oldTree
+//        print("old blob",old.blob(name: self.path))
+//        print("new blob",new.blob(name: self.path))
 
         return combine(repo, oldTree, newTree) 
             | { repo, old, new in repo.diffTreeToTree(oldTree: old, newTree: new, options: diffOptions) }
-//            | { $0.findSimilar(options: findOptions) }
+            | { $0.findSimilar(options: findOptions) }
     }
 }
