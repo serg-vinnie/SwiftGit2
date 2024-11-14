@@ -22,6 +22,7 @@ public extension GitFileID {
     }
 }
 
+
 // if the array is a list of parents
 internal extension Array where Element == GitFileID {
     func nextDiff() throws -> [GitFileID] {
@@ -48,17 +49,6 @@ internal extension Array where Element == GitFileID {
     }
 }
 
-internal extension Array where Element == ParentFileID {
-    func nextStepAsParents() -> R<[GitFileID]> {
-        guard let last else { return .success([]) } // no parents: end
-        
-        if self.count == 1 {
-            return .success([last.fileID])
-        }
-        
-        return .notImplemented
-    }
-}
 
 internal extension GitFileID {
     func step() -> R<[GitFileID]> {
@@ -109,10 +99,7 @@ extension Diff.Delta : CustomStringConvertible {
     }
 }
 
-internal struct ParentFileID {
-    let fileID: GitFileID
-    let endOfSearch: Bool
-}
+
 
 fileprivate extension GitFileID {
     func diffToParent(commitID parentCommitID: CommitID) -> R<ParentFileID> {
@@ -128,11 +115,7 @@ fileprivate extension GitFileID {
             }
     }
     
-    func _diffToParent(commitID parentCommitID: CommitID) -> R<Diff> {
-        guard let commitID else { return .wtf("commitID == nil")}
-        return combine(commitID.treeID, parentCommitID.treeID)
-            | { _diff(old: $1, new: $0) }
-    }
+
     
     func _diff(old: TreeID, new: TreeID) -> R<Diff> {
         let repo = old.repoID.repo
@@ -149,5 +132,14 @@ fileprivate extension GitFileID {
         return combine(repo, oldTree, newTree) 
             | { repo, old, new in repo.diffTreeToTree(oldTree: old, newTree: new, options: diffOptions) }
             | { $0.findSimilar(options: findOptions) }
+    }
+}
+
+
+internal extension GitFileID {
+    func _diffToParent(commitID parentCommitID: CommitID) -> R<Diff> {
+        guard let commitID else { return .wtf("commitID == nil")}
+        return combine(commitID.treeID, parentCommitID.treeID)
+            | { _diff(old: $1, new: $0) }
     }
 }

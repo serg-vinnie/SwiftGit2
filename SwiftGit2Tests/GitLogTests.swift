@@ -3,7 +3,7 @@ import XCTest
 import Essentials
 import EssentialsTesting
 
-class FileChangesTests: XCTestCase {
+class GitLogTests: XCTestCase {
 //    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
     let root = TestFolder.git_tests.sub(folder: "FileHistory")
     
