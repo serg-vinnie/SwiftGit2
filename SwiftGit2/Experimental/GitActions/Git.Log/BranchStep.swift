@@ -12,9 +12,22 @@ extension GitFileID {
         let start = self
         var next = [GitFileID]()
         
-//        let t = __diffToParent(commitID: parentCommitID)
+        // first step should be targeted to the selected parent
+        // let t = __diffToParent(commitID: parentCommitID)
+        
+        
         
         return .notImplemented
+    }
+    
+    fileprivate func branchStep(commitID parentCommitID: CommitID) throws -> BranchStep {
+        let start = self
+        var next = [GitFileID]()
+        
+        let diff1 = try self.__diffToParent(commitID: parentCommitID).get()
+        let deltas = diff1.asDeltas()
+        
+        return BranchStep(start: start, next: [], isFinal: false)
     }
     
     func branchStep(commitID parentCommitID: CommitID, base: CommitID) -> R<BranchStep> {
@@ -22,20 +35,20 @@ extension GitFileID {
         let start = self
         var next = [GitFileID]()
         
-//        let t = __diffToParent(commitID: parentCommitID)
+        
         
         return .notImplemented
     }
 }
 
-//fileprivate extension GitFileID {
-//    func __diffToParent(commitID parentCommitID: CommitID) -> R<Diff> {
-//        guard let commitID else { return .wtf("commitID == nil")}
-//        
-//        return combine(commitID.treeID, parentCommitID.treeID)
-//            | { diff(old: $1, new: $0, path: self.path) }
-//    }
-//}
+fileprivate extension GitFileID {
+    func __diffToParent(commitID parentCommitID: CommitID) -> R<Diff> {
+        guard let commitID else { return .wtf("commitID == nil")}
+        
+        return combine(commitID.treeID, parentCommitID.treeID)
+            | { diff(old: $1, new: $0, path: self.path) }
+    }
+}
 
 enum FileDiffToParent {
     case added

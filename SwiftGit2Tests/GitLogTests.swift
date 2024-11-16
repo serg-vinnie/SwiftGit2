@@ -7,6 +7,22 @@ class GitLogTests: XCTestCase {
 //    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
     let root = TestFolder.git_tests.sub(folder: "FileHistory")
     
+    func test_historyStep1() {
+        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
+        let repoID = folder.repoID
+        let mainRefID = ReferenceID(repoID: repoID, name: "refs/heads/main")
+        var commits = GitLog(refID: mainRefID).commitIDs
+            .shouldSucceed("log")!
+        
+        let commitID = commits.first!
+        let treeID = commitID.treeID
+        let blobID = treeID | { $0.blob(name: TestFile.fileA.rawValue) }
+        let fileID = blobID | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID) }
+        
+        (fileID | { $0.historyStep() })
+            .shouldSucceed("historyStep")
+    }
+    
     func test_fileWalk() {
         // file A [1]
         let folder = root.with(repo: "fileWalk", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
