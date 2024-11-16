@@ -1,7 +1,7 @@
 import Foundation
 import Essentials
 
-public struct HistoryFileIDO : Hashable
+public struct HistoryFileID : Hashable
 {
     public let repoID: RepoID
     public let path: String

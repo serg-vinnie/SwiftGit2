@@ -35,7 +35,10 @@ class GitLogTests: XCTestCase {
         let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileB.rawValue, blobID: $0, commitID: commitID4) }
         blobIDb4.shouldSucceed("BlobB4")
                 
-        (fileIDb | { $0.walk() })
+//        (fileIDb | { $0.walk() })
+//            .shouldSucceed("B")
+        
+        (fileIDb | { $0.historyStep() })
             .shouldSucceed("B")
         
         
