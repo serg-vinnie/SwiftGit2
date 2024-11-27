@@ -5,6 +5,8 @@ internal struct BranchStep {
     let start: GitFileID
     let next: [GitFileID]
     let isFinal : Bool
+    
+    var files : [GitFileID] { [start] + next }
 }
 
 extension GitFileID {

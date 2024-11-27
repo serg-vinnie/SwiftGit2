@@ -12,7 +12,7 @@ class GitLogTests: XCTestCase {
         let repoID = folder.repoID
         let mainRefID = ReferenceID(repoID: repoID, name: "refs/heads/main")
         var commits = GitLog(refID: mainRefID).commitIDs
-            .shouldSucceed("log")!
+            .shouldSucceed()!
         
         let commitID = commits.first!
         let treeID = commitID.treeID
@@ -20,7 +20,9 @@ class GitLogTests: XCTestCase {
         let fileID = blobID | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID) }
         
         (fileID | { $0.historyStep() })
-            .shouldSucceed("historyStep")
+            .map { $0.files.count }
+            .assertEqual(to: 1)
+//            .shouldSucceed("historyStep")
     }
     
     func test_fileWalk() {
