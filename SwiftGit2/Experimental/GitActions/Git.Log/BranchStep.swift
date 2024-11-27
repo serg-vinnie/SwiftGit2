@@ -10,29 +10,35 @@ internal struct BranchStep {
 }
 
 extension GitFileID {
-    func branchStep(commitID parentCommitID: CommitID) -> R<BranchStep> {
-        let start = self
-        var next = [GitFileID]()
-        
-        // first step should be targeted to the selected parent
-        // let t = __diffToParent(commitID: parentCommitID)
-        
-        
-        
-        return .notImplemented
-    }
+//    func branchStep(parentCommitID: CommitID) -> R<BranchStep> {
+//        let start = self
+//        var next = [GitFileID]()
+//        
+//        // first step should be targeted to the selected parent
+//        // let t = __diffToParent(commitID: parentCommitID)
+//        
+//        
+//        
+//        return .notImplemented
+//    }
     
-    fileprivate func branchStep(commitID parentCommitID: CommitID) throws -> BranchStep {
+    func branchStep(parentCommitID: CommitID) throws -> BranchStep {
         let start = self
         var next = [GitFileID]()
         
         let diff1 = try self.__diffToParent(commitID: parentCommitID).get()
         let deltas = diff1.asDeltas()
         
-        return BranchStep(start: start, next: [], isFinal: false)
+        if deltas.count == 0 {
+            let nextFileID = GitFileID(path: self.path, blobID: self.blobID, commitID: parentCommitID)
+            let parentsOfParent = try parentCommitID.parents.get()
+            return BranchStep(start: start, next: [nextFileID], isFinal: parentsOfParent.count == 0)
+        } else {
+            throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.count > 0")
+        }
     }
     
-    func branchStep(commitID parentCommitID: CommitID, base: CommitID) -> R<BranchStep> {
+    func branchStep(parentCommitID: CommitID, base: CommitID) -> R<BranchStep> {
         
         let start = self
         var next = [GitFileID]()

@@ -36,12 +36,23 @@ class GitLogTests: XCTestCase {
     
     func test_historyStep_1commit_shorter() {
         let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
-        let repoID = folder.repoID
-        let fileID = repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
         
         (fileID | { $0.historyStep() })
             .map { $0.files.count }
             .assertEqual(to: 1)
+    }
+    
+    func test_historyStep_2commitsAB() {
+        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
+        folder.commit(file: .fileB, msg: "commit2")
+            .shouldSucceed()
+        
+        let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        
+        (fileID | { $0.historyStep() })
+            .map { $0.files.count }
+            .assertEqual(to: 2)
     }
     
     

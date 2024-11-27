@@ -25,10 +25,15 @@ internal extension GitFileID {
         let parents = try commitID.parents.get()
         
         if parents.isEmpty {
+            
             let branchStep = BranchStep(start: self, next: [], isFinal: true)
             return FileHistoryStep(branchSteps: [branchStep])
-        } else if parents.count == 1 {
-            throw WTF("parents.count == 1 NOT IMPLEMENTED")
+            
+        } else if parents.count == 1, let parent = parents.first {
+            
+            let branchStep = try self.branchStep(parentCommitID: parent)
+            return FileHistoryStep(branchSteps: [branchStep])
+            
         } else {
             throw WTF("parents.count > 1 NOT IMPLEMENTED")
         }
@@ -44,9 +49,9 @@ internal extension Array where Element == CommitID {
     func fileHistoryStep(fileID: GitFileID) -> R<FileHistoryStep> {
         guard let last else { return .success(FileHistoryStep(branchSteps: [])) } // no parents: end
         
-        if self.count == 1 {
-            return fileID.branchStep(commitID: last) | { FileHistoryStep(branchSteps: [$0]) }
-        }
+//        if self.count == 1 {
+//            return fileID.branchStep(parentCommitID: last) | { FileHistoryStep(branchSteps: [$0]) }
+//        }
         
         return .notImplemented
     }
