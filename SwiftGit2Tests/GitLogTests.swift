@@ -3,15 +3,25 @@ import XCTest
 import Essentials
 import EssentialsTesting
 
+extension ReferenceID {
+    func t_recentFileID(name: String) -> R<GitFileID> {
+        let commits = GitLog(refID: self).commitIDs
+        let commitID = commits | { $0.first.asNonOptional("firstCommit for recent file") }
+        let treeID = commitID | { $0.treeID }
+        let blobID = treeID | { $0.blob(name: TestFile.fileA.rawValue) }
+        return combine(blobID,commitID) | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: $1) }
+    }
+}
+
 class GitLogTests: XCTestCase {
 //    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
     let root = TestFolder.git_tests.sub(folder: "FileHistory")
     
-    func test_historyStep1() {
+    func test_historyStep_1commit() {
         let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
         let repoID = folder.repoID
         let mainRefID = ReferenceID(repoID: repoID, name: "refs/heads/main")
-        var commits = GitLog(refID: mainRefID).commitIDs
+        let commits = GitLog(refID: mainRefID).commitIDs
             .shouldSucceed()!
         
         let commitID = commits.first!
@@ -22,8 +32,18 @@ class GitLogTests: XCTestCase {
         (fileID | { $0.historyStep() })
             .map { $0.files.count }
             .assertEqual(to: 1)
-//            .shouldSucceed("historyStep")
     }
+    
+    func test_historyStep_1commit_shorter() {
+        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
+        let repoID = folder.repoID
+        let fileID = repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        
+        (fileID | { $0.historyStep() })
+            .map { $0.files.count }
+            .assertEqual(to: 1)
+    }
+    
     
     func test_fileWalk() {
         // file A [1]
