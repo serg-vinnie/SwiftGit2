@@ -53,6 +53,20 @@ extension TestFolder {
         self.url.appendingPathComponent(file.rawValue).write(string: content.get())
     }
     
+    func repo(name: String, commits: [[TestCustomFile]], cleared: Bool = true, numbersOn: Bool = true) -> R<RepoID> {
+        let newCommits = commits.map { TestCustomCommit(files: $0, msg: "") }
+        return repo(name: name, commits: newCommits, cleared: cleared, numbersOn: numbersOn)
+    }
+    
+    func repo(name: String, commits: [TestCustomCommit], cleared: Bool = true, numbersOn: Bool = true) -> R<RepoID> {
+        let folder = self.with(repo: name, content: .empty, cleared: false)
+        let repoID = folder | { $0.repoID }
+        
+        let updatedCommits = numbersOn ? commits.withNumbers() : commits
+        
+        return repoID | { repoID in updatedCommits.flatMap { repoID.t_commit($0) } } | { _ in repoID }
+    }
+    
     func with(repo name: String, content: RepositoryContent, cleared: Bool = true) -> R<TestFolder> {
         let subFolder : TestFolder
         if cleared {

@@ -55,6 +55,10 @@ class GitLogTests: XCTestCase {
             .assertEqual(to: 2)
     }
     
+    func test_historyStep_ABA() {
+        let repoID = root.repo(name: "historyStep_ABA", commits: [[.randomA], [.randomB], [.randomA]], cleared: false)
+    }
+    
     
     func test_fileWalk() {
         // file A [1]

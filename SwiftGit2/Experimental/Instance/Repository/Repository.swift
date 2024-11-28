@@ -217,6 +217,10 @@ public extension Repository {
         }
     }
     
+    func addBy(paths: [String]) -> R<Repository> {
+        index() | { index in paths.flatMap { index.addBy(relPath: $0)  } } | { _ in self }
+    }
+    
     func addBy(path: String) -> R<Repository> {
         index() | { $0.addBy(relPath: path) } | { _ in self }
     }

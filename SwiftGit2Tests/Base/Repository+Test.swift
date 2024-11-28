@@ -13,6 +13,10 @@ enum RepositoryContent {
 }
 
 extension RepoID {
+    func t_commit(_ commit : TestCustomCommit) -> R<CommitID> {
+        repo | { $0.t_commit(commit) } | { CommitID(repoID: self, oid: $0.oid) }
+    }
+    
     func t_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> R<Commit> {
         repo | { $0.t_commit(file: file, with: content, msg: msg, signature: signature) }
     }
@@ -40,6 +44,12 @@ extension Repository {
     func t_push_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String) -> Result<Commit, Error> {
         t_commit(file: file, with: content, msg: msg)
             .flatMap { commit in self.push(.HEAD, options: PushOptions(auth: .credentials(.sshDefault))).map{ commit } }
+    }
+    
+    func t_commit(_ commit : TestCustomCommit) -> R<Commit> {
+        self.t_with(files: commit.files)
+            | { $0.addBy(paths: commit.files.map { $0.path } ) }
+            | { $0.commit(message: commit.msg, signature: commit.signature) }
     }
 
     func t_commit(file: TestFile = .fileA, with content: TestFileContent = .oneLine1, msg: String, signature: Signature = GitTest.signature) -> Result<Commit, Error> {
@@ -72,6 +82,53 @@ extension Repository {
             .map { $0.appendingPathComponent(file.rawValue) }
             .flatMap { $0.write(content: content.get()) }
             .map { _ in self }
+    }
+    
+    func t_with(files: [TestCustomFile]) -> R<Repository> {
+        let urls = files.flatMap { self.t_write(file: $0) }
+        return urls | { _ in self }
+    }
+    
+    func t_write(file: TestCustomFile) -> R<URL> {
+        directoryURL
+            .map { $0.appendingPathComponent(file.path) }
+            .flatMap { $0.write(content: file.content) }
+    }
+}
+
+struct TestCustomFile {
+    let path: String
+    let content : String
+    
+    init(path: String, content: String? = nil) {
+        self.path = path
+        self.content = content ?? UUID().uuidString
+    }
+    
+    static var randomA : TestCustomFile { .init(path: "fileA.txt") }
+    static var randomB : TestCustomFile { .init(path: "fileA.txt") }
+}
+
+struct TestCustomCommit {
+    let files : [TestCustomFile]
+    let msg : String
+    let signature: Signature
+    
+    init(files: [TestCustomFile], msg: String, signature: Signature = GitTest.signature) {
+        self.files = files
+        self.msg = msg
+        self.signature = signature
+    }
+}
+
+extension Array where Element == TestCustomCommit {
+    func withNumbers() -> Self {
+        var result = [TestCustomCommit]()
+        var idx = 0
+        for item in self {
+            result.append(.init(files: item.files, msg: "⚽\(idx) " + item.msg , signature: item.signature))
+        }
+        return result
     }
 }
 
