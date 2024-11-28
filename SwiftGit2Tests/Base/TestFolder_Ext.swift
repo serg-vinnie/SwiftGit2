@@ -61,10 +61,19 @@ extension TestFolder {
     func repo(name: String, commits: [TestCustomCommit], cleared: Bool = true, numbersOn: Bool = true) -> R<RepoID> {
         let folder = self.with(repo: name, content: .empty, cleared: false)
         let repoID = folder | { $0.repoID }
+        let log = repoID | { GitLog(refID: $0.mainRefID).commitIDs }
         
-        let updatedCommits = numbersOn ? commits.withNumbers() : commits
-        
-        return repoID | { repoID in updatedCommits.flatMap { repoID.t_commit($0) } } | { _ in repoID }
+        do {
+            let log = try log.get()
+            if log.isEmpty {
+                let updatedCommits = numbersOn ? commits.withNumbers() : commits
+                return repoID | { repoID in updatedCommits.flatMap { repoID.t_commit($0) } } | { _ in repoID }
+            } else {
+                return repoID
+            }
+        } catch {
+            return .failure(error)
+        }
     }
     
     func with(repo name: String, content: RepositoryContent, cleared: Bool = true) -> R<TestFolder> {
