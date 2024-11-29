@@ -59,7 +59,7 @@ extension TestFolder {
     }
     
     func repo(name: String, commits: [TestCustomCommit], cleared: Bool = true, numbersOn: Bool = true) -> R<RepoID> {
-        let folder = self.with(repo: name, content: .empty, cleared: false)
+        let folder = self.with(repo: name, content: .empty, cleared: cleared)
         let repoID = folder | { $0.repoID }
         let log = repoID | { GitLog(refID: $0.mainRefID).commitIDs }
         

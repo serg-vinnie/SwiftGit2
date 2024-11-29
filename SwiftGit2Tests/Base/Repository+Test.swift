@@ -105,8 +105,8 @@ struct TestCustomFile {
         self.content = content ?? UUID().uuidString
     }
     
-    static var randomA : TestCustomFile { .init(path: "fileA.txt") }
-    static var randomB : TestCustomFile { .init(path: "fileA.txt") }
+    static var randomA : TestCustomFile { .init(path: TestFile.fileA.rawValue) }
+    static var randomB : TestCustomFile { .init(path: TestFile.fileB.rawValue) }
 }
 
 struct TestCustomCommit {
@@ -127,6 +127,7 @@ extension Array where Element == TestCustomCommit {
         var idx = 0
         for item in self {
             result.append(.init(files: item.files, msg: "⚽\(idx) " + item.msg , signature: item.signature))
+            idx += 1
         }
         return result
     }

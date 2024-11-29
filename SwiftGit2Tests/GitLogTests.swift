@@ -11,6 +11,10 @@ extension ReferenceID {
         let blobID = treeID | { $0.blob(name: TestFile.fileA.rawValue) }
         return combine(blobID,commitID) | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: $1) }
     }
+    
+    func t_log() -> R<[String]> {
+        GitLog(refID: self).commitIDs | { $0.flatMap { $0.summary } }
+    }
 }
 
 class GitLogTests: XCTestCase {
@@ -56,7 +60,21 @@ class GitLogTests: XCTestCase {
     }
     
     func test_historyStep_ABA() {
-        let repoID = root.repo(name: "historyStep_ABA", commits: [[.randomA], [.randomB], [.randomA]], cleared: false)
+        let repoID = root.repo(name: "historyStep_ABA", commits: [[.randomA], [.randomB], [.randomA]], cleared: false).shouldSucceed()!
+        let fileID_A = repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        let fileID_B = repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        
+        repoID.mainRefID.t_log()
+            .shouldSucceed("log")
+            
+        (fileID_A | { $0.historyStep() })
+            .map { $0.files.count }
+            .shouldSucceed("A")
+        
+        (fileID_B | { $0.historyStep() })
+            .map { $0.files.count }
+            .shouldSucceed("B")
+//            .assertEqual(to: 2)
     }
     
     

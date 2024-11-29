@@ -25,6 +25,8 @@ public struct CommitID : CustomStringConvertible, Hashable, Identifiable {
     }
     
     public var description: String { "\(repoID.url.lastPathComponent):\(oid.oidShort)" }
+    
+    public var summary : R<String> { self.withCommit { .success($0.summary) } }
 }
 
 public extension CommitID {
