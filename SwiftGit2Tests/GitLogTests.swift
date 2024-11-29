@@ -4,6 +4,9 @@ import Essentials
 import EssentialsTesting
 
 extension ReferenceID {
+    var t_recentFileID_A :  R<GitFileID> { t_recentFileID(name: TestFile.fileA.rawValue) }
+    var t_recentFileID_B :  R<GitFileID> { t_recentFileID(name: TestFile.fileB.rawValue) }
+    
     func t_recentFileID(name: String) -> R<GitFileID> {
         let commits = GitLog(refID: self).commitIDs
         let commitID = commits | { $0.first.asNonOptional("firstCommit for recent file") }
@@ -61,8 +64,8 @@ class GitLogTests: XCTestCase {
     
     func test_historyStep_ABA() {
         let repoID = root.repo(name: "historyStep_ABA", commits: [[.randomA], [.randomB], [.randomA]], cleared: false).shouldSucceed()!
-        let fileID_A = repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
-        let fileID_B = repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        let fileID_A = repoID.mainRefID.t_recentFileID_A
+        let fileID_B = repoID.mainRefID.t_recentFileID_B
         
         repoID.mainRefID.t_log()
             .shouldSucceed("log")
