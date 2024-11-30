@@ -11,8 +11,8 @@ extension ReferenceID {
         let commits = GitLog(refID: self).commitIDs
         let commitID = commits | { $0.first.asNonOptional("firstCommit for recent file") }
         let treeID = commitID | { $0.treeID }
-        let blobID = treeID | { $0.blob(name: TestFile.fileA.rawValue) }
-        return combine(blobID,commitID) | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: $1) }
+        let blobID = treeID | { $0.blob(name: name) }
+        return combine(blobID,commitID) | { GitFileID(path: name, blobID: $0, commitID: $1) }
     }
     
     func t_log() -> R<[String]> {
@@ -62,8 +62,8 @@ class GitLogTests: XCTestCase {
             .assertEqual(to: 2)
     }
     
-    func test_historyStep_ABA() {
-        let repoID = root.repo(name: "historyStep_ABA", commits: [[.randomA], [.randomB], [.randomA]], cleared: false).shouldSucceed()!
+    func test_historyStep_ABAA() {
+        let repoID = root.repo(name: "historyStep_ABA", commits: [[.randomA], [.randomB], [.randomA], [.randomA]], cleared: false).shouldSucceed()!
         let fileID_A = repoID.mainRefID.t_recentFileID_A
         let fileID_B = repoID.mainRefID.t_recentFileID_B
         
@@ -72,12 +72,11 @@ class GitLogTests: XCTestCase {
             
         (fileID_A | { $0.historyStep() })
             .map { $0.files.count }
-            .shouldSucceed("A")
+            .assertEqual(to: 1, "A")
         
         (fileID_B | { $0.historyStep() })
             .map { $0.files.count }
-            .shouldSucceed("B")
-//            .assertEqual(to: 2)
+            .assertEqual(to: 3, "B")
     }
     
     

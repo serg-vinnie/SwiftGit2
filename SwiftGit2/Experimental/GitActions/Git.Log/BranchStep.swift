@@ -28,25 +28,32 @@ extension GitFileID {
         
         let diff1 = try self.__diffToParent(commitID: parentCommitID).get()
         let deltas = diff1.asDeltas()
+        let parentsOfParent = try parentCommitID.parents.get()
+        let isFinal = parentsOfParent.count == 0
         
-        if deltas.count == 0 {
-            let nextFileID = GitFileID(path: self.path, blobID: self.blobID, commitID: parentCommitID)
-            let parentsOfParent = try parentCommitID.parents.get()
-            return BranchStep(start: start, next: [nextFileID], isFinal: parentsOfParent.count == 0)
+        if let delta = deltas.first {
+            if delta.status == .modified {
+                return BranchStep(start: start, next: [], isFinal: isFinal)
+            } else {
+                throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
+            }
         } else {
-            throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.count > 0")
+            let nextFileID = GitFileID(path: self.path, blobID: self.blobID, commitID: parentCommitID)
+            next.append(nextFileID)
         }
+        
+        return BranchStep(start: start, next: next, isFinal: parentsOfParent.count == 0)
     }
     
-    func branchStep(parentCommitID: CommitID, base: CommitID) -> R<BranchStep> {
-        
-        let start = self
-        var next = [GitFileID]()
-        
-        
-        
-        return .notImplemented
-    }
+//    func branchStep(parentCommitID: CommitID, base: CommitID) -> R<BranchStep> {
+//        
+//        let start = self
+//        var next = [GitFileID]()
+//        
+//        
+//        
+//        return .notImplemented
+//    }
 }
 
 fileprivate extension GitFileID {

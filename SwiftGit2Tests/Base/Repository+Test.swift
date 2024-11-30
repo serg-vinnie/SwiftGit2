@@ -107,6 +107,7 @@ struct TestCustomFile {
     
     static var randomA : TestCustomFile { .init(path: TestFile.fileA.rawValue) }
     static var randomB : TestCustomFile { .init(path: TestFile.fileB.rawValue) }
+    static var randomC : TestCustomFile { .init(path: TestFile.fileC.rawValue) }
 }
 
 struct TestCustomCommit {
