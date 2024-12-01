@@ -63,6 +63,23 @@ class GitLogTests: XCTestCase {
             .assertEqual(to: 3, "B")
     }
     
+    func test_historyStep_rename() {
+        let file = TestCustomFile.randomA
+        let repoID = root.repo(name: "historyStep_rename", commits: [[file], [file.renamed(path: "fileB.txt")]], cleared: true).shouldSucceed()!
+        let fileID_A = repoID.mainRefID.t_recentFileID_A
+        let fileID_B = repoID.mainRefID.t_recentFileID_B
+        
+        repoID.mainRefID.t_log()
+            .shouldSucceed("log")
+            
+        (fileID_A | { $0.historyStep() })
+            .shouldFail("A")
+        
+        (fileID_B | { $0.historyStep() })
+            .map { $0.files.count }
+            .assertEqual(to: 1, "B")
+    }
+    
     
     func test_fileWalk() {
         // file A [1]
@@ -151,29 +168,6 @@ class GitLogTests: XCTestCase {
         print("commits with file changes FOUND: \(changedsOfFile.count)")
         print("-----------------------------------------------")
         print("\r\r\r\r")
-    }
-    
-    func test_changes2() {
-        let folder = root.sub(folder: "Changes")
-        
-        _ = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, CloneOptions(fetch: FetchOptions(auth: .credentials(.sshDefault))))).repo.shouldSucceed("repo1 clone")!
-        
-        let filePath = "fileA.txt"
-        
-        let repoId = RepoID(path: "\(folder.url.path)/repo1")
-        
-        print(repoId.path)
-        
-        let a = repoId
-            .getHistoryOfFile(withPath: filePath)
-            .shouldSucceed("changedsOfFileR found")!
-        
-        XCTAssertTrue(a.count > 0, "result history item is MORE than 0 ")
-        
-        let b = a.first!.getFileContent()
-            .shouldSucceed("changedsOfFileR found")!
-        
-        XCTAssertTrue(b.details.all.count > 0, "result history item is MORE than 0 ")
     }
 }
 

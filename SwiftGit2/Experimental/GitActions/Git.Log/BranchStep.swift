@@ -11,22 +11,11 @@ internal struct BranchStep {
 }
 
 extension GitFileID {
-//    func branchStep(parentCommitID: CommitID) -> R<BranchStep> {
-//        let start = self
-//        var next = [GitFileID]()
-//        
-//        // first step should be targeted to the selected parent
-//        // let t = __diffToParent(commitID: parentCommitID)
-//        
-//        
-//        
-//        return .notImplemented
-//    }
+    var initialBranchStep : BranchStep { BranchStep(start: self, next: [], isFinal: false, isComplete: false) }
     
     func branchStep(parentCommitID: CommitID) throws -> BranchStep {
-        let start = self
         var next = [GitFileID]()
-        var step = try BranchStep(start: start, next: [], isFinal: false, isComplete: false).expand(parentCommitID: parentCommitID)
+        var step = try initialBranchStep.expand(parentCommitID: parentCommitID)
         while !step.isComplete {
             step = try step.expand()
         }
@@ -51,7 +40,7 @@ extension BranchStep {
         let diff1 = try fileID.__diffToParent(commitID: parent).get()
         guard let delta = diff1.asDeltas().first else {
             let nextFileID = GitFileID(path: fileID.path, blobID: fileID.blobID, commitID: parent)
-            return BranchStep(start: start, next: next + [nextFileID], isFinal: isFinal, isComplete: false)
+            return BranchStep(start: start, next: next + [nextFileID], isFinal: isFinal, isComplete: isFinal)
         }
                 
         if delta.status == .modified {
@@ -72,35 +61,6 @@ fileprivate extension GitFileID {
         
         return combine(commitID.treeID, parentCommitID.treeID)
             | { diff(old: $1, new: $0, path: self.path) }
-    }
-}
-
-enum FileDiffToParent {
-    case added
-    case modified
-    case none
-}
-
-fileprivate extension GitFileID {
-    func diffToMainParent() -> R<FileDiffToParent> {
-        guard let commitID else { return .wtf("commitID == nil")}
-        
-        do {
-            let parents = try commitID.parents.get()
-            if let parentCommitID = parents.first {
-                let path = self.path
-                let diff_ = combine(commitID.treeID, parentCommitID.treeID) | { SwiftGit2.diff(old: $1, new: $0, path: path) }
-                let diff = try diff_.get()
-                
-                
-                return .notImplemented
-            } else {
-                return .success(.added)
-            }
-            
-        } catch {
-            return .failure(error)
-        }
     }
 }
 

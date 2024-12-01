@@ -10,11 +10,6 @@ internal struct FileHistoryStep {
 
 
 internal extension GitFileID {
-//    var parentFileIDs : R<[ParentFileID]> {
-//        guard let commitID else { return .wtf("commitID == nil") }
-//        return commitID.parents | { $0.flatMap { self.diffToParent(commitID: $0) } }
-//    }
-    
     func historyStep() -> R<FileHistoryStep> {
         Result { try _historyStep() }
     }
@@ -37,22 +32,7 @@ internal extension GitFileID {
         } else {
             throw WTF("parents.count > 1 NOT IMPLEMENTED")
         }
-        
-        
-//        throw WTF("NOT IMPLEMENTED")
     }
 }
 
 
-// Array of parents
-internal extension Array where Element == CommitID {
-    func fileHistoryStep(fileID: GitFileID) -> R<FileHistoryStep> {
-        guard let last else { return .success(FileHistoryStep(branchSteps: [])) } // no parents: end
-        
-//        if self.count == 1 {
-//            return fileID.branchStep(parentCommitID: last) | { FileHistoryStep(branchSteps: [$0]) }
-//        }
-        
-        return .notImplemented
-    }
-}

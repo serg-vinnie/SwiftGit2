@@ -105,6 +105,10 @@ struct TestCustomFile {
         self.content = content ?? UUID().uuidString
     }
     
+    func renamed(path: String) -> TestCustomFile {
+        return .init(path: path, content: content)
+    }
+    
     static var randomA : TestCustomFile { .init(path: TestFile.fileA.rawValue) }
     static var randomB : TestCustomFile { .init(path: TestFile.fileB.rawValue) }
     static var randomC : TestCustomFile { .init(path: TestFile.fileC.rawValue) }
