@@ -26,25 +26,11 @@ extension GitFileID {
     func branchStep(parentCommitID: CommitID) throws -> BranchStep {
         let start = self
         var next = [GitFileID]()
-        
-        let diff1 = try self.__diffToParent(commitID: parentCommitID).get()
-        let deltas = diff1.asDeltas()
-        let parentsOfParent = try parentCommitID.parents.get()
-        let isFinal = parentsOfParent.count == 0
-        
-        if let delta = deltas.first {
-            if delta.status == .modified {
-                return BranchStep(start: start, next: [], isFinal: isFinal, isComplete: false)
-            } else {
-                throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
-            }
-        } else {
-            let nextFileID = GitFileID(path: self.path, blobID: self.blobID, commitID: parentCommitID)
-            next.append(nextFileID)
-            return BranchStep(start: start, next: next, isFinal: parentsOfParent.count == 0, isComplete: false)
+        var step = try BranchStep(start: start, next: [], isFinal: false, isComplete: false).expand(parentCommitID: parentCommitID)
+        while !step.isComplete {
+            step = try step.expand()
         }
-        
-        
+        return step
     }
 }
 
@@ -70,6 +56,10 @@ extension BranchStep {
                 
         if delta.status == .modified {
             return BranchStep(start: self.start, next: self.next, isFinal: isFinal, isComplete: true)
+        } else if delta.status == .added {
+            return BranchStep(start: self.start, next: self.next, isFinal: true, isComplete: true)
+        } else if delta.status == .renamed {
+            throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
         } else {
             throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
         }
