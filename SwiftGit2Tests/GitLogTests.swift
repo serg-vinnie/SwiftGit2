@@ -3,22 +3,6 @@ import XCTest
 import Essentials
 import EssentialsTesting
 
-extension ReferenceID {
-    var t_recentFileID_A :  R<GitFileID> { t_recentFileID(name: TestFile.fileA.rawValue) }
-    var t_recentFileID_B :  R<GitFileID> { t_recentFileID(name: TestFile.fileB.rawValue) }
-    
-    func t_recentFileID(name: String) -> R<GitFileID> {
-        let commits = GitLog(refID: self).commitIDs
-        let commitID = commits | { $0.first.asNonOptional("firstCommit for recent file") }
-        let treeID = commitID | { $0.treeID }
-        let blobID = treeID | { $0.blob(name: name) }
-        return combine(blobID,commitID) | { GitFileID(path: name, blobID: $0, commitID: $1) }
-    }
-    
-    func t_log() -> R<[String]> {
-        GitLog(refID: self).commitIDs | { $0.flatMap { $0.summary } }
-    }
-}
 
 class GitLogTests: XCTestCase {
 //    let root = TestFolder.git_tests.sub(folder: "FileChangesTests")
@@ -63,7 +47,7 @@ class GitLogTests: XCTestCase {
     }
     
     func test_historyStep_ABAA() {
-        let repoID = root.repo(name: "historyStep_ABA", commits: [[.randomA], [.randomB], [.randomA], [.randomA]], cleared: false).shouldSucceed()!
+        let repoID = root.repo(name: "historyStep_ABAA", commits: [[.randomA], [.randomB], [.randomA], [.randomA]], cleared: true).shouldSucceed()!
         let fileID_A = repoID.mainRefID.t_recentFileID_A
         let fileID_B = repoID.mainRefID.t_recentFileID_B
         
@@ -190,5 +174,22 @@ class GitLogTests: XCTestCase {
             .shouldSucceed("changedsOfFileR found")!
         
         XCTAssertTrue(b.details.all.count > 0, "result history item is MORE than 0 ")
+    }
+}
+
+extension ReferenceID {
+    var t_recentFileID_A :  R<GitFileID> { t_recentFileID(name: TestFile.fileA.rawValue) }
+    var t_recentFileID_B :  R<GitFileID> { t_recentFileID(name: TestFile.fileB.rawValue) }
+    
+    func t_recentFileID(name: String) -> R<GitFileID> {
+        let commits = GitLog(refID: self).commitIDs
+        let commitID = commits | { $0.first.asNonOptional("firstCommit for recent file") }
+        let treeID = commitID | { $0.treeID }
+        let blobID = treeID | { $0.blob(name: name) }
+        return combine(blobID,commitID) | { GitFileID(path: name, blobID: $0, commitID: $1) }
+    }
+    
+    func t_log() -> R<[String]> {
+        GitLog(refID: self).commitIDs | { $0.flatMap { $0.summary } }
     }
 }

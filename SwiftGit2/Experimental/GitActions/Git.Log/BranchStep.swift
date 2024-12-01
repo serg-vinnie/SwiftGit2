@@ -40,20 +40,31 @@ extension GitFileID {
         } else {
             let nextFileID = GitFileID(path: self.path, blobID: self.blobID, commitID: parentCommitID)
             next.append(nextFileID)
+            return BranchStep(start: start, next: next, isFinal: parentsOfParent.count == 0)
         }
         
-        return BranchStep(start: start, next: next, isFinal: parentsOfParent.count == 0)
+        
     }
-    
-//    func branchStep(parentCommitID: CommitID, base: CommitID) -> R<BranchStep> {
-//        
-//        let start = self
-//        var next = [GitFileID]()
-//        
-//        
-//        
-//        return .notImplemented
-//    }
+}
+
+extension BranchStep {
+    func finish() throws -> BranchStep {
+        let fileID = self.next.last ?? self.start
+        guard let commitID = fileID.commitID else { throw WTF("BranchStep.finish() fileID.commitID == nil") }
+        let parents = try commitID.parents.get()
+        
+        if parents.isEmpty {
+            return BranchStep(start: self.start, next: self.next, isFinal: true)
+        } else if parents.count > 1 {
+            throw WTF("BranchStep.finish() parents.count > 1")
+        } else if let parent = parents.first {
+            let diff1 = try fileID.__diffToParent(commitID: parent).get()
+            let deltas = diff1.asDeltas()
+            
+        }
+        
+        throw WTF("BranchStep.finish() not implemented")
+    }
 }
 
 fileprivate extension GitFileID {
