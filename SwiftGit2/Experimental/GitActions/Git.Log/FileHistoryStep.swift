@@ -26,7 +26,7 @@ internal extension GitFileID {
         
         if parents.isEmpty {
             
-            let branchStep = BranchStep(start: self, next: [], isFinal: true)
+            let branchStep = BranchStep(start: self, next: [], isFinal: true, isComplete: true)
             return FileHistoryStep(branchSteps: [branchStep])
             
         } else if parents.count == 1, let parent = parents.first {

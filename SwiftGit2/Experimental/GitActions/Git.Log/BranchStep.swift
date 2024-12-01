@@ -5,6 +5,7 @@ internal struct BranchStep {
     let start: GitFileID
     let next: [GitFileID]
     let isFinal : Bool
+    let isComplete : Bool
     
     var files : [GitFileID] { [start] + next }
 }
@@ -33,14 +34,14 @@ extension GitFileID {
         
         if let delta = deltas.first {
             if delta.status == .modified {
-                return BranchStep(start: start, next: [], isFinal: isFinal)
+                return BranchStep(start: start, next: [], isFinal: isFinal, isComplete: false)
             } else {
                 throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
             }
         } else {
             let nextFileID = GitFileID(path: self.path, blobID: self.blobID, commitID: parentCommitID)
             next.append(nextFileID)
-            return BranchStep(start: start, next: next, isFinal: parentsOfParent.count == 0)
+            return BranchStep(start: start, next: next, isFinal: parentsOfParent.count == 0, isComplete: false)
         }
         
         
@@ -48,22 +49,30 @@ extension GitFileID {
 }
 
 extension BranchStep {
-    func finish() throws -> BranchStep {
+    func expand(parentCommitID: CommitID? = nil) throws -> BranchStep {
+        guard !isComplete && !isFinal else { return self }
         let fileID = self.next.last ?? self.start
-        guard let commitID = fileID.commitID else { throw WTF("BranchStep.finish() fileID.commitID == nil") }
+        guard let commitID = fileID.commitID else { throw WTF("BranchStep.expand(...) fileID.commitID == nil") }
         let parents = try commitID.parents.get()
         
-        if parents.isEmpty {
-            return BranchStep(start: self.start, next: self.next, isFinal: true)
-        } else if parents.count > 1 {
-            throw WTF("BranchStep.finish() parents.count > 1")
-        } else if let parent = parents.first {
-            let diff1 = try fileID.__diffToParent(commitID: parent).get()
-            let deltas = diff1.asDeltas()
-            
+        guard let parent = parentCommitID ?? parents.first else {
+            return BranchStep(start: self.start, next: self.next, isFinal: true, isComplete: true)
         }
         
-        throw WTF("BranchStep.finish() not implemented")
+        let parentsOfParent = try parent.parents.get()
+        let isFinal = parentsOfParent.count == 0
+        
+        let diff1 = try fileID.__diffToParent(commitID: parent).get()
+        guard let delta = diff1.asDeltas().first else {
+            let nextFileID = GitFileID(path: fileID.path, blobID: fileID.blobID, commitID: parent)
+            return BranchStep(start: start, next: next + [nextFileID], isFinal: isFinal, isComplete: false)
+        }
+                
+        if delta.status == .modified {
+            return BranchStep(start: self.start, next: self.next, isFinal: isFinal, isComplete: true)
+        } else {
+            throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
+        }
     }
 }
 
