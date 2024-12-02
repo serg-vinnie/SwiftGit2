@@ -8,6 +8,25 @@ internal struct FileHistoryStep {
     var files : [GitFileID] { branchSteps.flatMap { $0.files } }
 }
 
+extension FileHistoryStep {
+    func nextStep() throws -> FileHistoryStep {
+        guard let prevStep = branchSteps.first else { throw WTF("FileHistoryStep.nextStep: prevStep == nil") }
+        guard let fileID = prevStep.files.last else { throw WTF("FileHistoryStep.nextStep: fileID == nil") }
+        guard let commitID = fileID.commitID   else { throw WTF("FileHistoryStep.nextStep: commitID == nil") }
+        
+        let parents = try commitID.parents.get()
+        
+        if parents.isEmpty {
+            throw WTF("FileHistoryStep.nextStep: parents.isEmpty")
+        } else if parents.count == 1, let parent = parents.first {
+            
+        } else {
+            throw WTF("parents.count > 1 NOT IMPLEMENTED")
+        }
+        
+        throw WTF("FileHistoryStep.nextStep not implemented")
+    }
+}
 
 internal extension GitFileID {
     func historyStep() -> R<FileHistoryStep> {

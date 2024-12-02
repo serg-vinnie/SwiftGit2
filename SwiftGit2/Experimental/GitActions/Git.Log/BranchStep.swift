@@ -14,7 +14,6 @@ extension GitFileID {
     var initialBranchStep : BranchStep { BranchStep(start: self, next: [], isFinal: false, isComplete: false) }
     
     func branchStep(parentCommitID: CommitID) throws -> BranchStep {
-        var next = [GitFileID]()
         var step = try initialBranchStep.expand(parentCommitID: parentCommitID)
         while !step.isComplete {
             step = try step.expand()
@@ -24,6 +23,7 @@ extension GitFileID {
 }
 
 extension BranchStep {
+    
     func expand(parentCommitID: CommitID? = nil) throws -> BranchStep {
         guard !isComplete && !isFinal else { return self }
         let fileID = self.next.last ?? self.start
@@ -48,9 +48,9 @@ extension BranchStep {
         } else if delta.status == .added {
             return BranchStep(start: self.start, next: self.next, isFinal: true, isComplete: true)
         } else if delta.status == .renamed {
-            throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
+            throw WTF("BranchStep.expand(...) NOT IMPLEMENTED for deltas.status == \(delta.status)")
         } else {
-            throw WTF("branchStep(parentCommitID NOT IMPLEMENTED for deltas.status == \(delta.status)")
+            throw WTF("BranchStep.expand(...) NOT IMPLEMENTED for deltas.status == \(delta.status)")
         }
     }
 }
