@@ -9,7 +9,7 @@ class GitLogTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "FileHistory")
     
     func test_historyStep_1commit() {
-        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
+        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: true).shouldSucceed()!
         let repoID = folder.repoID
         let mainRefID = ReferenceID(repoID: repoID, name: "refs/heads/main")
         let commits = GitLog(refID: mainRefID).commitIDs
@@ -26,7 +26,7 @@ class GitLogTests: XCTestCase {
     }
     
     func test_historyStep_1commit_shorter() {
-        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
+        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: true).shouldSucceed()!
         let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
         
         (fileID | { $0.historyStep() })
@@ -35,7 +35,7 @@ class GitLogTests: XCTestCase {
     }
     
     func test_historyStep_2commitsAB() {
-        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: false).shouldSucceed()!
+        let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: true).shouldSucceed()!
         folder.commit(file: .fileB, msg: "commit2")
             .shouldSucceed()
         

@@ -50,3 +50,10 @@ public struct GitLogSplit {
     let parent : CommitID
     let parents : [CommitID]
 }
+
+extension GitFileLogSector {
+    func nextStep() throws -> GitFileLogSector {
+        
+        throw WTF("GitFileLogSector.nextStep() NOT IMPLEMENTED")
+    }
+}
