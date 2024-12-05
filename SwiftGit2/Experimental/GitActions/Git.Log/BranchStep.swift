@@ -55,7 +55,7 @@ extension BranchStep {
     }
 }
 
-fileprivate extension GitFileID {
+internal extension GitFileID {
     func __diffToParent(commitID parentCommitID: CommitID) -> R<Diff> {
         guard let commitID else { return .wtf("commitID == nil")}
         
