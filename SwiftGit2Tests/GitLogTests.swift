@@ -32,6 +32,11 @@ class GitLogTests: XCTestCase {
         (fileID | { $0.historyStep() })
             .map { $0.files.count }
             .assertEqual(to: 1)
+        
+        //------------------------------
+        (fileID | { $0.log })
+            .map { $0.files.count }
+            .assertEqual(to: 1)
     }
     
     func test_historyStep_2commitsAB() {
@@ -42,6 +47,11 @@ class GitLogTests: XCTestCase {
         let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
         
         (fileID | { $0.historyStep() })
+            .map { $0.files.count }
+            .assertEqual(to: 2)
+        
+        //------------------------------
+        (fileID | { $0.log })
             .map { $0.files.count }
             .assertEqual(to: 2)
     }
@@ -59,6 +69,15 @@ class GitLogTests: XCTestCase {
             .assertEqual(to: 1, "A")
         
         (fileID_B | { $0.historyStep() })
+            .map { $0.files.count }
+            .assertEqual(to: 3, "B")
+        
+        //------------------------------
+        (fileID_A | { $0.log })
+            .map { $0.files.count }
+            .assertEqual(to: 4, "A")
+        
+        (fileID_B | { $0.log })
             .map { $0.files.count }
             .assertEqual(to: 3, "B")
     }
