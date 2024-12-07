@@ -74,9 +74,9 @@ fileprivate func diff(old: TreeID, new: TreeID, path: String) -> R<Diff> {
     let newTree = repo | { $0.treeLookup(oid: new.oid) }
     
     let diffOptions = DiffOptions(pathspec: [path])
-    let findOptions = Diff.FindOptions()
+    let findOptions = Diff.FindFlags()
     
     return combine(repo, oldTree, newTree)
         | { repo, old, new in repo.diffTreeToTree(oldTree: old, newTree: new, options: diffOptions) }
-        | { $0.findSimilar(options: findOptions) }
+        | { $0.findSimilar(flags: findOptions) }
 }

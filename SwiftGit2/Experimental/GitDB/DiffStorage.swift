@@ -13,13 +13,13 @@ extension RepoID {
 
 class DiffStorage {
     let diffOptions : DiffOptions
-    let findOptions : Diff.FindOptions
+    let findFlags : Diff.FindFlags
     var treeDiffs   = LockedVar<[TreeDiffID:TreeDiff]>([:])
     var blobDiffs   = LockedVar<[BlobDiffID:[Diff.Hunk]]>([:])
     
-    init(diffOptions: DiffOptions = DiffOptions(), findOptions: Diff.FindOptions = Diff.FindOptions()) {
+    init(diffOptions: DiffOptions = DiffOptions(), findOptions: Diff.FindFlags = Diff.FindFlags()) {
         self.diffOptions = diffOptions
-        self.findOptions = findOptions
+        self.findFlags = findOptions
     }
     
     func diff(old: BlobID?, new: BlobID?) -> R<[Diff.Hunk]> {
@@ -60,7 +60,7 @@ private extension DiffStorage {
         let newTree = repo | { $0.treeLookup(oid: new.oid) }
         
         let diff = combine(repo, oldTree, newTree) | { repo, old, new in repo.diffTreeToTree(oldTree: old, newTree: new, options: self.diffOptions) }
-        return diff | { $0.findSimilar(options: self.findOptions) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
+        return diff | { $0.findSimilar(flags: self.findFlags) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
     }
     
     func diff(old: TreeID) -> R<TreeDiff> {
@@ -68,7 +68,7 @@ private extension DiffStorage {
         let oldTree = repo | { $0.treeLookup(oid: old.oid) }
         
         let diff = combine(repo, oldTree) | { repo, old in repo.diffTreeToTree(oldTree: old, newTree: nil, options: self.diffOptions) }
-        return diff | { $0.findSimilar(options: self.findOptions) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
+        return diff | { $0.findSimilar(flags: self.findFlags) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
     }
     
     func diff(new: TreeID) -> R<TreeDiff> {
@@ -76,7 +76,7 @@ private extension DiffStorage {
         let newTree = repo | { $0.treeLookup(oid: new.oid) }
         
         let diff = combine(repo, newTree) | { repo, new in repo.diffTreeToTree(oldTree: nil, newTree: new, options: self.diffOptions) }
-        return diff | { $0.findSimilar(options: self.findOptions) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
+        return diff | { $0.findSimilar(flags: self.findFlags) } | { $0.asDeltas() } | { TreeDiff(deltas: $0) }
     }
 }
 

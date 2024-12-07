@@ -93,7 +93,6 @@ class GitLogTests: XCTestCase {
         let fileID_B = repoID.mainRefID.t_recentFileID_B
         
 
-        
         //------------------------------
         (fileID_A | { $0.log })
             .shouldFail("A")

@@ -21,8 +21,14 @@ public class Diff: InstanceProtocol {
         git_diff_free(pointer)
     }
 
-    public func findSimilar(options: FindOptions) -> Result<Diff, Error> {
-        var opt = git_diff_find_options(version: 1, flags: options.rawValue, rename_threshold: 50, rename_from_rewrite_threshold: 50, copy_threshold: 50, break_rewrite_threshold: 60, rename_limit: 200, metric: nil)
+    public func findSimilar(flags: FindFlags) -> Result<Diff, Error> {
+        var opt = git_diff_find_options(version: 1, 
+                                        flags: flags.rawValue,
+                                        rename_threshold: 50,
+                                        rename_from_rewrite_threshold: 50,
+                                        copy_threshold: 50,
+                                        break_rewrite_threshold: 60,
+                                        rename_limit: 200, metric: nil)
 
         return git_try("git_diff_find_options") { git_diff_find_similar(pointer, &opt) }
             .map { self }
@@ -74,32 +80,36 @@ public extension Diff {
         }
     }
 
-    struct FindOptions: OptionSet {
+    struct FindFlags: OptionSet {
         // This appears to be necessary due to bug in Swift
         // https://bugs.swift.org/browse/SR-3003
         public init(rawValue: UInt32) {
             self.rawValue = rawValue
         }
+        
+        public init() {
+            self.rawValue = FindFlags.all.rawValue
+        }
 
         public let rawValue: UInt32
 
-        public static let byConfig = FindOptions(rawValue: GIT_DIFF_FIND_BY_CONFIG.rawValue)
-        public static let renames = FindOptions(rawValue: GIT_DIFF_FIND_RENAMES.rawValue)
-        public static let renamesFromRewrites = FindOptions(rawValue: GIT_DIFF_FIND_RENAMES_FROM_REWRITES.rawValue)
-        public static let copies = FindOptions(rawValue: GIT_DIFF_FIND_COPIES.rawValue)
-        public static let copiesFromUnmodified = FindOptions(rawValue: GIT_DIFF_FIND_COPIES_FROM_UNMODIFIED.rawValue)
-        public static let rewrites = FindOptions(rawValue: GIT_DIFF_FIND_REWRITES.rawValue)
-        public static let breakRewrites = FindOptions(rawValue: GIT_DIFF_BREAK_REWRITES.rawValue)
-        public static let findAndBreakRewrites = FindOptions(rawValue: GIT_DIFF_FIND_AND_BREAK_REWRITES.rawValue)
-        public static let forUntracked = FindOptions(rawValue: GIT_DIFF_FIND_FOR_UNTRACKED.rawValue)
-        public static let all = FindOptions(rawValue: GIT_DIFF_FIND_ALL.rawValue)
+        public static let byConfig = FindFlags(rawValue: GIT_DIFF_FIND_BY_CONFIG.rawValue)
+        public static let renames = FindFlags(rawValue: GIT_DIFF_FIND_RENAMES.rawValue)
+        public static let renamesFromRewrites = FindFlags(rawValue: GIT_DIFF_FIND_RENAMES_FROM_REWRITES.rawValue)
+        public static let copies = FindFlags(rawValue: GIT_DIFF_FIND_COPIES.rawValue)
+        public static let copiesFromUnmodified = FindFlags(rawValue: GIT_DIFF_FIND_COPIES_FROM_UNMODIFIED.rawValue)
+        public static let rewrites = FindFlags(rawValue: GIT_DIFF_FIND_REWRITES.rawValue)
+        public static let breakRewrites = FindFlags(rawValue: GIT_DIFF_BREAK_REWRITES.rawValue)
+        public static let findAndBreakRewrites = FindFlags(rawValue: GIT_DIFF_FIND_AND_BREAK_REWRITES.rawValue)
+        public static let forUntracked = FindFlags(rawValue: GIT_DIFF_FIND_FOR_UNTRACKED.rawValue)
+        public static let all = FindFlags(rawValue: GIT_DIFF_FIND_ALL.rawValue)
 
-        public static let ignoreLeadingWhitespace = FindOptions(rawValue: GIT_DIFF_FIND_IGNORE_LEADING_WHITESPACE.rawValue)
-        public static let ignoreWhitespace = FindOptions(rawValue: GIT_DIFF_FIND_IGNORE_WHITESPACE.rawValue)
-        public static let dontIgnoreWhitespace = FindOptions(rawValue: GIT_DIFF_FIND_DONT_IGNORE_WHITESPACE.rawValue)
-        public static let exactMatchOnly = FindOptions(rawValue: GIT_DIFF_FIND_EXACT_MATCH_ONLY.rawValue)
-        public static let breakRewritesForRenamesOnly = FindOptions(rawValue: GIT_DIFF_BREAK_REWRITES_FOR_RENAMES_ONLY.rawValue)
-        public static let removeUnmodified = FindOptions(rawValue: GIT_DIFF_FIND_REMOVE_UNMODIFIED.rawValue)
+        public static let ignoreLeadingWhitespace = FindFlags(rawValue: GIT_DIFF_FIND_IGNORE_LEADING_WHITESPACE.rawValue)
+        public static let ignoreWhitespace = FindFlags(rawValue: GIT_DIFF_FIND_IGNORE_WHITESPACE.rawValue)
+        public static let dontIgnoreWhitespace = FindFlags(rawValue: GIT_DIFF_FIND_DONT_IGNORE_WHITESPACE.rawValue)
+        public static let exactMatchOnly = FindFlags(rawValue: GIT_DIFF_FIND_EXACT_MATCH_ONLY.rawValue)
+        public static let breakRewritesForRenamesOnly = FindFlags(rawValue: GIT_DIFF_BREAK_REWRITES_FOR_RENAMES_ONLY.rawValue)
+        public static let removeUnmodified = FindFlags(rawValue: GIT_DIFF_FIND_REMOVE_UNMODIFIED.rawValue)
     }
 }
 

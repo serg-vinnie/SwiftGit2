@@ -26,7 +26,7 @@ public struct CommitDeltas {
 
 public extension Repository {
     
-    func deltas(target: CommitTarget, findOptions: Diff.FindOptions = [.renames, .renamesFromRewrites] ) -> R<CommitDeltas> {
+    func deltas(target: CommitTarget, findOptions: Diff.FindFlags = [.renames, .renamesFromRewrites] ) -> R<CommitDeltas> {
         if headIsUnborn {
             return .success(.emtpy)
         }
@@ -49,7 +49,7 @@ public extension Repository {
         let parentTrees = parents | { $0 | { $0.tree() } }
         let deltas      = combine(commitTree, parentTrees) | { tree, parents in parents | {
             self.diffTreeToTree(oldTree: $0, newTree: tree)
-                | { $0.findSimilar(options: findOptions) }
+                | { $0.findSimilar(flags: findOptions) }
                 | { $0.asDeltas() } } }
         
         return combine(parentOIDs, deltas, desc, commitID) | { commitDetails(commitID: $3, parents: $0, deltas: $1, desc: $2) }
