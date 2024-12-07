@@ -48,7 +48,7 @@ extension Repository {
     
     func t_commit(_ commit : TestCustomCommit) -> R<Commit> {
         self.t_with(files: commit.files)
-            | { $0.addBy(paths: commit.files.map { $0.path } ) }
+            | { $0.stage(.all) }
             | { $0.commit(message: commit.msg, signature: commit.signature) }
     }
 
@@ -90,19 +90,32 @@ extension Repository {
     }
     
     func t_write(file: TestCustomFile) -> R<URL> {
-        directoryURL
-            .map { $0.appendingPathComponent(file.path) }
-            .flatMap { $0.write(content: file.content) }
+        if file.operation == .add {
+            return directoryURL
+                .map { $0.appendingPathComponent(file.path) }
+                .flatMap { $0.write(content: file.content) }
+        } else {
+            return directoryURL
+                .map { $0.appendingPathComponent(file.path) }
+                .flatMap { url in url.rm() | { _ in url } }
+        }
     }
 }
 
 struct TestCustomFile {
+    enum Operation {
+        case add
+        case remove
+    }
+    
     let path: String
     let content : String
+    let operation : Operation
     
-    init(path: String, content: String? = nil) {
+    init(path: String, content: String? = nil, operation: Operation = .add) {
         self.path = path
         self.content = content ?? UUID().uuidString
+        self.operation = operation
     }
     
     func renamed(path: String) -> TestCustomFile {
@@ -112,6 +125,10 @@ struct TestCustomFile {
     static var randomA : TestCustomFile { .init(path: TestFile.fileA.rawValue) }
     static var randomB : TestCustomFile { .init(path: TestFile.fileB.rawValue) }
     static var randomC : TestCustomFile { .init(path: TestFile.fileC.rawValue) }
+    
+    static var removeA : TestCustomFile { .init(path: TestFile.fileA.rawValue, operation: .remove) }
+    static var removeB : TestCustomFile { .init(path: TestFile.fileB.rawValue, operation: .remove) }
+    static var removeC : TestCustomFile { .init(path: TestFile.fileC.rawValue, operation: .remove) }
 }
 
 struct TestCustomCommit {

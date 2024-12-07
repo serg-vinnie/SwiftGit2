@@ -24,6 +24,17 @@ public struct GitLogSplit {
 
 
 extension GitFileID {
+    func exists() throws -> Bool {
+        guard let commitID else { throw WTF("GitFileID.exists commitID == nil") }
+        let items = self.path.split(bySeparators: ["\\"])
+        if items.count == 1 {
+            let blobID = commitID.treeID | { $0.blob(name: self.path) }
+            return blobID.maybeSuccess != nil
+        }
+        
+        throw WTF("GitFileID.exists() NOT IMPLEMENTED: items.count = \(items.count)")
+    }
+    
     public var log : R<GitFileLog> {
         logSector | { .init(file: self, prime: $0) }
     }
@@ -34,6 +45,7 @@ extension GitFileID {
     
     func _logSector() throws -> GitFileLogLine {
         guard let commitID else { throw WTF("commitID == nil at _logSector()") }
+        guard try exists() else { throw WTF("File not exist: \(self.path), \(commitID)") }
         let parents = try commitID.parents.get()
         
         guard let firstParent = parents.first else {

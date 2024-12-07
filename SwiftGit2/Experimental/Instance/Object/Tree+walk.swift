@@ -15,7 +15,7 @@ public extension TreeID {
         self.tree | { $0.subTree(name: name) } | { TreeID(repoID: repoID, oid: $0) }
     }
     
-    func blob(name: String) -> R<BlobID> {
+    func blob(name: String) -> R<BlobID> { // NOT PATH
         self.tree | { $0.blob(name: name) } | { BlobID(repoID: repoID, oid: $0) }
     }
 }
@@ -40,7 +40,7 @@ public extension Tree {
                 return .success(entry.oid)
             }
         }
-        return .wtf("blob not found : \(name)")
+        return .wtf("[Tree \(self.oid.oidShort)] blob not found : \(name) ")
     }
     
     fileprivate func subTree(name: String) -> R<OID> {

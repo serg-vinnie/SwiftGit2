@@ -84,19 +84,23 @@ class GitLogTests: XCTestCase {
     
     func test_historyStep_rename() {
         let file = TestCustomFile.randomA
-        let repoID = root.repo(name: "historyStep_rename", commits: [[file], [file.renamed(path: "fileB.txt")]], cleared: true).shouldSucceed()!
+//        let repoID = root.repo(name: "historyStep_rename", commits: [[file], [file.renamed(path: "folder/fileB.txt"), .removeA]], cleared: true).shouldSucceed()!
+        let repoID = root.repo(name: "historyStep_rename", commits: [[file], [file.renamed(path: "fileB.txt"), .removeA]], cleared: true).shouldSucceed()!
+        repoID.mainRefID.t_log()
+            .shouldSucceed("log")
+        
         let fileID_A = repoID.mainRefID.t_recentFileID_A
         let fileID_B = repoID.mainRefID.t_recentFileID_B
         
-        repoID.mainRefID.t_log()
-            .shouldSucceed("log")
-            
-        (fileID_A | { $0.historyStep() })
+
+        
+        //------------------------------
+        (fileID_A | { $0.log })
             .shouldFail("A")
         
-        (fileID_B | { $0.historyStep() })
+        (fileID_B | { $0.log })
             .map { $0.files.count }
-            .assertEqual(to: 1, "B")
+            .assertEqual(to: 2, "B")
     }
     
     
@@ -203,6 +207,6 @@ extension ReferenceID {
     }
     
     func t_log() -> R<[String]> {
-        GitLog(refID: self).commitIDs | { $0.flatMap { $0.summary } }
+        GitLog(refID: self).commitIDs | { $0.flatMap { c in c.summary | { $0 + ":" + c.oid.oidShort } } }
     }
 }

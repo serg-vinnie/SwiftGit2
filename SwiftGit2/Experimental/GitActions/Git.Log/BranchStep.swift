@@ -37,6 +37,10 @@ extension BranchStep {
         let parentsOfParent = try parent.parents.get()
         let isFinal = parentsOfParent.count == 0
         
+        print("parentCommitID", parentCommitID)
+        print("parents", parents)
+        print("parent", parent)
+        
         let diff1 = try fileID.__diffToParent(commitID: parent).get()
         guard let delta = diff1.asDeltas().first else {
             let nextFileID = GitFileID(path: fileID.path, blobID: fileID.blobID, commitID: parent)
