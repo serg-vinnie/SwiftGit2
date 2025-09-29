@@ -8,7 +8,7 @@ public class StatusStorage {
     
     var statusEx : ExtendedStatus? { _statusEx.read }
     var _statusEx                   = LockedVar<ExtendedStatus?>(nil)
-    public let statusListDidChange  = S<Void>(queue: .main)
+    public let statusListDidChange  = Flow.Signal<Void>(queue: .main)
     
     init(repoID: RepoID) {
         self.repoID = repoID

@@ -17,7 +17,7 @@ public extension GitStatus {
         _storage.item(key: repoID) { StatusStorage(repoID: $0) }
     }
     
-    var statusListDidChange : S<Void> { storage.statusListDidChange }
+    var statusListDidChange : Flow.Signal<Void> { storage.statusListDidChange }
     
     func refreshing() -> R<ExtendedStatus> {
         storage.refreshing()
