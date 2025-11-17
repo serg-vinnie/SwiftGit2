@@ -10,8 +10,14 @@ import Clibgit2
 import Foundation
 import Essentials
 
-public typealias TransferProgressCB = (git_indexer_progress) -> (Bool) // return false to cancel progree
+public typealias GitIndexerProgress = git_indexer_progress
+public typealias TransferProgressCB = (GitIndexerProgress) -> (Bool) // return false to cancel progree
 
+public extension GitIndexerProgress {
+    var ratio : CGFloat {
+        CGFloat(indexed_objects)/CGFloat(total_objects)
+    }
+}
 
 public class MutexRecursiveLock  {
     private var _lock = pthread_mutex_t()
@@ -189,7 +195,7 @@ private func credentialsCallback(
 }
 
 // Return a value less than zero to cancel process
-private func transferCallback(stats: UnsafePointer<git_indexer_progress>?, payload: UnsafeMutableRawPointer?) -> Int32 {
+private func transferCallback(stats: UnsafePointer<GitIndexerProgress>?, payload: UnsafeMutableRawPointer?) -> Int32 {
     guard let stats = stats?.pointee else { return -1 }
     guard let payload = payload else { return -1 }
 
