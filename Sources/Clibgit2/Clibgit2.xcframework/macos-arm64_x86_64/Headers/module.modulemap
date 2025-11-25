@@ -1,0 +1,5 @@
+module Clibgit2 {
+    umbrella "."
+    export *
+    link "clibgit2"
+}
