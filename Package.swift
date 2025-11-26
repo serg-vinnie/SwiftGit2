@@ -14,7 +14,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-collections.git", exact: "1.3.0"),
+        .package(url: "https://github.com/apple/swift-collections.git", exact: "1.2.0"),
         .package(url: "https://github.com/pointfreeco/swift-parsing.git", exact: "0.10.0"),
         .package(url: "https://gitlab.com/sergiy.vynnychenko/essentials.git", branch: "master"),
         .package(url: "https://github.com/Quick/Nimble.git", exact: "8.1.2"),
