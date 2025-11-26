@@ -27,9 +27,16 @@ let package = Package(
         ),
         
         .target(
+            name: "Git2Init",
+            dependencies: ["Clibgit2"],
+            path: "Sources/Cibgit2Init"
+        ),
+        
+        .target(
             name: "SwiftGit2",
             dependencies: [
                 "Clibgit2",
+                "Git2Init",
                 .product(name: "Collections", package: "swift-collections"),
                 .product(name: "Essentials", package: "Essentials"),
                 .product(name: "Parsing", package: "swift-parsing"),
