@@ -125,6 +125,8 @@ public extension Repository {
         case .success(_):
             return true
         case .failure(let e):
+            guard e.code != -3 else { break }
+            
             let msg = """
                 
                 !!! ERROR !!! ERROR !!! ERROR !!! ERROR !!! ERROR !!!
