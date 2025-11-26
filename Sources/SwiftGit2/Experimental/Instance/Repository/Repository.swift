@@ -119,20 +119,30 @@ public extension Repository {
 
 public extension Repository {
     class func exists(at url: URL) -> Bool {
-        guard url.exists else {
-            return false
-        }
-        if case .success(_) = at(url: url) {
+        guard url.exists else { return false }
+        
+        switch at(url: url) {
+        case .success(_):
             return true
+        case .failure(let e):
+            let msg = """
+                
+                !!! ERROR !!! ERROR !!! ERROR !!! ERROR !!! ERROR !!!
+                --
+                \(e)
+                --
+                !!! ERROR !!! ERROR !!! ERROR !!! ERROR !!! ERROR !!!
+                
+                """
+            
+            print(msg)
         }
+        
         return false
     }
     
     class func exists(at path: String) -> Bool {
-        if case .success(_) = at(path: path) {
-            return true
-        }
-        return false
+        exists(at: URL(fileURLWithPath: path) )
     }
     
     class func at(path: String) -> Result<Repository, Error> {
