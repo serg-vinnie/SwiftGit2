@@ -38,6 +38,8 @@ let package = Package(
                 "Clibgit2",
                 "Git2Init",
                 .product(name: "Collections", package: "swift-collections"),
+                
+                // To run tests need to swith this to "EssentialsStatic"
                 .product(name: "Essentials", package: "Essentials"),
                 .product(name: "Parsing", package: "swift-parsing"),
             ],
@@ -52,7 +54,8 @@ let package = Package(
             dependencies: [
                 "SwiftGit2",
                 .product(name: "Quick", package: "Quick"),
-                .product(name: "Nimble", package: "Nimble")
+                .product(name: "Nimble", package: "Nimble"),
+                .product(name: "EssentialsTesting", package: "Essentials"),
             ]
         )
     ]
