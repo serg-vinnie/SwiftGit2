@@ -209,6 +209,9 @@ class MergeAnalysisTests: XCTestCase {
         shouldResolveConflict_Submodule(side: .our, folderName:"Conflict_Submod_Resolve_Our")
     }
     
+    //
+    // failure because of their conflict resolve doesn't displayed after their resolve
+    // failure is OK at the moment, but need to be fixed later
     func test_shouldResolveConflict_Their_Submod() {
         shouldResolveConflict_Submodule(side: .their, folderName:"Conflict_Submod_Resolve_Their")
     }
