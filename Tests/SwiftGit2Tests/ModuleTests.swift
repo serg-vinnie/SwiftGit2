@@ -8,7 +8,8 @@ class ModuleTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "ModuleTests")
     
     func test_bla() {
-        let url = URL(string: "git@github.com:serg-vinnie/SwiftGit2.git")!
+        let url = Paths.focusitoUrl
+        
         let repo = root.with(repo: "cloneNext", content: .clone(url, .ssh), cleared: false)
             .shouldSucceed()!
         
@@ -32,10 +33,10 @@ class ModuleTests: XCTestCase {
 //            .shouldSucceed("tao2")
         
     }
-
+    
     func test_shouldRemoveSubmodule() {
         let folder = root.sub(folder: "removeSubmodule").cleared().shouldSucceed()!
-
+        
         let main = folder.with(repo: "main_repo", content: .commit(.fileA, .random, "initial commit"))
             .shouldSucceed()!
             
@@ -55,12 +56,12 @@ class ModuleTests: XCTestCase {
     }
     
     func test_ini_gitconfig() {
-        GitConfigDefault().entries
+        GitConfigDefault()
+            .entries
             .onSuccess {
                 for item in $0 {
                     print(item.name, item.value)
                 }
-                
             }
 //        let url = URL.userHome.appendingPathComponent(".gitconfig")
 //        (INI.File(url: url).parser | { $0.sections } | { $0 | { $0.parse } })
@@ -127,11 +128,11 @@ class ModuleTests: XCTestCase {
     }
     
     func test_submodules() {
-        let url = URL.userHome.appendingPathComponent("dev/taogit")
-        Repository.module(at: url)
+        Repository.module(at: Paths.taoGitUrl)
             .shouldSucceed("module")
-        (Repository.module(at: url) | { $0.subModules } | { $0.count })
-            .assertEqual(to: 3, "taogit submodules")
+        
+        (Repository.module(at: Paths.taoGitUrl) | { $0.subModules } | { $0.count })
+            .assertEqual(to: 7, "taogit submodules")
     }
     
 //    func test_wtf() {

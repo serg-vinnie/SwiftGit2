@@ -110,7 +110,6 @@ class MergeAnalysisTests: XCTestCase {
             .rows
             .map { "\n\n" + $0.map { $0.description }.joined(separator: "\n") }
             .shouldSucceed("rows")
-
     }
     
     func test_shoulConflict() {
@@ -244,6 +243,10 @@ class MergeAnalysisTests: XCTestCase {
         
         // create commit #3 in sub_repo
         (folder.sub(folder: subRepo).repo | { $0.t_commit(file: .fileB, with: .random, msg: "sub commit 3") })
+            .shouldSucceed()
+        
+        // make head NOT detached to be able to update submodule
+        (dst.sub(folder: subRepo).repo.flatMap) { $0.detachedHeadFix() }
             .shouldSucceed()
         
         // update submodule in DST repo

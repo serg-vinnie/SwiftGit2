@@ -83,7 +83,10 @@ public extension Duo where T1 == BranchTarget, T2 == Repository {
     var repo : Repository { value.1 }
     //var target : RemoteTarget { value.0 }
     
-    var branchInstance: R<Branch> { value.0.branch(in: value.1) }
+    var branchInstance: R<Branch> {
+        value.0.branch(in: value.1)
+    }
+    
     var commit: R<Commit> {
         self.value.0.oid(in: self.value.1) | { value.1.commit(oid: $0) }
 //        branchInstance | { $0.targetOID } | { value.1.commit(oid: $0) }

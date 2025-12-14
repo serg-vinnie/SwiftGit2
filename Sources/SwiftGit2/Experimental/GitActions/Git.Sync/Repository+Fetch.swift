@@ -13,7 +13,9 @@ import Essentials
 public extension Repository {
     func fetch(refspec: [String], _ target: BranchTarget, options: FetchOptions) -> Result<Branch, Error> {
         let duo = target.with(self)
-        return duo.remote | { $0.fetch(refspec: refspec, options: options) } | { duo.branchInstance }
+        return duo.remote
+            | { $0.fetch(refspec: refspec, options: options) }
+            | { duo.branchInstance }
     }
 }
 

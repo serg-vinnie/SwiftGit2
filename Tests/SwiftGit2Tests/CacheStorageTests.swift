@@ -12,7 +12,7 @@ final class CacheStorageTests: XCTestCase {
     let root = TestFolder.git_tests.sub(folder: "CacheTests")
     
     func test_taogit() {
-        let repoID = RepoID(path: "/Users/loki/dev/taogit")
+        let repoID = RepoID(path: Paths.taoGitUrl.path)
         let storage = TreeStorage<RepoID>()
         storage.update(root: repoID)
         XCTAssertEqual(storage.roots.read(\.count), 1)

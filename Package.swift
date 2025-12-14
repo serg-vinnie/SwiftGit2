@@ -39,7 +39,7 @@ let package = Package(
                 "Git2Init",
                 .product(name: "Collections", package: "swift-collections"),
                 
-                // To run tests need to swith this to "EssentialsStatic"
+                // To run tests need to swith name to "EssentialsStatic"
                 .product(name: "Essentials", package: "Essentials"),
                 .product(name: "Parsing", package: "swift-parsing"),
             ],
