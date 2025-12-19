@@ -22,8 +22,10 @@ xcodebuild -create-xcframework \
 3) Створюємо в ньому файл в папці хеадерс: "module.modulemap" з контентом:
 ```
 module Clibgit2 {
-    umbrella "."
+    umbrella header "git2.h"
     export *
-    link "clibgit2"
+    link "git2"
 }
 ```
+
+Варіант ``` umbrella "." ``` не підходить бо буде конфліктувати з SetApp бібліотекою

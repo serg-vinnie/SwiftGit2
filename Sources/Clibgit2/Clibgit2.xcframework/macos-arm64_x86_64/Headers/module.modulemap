@@ -1,5 +1,5 @@
 module Clibgit2 {
-    umbrella "."
+    umbrella header "git2.h"
     export *
-    link "clibgit2"
+    link "git2"
 }

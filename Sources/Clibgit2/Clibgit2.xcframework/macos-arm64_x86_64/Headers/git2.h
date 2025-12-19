@@ -8,6 +8,7 @@
 #ifndef INCLUDE_git_git_h__
 #define INCLUDE_git_git_h__
 
+/* core */
 #include "git2/annotated_commit.h"
 #include "git2/apply.h"
 #include "git2/attr.h"
@@ -23,6 +24,8 @@
 #include "git2/common.h"
 #include "git2/config.h"
 #include "git2/credential.h"
+#include "git2/cred_helpers.h"
+#include "git2/credential_helpers.h"
 #include "git2/deprecated.h"
 #include "git2/describe.h"
 #include "git2/diff.h"
@@ -42,6 +45,7 @@
 #include "git2/odb.h"
 #include "git2/odb_backend.h"
 #include "git2/oid.h"
+#include "git2/oidarray.h"
 #include "git2/pack.h"
 #include "git2/patch.h"
 #include "git2/pathspec.h"
@@ -60,13 +64,37 @@
 #include "git2/signature.h"
 #include "git2/stash.h"
 #include "git2/status.h"
+#include "git2/strarray.h"
 #include "git2/submodule.h"
 #include "git2/tag.h"
-#include "git2/transport.h"
+#include "git2/trace.h"
 #include "git2/transaction.h"
+#include "git2/transport.h"
 #include "git2/tree.h"
 #include "git2/types.h"
 #include "git2/version.h"
 #include "git2/worktree.h"
 
-#endif
+/* sys (internal / advanced API — тепер теж експортується) */
+#include "git2/sys/alloc.h"
+#include "git2/sys/commit.h"
+#include "git2/sys/config.h"
+#include "git2/sys/cred.h"
+#include "git2/sys/credential.h"
+#include "git2/sys/diff.h"
+#include "git2/sys/filter.h"
+#include "git2/sys/hashsig.h"
+#include "git2/sys/index.h"
+#include "git2/sys/mempack.h"
+#include "git2/sys/merge.h"
+#include "git2/sys/odb_backend.h"
+#include "git2/sys/openssl.h"
+#include "git2/sys/path.h"
+#include "git2/sys/refdb_backend.h"
+#include "git2/sys/reflog.h"
+#include "git2/sys/refs.h"
+#include "git2/sys/repository.h"
+#include "git2/sys/stream.h"
+#include "git2/sys/transport.h"
+
+#endif /* INCLUDE_git_git_h__ */
