@@ -347,6 +347,31 @@ public extension Repository {
             git_repository_state_cleanup(self.pointer)
         }.map { self }
     }
+    
+    func mergeCancel() -> R<Repository> {
+        self.gitDirUrl
+            .flatMap { gitDirUrl in
+                let files = ( try? FileManager.default.contentsOfDirectory(
+                    at: gitDirUrl,
+                    includingPropertiesForKeys: [.isRegularFileKey],
+                    options: [.skipsSubdirectoryDescendants]
+                ) ) ?? []
+                
+                let urls = files.filter {
+                    $0.lastPathComponent.hasPrefix("MERGE_")
+                }
+                
+                return Result {
+                    try urls.forEach{ url in
+                        if FileManager.default.isDeletableFile(atPath: url.path) {
+                            try FileManager.default.removeItem(at: url)
+                        }
+                    }
+                }
+            }
+            .map { self }
+        
+    }
 }
 
 public extension Repository {

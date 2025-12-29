@@ -133,11 +133,11 @@ class MergeAnalysisTests: XCTestCase {
     ///////////////////////////////////////////////////////
     ///RESOLVE FILE THEIR
     ///////////////////////////////////////////////////////
-    func test_shouldResolveConflict_Their_File() {
+    func test_shouldResolveConflict_File_Their() {
         shouldResolveConflictFile( side: .their, folderName: "conflictResolveTheir")
     }
     
-    func test_shouldResolveConflict_Our_File() {
+    func test_shouldResolveConflict_File_Our() {
         shouldResolveConflictFile( side: .our, folderName: "conflictResolveOur")
     }
     
@@ -205,14 +205,14 @@ class MergeAnalysisTests: XCTestCase {
     ///////////////////////////////////////////////////////
     ///RESOLVE FILE OUR
     ///////////////////////////////////////////////////////
-    func test_shouldResolveConflict_Our_Submod() {
+    func test_shouldResolveConflict_Submod_Our() {
         shouldResolveConflict_Submodule(side: .our, folderName:"Conflict_Submod_Resolve_Our")
     }
     
     //
     // failure because of their conflict resolve doesn't displayed after their resolve
     // failure is OK at the moment, but need to be fixed later
-    func test_shouldResolveConflict_Their_Submod() {
+    func test_shouldResolveConflict_Submod_Their() {
         shouldResolveConflict_Submodule(side: .their, folderName:"Conflict_Submod_Resolve_Their")
     }
     
