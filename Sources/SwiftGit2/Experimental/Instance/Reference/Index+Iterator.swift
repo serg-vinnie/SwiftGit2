@@ -42,10 +42,15 @@ public extension Index {
         fileprivate var _our        : UnsafePointer<git_index_entry>?
         fileprivate var _ancestor   : UnsafePointer<git_index_entry>?
         
-        //must be nullables!
-        public var our     : Index.Entry { return Index.Entry(entry: _our!.pointee) }
-        public var their   : Index.Entry { return Index.Entry(entry: _their!.pointee) }
-        public var ancestor: Index.Entry { return Index.Entry(entry: _ancestor!.pointee) }
+        public var our     : Index.Entry? {
+            return _our.asNonOptional.map{ Index.Entry(entry: $0.pointee) }.maybeSuccess
+        }
+        public var their   : Index.Entry? {
+            return _their.asNonOptional.map{ Index.Entry(entry: $0.pointee) }.maybeSuccess
+        }
+        public var ancestor: Index.Entry? {
+            return _ancestor.asNonOptional.map{ Index.Entry(entry: $0.pointee) }.maybeSuccess
+        }
     }
 }
 

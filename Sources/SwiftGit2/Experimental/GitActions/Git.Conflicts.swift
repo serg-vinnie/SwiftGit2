@@ -56,7 +56,9 @@ public extension GitConflicts {
 
 public extension Index {
     func conflict(path: String) -> R<Index.Conflict> {
-        conflicts() | { $0.first { $0.our.path == path || $0.their.path == path } } | { $0.asNonOptional }
+        conflicts()
+            | { $0.first { $0.our?.path == path || $0.their?.path == path } }
+        | { $0.asNonOptional }
     }
 }
 
@@ -97,7 +99,8 @@ fileprivate extension GitConflicts {
         var index = repo | { $0.index() }
         let conflict = index | { $0.conflict(path: path) }
         
-        let tmpIndex = conflict.map { $0.their }
+        let tmpIndex = conflict
+            .flatMap { $0.their.asNonOptional }
             .flatMap{ sideEntry in
                 Index.new().flatMap { $0.add(sideEntry, inMemory: true) }
             }
@@ -129,8 +132,8 @@ fileprivate extension GitConflicts {
         
         let submodCommitOid = index
             .flatMap { $0.conflict(path: path) }
-            .map{ $0.their }
-            .map{ $0.oid }
+            .map { $0.their?.oid }
+            .flatMap { $0.asNonOptional }
         
         // Видаляємо конфлікт
         index = index | { $0.conflictRemove(relPath: path) }
