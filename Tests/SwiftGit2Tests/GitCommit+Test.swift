@@ -19,7 +19,7 @@ class GitCommitTests: XCTestCase {
         _ = src.addAllAndCommit(msg: "commit 2 is reverted").shouldSucceed()!
         
         let currContent = File(url: src.urlOf(file: .fileA) ).getContent()
-        let contentMustBe = TestFileContent.content1.rawValue
+        let contentMustBe = TestFileContent.content1.content
         
         XCTAssertEqual(currContent, contentMustBe)
     }

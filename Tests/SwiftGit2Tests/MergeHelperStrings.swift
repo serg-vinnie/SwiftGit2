@@ -1,13 +1,17 @@
-struct MergeHelperStrings {
-    let c1_our = MergeFile(path: "Ifrit/Levenstain", name: "Levenstein.swift", content: main1)
+struct MergeTemplates {
+    static let c1_our = MergeFile(path: "Ifrit/Levenstain", name: "Levenstein.swift", content: main1)
     //new branch
-    let c2_their = MergeFile(path: "Ifrit/Levenstein", name: "Levenstein.swift", content: their1)
+    static let c2_their = MergeFile(path: "Ifrit/Levenstein", name: "Levenstein.swift", content: their1)
 }
 
 struct MergeFile {
     let path: String
     let name: String
     let content: String
+    
+    var asRepoContent: RepositoryContent {
+        RepositoryContent.commit(.customFile("\(path)/\(name)"), .custom(self.content), "")
+    }
 }
 
 

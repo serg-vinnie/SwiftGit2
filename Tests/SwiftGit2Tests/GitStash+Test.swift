@@ -170,11 +170,11 @@ class GitStashTests: XCTestCase {
 
         let urlA = repoID.url.appendingPathComponent(TestFile.fileA.fileName)
         let contentA = try! String(contentsOf: urlA)
-        XCTAssertEqual(contentA, TestFileContent.content1.rawValue)
+        XCTAssertEqual(contentA, TestFileContent.content1.content)
 
         let urlB = repoID.url.appendingPathComponent(TestFile.fileB.fileName)
         let contentB = try! String(contentsOf: urlB)
-        XCTAssertEqual(contentB, TestFileContent.content2.rawValue)
+        XCTAssertEqual(contentB, TestFileContent.content2.content)
 
         (GitStash(repoID: repoID).items() | { $0.count })
             .assertEqual(to: 0)

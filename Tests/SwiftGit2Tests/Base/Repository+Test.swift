@@ -80,7 +80,13 @@ extension Repository {
     func t_with(file: TestFile, with content: TestFileContent) -> R<Repository> {
         directoryURL
             .map { $0.appendingPathComponent(file.fileName) }
-            .flatMap { $0.write(content: content.get()) }
+            .map {
+                if file.fileName.contains("/") {
+                    _ = $0.deletingLastPathComponent().makeSureDirExist()
+                }
+                return $0
+            }
+            .flatMap { $0.write(content: content.content) }
             .map { _ in self }
     }
     
@@ -169,8 +175,8 @@ enum TestFile {
     
     var fileName: String {
         switch self {
-//        case .customFile(let name):
-//            return name
+        case .customFile(let name):
+            return name
         case .fileLong:
             return "pneumonoultramicroscopicsilicovolcanoconiosis.txt"
         default:
@@ -179,69 +185,77 @@ enum TestFile {
     }
 }
 
-enum TestFileContent: String {
+enum TestFileContent {
     case random
     case oneLine1
     case oneLine2
-
-    case content1 = """
-    01 The White Rabbit put on his spectacles.  "Where shall I begin,
-    02 please your Majesty?" he asked.
-    03
-    04 "Begin at the beginning," the King said gravely, "and go on
-    05 till you come to the end; then stop."
-    06
-    07
-    08
-    09
-    """
-
-    case content2 = """
-    01 << LINE REPLACEMENT >>
-    02 please your Majesty?" he asked.
-    03
-    04 "Begin at the beginning," the King said gravely, "and go on
-    05 till you come to the end; then stop."
-    06
-    07
-    08
-    09
-    10 << LINE INSERTION >>
-    """
     
-    case content3 = """
-    01
-    02
-    03
-    04
-    05
-    06
-    07
-    08
-    09
-    """
+    case content1
+    case content2
+    case content3
+    case content4
     
-    case content4 = """
-    01 I must not fear.
-    02 Fear is the mind-killer.
-    03 Fear is the little-death that brings total obliteration.
-    04 I will face my fear.
-    05 I will permit it to pass over me and through me.
-    06 And when it has gone past I will turn the inner eye to see its path.
-    07 Where the fear has gone there will be nothing.
-    08 Only I will remain.
-    09
-    """
-    
+    case custom(String)
 }
 
 extension TestFileContent {
-    func get() -> String {
+    var content: String {
         switch self {
+        case .custom(let str):
+            return str
         case .random:
             return UUID().uuidString
+        case .content1:
+            return """
+                    01 The White Rabbit put on his spectacles.  "Where shall I begin,
+                    02 please your Majesty?" he asked.
+                    03
+                    04 "Begin at the beginning," the King said gravely, "and go on
+                    05 till you come to the end; then stop."
+                    06
+                    07
+                    08
+                    09
+                    """
+        case .content2:
+            return """
+                    01 << LINE REPLACEMENT >>
+                    02 please your Majesty?" he asked.
+                    03
+                    04 "Begin at the beginning," the King said gravely, "and go on
+                    05 till you come to the end; then stop."
+                    06
+                    07
+                    08
+                    09
+                    10 << LINE INSERTION >>
+                    """
+        case .content3:
+                return """
+                    01
+                    02
+                    03
+                    04
+                    05
+                    06
+                    07
+                    08
+                    09
+                    """
+        case .content4:
+                return """
+                    01 I must not fear.
+                    02 Fear is the mind-killer.
+                    03 Fear is the little-death that brings total obliteration.
+                    04 I will face my fear.
+                    05 I will permit it to pass over me and through me.
+                    06 And when it has gone past I will turn the inner eye to see its path.
+                    07 Where the fear has gone there will be nothing.
+                    08 Only I will remain.
+                    09
+                    """
         default:
-            return rawValue
+            return String(describing: self)
         }
     }
 }

@@ -50,7 +50,7 @@ extension TestFolder {
     }
     
     func add(file : TestFile, content: TestFileContent) -> R<Void> {
-        self.url.appendingPathComponent(file.fileName).write(string: content.get())
+        self.url.appendingPathComponent(file.fileName).write(string: content.content)
     }
     
     func repo(name: String, commits: [[TestCustomFile]], cleared: Bool = true, numbersOn: Bool = true) -> R<RepoID> {

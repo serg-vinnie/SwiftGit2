@@ -185,7 +185,7 @@ class MergeAnalysisTests: XCTestCase {
         switch side {
         case .our:
             repoID.url.appendingPathComponent(path).readToString
-                .assertEqual(to: TestFileContent.oneLine2.rawValue)
+                .assertEqual(to: TestFileContent.oneLine2.content)
             
             repoID.repo
                 .flatMap { $0.status() }
@@ -193,7 +193,7 @@ class MergeAnalysisTests: XCTestCase {
                 .assertEqual(to: true , "After --resolve as OUR-- must be 0 file with changes")
         case .their:
             repoID.url.appendingPathComponent(path).readToString
-                .assertEqual(to: TestFileContent.oneLine1.rawValue)
+                .assertEqual(to: TestFileContent.oneLine1.content)
             
             repoID.repo
                 .flatMap { $0.status() }
@@ -210,7 +210,7 @@ class MergeAnalysisTests: XCTestCase {
     
     func shouldConflictFileAdvanced(side: ConflictSide, folderName: String) {
         let folder = root.sub(folder: folderName)
-        //let src = folder.with(repo: "src", content: .commit(.customFile("Leva/leva.swift"), TestFileContent.content1, "")).shouldSucceed()!
+        let src = folder.with(repo: "src", content: MergeTemplates.c1_our.asRepoContent).shouldSucceed()!
         //let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
     }
     
