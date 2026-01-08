@@ -17,8 +17,8 @@ class GitLogTests: XCTestCase {
         
         let commitID = commits.first!
         let treeID = commitID.treeID
-        let blobID = treeID | { $0.blob(name: TestFile.fileA.rawValue) }
-        let fileID = blobID | { GitFileID(path: TestFile.fileA.rawValue, blobID: $0, commitID: commitID) }
+        let blobID = treeID | { $0.blob(name: TestFile.fileA.fileName) }
+        let fileID = blobID | { GitFileID(path: TestFile.fileA.fileName, blobID: $0, commitID: commitID) }
         
         (fileID | { $0.historyStep() })
             .map { $0.files.count }
@@ -27,7 +27,7 @@ class GitLogTests: XCTestCase {
     
     func test_historyStep_1commit_shorter() {
         let folder = root.with(repo: "historyStep1", content: .commit(.fileA, .content1, "initial commit"), cleared: true).shouldSucceed()!
-        let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.fileName)
         
         (fileID | { $0.historyStep() })
             .map { $0.files.count }
@@ -44,7 +44,7 @@ class GitLogTests: XCTestCase {
         folder.commit(file: .fileB, msg: "commit2")
             .shouldSucceed()
         
-        let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.rawValue)
+        let fileID = folder.repoID.mainRefID.t_recentFileID(name: TestFile.fileA.fileName)
         
         (fileID | { $0.historyStep() })
             .map { $0.files.count }
@@ -126,9 +126,9 @@ class GitLogTests: XCTestCase {
         let commitID4 = commits.first!
         let treeID4 = commitID4.treeID
 
-        let blobIDb4 = treeID4 | { $0.blob(name: TestFile.fileB.rawValue) }
+        let blobIDb4 = treeID4 | { $0.blob(name: TestFile.fileB.fileName) }
         
-        let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileB.rawValue, blobID: $0, commitID: commitID4) }
+        let fileIDb = blobIDb4 | { GitFileID(path: TestFile.fileB.fileName, blobID: $0, commitID: commitID4) }
         blobIDb4.shouldSucceed("BlobB4")
                 
 //        (fileIDb | { $0.walk() })
@@ -194,8 +194,8 @@ class GitLogTests: XCTestCase {
 }
 
 extension ReferenceID {
-    var t_recentFileID_A :  R<GitFileID> { t_recentFileID(name: TestFile.fileA.rawValue) }
-    var t_recentFileID_B :  R<GitFileID> { t_recentFileID(name: TestFile.fileB.rawValue) }
+    var t_recentFileID_A :  R<GitFileID> { t_recentFileID(name: TestFile.fileA.fileName) }
+    var t_recentFileID_B :  R<GitFileID> { t_recentFileID(name: TestFile.fileB.fileName) }
     
     func t_recentFileID(name: String) -> R<GitFileID> {
         let commits = GitLog(refID: self).commitIDs

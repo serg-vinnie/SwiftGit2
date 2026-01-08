@@ -46,11 +46,11 @@ extension TestFolder {
 
 extension TestFolder {
     func rm(file : TestFile) -> R<Void> {
-        self.url.appendingPathComponent(file.rawValue).rm()
+        self.url.appendingPathComponent(file.fileName).rm()
     }
     
     func add(file : TestFile, content: TestFileContent) -> R<Void> {
-        self.url.appendingPathComponent(file.rawValue).write(string: content.get())
+        self.url.appendingPathComponent(file.fileName).write(string: content.get())
     }
     
     func repo(name: String, commits: [[TestCustomFile]], cleared: Bool = true, numbersOn: Bool = true) -> R<RepoID> {
@@ -148,7 +148,7 @@ extension TestFolder {
     }
     
     func urlOf(file: TestFile) -> URL {
-        return self.url.appendingPathComponent("\(file.rawValue)")
+        return self.url.appendingPathComponent("\(file.fileName)")
     }
     
     func urlOf(fileName: String) -> URL {

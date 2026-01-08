@@ -145,6 +145,14 @@ class MergeAnalysisTests: XCTestCase {
         shouldResolveConflictFile( side: .markAsResolved, folderName: "conflictResolveMarkResolved")
     }
     
+    func test_shouldResolveConflictAdvanced_File_Their() {
+        shouldConflictFileAdvanced( side: .their, folderName: "conflictAdvancedResolveTheir")
+    }
+    
+    func test_shouldResolveConflictAdvanced_File_Our() {
+        shouldConflictFileAdvanced( side: .our, folderName: "conflictAdvancedResolveOur")
+    }
+    
     func shouldResolveConflictFile(side: ConflictSide, folderName: String) {
         let folder = root.sub(folder: folderName)
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
@@ -164,7 +172,7 @@ class MergeAnalysisTests: XCTestCase {
             .exist()
             .assertEqual(to: true)
         
-        let path = TestFile.fileA.rawValue
+        let path = TestFile.fileA.fileName
         
         GitConflicts(repoID: repoID)
             .resolve(path: path, side: side, type: .file)
@@ -199,7 +207,12 @@ class MergeAnalysisTests: XCTestCase {
         }
         
     }
-    /////////////////////////////////////////////////////
+    
+    func shouldConflictFileAdvanced(side: ConflictSide, folderName: String) {
+        let folder = root.sub(folder: folderName)
+        //let src = folder.with(repo: "src", content: .commit(.customFile("Leva/leva.swift"), TestFileContent.content1, "")).shouldSucceed()!
+        //let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
+    }
     
     
     ///////////////////////////////////////////////////////

@@ -29,7 +29,7 @@ class StatusEntryTests: XCTestCase {
             .repo 
             .flatMap { $0.status() }
             .map { $0[0].stagePath }
-            .assertEqual(to: TestFile.fileA.rawValue)
+            .assertEqual(to: TestFile.fileA.fileName)
     }
     
     func test_shouldStageNewFile() {
@@ -57,7 +57,7 @@ class StatusEntryTests: XCTestCase {
             .flatMap { $0.deltas(target: .HEADorWorkDir, findOptions: .all) }
             .shouldSucceed()!
         
-        XCTAssert(commitDetails.deltasWithHunks[0].stagePath == TestFile.fileA.rawValue)
+        XCTAssert(commitDetails.deltasWithHunks[0].stagePath == TestFile.fileA.fileName)
         XCTAssert(commitDetails.deltasWithHunks[0].statuses == [.added])
     }
     
@@ -73,7 +73,7 @@ class StatusEntryTests: XCTestCase {
         let folder = root.with(repo: "shouldReturn_EntyFileInfo_Commit_Rename", content: .commit(.fileA, .random, "...."))
             .shouldSucceed()!
         
-        folder.url.moveFile(at: TestFile.fileA.rawValue, to: TestFile.fileB.rawValue)
+        folder.url.moveFile(at: TestFile.fileA.fileName, to: TestFile.fileB.fileName)
         
         let status = folder.repo
             .flatMap { $0.status() }
@@ -95,8 +95,8 @@ class StatusEntryTests: XCTestCase {
         XCTAssert(deltas.deltasWithHunks[0].statuses == [.renamed])
         
         if case let .success(.renamed(a, b)) = deltas.deltasWithHunks[0].entryFileInfo {
-            XCTAssert(a == TestFile.fileA.rawValue)
-            XCTAssert(b == TestFile.fileB.rawValue)
+            XCTAssert(a == TestFile.fileA.fileName)
+            XCTAssert(b == TestFile.fileB.fileName)
         } else {
             XCTAssert(false)
         }

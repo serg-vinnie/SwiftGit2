@@ -14,7 +14,7 @@ class GitDiscardTests: XCTestCase {
         src.statusCount
             .assertEqual(to: 1, "status count is correct")
         
-        GitDiscard(repoID: repoID).path( TestFile.fileA.rawValue )
+        GitDiscard(repoID: repoID).path( TestFile.fileA.fileName )
             .shouldSucceed()
         
         src.statusCount
@@ -26,7 +26,7 @@ class GitDiscardTests: XCTestCase {
         
         let repoID = RepoID(url: src.url )
         
-        GitDiscard(repoID: repoID).path( TestFile.fileA.rawValue )
+        GitDiscard(repoID: repoID).path( TestFile.fileA.fileName )
             .shouldSucceed()
         
         ( repoID.repo
@@ -37,7 +37,7 @@ class GitDiscardTests: XCTestCase {
         
         src.statusCount.assertEqual(to: 2, "status count is correct")
         
-        GitDiscard(repoID: repoID).path(TestFile.fileA.rawValue).shouldSucceed()
+        GitDiscard(repoID: repoID).path(TestFile.fileA.fileName).shouldSucceed()
         
         src.statusCount.assertEqual(to: 1, "status count is correct")
     }
@@ -56,7 +56,7 @@ class GitDiscardTests: XCTestCase {
         
         (repoID.HEAD | { $0.detach() } ).shouldSucceed("detach1")
 
-        GitDiscard(repoID: repoID).path(TestFile.fileA.rawValue).shouldSucceed()
+        GitDiscard(repoID: repoID).path(TestFile.fileA.fileName).shouldSucceed()
         
         src.statusCount.assertEqual(to: 1, "status count is correct")
     }
@@ -153,7 +153,7 @@ class GitDiscardTests: XCTestCase {
         
         src.statusCount.assertEqual(to: 3, "status count is correct")
         
-        GitDiscard(repoID: repoID).paths([TestFile.fileA.rawValue, TestFile.fileB.rawValue ]).shouldSucceed()
+        GitDiscard(repoID: repoID).paths([TestFile.fileA.fileName, TestFile.fileB.fileName ]).shouldSucceed()
         
         src.statusCount.assertEqual(to: 1, "status count is correct")
     }

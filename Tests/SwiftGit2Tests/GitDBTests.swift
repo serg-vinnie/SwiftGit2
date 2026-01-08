@@ -20,8 +20,8 @@ final class GitDBTests: XCTestCase {
         let entry = status[0]
         let blobOID = entry.headToIndex!.newFile!.oid
         let blobID = BlobID(repoID: repoID, oid: blobOID)
-        let fileID_A = GitFileID(path: TestFile.fileA.rawValue, blobID: blobID, commitID: commidID)
-        let fileID_B = GitFileID(path: TestFile.fileB.rawValue, blobID: blobID, commitID: commidID)
+        let fileID_A = GitFileID(path: TestFile.fileA.fileName, blobID: blobID, commitID: commidID)
+        let fileID_B = GitFileID(path: TestFile.fileB.fileName, blobID: blobID, commitID: commidID)
         
         fileID_B.flags
             .assertEqual(to: GitFileFlags(fileID: fileID_B, isWorkDirModified: false, fileExists: false, isAtHEAD: false, isAtWorkDir: false), "'B' doesn't exist")
@@ -40,7 +40,7 @@ final class GitDBTests: XCTestCase {
         let entry2 = status2[0]
         let blobOID2 = entry2.headToIndex!.newFile!.oid
         let blobID2 = BlobID(repoID: repoID, oid: blobOID2)
-        let fileID_A2 = GitFileID(path: TestFile.fileA.rawValue, blobID: blobID2, commitID: commitID2)
+        let fileID_A2 = GitFileID(path: TestFile.fileA.fileName, blobID: blobID2, commitID: commitID2)
         
         fileID_A.flags
             .assertEqual(to: GitFileFlags(fileID: fileID_A, isWorkDirModified: false, fileExists: true, isAtHEAD: false, isAtWorkDir: false), "'A' HEAD: false")
@@ -48,7 +48,7 @@ final class GitDBTests: XCTestCase {
         fileID_A2.flags
             .assertEqual(to: GitFileFlags(fileID: fileID_A2, isWorkDirModified: false, fileExists: true, isAtHEAD: true, isAtWorkDir: true), "'A2' HEAD: true")
         
-        repoID.url.appendingPathComponent(TestFile.fileA.rawValue)
+        repoID.url.appendingPathComponent(TestFile.fileA.fileName)
             .write(string: "generate status M")
             .shouldSucceed()
         
@@ -90,7 +90,7 @@ final class GitDBTests: XCTestCase {
         let diff = (repoID.headCommitID | { $0.diffToParent() })
             .shouldSucceed("diff")!.first!.diff
             
-        XCTAssertEqual(diff.paths[TestFile.fileA.rawValue], .added)
+        XCTAssertEqual(diff.paths[TestFile.fileA.fileName], .added)
         
         // --------------------------------------------------------
         //
@@ -130,7 +130,7 @@ final class GitDBTests: XCTestCase {
         let diff3 = (repoID.headCommitID | { $0.diffToParent() })
             .shouldSucceed("diff 3")!.first!.diff
         
-        XCTAssertEqual(diff3.deletedPaths["subf00/subf02"], [TestFile.fileG.rawValue])
+        XCTAssertEqual(diff3.deletedPaths["subf00/subf02"], [TestFile.fileG.fileName])
         XCTAssertEqual(diff3.folders["subf00"], [.deleted])
         XCTAssertEqual(diff3.folders["subf00/subf02"], [.deleted])
         

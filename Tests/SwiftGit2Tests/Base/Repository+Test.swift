@@ -74,12 +74,12 @@ extension Repository {
 
     func t_write(file: TestFile, with content: TestFileContent) -> Result<String, Error> {
         return t_with(file: file, with: content)
-            .map { _ in file.rawValue }
+            .map { _ in file.fileName }
     }
     
     func t_with(file: TestFile, with content: TestFileContent) -> R<Repository> {
         directoryURL
-            .map { $0.appendingPathComponent(file.rawValue) }
+            .map { $0.appendingPathComponent(file.fileName) }
             .flatMap { $0.write(content: content.get()) }
             .map { _ in self }
     }
@@ -122,13 +122,13 @@ struct TestCustomFile {
         return .init(path: path, content: content)
     }
     
-    static var randomA : TestCustomFile { .init(path: TestFile.fileA.rawValue) }
-    static var randomB : TestCustomFile { .init(path: TestFile.fileB.rawValue) }
-    static var randomC : TestCustomFile { .init(path: TestFile.fileC.rawValue) }
+    static var randomA : TestCustomFile { .init(path: TestFile.fileA.fileName) }
+    static var randomB : TestCustomFile { .init(path: TestFile.fileB.fileName) }
+    static var randomC : TestCustomFile { .init(path: TestFile.fileC.fileName) }
     
-    static var removeA : TestCustomFile { .init(path: TestFile.fileA.rawValue, operation: .remove) }
-    static var removeB : TestCustomFile { .init(path: TestFile.fileB.rawValue, operation: .remove) }
-    static var removeC : TestCustomFile { .init(path: TestFile.fileC.rawValue, operation: .remove) }
+    static var removeA : TestCustomFile { .init(path: TestFile.fileA.fileName, operation: .remove) }
+    static var removeB : TestCustomFile { .init(path: TestFile.fileB.fileName, operation: .remove) }
+    static var removeC : TestCustomFile { .init(path: TestFile.fileC.fileName, operation: .remove) }
 }
 
 struct TestCustomCommit {
@@ -155,16 +155,28 @@ extension Array where Element == TestCustomCommit {
     }
 }
 
-enum TestFile: String {
-    case fileA = "fileA.txt"
-    case fileB = "fileB.txt"
-    case fileC = "fileC.txt"
-    case fileD = "fileD.txt"
-    case fileE = "fileE.txt"
-    case fileF = "fileF.txt"
-    case fileG = "fileG.txt"
-    case fileH = "fileH.txt"
-    case fileLong = "pneumonoultramicroscopicsilicovolcanoconiosis.txt"
+enum TestFile {
+    case fileA
+    case fileB
+    case fileC
+    case fileD
+    case fileE
+    case fileF
+    case fileG
+    case fileH
+    case fileLong
+    case customFile(String)
+    
+    var fileName: String {
+        switch self {
+//        case .customFile(let name):
+//            return name
+        case .fileLong:
+            return "pneumonoultramicroscopicsilicovolcanoconiosis.txt"
+        default:
+            return String(describing: self) + ".txt"
+        }
+    }
 }
 
 enum TestFileContent: String {
