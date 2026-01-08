@@ -211,7 +211,27 @@ class MergeAnalysisTests: XCTestCase {
     func shouldConflictFileAdvanced(side: ConflictSide, folderName: String) {
         let folder = root.sub(folder: folderName)
         let src = folder.with(repo: "src", content: MergeTemplates.c1_our.asRepoContent).shouldSucceed()!
-        //let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
+        let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
+        
+        FS.delete(src.url.appendingPathComponent("Ifrit/Levenstain").path)
+        
+        src.commit(file: MergeTemplates.c2_our.asTestFile, with: MergeTemplates.c2_our.asTestFileContent, msg: "bebebe").shouldSucceed()
+        
+        FS.delete(src.url.appendingPathComponent("Ifrit/Levenstain").path)
+        
+        dst.commit(file: MergeTemplates.c3_their.asTestFile, with: MergeTemplates.c3_their.asTestFileContent, msg: "bebebe2").shouldSucceed()
+        
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
+            .shouldSucceed()
+        
+        // -------------------------------------------------------------------
+        
+        let repoID = dst.repoID
+        
+        GitConflicts(repoID: repoID)
+            .exist()
+            .assertEqual(to: true)
+        
     }
     
     

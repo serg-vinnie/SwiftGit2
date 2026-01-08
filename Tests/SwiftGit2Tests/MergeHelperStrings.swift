@@ -1,7 +1,9 @@
 struct MergeTemplates {
     static let c1_our = MergeFile(path: "Ifrit/Levenstain", name: "Levenstein.swift", content: main1)
     //new branch
-    static let c2_their = MergeFile(path: "Ifrit/Levenstein", name: "Levenstein.swift", content: their1)
+    static let c2_our = MergeFile(path: "Ifrit/Levenstein", name: "Levenstein.swift", content: main1.replace(of: "Levenstain", to: "Levenstein"))
+    
+    static let c3_their = MergeFile(path: "Ifrit/Levenstein", name: "Levenstein.swift", content: their1)
 }
 
 struct MergeFile {
@@ -9,8 +11,16 @@ struct MergeFile {
     let name: String
     let content: String
     
+    var asTestFile: TestFile {
+        .customFile("\(path)/\(name)")
+    }
+    
+    var asTestFileContent: TestFileContent {
+        .custom(self.content)
+    }
+    
     var asRepoContent: RepositoryContent {
-        RepositoryContent.commit(.customFile("\(path)/\(name)"), .custom(self.content), "")
+        RepositoryContent.commit(asTestFile, asTestFileContent, "initial")
     }
 }
 
@@ -18,7 +28,7 @@ struct MergeFile {
 fileprivate let main1 = """
 import Foundation
 
-public class Levenstein {
+public class Levenstain {
     public static func searchSync(_ text: String, in aList: [String]) -> [FuzzySrchResult] {
         let tmp = aList.indices
             .map { idx -> FuzzySrchResult in
@@ -153,5 +163,6 @@ public class Levenstein {
         }
     }
 }
+
 
 """
