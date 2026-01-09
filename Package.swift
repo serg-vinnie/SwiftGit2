@@ -40,7 +40,7 @@ let package = Package(
                 .product(name: "Collections", package: "swift-collections"),
                 
                 // To run tests need to swith name to "EssentialsStatic"
-                .product(name: "EssentialsStatic", package: "Essentials"),
+                .product(name: "Essentials", package: "Essentials"),
                 .product(name: "Parsing", package: "swift-parsing"),
             ],
             linkerSettings: [
