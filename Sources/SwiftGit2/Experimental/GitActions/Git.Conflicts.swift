@@ -52,21 +52,22 @@ public extension GitConflicts {
         }
     }
     
-    @available(*, deprecated, message: "Shit-code")
+    @available(*, deprecated, message: "Shit-code, but it works")
     func getShaForSubmoduleConflict(path: String, side: ConflictSide) -> R<String> {
         XR.Shell.Git(repoID: repoID)
-            .run(args: ["ls-files", "-u", path])
+            .run(args: ["ls-files", "-u", path]) // git ls-files -u sub_repo_path
             .flatMap{
                 if side == .our {
-                    return $0.split(separator: "\n").dropFirst().first.asNonOptional
+                    return $0.split(separator: "\n").dropFirst().first.asNonOptional  // row 2 is OUR
                 } else { // if side == .their
-                    return $0.split(separator: "\n").dropFirst(2).first.asNonOptional
+                    return $0.split(separator: "\n").dropFirst(2).first.asNonOptional // row 3 is THEIRS
                 }
             }
             .map{ $0.asStr().split(bySeparators: [" ","\t"]) }
             .flatMap { theirsSha -> R<String> in // "160000 84ce5f6b64835795ee23f6ca08d95cc8f417dcbe 2 sub_repo"
-                guard let sha = theirsSha.dropFirst().first
-                else { return .failure(WTF("failed to get sha of \(side) submodule conflict")) }
+                guard let sha = theirsSha.dropFirst().first else {
+                    return .failure(WTF("Failed to get sha of \(side) submodule conflict"))
+                }
                 
                 return .success(sha)
             }
@@ -183,21 +184,19 @@ fileprivate extension GitConflicts {
             .flatMap{ _ in .success(())}
     }
     
-    @available(*, deprecated, message: "Shit-code")
+    @available(*, deprecated, message: "Shit-code, but it works")
     func resolveConflictSubmodule(path: String, side: ConflictSide) -> R<()> {
         let tmp = repoID.treeChildren.filter{
                 $0.path.ends(with: "/\(path)")
             }.first
         
-        // git ls-files -u sub_repo
-        
         return getShaForSubmoduleConflict(path: path, side: side)
-            .flatMap{ sha in
+            .flatMap { sha in
                 OID(string: sha).asNonOptional
             }
-            .flatMap{ oid in
+            .flatMap { oid in
                 resolveConflictAsOur(path: path, type: .submodule)
-                    .flatMap{ _ in
+                    .flatMap { _ in
                         tmp.asNonOptional
                             .flatMap{
                                 $0.repo.flatMap{ $0.checkout(oid, options: .init()) }
@@ -207,62 +206,10 @@ fileprivate extension GitConflicts {
                             .flatMap {
                                 $0.repo.flatMap{ $0.discardAll() }
                             }
-                        
                     }
             }
             .flatMap {
                 repoID.repo.flatMap{ $0.addBy(path: path) }.map{ _ in () }
             }
-        
-//        let repo = repoID.repo
-//        var index = repo | { $0.index() }
-//        
-//        
-//
-//
-//        let submodCommitOid = repoID.repo
-//            .map { OidRevFile(repo: $0, type: .MergeHead)?.contentAsOids ?? [] }
-//            .flatMap { $0.first.asNonOptional }
-//        
-//        
-//        let conflict = repoID.repo.flatMap{ $0.index() }
-//            .flatMap{ $0.conflicts() }
-//            .map{ $0.filter{ $0.our?.path ?? $0.their?.path ?? $0.ancestor?.path == path }.first }
-//            
-////                .compactMap{ $0.their }.filter{ $0.path == path }.first }
-////            .flatMap{ $0.asNonOptional }
-////            .maybeSuccess
-////            .map{ $0.oid }
-//        
-//        
-//        
-//        
-//        // Видаляємо конфлікт
-//        index = index | { $0.conflictRemove(relPath: path) }
-//        
-//        let submoduleRepo = repoID.module
-//            .map{ $0.subModules }
-//            .map{ $0.filter{ $0.key == path } }
-//            .map{ $0.first! }
-//            .map{ $0.value! }
-//            .map{ $0.repoID.url.deletingLastPathComponent() }
-//            .flatMap{ Repository.at(url: $0) }
-//        
-//        let submoduleCommit = combine(submoduleRepo, submodCommitOid)
-//            .flatMap { submoduleRepo, submodCommitOid in
-//                submoduleRepo.commit(oid: submodCommitOid)
-//            }
-//        
-//        return combine(submoduleRepo, submoduleCommit)
-//            .flatMap { subModRepo, commit in
-//                subModRepo.index().flatMap{ $0.addBy(relPath: path) }
-//            }
-////            .flatMap{ _ in repo }
-////            .flatMap{ $0.status() }
-////            .map{ $0.filter { $0.stagePath == path } }
-////            .flatMap{ entries in
-////                entries.flatMap { entry in repo.map{ $0.unStage(.entry(entry)) } }
-////            }
-//            .flatMap{ _ in .success(())}
     }
 }
