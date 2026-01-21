@@ -246,7 +246,7 @@ class MergeAnalysisTests: XCTestCase {
     // failure because of their conflict resolve doesn't displayed after their resolve
     // failure is OK at the moment, but need to be fixed later
     func test_shouldResolveConflict_Submod_Their() {
-        shouldResolveConflict_Submodule(side: .their, folderName:"Conflict_Submod_Resolve_Their")
+        shouldResolveConflict_Submodule(side: .their, folderName: "Conflict_Submod_Resolve_Their")
     }
     
     func shouldResolveConflict_Submodule(side: ConflictSide, folderName: String) {
@@ -293,15 +293,19 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.commit(message: "update sub repo to commit 3", signature: .test) })
             .shouldSucceed()
         
-        // ---------------------------------
         (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .shouldSucceed()
         
         let repoID = RepoID(url: dst.url )
         
+        let shaOur   = GitConflicts(repoID: repoID).getShaForSubmoduleConflict(path: subRepo, side: .our).maybeSuccess!
+        let shaTheir = GitConflicts(repoID: repoID).getShaForSubmoduleConflict(path: subRepo, side: .their).maybeSuccess!
+        
         GitConflicts(repoID: repoID)
             .exist()
             .assertEqual(to: true)
+        
+        // now conflict exist
         
         GitConflicts(repoID: repoID)
             .resolve(path: subRepo, side: side, type: .submodule)
@@ -312,11 +316,9 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: false)
         
         switch side {
+        case .markAsResolved:
+            fallthrough
         case .our:
-            // TODO:
-            // Maybe we need to get oidStr from commit by some way? For comparation
-            // let oidStr = OidRevFile(repo: repoID.repo.maybeSuccess!, type: .MergeHead).debugDescription
-            
             repoID.repo
                 .flatMap { $0.status() }
                 .map { $0.count == 0 }
@@ -326,11 +328,14 @@ class MergeAnalysisTests: XCTestCase {
             Repository.at(url: folder.url.appendingPathComponent("dst/sub_repo") )
                 .shouldSucceed()
             
-        case .their:
-            // TODO:
-            // Maybe we need to get oidStr from commit by some way? For comparation
-            // let oidStr = OidRevFile(repo: repoID.repo.maybeSuccess!, type: .MergeHead).debugDescription
+            Repository.at(url: folder.url.appendingPathComponent("dst/sub_repo"))
+                .flatMap {
+                    $0.headCommit()
+                }
+                .map{ $0.oid.description }
+                .assertEqual(to: shaOur)
             
+        case .their:
             repoID.repo
                 .flatMap { $0.status() }
                 .map { $0.count == 1 }
@@ -339,9 +344,13 @@ class MergeAnalysisTests: XCTestCase {
             // sub_repo exists!
             Repository.at(url: folder.url.appendingPathComponent("dst/sub_repo") )
                 .shouldSucceed()
-        case .markAsResolved:
-            //Nothing to do
-            break
+            
+            Repository.at(url: folder.url.appendingPathComponent("dst/sub_repo"))
+                .flatMap {
+                    $0.headCommit()
+                }
+                .map{ $0.oid.description }
+                .assertEqual(to: shaTheir)
         }
     }
 }
