@@ -43,6 +43,7 @@ public extension GitConflicts {
             return resolveConflictMarkResolved(path: path)
         case .our:
             return resolveConflictAsOur(path: path, type: type)
+//            return resolveConflictSubmodule(path: path, side: .our)
         case .their:
             if type == .file {
                 return resolveConflictAsTheirFile(path: path)
@@ -56,15 +57,17 @@ public extension GitConflicts {
     func getShaForSubmoduleConflict(path: String, side: ConflictSide) -> R<String> {
         XR.Shell.Git(repoID: repoID)
             .run(args: ["ls-files", "-u", path]) // git ls-files -u sub_repo_path
-            .flatMap{
+            .flatMap {
                 if side == .our {
-                    return $0.split(separator: "\n").dropFirst().first.asNonOptional  // row 2 is OUR
+                    return $0.split(separator: "\n").dropFirst(1).first.asNonOptional  // row 2 is OUR
                 } else { // if side == .their
                     return $0.split(separator: "\n").dropFirst(2).first.asNonOptional // row 3 is THEIRS
                 }
             }
-            .map{ $0.asStr().split(bySeparators: [" ","\t"]) }
-            .flatMap { theirsSha -> R<String> in // "160000 84ce5f6b64835795ee23f6ca08d95cc8f417dcbe 2 sub_repo"
+            .map {
+                $0.asStr().split(bySeparators: [" ","\t"])
+            }
+            .flatMap { theirsSha -> R<String> in // ["160000","84ce5f6b64835795ee23f6ca08d95cc8f417dcbe","2","sub_repo"]
                 guard let sha = theirsSha.dropFirst().first else {
                     return .failure(WTF("Failed to get sha of \(side) submodule conflict"))
                 }
@@ -186,9 +189,9 @@ fileprivate extension GitConflicts {
     
     @available(*, deprecated, message: "Shit-code, but it works")
     func resolveConflictSubmodule(path: String, side: ConflictSide) -> R<()> {
-        let tmp = repoID.treeChildren.filter{
-                $0.path.ends(with: "/\(path)")
-            }.first
+        let tmp = repoID.treeAllChildren
+            .filter { $0.url.path == repoID.url.appending(path: path).path }
+            .first
         
         return getShaForSubmoduleConflict(path: path, side: side)
             .flatMap { sha in
@@ -209,7 +212,9 @@ fileprivate extension GitConflicts {
                     }
             }
             .flatMap {
-                repoID.repo.flatMap{ $0.addBy(path: path) }.map{ _ in () }
+                repoID.repo
+                    .flatMap{ $0.addBy(path: path) }
+                    .map{ _ in () }
             }
     }
 }
