@@ -54,26 +54,10 @@ public extension GitConflicts {
     }
     
     @available(*, deprecated, message: "Shit-code, but it works")
-    func getShaForSubmoduleConflict(path: String, side: ConflictSide) -> R<String> {
+    func getOIDForSubmoduleConflict(path: String, side: ConflictSide) -> R<OID> {
         XR.Shell.Git(repoID: repoID)
             .run(args: ["ls-files", "-u", path]) // git ls-files -u sub_repo_path
-            .flatMap {
-                if side == .our {
-                    return $0.split(separator: "\n").dropFirst(1).first.asNonOptional  // row 2 is OUR
-                } else { // if side == .their
-                    return $0.split(separator: "\n").dropFirst(2).first.asNonOptional // row 3 is THEIRS
-                }
-            }
-            .map {
-                $0.asStr().split(bySeparators: [" ","\t"])
-            }
-            .flatMap { theirsSha -> R<String> in // ["160000","84ce5f6b64835795ee23f6ca08d95cc8f417dcbe","2","sub_repo"]
-                guard let sha = theirsSha.dropFirst().first else {
-                    return .failure(WTF("Failed to get sha of \(side) submodule conflict"))
-                }
-                
-                return .success(sha)
-            }
+            .flatMap { $0.getSha(side: side) }
     }
 }
 
@@ -193,10 +177,7 @@ fileprivate extension GitConflicts {
             .filter { $0.url.path == repoID.url.appending(path: path).path }
             .first
         
-        return getShaForSubmoduleConflict(path: path, side: side)
-            .flatMap { sha in
-                OID(string: sha).asNonOptional
-            }
+        return getOIDForSubmoduleConflict(path: path, side: side)
             .flatMap { oid in
                 resolveConflictAsOur(path: path, type: .submodule)
                     .flatMap { _ in
@@ -215,6 +196,29 @@ fileprivate extension GitConflicts {
                 repoID.repo
                     .flatMap{ $0.addBy(path: path) }
                     .map{ _ in () }
+            }
+    }
+}
+
+//
+// Helpers
+//
+
+fileprivate extension String {
+    func getSha(side: ConflictSide) -> R<OID> {
+        var row: String? = self
+            .split(separator: "\n")
+            .dropFirst(side == .our ? 1 : 2)
+            .first?
+            .asStr()
+        
+        return row.asNonOptional
+            .flatMap{ $0.split(bySeparators: [" ","\t"]).dropFirst().first.asNonOptional }
+            .flatMapError{ _ in
+                .failure(WTF("Failed to get sha of \(side) submodule conflict"))
+            }
+            .flatMap { sha in
+                OID(string: sha).asNonOptional
             }
     }
 }

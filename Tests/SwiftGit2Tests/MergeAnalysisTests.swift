@@ -298,8 +298,8 @@ class MergeAnalysisTests: XCTestCase {
         
         let repoID = RepoID(url: dst.url )
         
-        let shaOur   = GitConflicts(repoID: repoID).getShaForSubmoduleConflict(path: subRepo, side: .our).maybeSuccess!
-        let shaTheir = GitConflicts(repoID: repoID).getShaForSubmoduleConflict(path: subRepo, side: .their).maybeSuccess!
+        let oidOur   = GitConflicts(repoID: repoID).getOIDForSubmoduleConflict(path: subRepo, side: .our).maybeSuccess!
+        let oidTheir = GitConflicts(repoID: repoID).getOIDForSubmoduleConflict(path: subRepo, side: .their).maybeSuccess!
         
         GitConflicts(repoID: repoID)
             .exist()
@@ -332,8 +332,8 @@ class MergeAnalysisTests: XCTestCase {
                 .flatMap {
                     $0.headCommit()
                 }
-                .map{ $0.oid.description }
-                .assertEqual(to: shaOur)
+                .map{ $0.oid }
+                .assertEqual(to: oidOur)
             
         case .their:
             repoID.repo
@@ -349,8 +349,8 @@ class MergeAnalysisTests: XCTestCase {
                 .flatMap {
                     $0.headCommit()
                 }
-                .map{ $0.oid.description }
-                .assertEqual(to: shaTheir)
+                .map{ $0.oid }
+                .assertEqual(to: oidTheir)
         }
     }
 }

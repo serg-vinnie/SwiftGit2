@@ -57,6 +57,7 @@ extension OID: CustomStringConvertible {
 
 public extension OID {
     var oidShort: String { String("\( self )".prefix(7)) }
+    var oidLong: String  { String("\( self )") }
 }
 
 extension OID: Hashable {
