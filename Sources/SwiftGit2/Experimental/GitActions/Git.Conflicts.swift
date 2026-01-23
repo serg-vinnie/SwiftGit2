@@ -200,15 +200,12 @@ fileprivate extension GitConflicts {
                             }
                             .flatMap {
                                 $0.repo.flatMap{ $0.checkout(oid, options: .init()) }
-                            }.flatMap{
-                                submodRepoId
                             }
-                            .flatMap {
-                                $0.repo.flatMap{ $0.discardAll() }
-                            }
+                            .flatMap { submodRepoId }
+                            .flatMap { $0.repo.flatMap{ $0.discardAll() } }
                     }
             }
-            .flatMap { _ in
+            .flatMap {
                 repoID.repo
                     .flatMap{ $0.addBy(path: path) }
                     .map{ _ in () }
