@@ -173,26 +173,42 @@ fileprivate extension GitConflicts {
     
     @available(*, deprecated, message: "Shit-code, but it works")
     func resolveConflictSubmodule(path: String, side: ConflictSide) -> R<()> {
-        let tmp = repoID.treeAllChildren
+        let submodRepoId = repoID.treeAllChildren
             .filter { $0.url.path == repoID.url.appending(path: path).path }
             .first
+            .asNonOptional
+        
+        let submodStatusEntriesCount = submodRepoId
+            .flatMap{ $0.repo }
+            .flatMap{ $0.status() }
+            .map{ $0.count }
         
         return getOIDForSubmoduleConflict(path: path, side: side)
             .flatMap { oid in
                 resolveConflictAsOur(path: path, type: .submodule)
                     .flatMap { _ in
-                        tmp.asNonOptional
-                            .flatMap{
+                        //Submodule: soft checkout of "oid" + discardAll if there are no changes
+                        combine(submodRepoId, submodStatusEntriesCount)
+                            .flatMap{ input -> R<RepoID> in
+                                let (repoId, repoChangesCount) = input
+                                
+                                if repoChangesCount > 0 {
+                                    return .failure(WTF("Cannot resolve conflict as Theirs. There are changes in submodule at location: \(path)"))
+                                }
+                                
+                                return .success(repoId)
+                            }
+                            .flatMap {
                                 $0.repo.flatMap{ $0.checkout(oid, options: .init()) }
                             }.flatMap{
-                                tmp.asNonOptional
+                                submodRepoId
                             }
                             .flatMap {
                                 $0.repo.flatMap{ $0.discardAll() }
                             }
                     }
             }
-            .flatMap {
+            .flatMap { _ in
                 repoID.repo
                     .flatMap{ $0.addBy(path: path) }
                     .map{ _ in () }
