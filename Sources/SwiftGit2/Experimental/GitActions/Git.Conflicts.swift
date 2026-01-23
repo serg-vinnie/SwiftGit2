@@ -206,15 +206,16 @@ fileprivate extension GitConflicts {
 
 fileprivate extension String {
     func getSha(side: ConflictSide) -> R<OID> {
-        var row: String? = self
+        let row: String? = self
             .split(separator: "\n")
             .dropFirst(side == .our ? 1 : 2)
             .first?
             .asStr()
         
         return row.asNonOptional
-            .flatMap{ $0.split(bySeparators: [" ","\t"]).dropFirst().first.asNonOptional }
-            .flatMapError{ _ in
+            .map{ $0.split(bySeparators: [" ","\t"]).dropFirst().first }
+            .flatMap{ $0.asNonOptional }
+            .flatMapError{ _ in // fix error of asNonOptional
                 .failure(WTF("Failed to get sha of \(side) submodule conflict"))
             }
             .flatMap { sha in
