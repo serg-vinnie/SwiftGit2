@@ -178,26 +178,24 @@ fileprivate extension GitConflicts {
             .first
             .asNonOptional
         
-        let submodStatusEntriesCount = submodRepoId
+        // Check if there are no changes in Submodule + get "Theirs" oid
+        return submodRepoId
             .flatMap{ $0.repo }
             .flatMap{ $0.status() }
             .map{ $0.count }
-        
-        return getOIDForSubmoduleConflict(path: path, side: side)
+            .flatMap{ repoChangesCount -> R<OID> in
+                if repoChangesCount > 0 {
+                    return .failure(WTF("Cannot resolve conflict as Theirs. There are changes in submodule at location: \(path)"))
+                }
+                
+                return getOIDForSubmoduleConflict(path: path, side: side)
+            }
+            // Resolve conflict as "Ours" in parent repo
+            // + Submodule: soft checkout of  commit with "oid" + discardAll
             .flatMap { oid in
                 resolveConflictAsOur(path: path, type: .submodule)
                     .flatMap { _ in
-                        //Submodule: soft checkout of "oid" + discardAll if there are no changes
-                        combine(submodRepoId, submodStatusEntriesCount)
-                            .flatMap{ input -> R<RepoID> in
-                                let (repoId, repoChangesCount) = input
-                                
-                                if repoChangesCount > 0 {
-                                    return .failure(WTF("Cannot resolve conflict as Theirs. There are changes in submodule at location: \(path)"))
-                                }
-                                
-                                return .success(repoId)
-                            }
+                        submodRepoId
                             .flatMap {
                                 $0.repo.flatMap{ $0.checkout(oid, options: .init()) }
                             }
@@ -205,6 +203,7 @@ fileprivate extension GitConflicts {
                             .flatMap { $0.repo.flatMap{ $0.discardAll() } }
                     }
             }
+            // stage repo with changed submodule
             .flatMap {
                 repoID.repo
                     .flatMap{ $0.addBy(path: path) }
