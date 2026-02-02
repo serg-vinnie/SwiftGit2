@@ -5,7 +5,7 @@ import EssentialsTesting
 
 class MergeAnalysisTests: XCTestCase {
     let root  = TestFolder.git_tests.sub(folder: "MergeAnalysisTests")
-        
+    
     func test_branchSync() {
         let folder = root.sub(folder: "branchSync").cleared().shouldSucceed()!
         
@@ -30,7 +30,7 @@ class MergeAnalysisTests: XCTestCase {
         local.commit(file: .fileC, with: .random, msg: "Commit 3").shouldSucceed()
         
         branchSync = BranchSync.with(our: our, their: their)
-           .shouldSucceed()!
+            .shouldSucceed()!
         
         XCTAssert(branchSync.pull.maybeSuccess?.count == 2)
         XCTAssert(branchSync.push.maybeSuccess?.count == 2)
@@ -129,28 +129,23 @@ class MergeAnalysisTests: XCTestCase {
             .map { $0.hasConflict }
             .assertEqual(to: true, "Pull has conflict")
     }
-    
-    ///////////////////////////////////////////////////////
-    ///RESOLVE FILE THEIR
-    ///////////////////////////////////////////////////////
-    func test_shouldResolveConflict_File_Their() {
-        shouldResolveConflictFile( side: .their, folderName: "conflictResolveTheir")
-    }
-    
+}
+
+///
+/// RESOLVE FILE
+///
+extension MergeAnalysisTests {
     func test_shouldResolveConflict_File_Our() {
         shouldResolveConflictFile( side: .our, folderName: "conflictResolveOur")
     }
     
-    func test_shouldResolveConflict_MarkResolved_File() {
+    func test_shouldResolveConflict_File_Their() {
+        shouldResolveConflictFile( side: .their, folderName: "conflictResolveTheir")
+    }
+    
+    
+    func test_shouldResolveConflict_File_MarkResolved() {
         shouldResolveConflictFile( side: .markAsResolved, folderName: "conflictResolveMarkResolved")
-    }
-    
-    func test_shouldResolveConflictAdvanced_File_Their() {
-        shouldConflictFileAdvanced( side: .their, folderName: "conflictAdvancedResolveTheir")
-    }
-    
-    func test_shouldResolveConflictAdvanced_File_Our() {
-        shouldConflictFileAdvanced( side: .our, folderName: "conflictAdvancedResolveOur")
     }
     
     func shouldResolveConflictFile(side: ConflictSide, folderName: String) {
@@ -160,7 +155,7 @@ class MergeAnalysisTests: XCTestCase {
         
         src.commit(file: .fileA, with: .oneLine1, msg: "File A").shouldSucceed()
         dst.commit(file: .fileA, with: .oneLine2, msg: "File A").shouldSucceed()
-                
+        
         (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .shouldSucceed()
         
@@ -207,6 +202,19 @@ class MergeAnalysisTests: XCTestCase {
         }
         
     }
+}
+
+///
+/// RESOLVE FILE ADVANCED
+///
+extension MergeAnalysisTests {
+    func test_shouldResolveConflictAdvanced_File_Their() {
+        shouldConflictFileAdvanced( side: .their, folderName: "conflictAdvancedResolveTheir")
+    }
+    
+    func test_shouldResolveConflictAdvanced_File_Our() {
+        shouldConflictFileAdvanced( side: .our, folderName: "conflictAdvancedResolveOur")
+    }
     
     func shouldConflictFileAdvanced(side: ConflictSide, folderName: String) {
         let folder = root.sub(folder: folderName)
@@ -236,18 +244,16 @@ class MergeAnalysisTests: XCTestCase {
             .assertEqual(to: true)
         
     }
-    
-    
-    ///////////////////////////////////////////////////////
-    ///RESOLVE SUBMODULE OUR
-    ///////////////////////////////////////////////////////
+}
+
+///
+/// RESOLVE SUBMODULE OUR
+///
+extension MergeAnalysisTests {
     func test_shouldResolveConflict_Submod_Our() {
         shouldResolveConflict_Submodule(side: .our, folderName:"Conflict_Submod_Resolve_Our")
     }
     
-    //
-    // failure because of their conflict resolve doesn't displayed after their resolve
-    // failure is OK at the moment, but need to be fixed later
     func test_shouldResolveConflict_Submod_Their() {
         shouldResolveConflict_Submodule(side: .their, folderName: "Conflict_Submod_Resolve_Their")
     }
@@ -360,9 +366,11 @@ class MergeAnalysisTests: XCTestCase {
 
 
 
+//
+// Helpers
+//
 
-
-extension MergeAnalysisTests {
+fileprivate extension MergeAnalysisTests {
     private func createConflict(subFolder: String) -> TestFolder {
         let folder = root.sub(folder: subFolder)
         let repo1 = folder.with(repo: "repo1", content: .clone(PublicTestRepo().urlSsh, .ssh)).repo.shouldSucceed("repo1 clone")!
