@@ -185,13 +185,14 @@ fileprivate extension GitConflicts {
             .map{ $0.count }
             .flatMap{ repoChangesCount -> R<OID> in
                 if repoChangesCount > 0 {
-                    return .failure(WTF("Cannot resolve conflict as Theirs. There are changes in submodule at location: \(path)"))
+                    return .failure(WTF("Cannot resolve conflict as \(side). There are changes in submodule at location: \(path)"))
                 }
                 
                 return getOIDForSubmoduleConflict(path: path, side: side)
             }
             // Resolve conflict as "Ours" in parent repo
             // + Submodule: soft checkout of  commit with "oid" + discardAll
+            // It is safe as there was no changes
             .flatMap { oid in
                 resolveConflictAsOur(path: path, type: .submodule)
                     .flatMap { _ in

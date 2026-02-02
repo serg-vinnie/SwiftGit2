@@ -213,11 +213,14 @@ class MergeAnalysisTests: XCTestCase {
         let src = folder.with(repo: "src", content: MergeTemplates.c1_our.asRepoContent).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
-        FS.delete(src.url.appendingPathComponent("Ifrit/Levenstain").path)
+        
+        src.url.appendingPathComponent("Ifrit/Levenstain").path.FS.delete()
+            .shouldSucceed()
         
         src.commit(file: MergeTemplates.c2_our.asTestFile, with: MergeTemplates.c2_our.asTestFileContent, msg: "bebebe").shouldSucceed()
         
-        FS.delete(src.url.appendingPathComponent("Ifrit/Levenstain").path)
+        src.url.appendingPathComponent("Ifrit/Levenstain").path.FS.delete()
+            .shouldSucceed()
         
         dst.commit(file: MergeTemplates.c3_their.asTestFile, with: MergeTemplates.c3_their.asTestFileContent, msg: "bebebe2").shouldSucceed()
         
@@ -236,7 +239,7 @@ class MergeAnalysisTests: XCTestCase {
     
     
     ///////////////////////////////////////////////////////
-    ///RESOLVE FILE OUR
+    ///RESOLVE SUBMODULE OUR
     ///////////////////////////////////////////////////////
     func test_shouldResolveConflict_Submod_Our() {
         shouldResolveConflict_Submodule(side: .our, folderName:"Conflict_Submod_Resolve_Our")
