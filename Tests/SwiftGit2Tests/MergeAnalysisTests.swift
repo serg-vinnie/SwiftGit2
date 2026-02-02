@@ -208,12 +208,12 @@ extension MergeAnalysisTests {
 /// RESOLVE FILE ADVANCED
 ///
 extension MergeAnalysisTests {
-    func test_shouldResolveConflictAdvanced_File_Their() {
-        shouldConflictFileAdvanced( side: .their, folderName: "conflictAdvancedResolveTheir")
-    }
-    
     func test_shouldResolveConflictAdvanced_File_Our() {
         shouldConflictFileAdvanced( side: .our, folderName: "conflictAdvancedResolveOur")
+    }
+    
+    func test_shouldResolveConflictAdvanced_File_Their() {
+        shouldConflictFileAdvanced( side: .their, folderName: "conflictAdvancedResolveTheir")
     }
     
     func shouldConflictFileAdvanced(side: ConflictSide, folderName: String) {
@@ -221,21 +221,20 @@ extension MergeAnalysisTests {
         let src = folder.with(repo: "src", content: MergeTemplates.c1_our.asRepoContent).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
         
-        
-        src.url.appendingPathComponent("Ifrit/Levenstain").path.FS.delete()
+        src.url.appendingPathComponent("Ifrit/LevenstAin").path.FS.delete()
             .shouldSucceed()
+        src.repo.flatMap{ $0.stage(.all) }.shouldSucceed()
+        src.commit(file: MergeTemplates.c2_our.asTestFile, with: MergeTemplates.c2_our.asTestFileContent, msg: "bebebeSrc").shouldSucceed()
         
-        src.commit(file: MergeTemplates.c2_our.asTestFile, with: MergeTemplates.c2_our.asTestFileContent, msg: "bebebe").shouldSucceed()
-        
-        src.url.appendingPathComponent("Ifrit/Levenstain").path.FS.delete()
+        dst.url.appendingPathComponent("Ifrit/LevenstAin").path.FS.delete()
             .shouldSucceed()
-        
-        dst.commit(file: MergeTemplates.c3_their.asTestFile, with: MergeTemplates.c3_their.asTestFileContent, msg: "bebebe2").shouldSucceed()
+        dst.repo.flatMap{ $0.stage(.all) }.shouldSucceed()
+        dst.commit(file: MergeTemplates.c3_their.asTestFile, with: MergeTemplates.c3_their.asTestFileContent, msg: "bebebeDst").shouldSucceed()
         
         (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .shouldSucceed()
         
-        // -------------------------------------------------------------------
+        // Advanced conflict created here
         
         let repoID = dst.repoID
         

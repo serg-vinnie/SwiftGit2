@@ -1,9 +1,9 @@
 struct MergeTemplates {
-    static let c1_our = MergeFile(path: "Ifrit/Levenstain", name: "Levenstein.swift", content: main1)
+    static let c1_our   = MergeFile(path: "Ifrit/LevenstAin", name: "LevenstAin.swift", content: main1)
     //new branch
-    static let c2_our = MergeFile(path: "Ifrit/Levenstein", name: "Levenstein.swift", content: main1.replace(of: "Levenstain", to: "Levenstein"))
+    static let c2_our   = MergeFile(path: "Ifrit/LevenstEin", name: "LevenstEin.swift", content: main1.replacing(from: "Levenstain", to: "Levenstein") )
     
-    static let c3_their = MergeFile(path: "Ifrit/Levenstein", name: "Levenstein.swift", content: their1)
+    static let c3_their = MergeFile(path: "Ifrit/LevenstAin", name: "LevenstEin.swift", content: their1)
 }
 
 struct MergeFile {
@@ -88,6 +88,11 @@ public class Levenstain {
 }
 
 """
+
+fileprivate let main2 = """
+
+"""
+
 
 let their1 = """
 import Foundation
