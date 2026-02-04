@@ -26,10 +26,10 @@ public struct GitConflicts {
 }
 
 public extension GitConflicts {
-//    public func all() -> R<[Index.Conflict]> {
-//        repoID.repo.flatMap{ $0.index() }
-//            .flatMap{ $0.conflicts() }
-//    }
+    func all() -> R<[Index.Conflict]> {
+        repoID.repo.flatMap{ $0.index() }
+            .flatMap{ $0.conflicts() }
+    }
     
     func exist() -> R<Bool> {
         repoID.repo.flatMap { $0.index() }
@@ -45,11 +45,12 @@ public extension GitConflicts {
             return resolveConflictAsOur(path: path, type: type)
 //            return resolveConflictSubmodule(path: path, side: .our)
         case .their:
-            if type == .file {
+            switch type{
+            case .file:
                 return resolveConflictAsTheirFile(path: path)
+            case .submodule:
+                return resolveConflictSubmodule(path: path, side: .their)
             }
-            
-            return resolveConflictSubmodule(path: path, side: .their)
         }
     }
     
@@ -89,7 +90,14 @@ fileprivate extension GitConflicts {
         switch type {
         case .file:
              return conflictRemoveR
-                | { _ in GitDiscard(repoID: repoID).path(path) }
+                .flatMap { $0.entries() }
+            | { entries in
+                if entries.map({$0.path}).contains(path) {
+                    return GitDiscard(repoID: repoID).path(path)
+                } else {
+                    return.success(())
+                }
+            }
             
         case .submodule:
             return conflictRemoveR

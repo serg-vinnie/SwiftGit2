@@ -1,18 +1,20 @@
 struct MergeTemplates {
-    static let c1_our   = MergeFile(path: "Ifrit/LevenstAin", name: "LevenstAin.swift", content: main1)
+    static let c1_our   = MergeFile(location: "Ifrit/LevenstAin", name: "LevenstAin.swift", content: main1)
     //new branch
-    static let c2_our   = MergeFile(path: "Ifrit/LevenstEin", name: "LevenstEin.swift", content: main1.replacing(from: "Levenstain", to: "Levenstein") )
+    static let c2_our   = MergeFile(location: "Ifrit/LevenstEin", name: "LevenstEin.swift", content: main1.replacing(from: "Levenstain", to: "Levenstein") )
     
-    static let c3_their = MergeFile(path: "Ifrit/LevenstAin", name: "LevenstEin.swift", content: their1)
+    static let c3_their = MergeFile(location: "Ifrit/LevenstAin", name: "LevenstEin.swift", content: their1)
 }
 
 struct MergeFile {
-    let path: String
+    let location: String
     let name: String
     let content: String
     
+    var path: String { "\(location)/\(name)"}
+    
     var asTestFile: TestFile {
-        .customFile("\(path)/\(name)")
+        .customFile("\(location)/\(name)")
     }
     
     var asTestFileContent: TestFileContent {

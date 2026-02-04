@@ -209,11 +209,11 @@ extension MergeAnalysisTests {
 ///
 extension MergeAnalysisTests {
     func test_shouldResolveConflictAdvanced_File_Our() {
-        shouldConflictFileAdvanced( side: .our, folderName: "conflictAdvancedResolveOur")
+        shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveOur")
     }
     
     func test_shouldResolveConflictAdvanced_File_Their() {
-        shouldConflictFileAdvanced( side: .their, folderName: "conflictAdvancedResolveTheir")
+        shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveTheir")
     }
     
     func shouldConflictFileAdvanced(side: ConflictSide, folderName: String) {
@@ -231,7 +231,7 @@ extension MergeAnalysisTests {
         dst.repo.flatMap{ $0.stage(.all) }.shouldSucceed()
         dst.commit(file: MergeTemplates.c3_their.asTestFile, with: MergeTemplates.c3_their.asTestFileContent, msg: "bebebeDst").shouldSucceed()
         
-        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local ) })
             .shouldSucceed()
         
         // Advanced conflict created here
@@ -242,6 +242,33 @@ extension MergeAnalysisTests {
             .exist()
             .assertEqual(to: true)
         
+        let conflicts = GitConflicts(repoID: repoID)
+            .all()
+            .maybeSuccess!
+        
+        XCTAssertEqual(conflicts.count, 1)
+        
+        GitConflicts(repoID: repoID)
+            .resolve(path: "Ifrit/LevenstEin/LevenstEin.swift", side: side, type: .file)
+            .shouldSucceed()
+        
+        GitConflicts(repoID: repoID)
+            .exist()
+            .assertEqual(to: false)
+        
+        //
+        // It's OK that it's failing now, but need to fix in future
+        //
+        //        діскард що я реалізував після резолва конфлікта asOur в певних ситуаціях залишає ось таку папочку (не завжди)
+        //        я боюсь її автоматично ремувити з індекса - тому що в теорії там можуть законфліктитися декілька файлів по подібній схемі і якщо я автоматом його приберу - я не знаю які в цього будуть наслідки для індекса/репозиторія.
+        //
+        //        Тут 2 варіанти:
+        //        * Це рідкісна ситуація тож надаємо юзеру необхідність зробити зайвий клік самостійно і не ліземо
+        //        * написати на це окремий тест і потім написати функціонал автоматичного безпечного уникнення даної ситуації. На це може піти спокійно ще пів дня.
+        //
+        //        Я вважаю що 2й варіант нерезонний і ліпше підемо першим варіком.
+        let repoEntries = dst.repoID.repo.flatMap{ $0.status() }.map{ $0.filter { $0.stagePath == "Ifrit/" } }.maybeSuccess!
+        XCTAssertFalse(repoEntries.count == 1)
     }
 }
 

@@ -29,12 +29,14 @@ public enum MergeResult {
 public struct PullOptions {
     public var signature : Signature
     public var fetch : FetchOptions
-    public var checkoutProgress: CheckoutProgressBlock?    = nil
-    public var mergeOptions : MergeOptions                 = MergeOptions()
+    public var checkoutProgress: CheckoutProgressBlock?
+    public var mergeOptions : MergeOptions
     
-    public init(signature: Signature, fetch: FetchOptions) {
+    public init(signature: Signature, fetch: FetchOptions, checkoutProgress: CheckoutProgressBlock? = nil, mergeOptions: MergeOptions = MergeOptions()) {
         self.signature = signature
         self.fetch     = fetch
+        self.checkoutProgress = nil
+        self.mergeOptions = mergeOptions
     }
 }
 
@@ -42,7 +44,7 @@ public extension Repository {
     func pull(refspec: [String], _ target: BranchTarget, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
         return combine(fetch(refspec: refspec, target, options: options.fetch), mergeAnalysisUpstream(target))
             .flatMap { branch, anal in
-                self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options, stashing: stashing)
+                return self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options, stashing: stashing)
             }
     }
     
@@ -53,19 +55,25 @@ public extension Repository {
             .upstream()
         
         if anal.contains(.fastForward) || anal.contains(.unborn) {
-            /////////////////////////////////////
+            //
             // FAST-FORWARD MERGE
+            //
             
             return theirReference | { self.mergeFastForward(our: ourLocal, their: $0, options: options,
                                                             stashing: stashing) }
         } else if anal.contains(.normal) {
-            /////////////////////////////////
+            //
             // THREE-WAY MERGE
-            
-            return theirReference | { mergeThreeWay(our: ourLocal, their: $0, options: options,
-                                                    stashing: stashing) }
+            //
+//            ourLocal
+            //git  feature
+            return theirReference | { their in
+                mergeThreeWayCli(our: ourLocal, their: their, options: options, stashing: stashing)
+                // works bad
+                // mergeThreeWay(our: ourLocal, their: their, options: options, stashing: stashing)
+            }
         }
-
+        
         return .failure(WTF("pull: unexpected MergeAnalysis value: \(anal.rawValue)"))
     }
 
@@ -83,6 +91,74 @@ public extension Repository {
         }
     }
     
+    
+    
+    private func mergeThreeWayCli(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
+        let theirName = their.nameAsReference
+        
+        return self.repoID.flatMap{ repoID in
+            XR.Shell.Git(repoID: repoID )
+                .run(args: ["merge", theirName])
+        }
+        .flatMap { str -> R<MergeResult> in
+            if str.contains("Automatic merge failed") { // must be first
+                return self.index().map {
+                    MergeResult.threeWayConflict($0)
+                }
+            } else if str.contains("Fast-forward") {
+                return .success(MergeResult.fastForward)
+            } else if str.contains("Already up to date") {
+                return .success(MergeResult.upToDate)
+            } else if str.contains("'recursive' strategy") {
+                // possibly last is best, but must be after "failed" at least
+                return .success(MergeResult.threeWaySuccess)
+            }
+            
+            return .failure(WTF(str))
+        }
+    }
+}
+
+private extension Result where Success == OID, Failure == Error {
+    func tree(_ repo: Repository) -> Result<Tree, Error> {
+        self | { repo.commit(oid: $0) } | { $0.tree() }
+    }
+}
+
+public extension Index {
+    func commit(into repo: Repository, signature: Signature, message: String, parents: [Commit]) -> Result<Void, Error> {
+        writeTree(to: repo)
+            | { tree in repo.commitCreate(signature: signature, message: message, tree: tree, parents: parents) }
+            | { _ in () }
+    }
+}
+
+extension MergeResult: Equatable {
+    public var hasConflict: Bool {
+        if case .threeWayConflict = self {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    public static func == (lhs: MergeResult, rhs: MergeResult) -> Bool {
+        switch (lhs, rhs) {
+        case (.upToDate, .upToDate): return true
+        case (.fastForward, .fastForward): return true
+        case (.threeWaySuccess, .threeWaySuccess): return true
+        default:
+            return false
+        }
+    }
+}
+
+
+//
+// DEPRECATED
+//
+fileprivate extension Repository {
+    @available(*, deprecated, message: "Works bad. Check test_shouldResolveConflictAdvanced_File_Our or test_shouldResolveConflictAdvanced_File_Their")
     private func mergeThreeWay(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
         let repo = self
         let ourOID   = our.target_resut
@@ -143,39 +219,5 @@ public extension Repository {
                         | { _ in stasher | { $0.pop() } }
                         | { _ in .threeWaySuccess }
                 })
-    }
-}
-
-private extension Result where Success == OID, Failure == Error {
-    func tree(_ repo: Repository) -> Result<Tree, Error> {
-        self | { repo.commit(oid: $0) } | { $0.tree() }
-    }
-}
-
-public extension Index {
-    func commit(into repo: Repository, signature: Signature, message: String, parents: [Commit]) -> Result<Void, Error> {
-        writeTree(to: repo)
-            | { tree in repo.commitCreate(signature: signature, message: message, tree: tree, parents: parents) }
-            | { _ in () }
-    }
-}
-
-extension MergeResult: Equatable {
-    public var hasConflict: Bool {
-        if case .threeWayConflict = self {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    public static func == (lhs: MergeResult, rhs: MergeResult) -> Bool {
-        switch (lhs, rhs) {
-        case (.upToDate, .upToDate): return true
-        case (.fastForward, .fastForward): return true
-        case (.threeWaySuccess, .threeWaySuccess): return true
-        default:
-            return false
-        }
     }
 }
