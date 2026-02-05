@@ -83,7 +83,7 @@ public extension Repository {
     }
 
     private func mergeFastForward(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
-        let targetOID = their.target_resut
+        let targetOID = their.target_result
         
         let message = "pull: Fast-forward \(their.nameAsReferenceCleaned) -> \(our.nameAsReferenceCleaned)"
         
@@ -101,26 +101,59 @@ public extension Repository {
     private func mergeThreeWayCli(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
         let theirName = their.nameAsReference
         
-        return self.repoID.flatMap{ repoID in
-            XR.Shell.Git(repoID: repoID )
-                .run(args: ["merge", theirName])
+        // CLI already generate message for merge, so no need to create it here with code
+        
+        let stasher: R<GitStasher>
+        if stashing {
+            stasher = GitStasher.init(repo: self, state: .tag("pull-merge")).push()
+        } else {
+            stasher = .success(.init(repo: self, state: .empty))
         }
-        .flatMap { str -> R<MergeResult> in
-            if str.contains("Automatic merge failed") { // must be first
-                return self.index().map {
-                    MergeResult.threeWayConflict($0)
+        
+        if case .failure(let error) = stasher {
+            return .failure(error)
+        }
+        
+        return combine(self.repoID.flatMap{ $0.HEAD }.flatMap{ $0.asOID }, our.target_result)
+            .flatMap{ (headOID,ourOID) -> R<()> in
+                if headOID != ourOID {
+                    return self.repoID
+                        .flatMap{ $0.repo }
+                        .flatMap{ repo in
+                            repo.checkout(ourOID, options: .init())
+                                .flatMap { _ in repo.detachedHeadFix() }
+                                .map{ _ in () }
+                        }
+                } else {
+                    return .success(())
                 }
-            } else if str.contains("Fast-forward") {
-                return .success(MergeResult.fastForward)
-            } else if str.contains("Already up to date") {
-                return .success(MergeResult.upToDate)
-            } else if str.contains("'recursive' strategy") {
-                // possibly last is best, but must be after "failed" at least
-                return .success(MergeResult.threeWaySuccess)
             }
-            
-            return .failure(WTF(str))
-        }
+            .flatMap{ self.repoID }
+            .flatMap{ repoID in
+                XR.Shell.Git(repoID: repoID )
+                    .run(args: ["merge", theirName])
+            }
+            .flatMap { str -> R<MergeResult> in
+                if str.contains("Automatic merge failed") { // must be first
+                    return self.index().map {
+                        MergeResult.threeWayConflict($0)
+                    }
+                } else if str.contains("Already up to date") {
+                    return .success(MergeResult.upToDate)
+                } else if str.contains("Fast-forward") {
+                    return .success(MergeResult.fastForward)
+                } else if str.contains("'recursive' strategy") {
+                    // possibly last is best, but must be after "failed" at least
+                    return .success(MergeResult.threeWaySuccess)
+                }
+                
+                return .failure(WTF(str))
+            }
+            .flatMap { mergeResult in
+                return stasher
+                    .map { $0.pop() }
+                    .map{ _ in mergeResult }
+            }
     }
 }
 
@@ -172,8 +205,8 @@ fileprivate extension Repository {
     @available(*, deprecated, message: "Works bad. Check test_shouldResolveConflictAdvanced_File_Our or test_shouldResolveConflictAdvanced_File_Their")
     private func mergeThreeWay(our: Branch, their: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
         let repo = self
-        let ourOID   = our.target_resut
-        let theirOID = our.upstream()            | { $0.target_resut }
+        let ourOID   = our.target_result
+        let theirOID = our.upstream()            | { $0.target_result }
         let baseOID  = combine(ourOID, theirOID) | { self.mergeBase(one: $0, two: $1) }
         
         let message = baseOID

@@ -208,21 +208,20 @@ extension MergeAnalysisTests {
 /// RESOLVE FILE ADVANCED
 ///
 extension MergeAnalysisTests {
-    func test_shouldResolveConflictAdvanced_File_Our_cli() {
-        shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveCliOur", merge3way: .cli)
-    }
-    
-    func test_shouldResolveConflictAdvanced_File_Their_cli() {
-        shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveCliTheir", merge3way: .cli)
-    }
-    
-    
     func test_shouldResolveConflictAdvanced_File_Our_swifGit2() {
         shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveSG2Our", merge3way: .swiftGit2)
     }
     
     func test_shouldResolveConflictAdvanced_File_Their_swifGit2() {
         shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveSG2Their", merge3way: .swiftGit2)
+    }
+    
+    func test_shouldResolveConflictAdvanced_File_Our_cli() {
+        shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveCliOur", merge3way: .cli)
+    }
+    
+    func test_shouldResolveConflictAdvanced_File_Their_cli() {
+        shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveCliTheir", merge3way: .cli)
     }
     
     func shouldConflictFileAdvanced(side: ConflictSide, folderName: String, merge3way: MergeThreeWay) {

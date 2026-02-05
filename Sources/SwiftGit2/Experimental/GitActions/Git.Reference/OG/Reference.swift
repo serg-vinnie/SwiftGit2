@@ -42,7 +42,7 @@ public extension Reference {
         }
         return .failure(WTF("asBranch() failed for \(nameAsReference)"))
     }
-
+    
     @available(*, deprecated, message: "use asBranch() instead")
     var asBranch_: Branch? {
         if isBranch || isRemote {
@@ -72,7 +72,7 @@ public extension Reference {
 //        }
 //    }
     
-    var target_resut : R<OID> {
+    var target_result : R<OID> {
         target.asNonOptional("reference.target : OID")
     }
     
@@ -148,7 +148,7 @@ public extension Duo where T1 == Reference, T2 == Repository {
         if ref.isSymbolic {
             return ref.nameAsReferenceSymbolic.asNonOptional | { repo.referenceTarget(name: $0) }
         } else {
-            return ref.target_resut
+            return ref.target_result
         }
     }
     

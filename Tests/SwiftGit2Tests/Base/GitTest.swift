@@ -42,7 +42,9 @@ extension FetchOptions {
 }
 
 extension PullOptions {
-    static var local : PullOptions { PullOptions(signature: GitTest.signature, fetch: .local) }
+    static var local : PullOptions {
+        PullOptions(signature: GitTest.signature, fetch: .local)
+    }
     static var ssh   : PullOptions { PullOptions(signature: GitTest.signature, fetch: .ssh) }
 }
 

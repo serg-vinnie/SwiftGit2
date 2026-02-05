@@ -118,7 +118,7 @@ public extension ReferenceID {
         guard isTag else { return .wtf("not a tag") }
         
         let repo = repoID.repo
-        let oid = repo | { $0.reference(name: name) } | { $0.target_resut }
+        let oid = repo | { $0.reference(name: name) } | { $0.target_result }
         let tag = combine(repo, oid) | { $0.tagLookup(oid: $1) }
         
         return tag.map { .annotated($0) }
