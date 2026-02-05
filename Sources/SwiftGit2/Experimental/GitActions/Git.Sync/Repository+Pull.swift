@@ -41,14 +41,14 @@ public struct PullOptions {
 }
 
 public extension Repository {    
-    func pull(refspec: [String], _ target: BranchTarget, options: PullOptions, stashing: Bool = false) -> Result<MergeResult, Error> {
+    func pull(refspec: [String], _ target: BranchTarget, options: PullOptions, stashing: Bool = false, merge3way: MergeThreeWay = .swiftGit2) -> Result<MergeResult, Error> {
         return combine(fetch(refspec: refspec, target, options: options.fetch), mergeAnalysisUpstream(target))
             .flatMap { branch, anal in
-                return self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options, stashing: stashing)
+                return self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options, stashing: stashing, merge3way: merge3way)
             }
     }
     
-    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool) -> R<MergeResult> {
+    private func mergeFromUpstream(anal: MergeAnalysis, ourLocal: Branch, options: PullOptions, stashing: Bool, merge3way: MergeThreeWay) -> R<MergeResult> {
         guard !anal.contains(.upToDate) else { return .success(.upToDate) }
         
         let theirReference = ourLocal
@@ -65,12 +65,17 @@ public extension Repository {
             //
             // THREE-WAY MERGE
             //
+            
 //            ourLocal
             //git  feature
-            return theirReference | { their in
-                mergeThreeWayCli(our: ourLocal, their: their, options: options, stashing: stashing)
-                // works bad
-                // mergeThreeWay(our: ourLocal, their: their, options: options, stashing: stashing)
+            return theirReference | { their -> R<MergeResult> in
+                switch merge3way {
+                case .cli:
+                    return mergeThreeWayCli(our: ourLocal, their: their, options: options, stashing: stashing)
+                case .swiftGit2:
+                    // works bad
+                    return mergeThreeWay(our: ourLocal, their: their, options: options, stashing: stashing)
+                }
             }
         }
         
@@ -151,6 +156,12 @@ extension MergeResult: Equatable {
             return false
         }
     }
+}
+
+
+public enum MergeThreeWay {
+    case swiftGit2
+    case cli
 }
 
 

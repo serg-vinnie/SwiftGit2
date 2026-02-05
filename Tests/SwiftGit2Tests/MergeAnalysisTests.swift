@@ -208,15 +208,24 @@ extension MergeAnalysisTests {
 /// RESOLVE FILE ADVANCED
 ///
 extension MergeAnalysisTests {
-    func test_shouldResolveConflictAdvanced_File_Our() {
-        shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveOur")
+    func test_shouldResolveConflictAdvanced_File_Our_cli() {
+        shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveCliOur", merge3way: .cli)
     }
     
-    func test_shouldResolveConflictAdvanced_File_Their() {
-        shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveTheir")
+    func test_shouldResolveConflictAdvanced_File_Their_cli() {
+        shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveCliTheir", merge3way: .cli)
     }
     
-    func shouldConflictFileAdvanced(side: ConflictSide, folderName: String) {
+    
+    func test_shouldResolveConflictAdvanced_File_Our_swifGit2() {
+        shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveSG2Our", merge3way: .swiftGit2)
+    }
+    
+    func test_shouldResolveConflictAdvanced_File_Their_swifGit2() {
+        shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveSG2Their", merge3way: .swiftGit2)
+    }
+    
+    func shouldConflictFileAdvanced(side: ConflictSide, folderName: String, merge3way: MergeThreeWay) {
         let folder = root.sub(folder: folderName)
         let src = folder.with(repo: "src", content: MergeTemplates.c1_our.asRepoContent).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
@@ -231,7 +240,7 @@ extension MergeAnalysisTests {
         dst.repo.flatMap{ $0.stage(.all) }.shouldSucceed()
         dst.commit(file: MergeTemplates.c3_their.asTestFile, with: MergeTemplates.c3_their.asTestFileContent, msg: "bebebeDst").shouldSucceed()
         
-        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local ) })
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local, merge3way: merge3way ) })
             .shouldSucceed()
         
         // Advanced conflict created here
