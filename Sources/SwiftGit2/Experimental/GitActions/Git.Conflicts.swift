@@ -90,14 +90,16 @@ fileprivate extension GitConflicts {
         switch type {
         case .file:
              return conflictRemoveR
-                .flatMap { $0.entries() }
-            | { entries in
-                if entries.map({$0.path}).contains(path) {
-                    return GitDiscard(repoID: repoID).path(path)
-                } else {
-                    return.success(())
+                .flatMap { _ in repoID.repo }
+                .flatMap { $0.status() }
+                .map { $0.map{ $0.stagePath } }
+                .flatMap{ statusPaths in
+                    if statusPaths.contains(path) {
+                        return GitDiscard(repoID: repoID).path(path)
+                    } else {
+                        return.success(())
+                    }
                 }
-            }
             
         case .submodule:
             return conflictRemoveR

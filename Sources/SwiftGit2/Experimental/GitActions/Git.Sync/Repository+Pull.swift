@@ -41,7 +41,7 @@ public struct PullOptions {
 }
 
 public extension Repository {    
-    func pull(refspec: [String], _ target: BranchTarget, options: PullOptions, stashing: Bool = false, merge3way: MergeThreeWay = .swiftGit2) -> Result<MergeResult, Error> {
+    func pull(refspec: [String], _ target: BranchTarget, options: PullOptions, stashing: Bool = false, merge3way: MergeThreeWay = .cli) -> Result<MergeResult, Error> {
         return combine(fetch(refspec: refspec, target, options: options.fetch), mergeAnalysisUpstream(target))
             .flatMap { branch, anal in
                 return self.mergeFromUpstream(anal: anal, ourLocal: branch, options: options, stashing: stashing, merge3way: merge3way)
@@ -114,6 +114,8 @@ public extension Repository {
             return .failure(error)
         }
         
+        let successStrs = ["recursive","ort","octopus","resolve","ours"].map{ "made by the '\($0)' strategy"}
+        
         return combine(self.repoID.flatMap{ $0.HEAD }.flatMap{ $0.asOID }, our.target_result)
             .flatMap{ (headOID,ourOID) -> R<()> in
                 if headOID != ourOID {
@@ -142,7 +144,7 @@ public extension Repository {
                     return .success(MergeResult.upToDate)
                 } else if str.contains("Fast-forward") {
                     return .success(MergeResult.fastForward)
-                } else if str.contains("'recursive' strategy") {
+                } else if str.contains(oneOf: successStrs) {
                     // possibly last is best, but must be after "failed" at least
                     return .success(MergeResult.threeWaySuccess)
                 }

@@ -26,14 +26,13 @@ public extension GitCommit {
     
     func getLastCommitsDescrForUser(name: String, email: String, count: Int = 10) -> R<[String]> {
         repoID.repo
-            .flatMap{ $0.commitsFromHead(num:300) }
+            .flatMap{ $0.commitsFromHead(num: 300) }
             .map {
                 $0.filter{ $0.commiter.name.asString() == name || $0.commiter.email.asString() == email }
             }
             .map{ $0.map{ $0.description } }
             .map{ $0.filter { !$0.contains("MERGE") } }
             .map{ $0.distinct() }
-            .map{ $0.reversed() }
             .map{ $0.first(count).map{ $0 } }
     }
 }

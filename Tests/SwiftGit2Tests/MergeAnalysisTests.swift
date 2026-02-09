@@ -143,7 +143,6 @@ extension MergeAnalysisTests {
         shouldResolveConflictFile( side: .their, folderName: "conflictResolveTheir")
     }
     
-    
     func test_shouldResolveConflict_File_MarkResolved() {
         shouldResolveConflictFile( side: .markAsResolved, folderName: "conflictResolveMarkResolved")
     }
@@ -164,8 +163,9 @@ extension MergeAnalysisTests {
         let repoID = dst.repoID
         
         GitConflicts(repoID: repoID)
-            .exist()
-            .assertEqual(to: true)
+            .all()
+            .map{ $0.count }
+            .assertEqual(to: 1)
         
         let path = TestFile.fileA.fileName
         
@@ -197,7 +197,7 @@ extension MergeAnalysisTests {
             
         case .markAsResolved:
             repoID.url.appendingPathComponent(path).readToString
-                .map{ $0.contains("||||||| ancestor") }
+                .map{ $0.contains("<<<<<<<") || $0.contains("|||||||") }
                 .assertEqual(to: true, "Content is correct")
         }
         
@@ -336,12 +336,16 @@ extension MergeAnalysisTests {
         (dst.repo | { $0.commit(message: "update sub repo to commit 3", signature: .test) })
             .shouldSucceed()
         
-        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
+        // must be "merge3way: .swiftGit2"
+        // because of .cli version do automerge of submodule by latest date/time
+        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local, merge3way: .swiftGit2) })
             .shouldSucceed()
         
         let repoID = RepoID(url: dst.url )
         
+        // can be nil if you used .cli version of pull
         let oidOur   = GitConflicts(repoID: repoID).getOIDForSubmoduleConflict(path: subRepo, side: .our).maybeSuccess!
+        // can be nil if you used .cli version of pull
         let oidTheir = GitConflicts(repoID: repoID).getOIDForSubmoduleConflict(path: subRepo, side: .their).maybeSuccess!
         
         GitConflicts(repoID: repoID)

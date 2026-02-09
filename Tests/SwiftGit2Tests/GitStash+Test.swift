@@ -100,7 +100,7 @@ class GitStashTests: XCTestCase {
         
         (repoID.repo | { $0.t_write(file: .fileA, with: .random) })
             .shouldSucceed()
-
+        
         GitSync(repoID: repoID).pull(refspec: [], .HEAD, options: .local, stashing: true)
             .shouldSucceed()
         
