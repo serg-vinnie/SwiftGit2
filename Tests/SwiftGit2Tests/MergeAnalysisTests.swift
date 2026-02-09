@@ -208,10 +208,13 @@ extension MergeAnalysisTests {
 /// RESOLVE FILE ADVANCED
 ///
 extension MergeAnalysisTests {
+    
+    //should fail, this is OK
     func test_shouldResolveConflictAdvanced_File_Our_swifGit2() {
         shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveSG2Our", merge3way: .swiftGit2)
     }
     
+    //should fail, this is OK
     func test_shouldResolveConflictAdvanced_File_Their_swifGit2() {
         shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveSG2Their", merge3way: .swiftGit2)
     }

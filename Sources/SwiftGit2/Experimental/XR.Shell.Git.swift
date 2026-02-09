@@ -24,10 +24,16 @@ public extension XR.Shell {
 //            return shell.run(args: args, waitUntilExit: false).outputAsString
 //        }
         public func run(args: [String]?) -> R<String> {
-            let binPath = Bundle.main.path(forAuxiliaryExecutable: "git") ?? "/usr/bin/git"
-//            guard  else {
-//                return .failure(WTF("can't resolve Auxiliary Executable git"))
-//            }
+            var binPath = Bundle.main.path(forAuxiliaryExecutable: "git")
+            
+            if binPath == nil {
+                binPath = "/usr/bin/git"
+                print("Can't resolve Auxiliary Executable git, so will be used /usr/bin/git")
+            }
+            
+            guard let binPath else {
+                return .failure(WTF("can't resolve Auxiliary Executable git + no git in /usr/bin/git"))
+            }
             
             let shell = XR.Shell(cmd: binPath, workDir: workDir)
             
