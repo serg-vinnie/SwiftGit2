@@ -208,7 +208,6 @@ extension MergeAnalysisTests {
 /// RESOLVE FILE ADVANCED
 ///
 extension MergeAnalysisTests {
-    
     //should fail, this is OK
     func test_shouldResolveConflictAdvanced_File_Our_swifGit2() {
         shouldConflictFileAdvanced(side: .our,   folderName: "conflictAdvancedResolveSG2Our", merge3way: .swiftGit2)
@@ -217,6 +216,10 @@ extension MergeAnalysisTests {
     //should fail, this is OK
     func test_shouldResolveConflictAdvanced_File_Their_swifGit2() {
         shouldConflictFileAdvanced(side: .their, folderName: "conflictAdvancedResolveSG2Their", merge3way: .swiftGit2)
+    }
+    
+    func test_shouldResolveConflictAdvanced_File_MarkResolved_cli() {
+        shouldConflictFileAdvanced(side: .markAsResolved, folderName: "conflictAdvancedMarkAsResolvedCli", merge3way: .cli)
     }
     
     func test_shouldResolveConflictAdvanced_File_Our_cli() {
@@ -266,6 +269,35 @@ extension MergeAnalysisTests {
         GitConflicts(repoID: repoID)
             .exist()
             .assertEqual(to: false)
+        
+        switch side {
+        case .markAsResolved:
+            repoID.url.appendingPathComponent("Ifrit/LevenstEin/LevenstEin.swift").readToString
+                .map{ $0.contains("<<<<<<<") || $0.contains("|||||||") }
+                .assertEqual(to: true, "Content is correct")
+        case .our:
+            // need to rewrite
+            repoID.url.appendingPathComponent("Ifrit/LevenstEin/LevenstEin.swift").readToString
+                .assertEqual(to: MergeTemplates.c2_our.asTestFileContent.content)
+            
+            repoID.repo
+                .flatMap { $0.status() }
+                .map { $0.count == 0 }
+                .assertEqual(to: true , "After --resolve as OUR-- must be 0 file with changes")
+            
+        case .their:
+            // need to rewrite
+            repoID.url.appendingPathComponent("Ifrit/LevenstAin/LevenstEin.swift").readToString
+                .assertEqual(to: TestFileContent.oneLine1.content)
+            
+            repoID.repo
+                .flatMap { $0.status() }
+                .map { $0.count == 1 }
+                .assertEqual(to: true , "After --resolve as THEIR-- must be 1 file with changes")
+        }
+        
+        
+        
         
         //
         // It's OK that it's failing now, but need to fix in future
