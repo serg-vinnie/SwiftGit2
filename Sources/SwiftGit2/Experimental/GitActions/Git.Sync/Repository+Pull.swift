@@ -117,7 +117,7 @@ public extension Repository {
         let successStrs = ["recursive","ort","octopus","resolve","ours"].map{ "made by the '\($0)' strategy"}
         
         return combine(self.repoID.flatMap{ $0.HEAD }.flatMap{ $0.asOID }, our.target_result)
-            .flatMap{ (headOID,ourOID) -> R<()> in
+            .flatMap{ (headOID, ourOID) -> R<()> in
                 if headOID != ourOID {
                     return self.repoID
                         .flatMap{ $0.repo }
