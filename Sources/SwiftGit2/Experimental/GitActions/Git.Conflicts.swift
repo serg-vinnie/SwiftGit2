@@ -245,6 +245,9 @@ fileprivate extension GitConflicts {
         var index = repo | { $0.index() }
         
         let submodCommitOid = index
+            // be careful
+            // conflict instance can be destroyed in case of "index" will be destroyed
+            // or "conflict iterator" will be destroyed
             .flatMap { $0.conflict(relPath: path) }
             .map { $0.their?.oid }
             .flatMap { $0.asNonOptional }

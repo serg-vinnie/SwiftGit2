@@ -84,7 +84,7 @@ public extension Index {
         }
     }
     
-    /// Works bad with advanced conflicts
+    @available(*, deprecated, message: "Works bad with advanced conflicts")
     func conflictResolve(relPath: String, asSide side: ConflictEntries) -> R<Index> {
         var entry: R<Index.Entry?>
         
@@ -110,6 +110,9 @@ public extension Index {
         return result
     }
     
+    // be careful
+    // conflict instance can be destroyed in case of "index" will be destroyed
+    // or "conflict iterator" will be destroyed
     func conflict(relPath: String) -> R<Conflict> {
         let c = Conflict()
         
