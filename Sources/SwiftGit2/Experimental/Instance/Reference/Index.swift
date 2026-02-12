@@ -110,7 +110,7 @@ public extension Index {
         return result
     }
     
-    private func conflict(relPath: String) -> R<Conflict> {
+    func conflict(relPath: String) -> R<Conflict> {
         let c = Conflict()
         
         return _result({
