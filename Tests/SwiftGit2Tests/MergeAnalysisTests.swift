@@ -300,22 +300,8 @@ extension MergeAnalysisTests {
                 .assertEqual(to: true , "After --resolve as THEIR-- must be 1 file with changes")
         }
         
-        
-        
-        
-        //
-        // It's OK that it's failing now, but need to fix in future
-        //
-        //        діскард що я реалізував після резолва конфлікта asOur в певних ситуаціях залишає ось таку папочку (не завжди)
-        //        я боюсь її автоматично ремувити з індекса - тому що в теорії там можуть законфліктитися декілька файлів по подібній схемі і якщо я автоматом його приберу - я не знаю які в цього будуть наслідки для індекса/репозиторія.
-        //
-        //        Тут 2 варіанти:
-        //        * Це рідкісна ситуація тож надаємо юзеру необхідність зробити зайвий клік самостійно і не ліземо
-        //        * написати на це окремий тест і потім написати функціонал автоматичного безпечного уникнення даної ситуації. На це може піти спокійно ще пів дня.
-        //
-        //        Я вважаю що 2й варіант нерезонний і ліпше підемо першим варіком.
-//        let repoEntries = dst.repoID.repo.flatMap{ $0.status() }.map{ $0.filter { $0.stagePath == "Ifrit/" } }.maybeSuccess!
-//        XCTAssertFalse(repoEntries.count == 1)
+        let repoEntries = dst.repoID.repo.flatMap{ $0.status() }.map{ $0.filter { $0.stagePath == "Ifrit/" } }.maybeSuccess!
+        XCTAssertFalse(repoEntries.count == 1)
     }
 }
 
@@ -372,12 +358,12 @@ extension MergeAnalysisTests {
 //        XCTAssertTrue(firstConflict3.their != nil )
         
         let all = gitConflicts
-            .allConflictIds()
+            .allConflictPaths()
             .maybeSuccess!
         
-        let firstConflict4 = all.first!
+        let firstConflict4 = all.first
         
-        XCTAssertTrue(firstConflict4.path != nil)
+        XCTAssertTrue(firstConflict4 != nil)
     }
 }
 

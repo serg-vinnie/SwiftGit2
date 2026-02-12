@@ -21,37 +21,23 @@ internal extension Index {
             git_index_conflict_iterator_free(pointer)
         }
         
-        func next() -> Result<Conflict?,Error> {
-            let c = Conflict()
-            let result = git_index_conflict_next(&c._ancestor, &c._our, &c._their, self.pointer)
+        func next() -> Result<String?,Error> {
+            var _their      : UnsafePointer<git_index_entry>?
+            var _our        : UnsafePointer<git_index_entry>?
+            var _ancestor   : UnsafePointer<git_index_entry>?
+            
+            let result = git_index_conflict_next(&_ancestor, &_our, &_their, self.pointer)
             if result == GIT_OK.rawValue {
-                return .success(c)
+                return .success( pathFromConflict(their: _their, our: _our, ancestor: _ancestor) )
             } else if result == GIT_ITEROVER.rawValue {
                 return .success(nil)
             }
+            
             return .failure(NSError(gitError: result, pointOfFailure: "git_index_conflict_next"))
         }
     }
     
     // ResultIterator.all() -> Result<[Success], Error>
-}
-
-public extension Index {
-    class Conflict {
-        fileprivate var _their      : UnsafePointer<git_index_entry>?
-        fileprivate var _our        : UnsafePointer<git_index_entry>?
-        fileprivate var _ancestor   : UnsafePointer<git_index_entry>?
-        
-        public var our     : Index.Entry? {
-            return _our.asNonOptional.map{ Index.Entry(entry: $0.pointee) }.maybeSuccess
-        }
-        public var their   : Index.Entry? {
-            return _their.asNonOptional.map{ Index.Entry(entry: $0.pointee) }.maybeSuccess
-        }
-        public var ancestor: Index.Entry? {
-            return _ancestor.asNonOptional.map{ Index.Entry(entry: $0.pointee) }.maybeSuccess
-        }
-    }
 }
 
 extension Index : CustomDebugStringConvertible, CustomStringConvertible {
@@ -67,17 +53,12 @@ extension Index : CustomDebugStringConvertible, CustomStringConvertible {
     }
 }
 
-extension Index.Conflict : CustomDebugStringConvertible, CustomStringConvertible {
-    public var description: String {
-        debugDescription
-    }
-    
-    public var debugDescription: String {
-        if let path = _their?.pointee.path {
-            return String(cString: path)
-        }
-        return "WTF"
-    }
-    
-    
+//
+// Helpers
+//
+
+fileprivate func pathFromConflict(their: UnsafePointer<git_index_entry>?, our: UnsafePointer<git_index_entry>?, ancestor: UnsafePointer<git_index_entry>?) -> String? {
+    return our.asNonOptional.map{ $0.pointee.path }.flatMap{ $0.asNonOptional }.map{ String(cString: $0) }.maybeSuccess ??
+        their.asNonOptional.map{ $0.pointee.path }.flatMap{ $0.asNonOptional }.map{ String(cString: $0) }.maybeSuccess ??
+        ancestor.asNonOptional.map{ $0.pointee.path }.flatMap{ $0.asNonOptional }.map{ String(cString: $0) }.maybeSuccess
 }
