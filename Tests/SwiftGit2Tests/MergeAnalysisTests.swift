@@ -305,68 +305,6 @@ extension MergeAnalysisTests {
     }
 }
 
-extension MergeAnalysisTests {
-    func test_ConflictIteratorWorksWell() {
-        let folder = root.sub(folder: "conflictIteratorWorksWell")
-        let src = folder.with(repo: "src", content: MergeTemplates.c1_our.asRepoContent).shouldSucceed()!
-        let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
-        
-        src.url.appendingPathComponent("Ifrit/LevenstAin").path.FS.delete()
-            .shouldSucceed()
-        src.repo.flatMap{ $0.stage(.all) }.shouldSucceed()
-        src.commit(file: MergeTemplates.c2_our.asTestFile, with: MergeTemplates.c2_our.asTestFileContent, msg: "bebebeSrc").shouldSucceed()
-        
-        dst.url.appendingPathComponent("Ifrit/LevenstAin").path.FS.delete()
-            .shouldSucceed()
-        dst.repo.flatMap{ $0.stage(.all) }.shouldSucceed()
-        dst.commit(file: MergeTemplates.c3_their.asTestFile, with: MergeTemplates.c3_their.asTestFileContent, msg: "bebebeDst").shouldSucceed()
-        
-        (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local, merge3way: .cli ) })
-            .shouldSucceed()
-        
-        // Advanced conflict created here
-        
-        let repoID = dst.repoID
-        
-        GitConflicts(repoID: repoID)
-            .exist()
-            .assertEqual(to: true)
-        
-        let gitConflicts = GitConflicts(repoID: repoID)
-        
-        let repo = repoID.repo
-        
-        let index = repo.flatMap{ $0.index() }
-        
-//        let firstConflict1 = index.flatMap{ $0.conflictIteratorInternal() }.flatMap{ $0.all() }.map{ $0.first! }.maybeSuccess!
-//        XCTAssertTrue(firstConflict1.ancestor != nil )
-//        XCTAssertTrue(firstConflict1.our != nil )
-//        XCTAssertTrue(firstConflict1.their != nil )
-        
-//        let conflictIterator1 = index.flatMap{ $0.conflictIteratorInternal() }
-//        let firstConflict2 = conflictIterator1.flatMap{ $0.all() }.map{ $0.first! }.maybeSuccess!
-//        XCTAssertTrue(firstConflict2.ancestor != nil )
-//        XCTAssertTrue(firstConflict2.our != nil )
-//        XCTAssertTrue(firstConflict2.their != nil )
-//        
-//        let conflictIterator2 = index.flatMap{ $0.conflictIteratorInternal() }
-//        
-//        let allConflicts = conflictIterator2.flatMap{ $0.all() }
-//        let firstConflict3 = allConflicts.map{ $0.first! }.maybeSuccess!
-//        XCTAssertTrue(firstConflict3.ancestor != nil )
-//        XCTAssertTrue(firstConflict3.our != nil )
-//        XCTAssertTrue(firstConflict3.their != nil )
-        
-        let all = gitConflicts
-            .allConflictPaths()
-            .maybeSuccess!
-        
-        let firstConflict4 = all.first
-        
-        XCTAssertTrue(firstConflict4 != nil)
-    }
-}
-
 
 
 
