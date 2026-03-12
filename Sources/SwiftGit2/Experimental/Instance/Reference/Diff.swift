@@ -28,7 +28,7 @@ public class Diff: InstanceProtocol {
                                         rename_from_rewrite_threshold: 50,
                                         copy_threshold: 50,
                                         break_rewrite_threshold: 60,
-                                        rename_limit: 200, metric: nil)
+                                        rename_limit: 1000, metric: nil)
 
         return git_try("git_diff_find_options") { git_diff_find_similar(pointer, &opt) }
             .map { self }
