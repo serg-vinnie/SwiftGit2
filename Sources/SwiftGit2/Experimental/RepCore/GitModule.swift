@@ -29,11 +29,19 @@ public struct GitModule : CustomStringConvertible {
         }
         return result //.merging(subModulesRecursive) { a, b in a }
     }
+    
+    // Does not return id for .unregistered state of submodule
     public var submoduleIDs : [SubmoduleID] {
         subModules.compactMapValues { $0 }.map { key,value in
             SubmoduleID(repoID: self.repoID, name: key)
         }
     }
+    
+    public var submoduleRepoIDs : [RepoID] {
+        let a = repoID.repo.flatMap{ $0.childrenURLs }
+        return a.map{ $0.map{ RepoID(url: $0) } }.maybeSuccess ?? []
+    }
+    
     public let subModules : OrderedDictionary<String,GitModule?>
     public var subModulesRecursive : OrderedDictionary<String,GitModule?> {
         var results = OrderedDictionary<String,GitModule?>()
