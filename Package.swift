@@ -29,7 +29,7 @@ let package = Package(
         .target(
             name: "Git2Init",
             dependencies: ["Clibgit2"],
-            path: "Sources/Cibgit2Init"
+            path: "Sources/Git2Init"
         ),
         
         .target(
