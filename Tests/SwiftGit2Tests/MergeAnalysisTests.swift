@@ -112,7 +112,7 @@ class MergeAnalysisTests: XCTestCase {
             .shouldSucceed("rows")
     }
     
-    func test_shoulConflict() {
+    func test_shouldConflict() {
         let folder = root.sub(folder: "conflict").cleared().shouldSucceed()!
         let src = folder.with(repo: "src", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
         let dst = folder.with(repo: "dst", content: .clone(src.url, .local)).shouldSucceed()!
@@ -128,6 +128,54 @@ class MergeAnalysisTests: XCTestCase {
         (dst.repo | { $0.pull(refspec: [], .HEAD, options: .local) })
             .map { $0.hasConflict }
             .assertEqual(to: true, "Pull has conflict")
+    }
+    
+    func test_submodGitLinkMergeIsGoing() {
+//        submodMergeIsGoing(gitLink: false) // all is ok
+        submodMergeIsGoing(gitLink: true) // failing
+    }
+    
+    func submodMergeIsGoing(gitLink: Bool) {
+        let submoduleName = "ForMergeTests"
+        let submodMainBranch = "master"
+        let submodBranch2 = "branch2"
+        
+        // create root repo
+        let folder = root.sub(folder: "submodMergeIsGoing").cleared().shouldSucceed()!
+        let parent = folder.with(repo: "parent", content: .commit(.fileA, .random, "initial commit")).shouldSucceed()!
+        
+        _ = parent.repo.flatMap{ $0.add(submodule: submoduleName, remote: "https://gitlab.com/UKS/ForMergeTests.git", gitlink: gitLink) }
+            .shouldSucceed()!
+        
+        _ = parent.stageAllAndCommit(withMsg: "added submod").shouldSucceed()!
+        // submodule added
+        
+        let submod = root.sub(folder: "submodMergeIsGoing").sub(folder: "parent").sub(folder: submoduleName)
+        let submodFile = submod.url.appendingPathComponent("File1.txt")
+        try! File(url: submodFile).setContent("ggg\nAAA\(UUID().uuidString)AAA\nggg")
+        _ = submod.stageAllAndCommit(withMsg: "File1 added").shouldSucceed()!
+        
+        let mainBranch = submod.repo.flatMap{ $0.headBranch() }.shouldSucceed()!
+        
+        _ = submod.repo.flatMap{ $0.createBranch(from: .HEAD, name: submodBranch2, checkout: true) }.shouldSucceed()!
+        try! File(url: submodFile).setContent("ggg\nABA\(UUID().uuidString)ACA\nggg")
+        _ = submod.stageAllAndCommit(withMsg: "File1 chanded in another branch").shouldSucceed()!
+        
+        let branch2 = submod.repo.flatMap{ $0.headBranch() }.shouldSucceed()!
+        
+        _ = submod.repo.flatMap{ $0.checkout(branch: mainBranch, stashing: false) }
+        _ = submod.repo.flatMap{ $0.discardAll() }
+        
+        try! File(url: submodFile).setContent("ggg\nAPA\(UUID().uuidString)ACA\nggg")
+        _ = submod.stageAllAndCommit(withMsg: "File1 chanded in main").shouldSucceed()!
+        
+        //doing merge and got conflict
+        _ = submod.repo.flatMap{
+            $0.mergeIntoHEAD(their: branch2.nameAsReference, signature: .test, options: MergeOptions() )
+        }.shouldSucceed()!
+        
+        let isInMerge = submod.repo.map{ $0.state == .merge }.maybeSuccess!
+        XCTAssertTrue(isInMerge)
     }
 }
 
@@ -465,5 +513,13 @@ fileprivate extension MergeAnalysisTests {
             .assertEqual(to: true)
         
         return folder
+    }
+}
+
+extension TestFolder {
+    func stageAllAndCommit(withMsg: String) -> R<Commit> {
+        _ = self.repo.flatMap{ $0.addAllFiles() }.shouldSucceed()!
+        
+        return self.repo.flatMap{ $0.commit(message: withMsg, signature: .test) }
     }
 }

@@ -238,20 +238,24 @@ fileprivate extension Repository {
             .if(\.hasConflicts,
                 then: { index in
                     parents
-                        .map {
+                        .map { parents in
                             // MERGE_HEAD creation
-                            let _ = RevFile( repo: repo, type: .PullMsg)?
-                                .generatePullMsg(from: index, msg: nil)
-                                .save()
-
+                            let _ = repo.revFile(type: .PullMsg)
+                                .flatMap{
+                                    $0.generatePullMsg(from: index, msg: nil)
+                                        .save()
+                                }
+                            
                             // MERGE_MODE creation
-                            let _ = RevFile(repo: repo, type: .MergeMode )?
-                                .save()
-
+                            let _ = repo.revFile(type: .MergeMode)
+                                .flatMap{ $0.save() }
+                            
                             // MERGE_HEAD creation
-                            OidRevFile( repo: repo, type: .MergeHead)?
-                                .setOid(from: $0[1] )
-                                .save()
+                            let _ = repo.oidRevFile(type: .MergeHead)
+                                .flatMap{
+                                    $0.setOid(from: parents[1] )
+                                        .save()
+                                }
                             
                             return
                         }//.flatMap { _ in GitStasher(repo: self, state: .tag("merge")).push() }

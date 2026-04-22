@@ -27,20 +27,26 @@ extension RepoID {
     
     public func goMergeMode(index: Index, theirOID: OID, message: String?) -> R<Void> {
         // MERGE_HEAD creation
-        let msg = RevFile(repoID: self, type: .PullMsg)
-            .generatePullMsg(from: index, msg: message)
-            .save()
+        let pullMsgRev = self.revFile(type: .PullMsg)
+            .flatMap{
+                $0.generatePullMsg(from: index, msg: message)
+                    .save()
+            }
         
         // MERGE_MODE creation
-        let mergeMode = RevFile(repoID: self, type: .MergeMode )
-            .save()
+        let mergeModeRev = self.revFile(type: .MergeMode)
+            .flatMap{
+                $0.save()
+            }
         
         // MERGE_HEAD creation
-        let head = OidRevFile(repoID: self, type: .MergeHead)
-            .set(oid: theirOID)
-            .save()
+        let headRev = self.oidRevFile(type: .MergeHead)
+            .flatMap{
+                $0.set(oid: theirOID)
+                    .save()
+            }
         
-        return combine(msg, mergeMode, head).asVoid
+        return combine(pullMsgRev, mergeModeRev, headRev).asVoid
     }
 }
 
@@ -128,20 +134,26 @@ public extension Repository {
         }
     }
     
-    private func goMergeMode(index: Index, theirOID: OID, message: String?) {
+    private func goMergeMode(index: Index, theirOID: OID, message: String?) -> R<Void> {
         // MERGE_HEAD creation
-        _ = RevFile( repo: self, type: .PullMsg)?
-            .generatePullMsg(from: index, msg: message)
-            .save()
+        let pullMsgRev = self.revFile(type: .PullMsg)
+            .flatMap{
+                $0.generatePullMsg(from: index, msg: message)
+                    .save()
+            }
         
         // MERGE_MODE creation
-        _ = RevFile(repo: self, type: .MergeMode )?
-            .save()
+        let mergeModeRev = self.revFile(type: .MergeMode)
+            .flatMap{ $0.save() }
         
         // MERGE_HEAD creation
-        _ = OidRevFile( repo: self, type: .MergeHead)?
-            .set(oid: theirOID)
-            .save()
+        let headRev = self.oidRevFile(type: .MergeHead)
+            .flatMap{
+                $0.set(oid: theirOID)
+                    .save()
+            }
+        
+        return combine(pullMsgRev, mergeModeRev, headRev).asVoid
     }
     
     func mergeAndCommit(anal: MergeAnalysis, our: Branch, their: Branch, signature: Signature, options: MergeOptions, stashing: Bool = false) -> Result<MergeResult, Error> {

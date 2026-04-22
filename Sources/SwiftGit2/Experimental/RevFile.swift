@@ -1,13 +1,40 @@
-//
-//  RevFile.swift
-//  AppCore
-//
-//  Created by UKS on 03.08.2021.
-//  Copyright © 2021 Loki. All rights reserved.
-//
 
 import Foundation
 import Essentials
+
+public extension Repository {
+    func revFile(type: RevFileType) -> R<RevFile> {
+        guard let revFile = RevFile(repo: self, type: type)
+        else { return .failure( WTF("Failed to init RevFile: \(type)") )}
+        
+        return .success(revFile)
+    }
+    
+    func oidRevFile(type: OidRevFileType) -> R<OidRevFile> {
+        guard let revFile = OidRevFile(repo: self, type: type)
+        else { return .failure( WTF("Failed to init OidRevFile: \(type)") )}
+        
+        return .success(revFile)
+    }
+}
+
+public extension RepoID {
+    func revFile(type: RevFileType) -> R<RevFile> {
+        guard let revFile = RevFile(repoID: self, type: type)
+        else { return .failure( WTF("Failed to init RevFile: \(type)") )}
+        
+        return .success(revFile)
+    }
+    
+    func oidRevFile(type: OidRevFileType) -> R<OidRevFile> {
+        guard let revFile = OidRevFile(repoID: self, type: type)
+        else { return .failure( WTF("Failed to init OidRevFile: \(type)") )}
+        
+        return .success(revFile)
+    }
+}
+
+
 
 public class OidRevFile {
     private var content: String?
@@ -24,7 +51,7 @@ public class OidRevFile {
     
     private var gitDir: URL
     
-    public init? ( repo: Repository, type: OidRevFileType ) {
+    fileprivate init? ( repo: Repository, type: OidRevFileType ) {
         guard let gitDir = (try? repo.gitDirUrl.get() )?.absoluteURL else { return nil }
         
         self.type = type
@@ -34,9 +61,11 @@ public class OidRevFile {
         getContent(type: type)
     }
     
-    public init(repoID: RepoID, type: OidRevFileType) {        
+    fileprivate init?(repoID: RepoID, type: OidRevFileType) {
+        guard let gitDir = repoID.repo.flatMap({ $0.gitDirUrl }).maybeSuccess?.absoluteURL else { return nil }
+        
         self.type = type
-        self.gitDir = repoID.url.appendingPathComponent(".git")
+        self.gitDir = gitDir
         self.content = nil
         
         getContent(type: type)
@@ -70,11 +99,14 @@ public class OidRevFile {
         return self
     }
     
-    public func save() -> R<Void> {
+    public func save() -> R<OidRevFile> {
         let url = gitDir.appendingPathComponent("MERGE_HEAD")
         
         switch type {
-        case .MergeHead:    return content.asNonOptional("content") | { url.write(content: $0).asVoid }
+        case .MergeHead:    return content
+                .asNonOptional("content")
+                .flatMap{ url.write(content: $0).asVoid }
+                .map{ _ in self }
         default:            return .wtf("OidRevFile wrong type \(type)")
         }
     }
@@ -120,7 +152,7 @@ public class RevFile {
     
     private var gitDir: URL
     
-    public init?( repo: Repository, type: RevFileType ) {
+    fileprivate init?( repo: Repository, type: RevFileType ) {
         guard let gitDir = (try? repo.gitDirUrl.get() )?.absoluteURL else { return nil }
         
         self.type = type
@@ -128,9 +160,11 @@ public class RevFile {
         self.content = File(url: gitDir.appendingPathComponent(type.asFileName())).getContent()
     }
     
-    public init(repoID: RepoID, type: RevFileType ) {
+    fileprivate init?(repoID: RepoID, type: RevFileType ) {
+        guard let gitDir = repoID.repo.flatMap({ $0.gitDirUrl }).maybeSuccess?.absoluteURL else { return nil }
+        
         self.type = type
-        self.gitDir = repoID.url.appendingPathComponent(".git")
+        self.gitDir = gitDir
         self.content = File(url: gitDir.appendingPathComponent(type.asFileName())).getContent()
     }
     
@@ -181,9 +215,9 @@ public class RevFile {
         return self
     }
     
-    public func save() -> R<Void> {
+    public func save() -> R<RevFile> {
         let url = gitDir.appendingPathComponent( self.type.asFileName() )
-        return url.write(content: self.content ?? "").asVoid
+        return url.write(content: self.content ?? "").asVoid.map{ _ in self }
     }
     
     public func delete() -> RevFile {
