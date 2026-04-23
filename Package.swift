@@ -23,7 +23,7 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "Clibgit2",
-            path: "Sources/Clibgit2/Clibgit2.xcframework"
+            path: "Artifacts/Clibgit2.xcframework"
         ),
         
         .target(
