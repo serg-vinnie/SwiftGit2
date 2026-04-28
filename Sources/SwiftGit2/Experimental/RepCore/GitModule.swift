@@ -103,6 +103,9 @@ public struct GitModule : CustomStringConvertible {
             $0.submodules() | { $0 | { $0.update(options: options, init: `init`) } }
         } | { _ in () }
     }
+    
+//    public func initModule(){
+//    }
 }
 
 /*

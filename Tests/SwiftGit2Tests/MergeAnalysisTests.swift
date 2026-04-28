@@ -233,6 +233,7 @@ extension MergeAnalysisTests {
                 .flatMap { $0.status() }
                 .map { $0.count == 0 }
                 .assertEqual(to: true , "After --resolve as OUR-- must be 0 file with changes")
+            
         case .their:
             repoID.url.appendingPathComponent(path).readToString
                 .assertEqual(to: TestFileContent.oneLine1.content)

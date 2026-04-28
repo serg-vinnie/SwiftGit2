@@ -161,6 +161,7 @@ public extension Repository {
         }
     }
     
+    // Create means Initialize
     class func create(at url: URL) -> Result<Repository, Error> {
         guard !Repository.exists(at: url) else { return .wtf("Repository already exists") }
         

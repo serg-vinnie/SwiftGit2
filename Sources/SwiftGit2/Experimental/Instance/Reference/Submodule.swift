@@ -235,9 +235,9 @@ public extension Submodule {
             git_submodule_add_finalize(self.pointer)
         }
     }
-
+    
     // TODO: Test Me. Especially "overwrite"
-    func `init`(overwrite: Bool) -> R<Submodule> {
+    func submodule_init(overwrite: Bool) -> R<Submodule> {
         git_try("git_submodule_init") {
             git_submodule_init(self.pointer, overwrite ? 1 : 0)
         } | { self }
